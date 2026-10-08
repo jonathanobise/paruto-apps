@@ -1,0 +1,63 @@
+{
+  "site": {
+    "name": "Paruto Apps",
+    "eyebrow": "Built by Paruto",
+    "headline": "Apps we're building.",
+    "subheadline": "A growing collection of products from Paruto — playful, useful and made with care. Tap any app to see it up close.",
+    "contactEmail": "hello@paruto.com",
+    "footer": "© Paruto. All rights reserved."
+  },
+  "apps": [
+    {
+      "id": "paruto-kids-world",
+      "name": "Paruto Kids World",
+      "tagline": "An explorable 3D village where little ones learn and play.",
+      "description": "A browser-based 3D village for children aged 2–5. Kids walk around with Jas, Jay and baby Joe, step into buildings like the market, farm and story house, and play gentle learning games for letters and counting. A grown-up gate keeps the parent area separate, with safeguarding built in from day one.",
+      "status": "in-development",
+      "category": "Kids & Learning",
+      "platforms": ["Web"],
+      "accent": "#34d399",
+      "accent2": "#38bdf8",
+      "icon": "🏡",
+      "added": "2026-09-26",
+      "featured": true,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Walkable 3D world with six zones",
+        "Three complete learning games",
+        "Parent area behind a grown-up gate"
+      ],
+      "cover": "assets/apps/paruto-kids-world/world-square.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/paruto-kids-world/world-square.jpg", "caption": "The village square" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/farm.jpg", "caption": "The farm" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/inside-market.jpg", "caption": "Inside the market" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/mobile-world.jpg", "caption": "On a phone", "device": "phone" }
+      ]
+    },
+    {
+      "id": "naija-hustle",
+      "name": "Naija Hustle",
+      "tagline": "A multiplayer life simulation set in the streets of Lagos.",
+      "description": "A persistent, mobile-first browser life sim set in Nigerian cities. Start in Lagos, earn, trade and build a life alongside other players in a living, server-driven economy.",
+      "status": "in-development",
+      "category": "Games",
+      "platforms": ["Web", "Mobile"],
+      "accent": "#fbbf24",
+      "accent2": "#f43f5e",
+      "icon": "🌆",
+      "added": "2026-09-01",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Multiplayer, persistent world",
+        "Mobile-first",
+        "Starting with Lagos — Block One"
+      ],
+      "cover": "",
+      "media": []
+    }
+  ]
+}

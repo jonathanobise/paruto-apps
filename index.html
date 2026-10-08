@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Paruto Apps</title>
+  <meta name="description" content="A showcase of the apps being built by Paruto.">
+  <meta name="theme-color" content="#060608">
+  <meta property="og:title" content="Paruto Apps">
+  <meta property="og:description" content="A showcase of the apps being built by Paruto.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <!-- Apple devices use SF Pro / SF Mono via the system stack; these are the fallbacks elsewhere -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Floating Liquid Glass nav -->
+  <header class="nav glass" id="nav">
+    <a class="brand" href="#top" aria-label="Home">
+      <span class="mark" aria-hidden="true"></span>
+      <span id="brandName">Paruto Apps</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#index">Index</a>
+      <a href="#work">Showcase</a>
+    </nav>
+    <a class="nav-cta" id="contactLink" href="#contact">Contact</a>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-inner wrap">
+        <a class="chip-link glass" href="#index">
+          <span class="pulse" aria-hidden="true"></span>
+          <span id="eyebrow"></span>
+          <span class="chip-sep" aria-hidden="true"></span>
+          <span class="mono" id="eyebrowCount"></span>
+          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <h1 id="headline"></h1>
+        <p class="sub" id="subheadline"></p>
+        <div class="hero-ctas">
+          <a class="btn primary" href="#index">Explore the apps</a>
+          <a class="btn ghost glass" id="heroContact" href="#contact">Get in touch</a>
+        </div>
+      </div>
+      <div class="wall" id="wall" aria-hidden="true"></div>
+    </section>
+
+    <section class="statsbar wrap" aria-label="At a glance">
+      <dl class="stats" id="stats"></dl>
+    </section>
+
+    <!-- Index -->
+    <section class="section wrap" id="index" aria-labelledby="indexTitle">
+      <header class="section-head">
+        <div>
+          <p class="label mono">(01) Index</p>
+          <h2 id="indexTitle">Everything we're <em>making</em>.</h2>
+        </div>
+        <div class="filters glass" id="filters" role="tablist" aria-label="Filter apps"></div>
+      </header>
+      <ol class="list" id="list"></ol>
+      <p class="empty mono" id="empty" hidden>Nothing here yet.</p>
+    </section>
+
+    <!-- Showcase -->
+    <section class="section wrap" id="work" aria-labelledby="workTitle">
+      <header class="section-head">
+        <div>
+          <p class="label mono">(02) Showcase</p>
+          <h2 id="workTitle">Up <em>close</em>.</h2>
+        </div>
+      </header>
+      <div class="apps" id="apps"></div>
+    </section>
+  </main>
+
+  <footer class="footer wrap" id="contact">
+    <div class="cta panel">
+      <p class="label mono">(03) Contact</p>
+      <h2>Have an idea? Let's <em>talk</em>.</h2>
+      <a class="footer-email" id="footerEmail" href="#"></a>
+    </div>
+    <div class="wordmark" id="wordmark" aria-hidden="true"></div>
+    <div class="footer-bottom mono">
+      <span id="footerText"></span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <!-- Floating preview that follows the cursor over the index -->
+  <div class="peek glass" id="peek" aria-hidden="true"></div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="lb-btn glass lb-close" data-lb-close aria-label="Close">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <button class="lb-btn glass lb-prev" id="lbPrev" aria-label="Previous">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <figure id="lbFigure"></figure>
+    <button class="lb-btn glass lb-next" id="lbNext" aria-label="Next">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <p class="lb-count mono" id="lbCount"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
