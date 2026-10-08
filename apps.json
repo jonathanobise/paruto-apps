@@ -56,6 +56,34 @@
         "Mobile-first",
         "Starting with Lagos — Block One"
       ],
+      "cover": "assets/apps/naija-hustle/landing.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/naija-hustle/landing.jpg", "caption": "Claim your username and start with ₦10m" },
+        { "type": "image", "src": "assets/apps/naija-hustle/mobile-landing.jpg", "caption": "Mobile-first", "device": "phone" },
+        { "type": "image", "src": "assets/apps/naija-hustle/enter-naija.jpg", "caption": "Enter Naija" },
+        { "type": "image", "src": "assets/apps/naija-hustle/what-you-can-build.jpg", "caption": "What you can build" }
+      ]
+    },
+    {
+      "id": "casefile-africa",
+      "name": "Casefile Africa",
+      "tagline": "A 3D detective game: solve crimes and build cases that hold up in court.",
+      "description": "A premium, browser-based 3D investigation game. You play an investigator with a fictional federal agency: examine crime scenes, interview witnesses, send evidence to the lab and build a case that stands up in court. Case 001, The Maitama Ledger, opens at a rain-soaked murder scene in an upscale Abuja estate.",
+      "status": "in-development",
+      "category": "Games",
+      "platforms": ["Web"],
+      "accent": "#facc15",
+      "accent2": "#1e40af",
+      "icon": "🕵🏾",
+      "added": "2026-10-08",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Explore 3D crime scenes in first person",
+        "Interview witnesses who remember, trust and lie",
+        "Fair-play cases: every answer can be deduced from the evidence"
+      ],
       "cover": "",
       "media": []
     }
