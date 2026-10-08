@@ -46,7 +46,12 @@ Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder)
 Site-level text (`site` object): `name`, `eyebrow`, `headline`, `subheadline`, `contactEmail` (currently hello@paruto.com; used by every contact link), `footer`, and optional `wordmark` (the big footer word; defaults to the first word of `name`).
 
 ## Deploying
-Static files only — deploy the repo root as-is (Cloudflare Pages / Netlify / Vercel / GitHub Pages, no build command, no output dir). See README.md. After editing, remind the user to commit/push (or redeploy) so the change goes live — don't push without being asked.
+Live at **https://apps.paruto.com** via **GitHub Pages** from `master` of the public repo `jonathanobise/paruto-apps` (no build step; `CNAME` + `.nojekyll` at the root — don't delete them). DNS: a CNAME record `apps` → `jonathanobise.github.io.` in DreamHost. HTTPS is enforced (Let's Encrypt, auto-renewed).
+- **Every push to `master` redeploys** within a minute or two. After editing, remind the user to commit/push — don't push without being asked.
+- `gh` lives at `/opt/homebrew/bin/gh` (not on the non-interactive PATH). Local git is old (2.15): push with
+  `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`
+  or pushes containing images fail with HTTP 400.
+- Check a deploy with `gh api repos/jonathanobise/paruto-apps/pages --jq .status` (wait for `built`).
 
 ## Style rules
 - Don't hand-edit HTML for content; keep content in `apps.json`.
