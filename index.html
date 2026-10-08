@@ -15,6 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Dark by default; apply a saved light preference before first paint (no flash)
+    try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}
+  </script>
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -29,7 +33,13 @@
       <a href="#index">Index</a>
       <a href="#work">Showcase</a>
     </nav>
-    <a class="nav-cta" id="contactLink" href="#contact">Contact</a>
+    <div class="nav-end">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="nav-cta" id="contactLink" href="#contact">Contact</a>
+    </div>
   </header>
 
   <main id="top">

@@ -337,6 +337,24 @@
     }, { passive: true });
   }
 
+  /* ---------- Theme: dark by default, light is opt-in and remembered ---------- */
+  function setupThemeToggle() {
+    const btn = $("themeToggle");
+    const root = document.documentElement;
+    const sync = () => {
+      const light = root.dataset.theme === "light";
+      btn.setAttribute("aria-label", light ? "Switch to dark mode" : "Switch to light mode");
+      document.querySelector('meta[name="theme-color"]').content = light ? "#f5f5f7" : "#060608";
+    };
+    btn.addEventListener("click", () => {
+      const light = root.dataset.theme !== "light";
+      if (light) root.dataset.theme = "light"; else delete root.dataset.theme;
+      try { localStorage.setItem("theme", light ? "light" : "dark"); } catch {}
+      sync();
+    });
+    sync();
+  }
+
   /* ---------- Lightbox ---------- */
   function openLightbox(items, i) {
     if (!items.length) return;
@@ -394,7 +412,7 @@
     state.apps = [...state.data.apps].sort((a, b) =>
       (b.featured === true) - (a.featured === true) || (b.added || "").localeCompare(a.added || ""));
 
-    renderChrome(); renderWall(); renderFilters(); renderApps(); setupPeek(); setupPointerFx(); setupNav();
+    renderChrome(); renderWall(); renderFilters(); renderApps(); setupPeek(); setupPointerFx(); setupNav(); setupThemeToggle();
     if (location.hash.startsWith("#/")) requestAnimationFrame(route);
 
     addEventListener("hashchange", route);
