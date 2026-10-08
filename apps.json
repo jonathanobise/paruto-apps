@@ -69,7 +69,7 @@
       "name": "Casefile Africa",
       "tagline": "A 3D detective game: solve crimes and build cases that hold up in court.",
       "description": "A premium, browser-based 3D investigation game. You play an investigator with a fictional federal agency: examine crime scenes, interview witnesses, send evidence to the lab and build a case that stands up in court. Case 001, The Maitama Ledger, opens at a rain-soaked murder scene in an upscale Abuja estate.",
-      "status": "in-development",
+      "status": "live",
       "category": "Games",
       "platforms": ["Web"],
       "accent": "#facc15",
@@ -77,15 +77,22 @@
       "icon": "🕵🏾",
       "added": "2026-10-08",
       "featured": false,
-      "url": "",
+      "url": "https://casefile.paruto.com",
       "links": [],
       "highlights": [
         "Explore 3D crime scenes in first person",
         "Interview witnesses who remember, trust and lie",
         "Fair-play cases: every answer can be deduced from the evidence"
       ],
-      "cover": "",
-      "media": []
+      "cover": "assets/apps/casefile-africa/investigator-device.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/casefile-africa/title-screen.jpg", "caption": "Case 001: The Maitama Ledger" },
+        { "type": "image", "src": "assets/apps/casefile-africa/warrant-card.jpg", "caption": "Create your investigator" },
+        { "type": "image", "src": "assets/apps/casefile-africa/incoming-call.jpg", "caption": "The call comes in" },
+        { "type": "image", "src": "assets/apps/casefile-africa/arrival.jpg", "caption": "Maitama Heights, 23:58, heavy rain" },
+        { "type": "image", "src": "assets/apps/casefile-africa/crime-scene.jpg", "caption": "The crime scene" },
+        { "type": "image", "src": "assets/apps/casefile-africa/investigator-device.jpg", "caption": "The investigator device and case file" }
+      ]
     }
   ]
 }
