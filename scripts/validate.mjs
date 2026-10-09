@@ -17,6 +17,10 @@ try {
   process.exit(1);
 }
 
+(data.site?.family ?? []).forEach((f, i) => {
+  if (!f?.name || !/^https?:\/\//.test(f?.url ?? "")) errors.push(`site.family[${i}] needs a name and an http(s) url`);
+});
+
 const ids = new Set();
 const checkFile = (app, label, p) => {
   if (!p) return;

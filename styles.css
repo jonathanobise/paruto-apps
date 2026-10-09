@@ -257,13 +257,24 @@ h1 .w.serif { font-weight: 400; font-size: 1.1em; line-height: 0.8; letter-spaci
 /* Stats bar */
 .statsbar { margin-top: clamp(8px, 2vw, 24px); }
 .stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); margin: 0;
+  display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); margin: 0;
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
-.stats > div { display: flex; flex-direction: column-reverse; gap: 2px; padding: 22px clamp(12px, 2vw, 24px); border-left: 1px solid var(--line); }
+/* Number on top, label below, so every number sits on the same line even when a label wraps */
+.stats > div { display: flex; flex-direction: column; justify-content: flex-start; gap: 4px; padding: 22px clamp(12px, 2vw, 24px); border-left: 1px solid var(--line); }
 .stats > div:first-child { border-left: 0; padding-left: 0; }
-.stats dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); }
-.stats dd { margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 600; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stats dt { font-family: var(--mono); font-size: 11px; line-height: 1.35; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); }
+.stats dd { order: -1; margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 600; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+/* Phones: a clean 3-column grid with hairlines between rows (no stray wrapped cell) */
+@media (max-width: 640px) {
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stats > div { padding: 18px 12px; }
+  .stats > div:nth-child(3n+1) { border-left: 0; padding-left: 0; }
+  .stats > div:nth-child(n+4) { border-top: 1px solid var(--line); }
+  .stats > div:last-child:nth-child(3n+2) { grid-column: span 2; }  /* fill the row so its hairline runs full width */
+  .stats dd { font-size: 30px; }
+  .stats dt { font-size: 10px; letter-spacing: .06em; }
+}
 @keyframes fade { from { opacity: 0; } }
 
 /* ==========================================================================
@@ -279,6 +290,9 @@ h1 .w.serif { font-weight: 400; font-size: 1.1em; line-height: 0.8; letter-spaci
   display: flex; gap: 2px; padding: 4px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; max-width: 100%;
 }
 .filters::-webkit-scrollbar { display: none; }
+.filters.more-end { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); }
+.filters.more-start { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px); mask-image: linear-gradient(to right, transparent, #000 44px); }
+.filters.more-start.more-end { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); }
 .seg-thumb {
   position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; pointer-events: none;
   background: color-mix(in srgb, var(--text) 12%, transparent);
@@ -513,6 +527,35 @@ h1 .w.serif { font-weight: 400; font-size: 1.1em; line-height: 0.8; letter-spaci
 .footer-email:hover { scale: 1.04; }
 .footer-email svg { width: 16px; height: 16px; transition: translate .4s var(--spring); }
 .footer-email:hover svg { translate: 3px 0; }
+/* The Paruto family — sister companies */
+.family { margin-top: clamp(48px, 7vw, 88px); }
+.family-links {
+  list-style: none; margin: 16px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px;
+}
+.family-link {
+  position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%;
+  padding: 20px 44px 20px 20px; border-radius: 20px;
+  background: color-mix(in srgb, var(--text) 3%, transparent); box-shadow: inset 0 0 0 1px var(--line), inset 0 1px 0 var(--hi);
+  transition: background-color .3s, scale .45s var(--spring), box-shadow .3s;
+}
+.family-link:hover { background: color-mix(in srgb, var(--text) 6%, transparent); box-shadow: inset 0 0 0 1px var(--line-2), inset 0 1px 0 var(--hi); scale: 1.02; }
+.family-name { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+.family-note { font-size: 13.5px; line-height: 1.35; color: var(--muted); }
+.family-host { margin-top: auto; padding-top: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
+.family-arrow {
+  position: absolute; top: 18px; right: 16px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%;
+  color: var(--faint); box-shadow: inset 0 0 0 1px var(--line); transition: color .3s, background-color .3s, rotate .5s var(--spring);
+}
+.family-arrow svg { width: 11px; height: 11px; }
+.family-link:hover .family-arrow { color: var(--bg); background: var(--text); rotate: 45deg; }
+@media (max-width: 560px) {
+  .family-links { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .family-links li:first-child { grid-column: 1 / -1; }   /* the group spans the top; companies sit 2×2 below */
+  .family-link { padding: 16px 38px 16px 16px; border-radius: 18px; }
+  .family-arrow { top: 14px; right: 12px; }
+}
+
 .wordmark {
   margin-top: clamp(48px, 8vw, 112px); font-size: clamp(88px, 24vw, 360px); font-weight: 800; letter-spacing: -0.07em; line-height: 0.76;
   white-space: nowrap; user-select: none; text-align: center; overflow: hidden; padding-bottom: 0.04em;

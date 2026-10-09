@@ -70,6 +70,18 @@
     $("footerText").textContent = s.footer || "";
     $("wordmark").textContent = s.wordmark || first;
 
+    // The Paruto family: sister companies, from site.family
+    const family = (s.family || []).filter((f) => f && f.name && f.url);
+    $("family").hidden = !family.length;
+    $("familyLinks").replaceChildren(...family.map((f) =>
+      h("li", {},
+        h("a", { class: "family-link", href: f.url, target: "_blank", rel: "noopener" },
+          h("span", { class: "family-name" }, f.name),
+          f.note && h("span", { class: "family-note" }, f.note),
+          h("span", { class: "family-host" }, hostOf(f.url).replace(/^www\./, "")),
+          h("span", { class: "family-arrow", "aria-hidden": "true" }, svg(EXT))))
+    ));
+
     const email = s.contactEmail;
     const mail = email ? `mailto:${email}` : null;
     $("contactLink").href = mail || "#contact";
@@ -87,6 +99,7 @@
       ...byStatus.map(([st, n]) => stat(n, STATUS[st])),
       ...(cats ? [stat(cats, cats === 1 ? "Category" : "Categories")] : [])
     );
+    $("stats").style.setProperty("--cols", $("stats").children.length); // one row on wider screens
   }
 
   /* ---------- Hero wall: every app visual, drifting on a tilted plane ---------- */
@@ -145,6 +158,18 @@
     thumb.style.translate = `${sel.offsetLeft}px 0`;
     thumb.style.width = `${sel.offsetWidth}px`;
     if (instant) { void thumb.offsetWidth; thumb.style.transition = ""; }
+    // Keep the selected option visible when the bar scrolls (narrow screens)
+    if (wrap.scrollWidth > wrap.clientWidth) {
+      const left = sel.offsetLeft - (wrap.clientWidth - sel.offsetWidth) / 2;
+      wrap.scrollTo({ left: Math.max(0, left), behavior: instant || reduceMotion ? "auto" : "smooth" });
+    }
+    syncFilterFades();
+  }
+  // Fade whichever edge has more options, so the bar reads as scrollable
+  function syncFilterFades() {
+    const wrap = $("filters");
+    wrap.classList.toggle("more-start", wrap.scrollLeft > 2);
+    wrap.classList.toggle("more-end", wrap.scrollLeft + wrap.clientWidth < wrap.scrollWidth - 2);
   }
 
   const matches = (app) => {
@@ -418,6 +443,7 @@
 
     addEventListener("hashchange", route);
     addEventListener("resize", () => moveThumb(true));
+    $("filters").addEventListener("scroll", syncFilterFades, { passive: true });
     document.fonts?.ready.then(() => moveThumb(true));
     $("lightbox").addEventListener("click", (e) => {
       if (e.target.closest("[data-lb-close]") || e.target === $("lightbox") || e.target === $("lbFigure")) closeLightbox();

@@ -5,7 +5,14 @@
     "headline": "Apps we're building.",
     "subheadline": "A growing collection of products from Paruto — playful, useful and made with care. Tap any app to see it up close.",
     "contactEmail": "hello@paruto.com",
-    "footer": "© Paruto. All rights reserved."
+    "footer": "© Paruto. All rights reserved.",
+    "family": [
+      { "name": "Paruto", "url": "https://paruto.com", "note": "One group. Many possibilities." },
+      { "name": "Paruto Media", "url": "https://parutomedia.com", "note": "Development communication for Africa and beyond" },
+      { "name": "Paruto Music", "url": "https://parutomusic.com", "note": "Recording studio and record label" },
+      { "name": "Paruto Capital", "url": "https://parutocapital.com", "note": "Trading education: mastery, not hype" },
+      { "name": "Paruto Kids", "url": "https://parutokids.com", "note": "Songs, stories and play for little ones" }
+    ]
   },
   "apps": [
     {
