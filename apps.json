@@ -93,6 +93,130 @@
         { "type": "image", "src": "assets/apps/casefile-africa/crime-scene.jpg", "caption": "The crime scene" },
         { "type": "image", "src": "assets/apps/casefile-africa/investigator-device.jpg", "caption": "The investigator device and case file" }
       ]
+    },
+    {
+      "id": "my-mama",
+      "name": "My Mama",
+      "tagline": "A private women's-health companion, experienced as a warm 3D village.",
+      "description": "My Mama is a women's-health companion you explore as a calm 3D village. Walk the village, keep a private journal, track your cycle and prepare for care, at your own pace and through every stage of life. It offers information and a place to record your health; it does not diagnose.",
+      "status": "in-development",
+      "category": "Health",
+      "platforms": ["Web"],
+      "accent": "#c0507f",
+      "accent2": "#5b1f4a",
+      "icon": "🌸",
+      "added": "2026-10-09",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "A calm 3D village to explore",
+        "Private by default: your journal and records stay yours",
+        "Support through every stage of life"
+      ],
+      "cover": "assets/apps/my-mama/village.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/my-mama/village.jpg", "caption": "The village" },
+        { "type": "image", "src": "assets/apps/my-mama/mobile-welcome.jpg", "caption": "A warm place to look after yourself", "device": "phone" },
+        { "type": "image", "src": "assets/apps/my-mama/mobile-what-brings-you.jpg", "caption": "Make it yours", "device": "phone" },
+        { "type": "image", "src": "assets/apps/my-mama/mobile-village.jpg", "caption": "The village on a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/my-mama/welcome.jpg", "caption": "Welcome" }
+      ]
+    },
+    {
+      "id": "paruto-galleries",
+      "name": "Paruto Galleries",
+      "tagline": "Private photo and film delivery for Paruto Media clients.",
+      "description": "Paruto Media's client-gallery service. Clients open a private link, optionally password-protected, to view their photos and films, favourite and send selections, and download them, without ever creating an account.",
+      "status": "live",
+      "category": "Media",
+      "platforms": ["Web"],
+      "accent": "#d4a94a",
+      "accent2": "#7a5414",
+      "icon": "🖼️",
+      "added": "2026-10-08",
+      "featured": false,
+      "url": "https://galleries.paruto.com",
+      "links": [{ "label": "Paruto Media", "url": "https://www.parutomedia.com" }],
+      "highlights": [
+        "Private gallery links, with optional passwords",
+        "Favourite, select and download in one place",
+        "No client accounts needed"
+      ],
+      "cover": "assets/apps/paruto-galleries/home.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/paruto-galleries/home.jpg", "caption": "Client galleries" },
+        { "type": "image", "src": "assets/apps/paruto-galleries/mobile-home.jpg", "caption": "On a phone", "device": "phone" }
+      ]
+    },
+    {
+      "id": "paruto-finance",
+      "name": "Paruto Finance",
+      "tagline": "Mobile-first accounting for invoices, payments, expenses and project profitability.",
+      "description": "A mobile-first accounting platform for managing invoices, receipts, payments, expenses and project profitability. Built for Paruto and designed to scale to other organisations, it brings multi-currency finances, approvals and financial reporting into one simple workspace.",
+      "status": "in-development",
+      "category": "Finance",
+      "platforms": ["Web"],
+      "accent": "#34d399",
+      "accent2": "#065f46",
+      "icon": "📊",
+      "added": "2026-10-09",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Invoices, receipts, payments and expenses in one workspace",
+        "Multi-currency, with approvals built in",
+        "Project profitability and financial reporting"
+      ],
+      "cover": "",
+      "media": []
+    },
+    {
+      "id": "churchsense",
+      "name": "ChurchSense",
+      "tagline": "Turn attendance, giving, follow-up and ministry data into clear insights and action.",
+      "description": "A church operations and ministry intelligence platform. ChurchSense helps churches capture attendance, track giving and follow-up, manage users and locations, generate reports and monitor ministry health. Built for pastors, administrators, service leaders and ministry teams, with role-based access, location-level reporting, dashboards, notifications, AI-powered insights and mobile-friendly workflows.",
+      "status": "coming-soon",
+      "category": "Ministry",
+      "platforms": ["Web"],
+      "accent": "#818cf8",
+      "accent2": "#312e81",
+      "icon": "⛪",
+      "added": "2026-10-09",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Attendance, giving and follow-up in one place",
+        "Role-based access and location-level reporting",
+        "AI-powered insights for church leaders"
+      ],
+      "cover": "",
+      "media": []
+    },
+    {
+      "id": "paruto-bid",
+      "name": "Paruto Bid",
+      "tagline": "AI-powered bid management, from tender discovery to submission-ready proposals.",
+      "description": "An AI-powered procurement and bid management platform. Paruto Bid analyses RFPs, tracks compliance requirements, organises evidence and past performance, and supports technical and financial proposal development, helping teams manage bids with greater accuracy, speed and control.",
+      "status": "coming-soon",
+      "category": "Business",
+      "platforms": ["Web"],
+      "accent": "#38bdf8",
+      "accent2": "#0f3a5f",
+      "icon": "📑",
+      "added": "2026-10-09",
+      "featured": false,
+      "url": "",
+      "links": [],
+      "highlights": [
+        "Analyse RFPs and track compliance requirements",
+        "Organise evidence and past performance",
+        "Develop technical and financial proposals together"
+      ],
+      "cover": "",
+      "media": []
     }
   ]
 }
