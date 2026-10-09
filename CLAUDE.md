@@ -31,13 +31,13 @@ Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder)
 | --- | --- |
 | `id` | kebab-case, unique, used in the URL hash |
 | `name`, `tagline`, `description` | `tagline` ≈ one line; `description` ≈ 2–4 sentences |
-| `status` | `live` · `beta` · `in-development` · `coming-soon` |
+| `status` | `live` · `beta` · `in-development` · `coming-soon` — apps are listed in this order (live first) |
 | `category` | free text; becomes a filter option automatically |
 | `platforms` | e.g. `["Web", "iOS", "Android"]` |
 | `accent`, `accent2` | hex colours for the app icon gradient, panel tint and glow |
 | `icon` | an emoji (or short text) drawn inside the layered app icon |
-| `added` | `YYYY-MM-DD`; newest apps are listed first |
-| `featured` | `true` pins the app to the top of the index and showcase |
+| `added` | `YYYY-MM-DD`; within a status group, newest apps are listed first |
+| `featured` | `true` puts the app first within its status group |
 | `url`, `links` | primary link ("Open app") and extra `{label, url}` buttons |
 | `highlights` | 2–4 short phrases shown as a checklist |
 | `cover` | landscape (~16:10) image for the Mac-window frame (optional) |

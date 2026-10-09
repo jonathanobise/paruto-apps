@@ -408,9 +408,10 @@
       $("subheadline").textContent = "apps.json failed to load. If you opened this file directly, run a local server (see README).";
       return;
     }
-    // Featured apps first, then newest first
+    // Live apps first (then beta, in development, coming soon); within a status, featured first, then newest
+    const rank = (app) => { const i = STATUS_ORDER.indexOf(app.status); return i === -1 ? STATUS_ORDER.length : i; };
     state.apps = [...state.data.apps].sort((a, b) =>
-      (b.featured === true) - (a.featured === true) || (b.added || "").localeCompare(a.added || ""));
+      rank(a) - rank(b) || (b.featured === true) - (a.featured === true) || (b.added || "").localeCompare(a.added || ""));
 
     renderChrome(); renderWall(); renderFilters(); renderApps(); setupPeek(); setupPointerFx(); setupNav(); setupThemeToggle();
     if (location.hash.startsWith("#/")) requestAnimationFrame(route);
