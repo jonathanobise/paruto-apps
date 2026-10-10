@@ -18,9 +18,9 @@
     {
       "id": "paruto-kids-world",
       "name": "Paruto Kids World",
-      "tagline": "An explorable 3D village where little ones learn and play.",
-      "description": "A browser-based 3D village for children aged 2–5. Kids walk around with Jas, Jay and baby Joe, step into buildings like the market, farm and story house, and play gentle learning games for letters and counting. A grown-up gate keeps the parent area separate, with safeguarding built in from day one.",
-      "status": "in-development",
+      "tagline": "An illustrated village where little ones learn and play with Jas, Jay and baby Joe.",
+      "description": "A browser-based illustrated village for children aged 2–5. Kids explore a 2D village with six zones alongside Jas, Jay and baby Joe, play ten learning games and draw in the Colour Workshop. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
+      "status": "live",
       "category": "Kids & Learning",
       "platforms": ["Web"],
       "accent": "#34d399",
@@ -28,19 +28,19 @@
       "icon": "🏡",
       "added": "2026-09-26",
       "featured": true,
-      "url": "",
-      "links": [],
+      "url": "https://play.parutokids.com",
+      "links": [
+        { "label": "Paruto Kids", "url": "https://parutokids.com" }
+      ],
       "highlights": [
-        "Walkable 3D world with six zones",
-        "Three complete learning games",
+        "Ten learning games and a Colour Workshop",
+        "Works offline, with no ads or endless scrolling",
         "Parent area behind a grown-up gate"
       ],
-      "cover": "assets/apps/paruto-kids-world/world-square.jpg",
+      "cover": "assets/apps/paruto-kids-world/village.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/paruto-kids-world/world-square.jpg", "caption": "The village square" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/farm.jpg", "caption": "The farm" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/inside-market.jpg", "caption": "Inside the market" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/mobile-world.jpg", "caption": "On a phone", "device": "phone" }
+        { "type": "image", "src": "assets/apps/paruto-kids-world/village.jpg", "caption": "The village square with the family" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/choose-your-player.jpg", "caption": "Play as Jas or Jay" }
       ]
     },
     {
@@ -56,7 +56,7 @@
       "icon": "🌆",
       "added": "2026-09-01",
       "featured": false,
-      "url": "",
+      "url": "https://naijahustle.paruto.com",
       "links": [],
       "highlights": [
         "Multiplayer, persistent world",
@@ -144,7 +144,9 @@
       "added": "2026-10-08",
       "featured": false,
       "url": "https://galleries.paruto.com",
-      "links": [{ "label": "Paruto Media", "url": "https://www.parutomedia.com" }],
+      "links": [
+        { "label": "Paruto Media", "url": "https://www.parutomedia.com" }
+      ],
       "highlights": [
         "Private gallery links, with optional passwords",
         "Favourite, select and download in one place",
@@ -224,6 +226,89 @@
       ],
       "cover": "",
       "media": []
+    },
+    {
+      "id": "abuja-lagos-hyperspeed",
+      "name": "Abuja → Lagos Hyperspeed",
+      "tagline": "A concept maglev from Abuja to Lagos, drawn on real terrain in your browser.",
+      "description": "An interactive 3D concept for a 632 km maglev line between Abuja and Lagos, built on real elevation data and OpenStreetMap buildings and roads. Tunnels, viaducts, speed limits and the 1 h 31 min nonstop trip are all computed from the terrain, with a ten-stop guided tour. A concept, not an official plan; costs are illustrative.",
+      "status": "live",
+      "category": "Concepts",
+      "platforms": ["Web"],
+      "accent": "#22c55e",
+      "accent2": "#0e7490",
+      "icon": "🚄",
+      "added": "2026-10-10",
+      "featured": false,
+      "url": "https://hyperspeed.paruto.com",
+      "links": [],
+      "highlights": [
+        "Real terrain and OpenStreetMap data",
+        "Tunnels, viaducts and trip times computed live",
+        "A ten-stop guided tour of the route"
+      ],
+      "cover": "assets/apps/abuja-lagos-hyperspeed/overview.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/abuja-lagos-hyperspeed/overview.jpg", "caption": "Abuja Central and the route profile" },
+        { "type": "image", "src": "assets/apps/abuja-lagos-hyperspeed/chase-view.jpg", "caption": "Chase view, leaving Abuja Central" }
+      ]
+    },
+    {
+      "id": "arclight",
+      "name": "ARCLIGHT",
+      "tagline": "An anti-gravity racer for the browser, with every mesh and sound generated in code.",
+      "description": "An original anti-gravity racing game built with Three.js. Race three circuits (Coral Causeway, Neon Arcology and Dust Mesa) in either direction, with airbrakes, side-shifts, boost pads and weapons, against skill-based AI. There are no image, model or audio files: everything is generated at runtime, down to the synthwave soundtrack.",
+      "status": "live",
+      "category": "Games",
+      "platforms": ["Web"],
+      "accent": "#22d3ee",
+      "accent2": "#db2777",
+      "icon": "🏁",
+      "added": "2026-10-10",
+      "featured": false,
+      "url": "http://arclight.paruto.com",
+      "links": [],
+      "highlights": [
+        "Three circuits, raced in either direction",
+        "Keyboard, gamepad and touch controls",
+        "Procedural graphics and a synthwave soundtrack"
+      ],
+      "cover": "assets/apps/arclight/neon-arcology.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/arclight/neon-arcology.jpg", "caption": "Neon Arcology" },
+        { "type": "image", "src": "assets/apps/arclight/menu.jpg", "caption": "Pick a circuit, craft and difficulty" },
+        { "type": "image", "src": "assets/apps/arclight/coral-causeway.jpg", "caption": "Coral Causeway" },
+        { "type": "image", "src": "assets/apps/arclight/dust-mesa.jpg", "caption": "Dust Mesa" }
+      ]
+    },
+    {
+      "id": "repwise",
+      "name": "Repwise",
+      "tagline": "A fitness app for workouts, timers and nutrition that works offline, with no account.",
+      "description": "An offline-first fitness app you can install on any phone or desktop. Log workouts with rest timers and PR alerts, follow Coach Remy as he demonstrates all 154 built-in exercises, run HIIT, Tabata, EMOM and AMRAP timers, track food and water, and watch your progress. Everything stays private on your device.",
+      "status": "live",
+      "category": "Fitness",
+      "platforms": ["Web", "Installable app"],
+      "accent": "#bef264",
+      "accent2": "#3f6212",
+      "icon": "🏋️",
+      "added": "2026-10-09",
+      "featured": false,
+      "url": "https://repwise.casefile-africa.workers.dev",
+      "links": [],
+      "highlights": [
+        "Coach Remy demonstrates 154 exercises",
+        "Workout logger with rest timers and PR alerts",
+        "Works offline; your data stays on your device"
+      ],
+      "cover": "",
+      "media": [
+        { "type": "image", "src": "assets/apps/repwise/coach-remy.jpg", "caption": "Coach Remy demonstrates every exercise", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/today.jpg", "caption": "Today", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/timers.jpg", "caption": "HIIT, Tabata, EMOM and AMRAP timers", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/nutrition.jpg", "caption": "Nutrition and water", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/progress.jpg", "caption": "Progress", "device": "phone" }
+      ]
     }
   ]
 }
