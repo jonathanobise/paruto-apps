@@ -76,7 +76,10 @@
     $("familyLinks").replaceChildren(...family.map((f) =>
       h("li", {},
         h("a", { class: "family-link", href: f.url, target: "_blank", rel: "noopener" },
-          h("span", { class: "family-name" }, f.name),
+          f.logo && h("span", { class: "family-logo", "aria-hidden": "true" },
+            h("img", { class: "only-dark", src: `${f.logo}-white.svg`, alt: "", loading: "lazy" }),
+            h("img", { class: "only-light", src: `${f.logo}-black.svg`, alt: "", loading: "lazy" })),
+          h("span", { class: f.logo ? "family-name sr-only" : "family-name" }, f.name),
           f.note && h("span", { class: "family-note" }, f.note),
           h("span", { class: "family-host" }, hostOf(f.url).replace(/^www\./, "")),
           h("span", { class: "family-arrow", "aria-hidden": "true" }, svg(EXT))))

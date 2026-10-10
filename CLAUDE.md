@@ -45,7 +45,7 @@ Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder)
 
 Site-level text (`site` object): `name`, `eyebrow`, `headline`, `subheadline`, `contactEmail` (currently hello@paruto.com; used by every contact link), `footer`, and optional `wordmark` (the big footer word; defaults to the first word of `name`).
 
-`site.family` lists the sister companies shown as "The Paruto family" link cards in the footer: `[{ "name": "Paruto Media", "url": "https://parutomedia.com", "note": "one-liner" }]`. Keep it in sync with the Companies on paruto.com (`~/Projects/paruto-com`). Paruto Apps itself isn't listed (it's this site).
+`site.family` lists the sister companies shown as "The Paruto family" link cards in the footer: `[{ "name": "Paruto Media", "logo": "assets/family/paruto-media-logo", "url": "https://parutomedia.com", "note": "one-liner" }]`. `logo` is optional: a path without the suffix; the site loads `<logo>-white.svg` on the dark theme and `<logo>-black.svg` on light. Lockups are copies from `~/Projects/paruto-brand/assets/logos` (never hand-edit them; regenerate there and copy over). Keep it in sync with the Companies on paruto.com (`~/Projects/paruto-com`). Paruto Apps itself isn't listed (it's this site).
 
 ## Deploying
 Live at **https://apps.paruto.com** via **GitHub Pages** from `master` of the public repo `jonathanobise/paruto-apps` (no build step; `CNAME` + `.nojekyll` at the root — don't delete them). DNS: a CNAME record `apps` → `jonathanobise.github.io.` in DreamHost. HTTPS is enforced (Let's Encrypt, auto-renewed).

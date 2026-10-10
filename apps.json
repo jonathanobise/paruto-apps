@@ -7,11 +7,11 @@
     "contactEmail": "hello@paruto.com",
     "footer": "© Paruto. All rights reserved.",
     "family": [
-      { "name": "Paruto", "url": "https://paruto.com", "note": "One group. Many possibilities." },
-      { "name": "Paruto Media", "url": "https://parutomedia.com", "note": "Development communication for Africa and beyond" },
-      { "name": "Paruto Music", "url": "https://parutomusic.com", "note": "Recording studio and record label" },
-      { "name": "Paruto Capital", "url": "https://parutocapital.com", "note": "Trading education: mastery, not hype" },
-      { "name": "Paruto Kids", "url": "https://parutokids.com", "note": "Songs, stories and play for little ones" }
+      { "name": "Paruto", "logo": "assets/family/paruto-logo", "url": "https://paruto.com", "note": "One group. Many possibilities." },
+      { "name": "Paruto Media", "logo": "assets/family/paruto-media-logo", "url": "https://parutomedia.com", "note": "Development communication for Africa and beyond" },
+      { "name": "Paruto Music", "logo": "assets/family/paruto-music-logo", "url": "https://parutomusic.com", "note": "Recording studio and record label" },
+      { "name": "Paruto Capital", "logo": "assets/family/paruto-capital-logo", "url": "https://parutocapital.com", "note": "Trading education: mastery, not hype" },
+      { "name": "Paruto Kids", "logo": "assets/family/paruto-kids-logo", "url": "https://parutokids.com", "note": "Songs, stories and play for little ones" }
     ]
   },
   "apps": [

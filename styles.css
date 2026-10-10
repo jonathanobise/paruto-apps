@@ -541,6 +541,11 @@ h1 .w.serif { font-weight: 400; font-size: 1.1em; line-height: 0.8; letter-spaci
 }
 .family-link:hover { background: color-mix(in srgb, var(--text) 6%, transparent); box-shadow: inset 0 0 0 1px var(--line-2), inset 0 1px 0 var(--hi); scale: 1.02; }
 .family-name { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+/* Brand lockups from paruto-brand (assets/family): white on the dark theme, black on light */
+.family-logo { display: block; width: min(100%, 140px); margin: -4px 0 4px -4px; }
+.family-logo img { display: block; width: 100%; height: auto; }
+:root[data-theme="light"] .family-logo .only-dark, :root:not([data-theme="light"]) .family-logo .only-light { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .family-note { font-size: 13.5px; line-height: 1.35; color: var(--muted); }
 .family-host { margin-top: auto; padding-top: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
 .family-arrow {

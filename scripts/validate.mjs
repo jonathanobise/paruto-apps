@@ -19,6 +19,10 @@ try {
 
 (data.site?.family ?? []).forEach((f, i) => {
   if (!f?.name || !/^https?:\/\//.test(f?.url ?? "")) errors.push(`site.family[${i}] needs a name and an http(s) url`);
+  if (f?.logo) for (const v of ["white", "black"]) {
+    const p = `${f.logo}-${v}.svg`;
+    if (!existsSync(join(root, p))) errors.push(`site.family[${i}] logo file not found → ${p}`);
+  }
 });
 
 const ids = new Set();
