@@ -133,8 +133,8 @@
     {
       "id": "paruto-galleries",
       "name": "Paruto Galleries",
-      "tagline": "Private photo and film delivery for Paruto Media clients.",
-      "description": "Paruto Media's client-gallery service. Clients open a private link, optionally password-protected, to view their photos and films, favourite and send selections, and download them, without ever creating an account.",
+      "tagline": "Your stories, delivered with care: private photo and film galleries from Paruto Media.",
+      "description": "Paruto Media's private client galleries for the organisations and people whose work it documents. Clients open a private link to view, choose and download every photo and film in full resolution, on any device, without creating an account. Built for reporting, with originals, RAW files, captions and PDF reports alongside the photos, in English and French.",
       "status": "live",
       "category": "Media",
       "platforms": ["Web"],
@@ -148,14 +148,17 @@
         { "label": "Paruto Media", "url": "https://www.parutomedia.com" }
       ],
       "highlights": [
-        "Private gallery links, with optional passwords",
-        "Favourite, select and download in one place",
-        "No client accounts needed"
+        "Private links with passwords, PINs and expiry dates",
+        "Built for reporting: originals, RAW files and captions",
+        "In English and French, on any device"
       ],
-      "cover": "assets/apps/paruto-galleries/home.jpg",
+      "cover": "assets/apps/paruto-galleries/hero.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/paruto-galleries/home.jpg", "caption": "Client galleries" },
-        { "type": "image", "src": "assets/apps/paruto-galleries/mobile-home.jpg", "caption": "On a phone", "device": "phone" }
+        { "type": "image", "src": "assets/apps/paruto-galleries/hero.jpg", "caption": "Your stories, delivered with care" },
+        { "type": "image", "src": "assets/apps/paruto-galleries/mobile-hero.jpg", "caption": "On a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/paruto-galleries/how-it-works.jpg", "caption": "Three steps from shoot to report" },
+        { "type": "image", "src": "assets/apps/paruto-galleries/for-institutions.jpg", "caption": "Built for the way organisations work" },
+        { "type": "image", "src": "assets/apps/paruto-galleries/documenting-impact.jpg", "caption": "Documenting impact across Nigeria and beyond" }
       ]
     },
     {
