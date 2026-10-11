@@ -163,6 +163,7 @@
     },
     {
       "id": "ivra",
+      "aliases": ["paruto-finance"],
       "name": "Ivra",
       "tagline": "Mobile-first accounting for invoices, payments, expenses and project profitability.",
       "description": "A mobile-first accounting platform for managing invoices, receipts, payments, expenses and project profitability. Built for Paruto and designed to scale to other organisations, it brings multi-currency finances, approvals and financial reporting into one simple workspace.",
