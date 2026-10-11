@@ -41,7 +41,11 @@
   const accentStyle = (app) => `--a:${app.accent || "#8e8e93"};--b:${app.accent2 || app.accent || "#636366"}`;
   const statusEl = (s, extra = "") => h("span", { class: `status s-${s} ${extra}`.trim() }, STATUS[s] || s);
   const numberOf = (app) => pad(state.apps.indexOf(app) + 1);
-  const iconEl = (app) => h("span", { class: "app-icon", style: accentStyle(app), "aria-hidden": "true" }, h("span", {}, app.icon || app.name[0]));
+  const iconEl = (app) => app.iconImage
+    ? h("span", { class: "app-icon has-img", style: accentStyle(app), "aria-hidden": "true" },
+        h("img", { class: "only-dark", src: `${app.iconImage}-dark.svg`, alt: "" }),
+        h("img", { class: "only-light", src: `${app.iconImage}-light.svg`, alt: "" }))
+    : h("span", { class: "app-icon", style: accentStyle(app), "aria-hidden": "true" }, h("span", {}, app.icon || app.name[0]));
 
   // Visual helpers
   const media = (app) => app.media || [];

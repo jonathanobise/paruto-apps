@@ -38,6 +38,7 @@ Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder)
 | `platforms` | e.g. `["Web", "iOS", "Android"]` |
 | `accent`, `accent2` | hex colours for the app icon gradient, panel tint and glow |
 | `icon` | an emoji (or short text) drawn inside the layered app icon |
+| `iconImage` | optional path without suffix to a brand app icon, e.g. `assets/apps/ivra/icon`; the site loads `<iconImage>-dark.svg` on the dark theme and `<iconImage>-light.svg` on light, in place of the emoji icon. Use the app's own square icon artwork (opaque tile); `icon` stays as the fallback |
 | `added` | `YYYY-MM-DD`; within a status group, newest apps are listed first |
 | `featured` | `true` puts the app first within its status group |
 | `url`, `links` | primary link ("Open app") and extra `{label, url}` buttons |

@@ -40,6 +40,7 @@ for (const app of data.apps ?? []) {
   if (app.status && !STATUSES.includes(app.status)) errors.push(`${app.id}: status must be one of ${STATUSES.join(", ")}`);
   if (!app.added) warnings.push(`${app.id}: no "added" date (YYYY-MM-DD) — used for sorting`);
   checkFile(app, "cover", app.cover);
+  if (app.iconImage) for (const v of ["dark", "light"]) checkFile(app, "iconImage", `${app.iconImage}-${v}.svg`);
   (app.media ?? []).forEach((m, i) => {
     if (!["image", "video"].includes(m.type)) errors.push(`${app.id}: media[${i}].type must be image or video`);
     checkFile(app, `media[${i}]`, m.src);
