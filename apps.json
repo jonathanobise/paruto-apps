@@ -189,7 +189,7 @@
         { "type": "image", "src": "assets/apps/ivra/overview-phone.jpg", "caption": "Bank accounts as a stack of cards", "device": "phone" },
         { "type": "image", "src": "assets/apps/ivra/invoice-paper-phone.jpg", "caption": "Invoices on paper, stamped when paid", "device": "phone" },
         { "type": "image", "src": "assets/apps/ivra/approvals-deck-phone.jpg", "caption": "Swipe right to approve, left to reject", "device": "phone" },
-        { "type": "image", "src": "assets/apps/ivra/project-skyline-laptop.jpg", "caption": "Project margins as a 3D skyline" }
+        { "type": "image", "src": "assets/apps/ivra/project-margins-laptop.jpg", "caption": "Every project's margin at a glance" }
       ]
     },
     {
