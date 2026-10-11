@@ -312,6 +312,38 @@
         { "type": "image", "src": "assets/apps/repwise/nutrition.jpg", "caption": "Nutrition and water", "device": "phone" },
         { "type": "image", "src": "assets/apps/repwise/progress.jpg", "caption": "Progress", "device": "phone" }
       ]
+    },
+    {
+      "id": "anansi-of-lagos",
+      "name": "Anansi of Lagos",
+      "tagline": "A 3D web-swinging game: swing across Lagos, or your own city, and switch the lights back on.",
+      "description": "Anansi, the West African spider trickster, is now a web-slinger, and Dr. Blackout has cut the city's power. Swing through an endless 3D city from Lagos Island over the Third Mainland Bridge to Eko Atlantic, smash drones, bounce on danfos and grab power cells until the skyline shouts UP NEPA! Choose Lagos, Abuja, Accra, Cape Town, London, New York or Dubai, or type any city's name. A classic 2D version is included.",
+      "status": "live",
+      "category": "Games",
+      "platforms": ["Web"],
+      "accent": "#d4152f",
+      "accent2": "#ffc72c",
+      "icon": "🕸️",
+      "added": "2026-10-11",
+      "featured": false,
+      "url": "https://apps.paruto.com/games/anansi-of-lagos-3d/",
+      "links": [{ "label": "Play the 2D version", "url": "https://apps.paruto.com/games/anansi-of-lagos/" }],
+      "highlights": [
+        "Seven cities to swing over, or type your own",
+        "Real-time sky from afternoon to night, with lagoon reflections",
+        "One-touch swinging on phone or desktop",
+        "Classic 2D version included"
+      ],
+      "cover": "assets/apps/anansi-of-lagos/lekki-night-swing.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/lekki-night-swing.jpg", "caption": "Swinging through Ikoyi–Lekki at night" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/third-mainland-golden-hour.jpg", "caption": "Golden hour on the Third Mainland Bridge" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/lagos-island-afternoon.jpg", "caption": "Lagos Island in the afternoon" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/eko-atlantic-night.jpg", "caption": "Eko Atlantic after dark" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/london.jpg", "caption": "London: red buses and brick terraces" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/cape-town.jpg", "caption": "Cape Town: Bo-Kaap colours and minibus taxis" },
+        { "type": "image", "src": "assets/apps/anansi-of-lagos/classic-2d.jpg", "caption": "The classic 2D game" }
+      ]
     }
   ]
 }
