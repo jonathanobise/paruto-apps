@@ -117,6 +117,24 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .stat span { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .stat b { font-family: var(--display); font-weight: 400; font-size: 24px; font-variant-numeric: tabular-nums; }
 .newbest { justify-self: center; background: var(--naija); color: var(--chalk); font-weight: 700; letter-spacing: .14em; font-size: 12px; padding: 5px 12px; border-radius: 999px; text-transform: uppercase; }
+.city-pick { display: grid; gap: 6px; }
+.seg-label { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.city-row { display: flex; gap: 8px; }
+.city-row select, .city-row input { flex: 1 1 auto; min-width: 0; font: 700 16px var(--body); letter-spacing: .03em; color: var(--ink); background: var(--chalk); border: 3px solid var(--ink); border-radius: 12px; padding: 10px 12px; box-shadow: 0 4px 0 var(--ink); }
+.city-row select { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 36px; cursor: pointer; }
+.city-row select:focus-visible, .city-row input:focus-visible { outline: 3px solid var(--danfo); outline-offset: 2px; }
+.city-row .btn { flex: 0 0 auto; font-size: 15px; padding: 11px 14px; }
+.logo .small { overflow-wrap: anywhere; }
+.logo .small.long { font-size: clamp(14px, 4vw, 18px); letter-spacing: .08em; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--chalk); border-radius: 12px; overflow: hidden; }
+.seg button { font: 700 14px var(--body); letter-spacing: .06em; padding: 13px 4px; background: transparent; color: var(--chalk); border: 0; cursor: pointer; }
+.seg button + button { border-left: 2px solid rgba(255,245,222,.5); }
+.seg button[aria-pressed="true"] { background: var(--chalk); color: var(--ink); }
+.seg button:focus-visible { outline: 3px solid var(--danfo); outline-offset: 2px; }
+.keys { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.keys li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; line-height: 1.35; }
+.keys li span { flex: 1 1 150px; min-width: 0; }
+kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); background: var(--chalk); border: 2px solid var(--ink); border-bottom-width: 4px; border-radius: 8px; padding: 3px 8px; white-space: nowrap; }
 .portrait-tip { text-align: center; font-size: 12px; color: var(--muted); margin: 0; }
 @media (orientation: landscape), (min-width: 700px) { .portrait-tip { display: none; } }
 @media (max-height: 520px) { .card { padding: 16px 18px 12px; gap: 10px; } .logo .big { font-size: 48px; } .lede { font-size: 13px; } }
@@ -148,24 +166,24 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 
   <section id="menu" class="screen">
     <div class="card">
-      <div class="eyebrow">Lagos has a web-slinger</div>
-      <h1 class="logo"><span class="big">ANANSI</span><span class="small">OF LAGOS</span></h1>
-      <p class="lede">Dr. Blackout has cut the city's power. Swing from Marina to Eko Atlantic, smash his drones and grab power cells until the whole skyline shouts <strong>UP NEPA!</strong></p>
+      <div class="eyebrow" id="menuEyebrow">Lagos has a web-slinger</div>
+      <h1 class="logo"><span class="big">ANANSI</span><span class="small" id="logoCity">OF LAGOS</span></h1>
+      <p class="lede" id="lede">Dr. Blackout has cut the city's power. Swing across town, smash his drones and grab power cells until the whole skyline lights up.</p>
+      <div class="city-pick">
+        <label class="seg-label" for="citySel">Swing over</label>
+        <div class="city-row"><select id="citySel"></select></div>
+        <form class="city-row" id="cityForm" hidden>
+          <input id="cityInput" type="text" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Type a city, e.g. Kigali" aria-label="Your city">
+          <button class="btn alt" type="submit">Build it</button>
+        </form>
+      </div>
       <div class="btns">
         <button class="btn" id="btnPlay">Swing out</button>
         <div class="row">
-          <button class="btn alt" id="btnHow" aria-expanded="false" aria-controls="howto">How to play</button>
+          <button class="btn alt" id="btnControls">Controls</button>
           <button class="btn alt" id="btnMuteMenu">Sound on</button>
         </div>
       </div>
-      <ul class="howto" id="howto" hidden>
-        <li><b>Hold</b><span>Tap and hold anywhere (or Space) to web the ringed anchor.</span></li>
-        <li><b>Let go</b><span>Release to fling. Let go on the upswing for a <strong>Gbam!</strong> boost.</span></li>
-        <li><b>Drones</b><span>Hit them fast to smash them. Slow bumps hurt.</span></li>
-        <li><b>Danfo</b><span>Land on a bus roof to bounce high.</span></li>
-        <li><b>Lagoon</b><span>Falling in costs a heart.</span></li>
-        <li><b>Power</b><span>Fill the grid meter for an UP NEPA surge.</span></li>
-      </ul>
       <p class="portrait-tip">Turn your phone sideways to see more of the city.</p>
       <div class="stat-best" id="bestLine">Best: 0</div>
       <div class="foot">
@@ -182,14 +200,46 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
         <button class="btn" id="btnResume">Resume</button>
         <div class="row">
           <button class="btn alt" id="btnRestart">Restart</button>
-          <button class="btn alt" id="btnMutePause">Sound on</button>
+          <button class="btn alt" id="btnControlsPause">Controls</button>
         </div>
-        <button class="btn alt" id="btnQuit">Main menu</button>
+        <div class="row">
+          <button class="btn alt" id="btnMutePause">Sound on</button>
+          <button class="btn alt" id="btnQuit">Main menu</button>
+        </div>
       </div>
       <div class="foot">
         <span class="stat-best" id="pauseDist">0 m</span>
         <a class="credit" href="https://paruto.com" target="_blank" rel="noopener">Built by Paruto</a>
       </div>
+    </div>
+  </section>
+
+  <section id="controls" class="screen" hidden>
+    <div class="card">
+      <h2 class="over-title" style="color:var(--danfo)">Controls</h2>
+      <div class="seg" role="group" aria-label="Device">
+        <button id="tabTouch" aria-pressed="false">Touch</button><button id="tabKeys" aria-pressed="false">Keyboard &amp; mouse</button>
+      </div>
+      <ul class="keys" id="keysTouch">
+        <li><kbd>Hold anywhere</kbd><span>Shoot a web at the ringed anchor</span></li>
+        <li><kbd>Let go</kbd><span>Fling forward. On the upswing it's a perfect release</span></li>
+        <li><kbd>Tap on the ground</kbd><span>Jump when no anchor is in reach</span></li>
+        <li><kbd>❚❚ button</kbd><span>Pause</span></li>
+      </ul>
+      <ul class="keys" id="keysDesk" hidden>
+        <li><kbd>Space</kbd><kbd>Click</kbd><kbd>↑</kbd><span>Hold to web, let go to fling</span></li>
+        <li><kbd>Space</kbd><span>Jump when you're on the ground with no anchor in reach</span></li>
+        <li><kbd>P</kbd><kbd>Esc</kbd><span>Pause</span></li>
+        <li><kbd>M</kbd><span>Sound on or off</span></li>
+      </ul>
+      <ul class="howto">
+        <li><b>Perfect</b><span>Let go as you swing upward for a speed boost.</span></li>
+        <li><b>Drones</b><span>Hit them fast to smash them. Slow bumps hurt.</span></li>
+        <li><b>Buses</b><span id="tipBus">Land on a bus roof to bounce high.</span></li>
+        <li><b>Power</b><span>Grab green cells to fill the GRID meter and set off a power surge.</span></li>
+        <li><b>Water</b><span>Falling in costs a heart.</span></li>
+      </ul>
+      <button class="btn" id="btnControlsBack">Got it</button>
     </div>
   </section>
 
@@ -213,6 +263,7 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
   </section>
 </div>
 
+<script src="../shared/cities.js"></script>
 <script>
 (() => {
 'use strict';
@@ -246,13 +297,18 @@ const GROUND_Y = 650;
 const WATER_Y = 676;
 const CEIL = -600;
 
-const DISTRICTS = [
-  { name: 'Lagos Island', sub: 'Marina · Broad Street', len: 650, kind: 'island' },
-  { name: 'Third Mainland Bridge', sub: '11.8 km over the lagoon', len: 800, kind: 'bridge' },
-  { name: 'Ikoyi–Lekki Link', sub: 'Cable-stayed over Five Cowrie Creek', len: 850, kind: 'lekki' },
-  { name: 'Eko Atlantic', sub: 'A new city on the Atlantic', len: 900, kind: 'eko' },
-];
-const CYCLE = DISTRICTS.reduce((s, d) => s + d.len, 0);
+// Cities come from ../shared/cities.js (shared with the 3D game). Each themes the same four route types.
+const KINDS = ['island', 'bridge', 'lekki', 'eko'], LENS = [650, 800, 850, 900];
+let CITY, DISTRICTS, CYCLE, CHEERS, HYPE, SPEED, THANKS, SMASHES, OUCH, WET, SHOUTS, SLOGANS, BILLBOARDS;
+function setCityData(c) {
+  CITY = c;
+  DISTRICTS = c.districts.map(([name, sub], i) => ({ name, sub, len: LENS[i], kind: KINDS[i] }));
+  CYCLE = DISTRICTS.reduce((t, d) => t + d.len, 0);
+  ({ cheers: CHEERS, hype: HYPE, speed: SPEED, thanks: THANKS, smashes: SMASHES, ouch: OUCH, wet: WET, shouts: SHOUTS } = c);
+  SLOGANS = c.bus.slogans; BILLBOARDS = c.billboards;
+}
+let cityChoice = window.AnansiCities.loadChoice();
+setCityData(window.AnansiCities.resolve(cityChoice));
 
 const C = {
   night: hex('#0a0d2a'), black: hex('#000000'), white: hex('#ffffff'),
@@ -260,9 +316,10 @@ const C = {
   water: hex('#0f4a6a'), steel: hex('#3a3f55'), road: hex('#2a2a33'), curb: hex('#a29e8e'), deck: hex('#a9a293'),
   danfo: hex('#ffc72c'), suit: hex('#10a35e'), indigo: hex('#23306e'), gold: hex('#ffc72c'),
 };
-const TOWER_COLS = ['#8a93a6', '#a8977f', '#5e7f8f', '#c9b79c', '#6d7a9c', '#9a8a9e'].map(hex);
-const LOW_COLS = ['#e2a65b', '#d9735a', '#77b28c', '#e6d17a', '#9fb6d8', '#c98bb0', '#efe8d6', '#e88a6a'].map(hex);
-const GLASS_COLS = ['#2f6f8f', '#3c86a3', '#4f9ab3', '#2b5878', '#3a6f9e'].map(hex);
+const BASE_PAL = { tower: ['#8a93a6', '#a8977f', '#5e7f8f', '#c9b79c', '#6d7a9c', '#9a8a9e'], low: ['#e2a65b', '#d9735a', '#77b28c', '#e6d17a', '#9fb6d8', '#c98bb0', '#efe8d6', '#e88a6a'], glass: ['#2f6f8f', '#3c86a3', '#4f9ab3', '#2b5878', '#3a6f9e'] };
+let TOWER_COLS, LOW_COLS, GLASS_COLS;
+function setPalettes() { const p = CITY.pal || {}; TOWER_COLS = (p.tower || BASE_PAL.tower).map(hex); LOW_COLS = (p.low || BASE_PAL.low).map(hex); GLASS_COLS = (p.glass || BASE_PAL.glass).map(hex); C.danfo = hex(CITY.bus.color); }
+setPalettes();
 const SKY = [
   { t: 0.00, top: hex('#4a86d8'), bot: hex('#ffd08a'), dk: 0.0 },
   { t: 0.26, top: hex('#4b4fa0'), bot: hex('#ff9255'), dk: 0.25 },
@@ -271,17 +328,6 @@ const SKY = [
   { t: 0.93, top: hex('#080b26'), bot: hex('#2b2a66'), dk: 1.0 },
   { t: 1.00, top: hex('#4a86d8'), bot: hex('#ffd08a'), dk: 0.0 },
 ];
-
-const SLOGANS = ['NO FOOD FOR LAZY MAN', "GOD'S TIME IS THE BEST", 'NO CONDITION IS PERMANENT', 'SHINE YOUR EYE', 'OBALENDE · CMS', 'EXCUSE ME, YOUR CHANGE'];
-const BILLBOARDS = [
-  ['SUYA', 'HOT & SPICY · OPEN LATE', '#c0392b'], ['PURE WATER', '₦50 · ICE COLD', '#2e86c1'], ['JOLLOF CHAMPS', 'WE DON WIN AGAIN', '#e67e22'],
-  ['NEPA', 'LIGHT DEY COME... SOON', '#16a085'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AFROBEATS', 'LIVE TONIGHT · TBS', '#8e44ad'],
-];
-const CHEERS = ['Gbam!', 'Oya!', 'Correct!', 'Ehen!', 'Sharp!', 'Na so!'];
-const THANKS = ['Thank you o!', 'E se gan!', 'Daalụ!', 'Na gode!', 'My guy!', 'God bless!'];
-const SMASHES = ['Gbosa!', 'Scatter am!', 'Kpatakpata!', 'Finish!'];
-const OUCH = ['Wahala!', 'Haba!', 'Ouch o!'];
-const WET = ['Chai!', 'Na lagoon o!', 'Splash!'];
 
 /* ================= audio ================= */
 const Sound = (() => {
@@ -572,15 +618,17 @@ function attach(a) {
   if (p.grounded) { p.grounded = null; p.vy = Math.min(p.vy, -260); }
   p.vx += 80;
   stats.combo++; stats.swings++;
+  if (stats.combo >= 5 && stats.combo % 5 === 0) pop(player.x, player.y - 46, pick(HYPE, Math.random()), '#ff9a3d', true);
   input.buffer = 0;
   Sound.fx.thwip();
-  if (!$('hint').hidden) $('hint').hidden = true;
+  coachEvent('web');
   bumpCombo();
 }
 function release(manual) {
   const p = player; if (!p.rope) return;
   p.rope = null;
   if (!manual) return;
+  coachEvent('release');
   const ang = Math.atan2(-p.vy, p.vx) * 180 / Math.PI;
   if (p.vx > 250 && ang > 12 && ang < 72) {
     p.vx *= 1.1; p.vy = p.vy * 1.1 - 80;
@@ -625,7 +673,7 @@ function splash() {
   if (p.hearts <= 0) { p.dead = true; p.hidden = true; die(); return; }
   pop(p.x, WATER_Y - 40, pick(WET, Math.random()), '#bfe6ff', true);
   p.rope = null; p.grounded = null;
-  p.y = 360; p.vx = 420; p.vy = -300; p.inv = 2;
+  p.y = 360; p.vx = 420; p.vy = -300; p.inv = 2; snapCam = true;
 }
 function die() {
   player.dead = true; state = 'dying'; stats.dieT = 1.1;
@@ -634,7 +682,7 @@ function die() {
 function startSurge() {
   stats.surge = 7; stats.power = 1; stats.nepas++;
   Sound.fx.nepa(); addShake(10);
-  pop(player.x, player.y - 50, 'UP NEPA!', '#ffc72c', true);
+  pop(player.x, player.y - 50, CITY.surge, '#ffc72c', true);
   for (let i = 0; i < 4; i++) burstParticles(player.x + (Math.random() - .5) * 300, player.y - 100 + (Math.random() - .5) * 200, 14, ['#10a35e', '#ffffff', '#ffc72c'], 380, 1.2, 4, 300);
   stats.bonus += 500;
 }
@@ -689,14 +737,14 @@ function updateEntities(dt) {
   // danfos
   for (const d of W.danfos) {
     if (d.x < d.limit) d.x = Math.min(d.limit, d.x + d.speed * dt);
-    if (d.shout > 0) { d.shout -= dt; if (d.shout <= 0 && Math.abs(d.x - p.x) < visW) { pop(d.x + 58, GROUND_Y - 70, pick(['Obalende! Obalende!', 'CMS! Enter with your change!', 'Oshodi! Oshodi!', 'Wole! Wole!'], Math.random()), '#ffc72c'); d.shout = 6 + Math.random() * 6; } }
+    if (d.shout > 0) { d.shout -= dt; if (d.shout <= 0 && Math.abs(d.x - p.x) < visW) { pop(d.x + 58, GROUND_Y - 70, pick(SHOUTS, Math.random()), '#ffc72c'); d.shout = 6 + Math.random() * 6; } }
     if (p.dead) continue;
     const top = GROUND_Y - d.h;
     if (p.x + R > d.x && p.x - R < d.x + d.w && p.y + R > top && p.y - R < GROUND_Y) {
       if (p.vy >= 0 && p.y < top + 8) {
         p.y = top - R; p.vy = -980; p.vx = Math.max(p.vx, 420); p.grounded = null;
         stats.bonus += 40 * comboMult(); stats.combo++; bumpCombo();
-        Sound.fx.bounce(); pop(d.x + 58, top - 20, 'Danfo bounce!', '#ffc72c');
+        Sound.fx.bounce(); pop(d.x + 58, top - 20, CITY.bus.name + ' bounce!', '#ffc72c');
       } else if (p.grounded) { p.x = d.x - R - 1; p.vx = Math.min(p.vx, 0); }
       else if (p.x < d.x + d.w / 2) { p.x = d.x - R - 1; p.vx = -Math.abs(p.vx) * 0.3; }
     }
@@ -774,7 +822,7 @@ function updateEntities(dt) {
   if (surge) {
     stats.surge -= dt;
     stats.power = clamp(stats.surge / 7, 0, 1);
-    if (stats.surge <= 0) { stats.power = 0.1; pop(p.x, p.y - 40, 'NEPA don take light!', '#b9bde6', true); }
+    if (stats.surge <= 0) { stats.power = 0.1; pop(p.x, p.y - 40, CITY.off, '#b9bde6', true); }
   }
 
   // particles & pops
@@ -787,9 +835,16 @@ function updateCamera(dt) {
   const lead = clamp(p.vx / 9000, -0.05, 0.1);
   const tx = p.x - visW * (0.3 - lead);
   const ty = Math.min(p.y - visH * 0.5, restCamY());
+  if (snapCam) { camX = tx; camY = ty; snapCam = false; }
   camX += (tx - camX) * Math.min(1, dt * 6);
   camY += (ty - camY) * Math.min(1, dt * 4);
+  // never let the hero leave the frame, whatever the speed
+  if (!p.hidden) {
+    camX = clamp(camX, p.x - visW * 0.78, p.x - visW * 0.12);
+    camY = clamp(camY, p.y - visH * 0.9, p.y - visH * 0.14);
+  }
 }
+let snapCam = false;
 
 function update(dt) {
   time += dt;
@@ -826,6 +881,7 @@ function update(dt) {
   const dd = districtAt(p.x), key = dd.lap * 10 + dd.i;
   if (key !== world.districtKey) { world.districtKey = key; showBanner(dd); }
   Sound.setIntensity(stats.surge > 0 ? 1 : 0.7);
+  if (state === 'play' && Math.hypot(p.vx, p.vy) > 1080 && time - (stats.speedPop || -99) > 9) { stats.speedPop = time; pop(p.x, p.y - 40, pick(SPEED, Math.random()), '#8ad8ff'); }
 
   if (state === 'dying') { stats.dieT -= dt; if (stats.dieT <= 0) gameOver(); }
   updateHud();
@@ -1062,7 +1118,8 @@ function drawDanfo(d) {
   for (let i = 0; i < 4; i++) ctx.fillRect(x + 10 + i * 22, top + 6, 17, 14);
   ctx.fillRect(x + w - 18, top + 8, 13, 14);
   if (dk > 0.4) { ctx.fillStyle = 'rgba(255,240,180,.85)'; ctx.fillRect(x + w - 4, GROUND_Y - 20, 4, 5); ctx.fillStyle = 'rgba(255,60,50,.8)'; ctx.fillRect(x, GROUND_Y - 20, 3, 5); }
-  ctx.fillStyle = rgb(C.black, 0.75); ctx.font = '700 6px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const darkBus = C.danfo[0] * 0.3 + C.danfo[1] * 0.59 + C.danfo[2] * 0.11 < 115;
+  ctx.fillStyle = darkBus ? 'rgba(255,245,222,.9)' : rgb(C.black, 0.75); ctx.font = '700 6px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(d.slogan, x + w / 2 - 6, top + 38, w - 20);
   ctx.fillStyle = '#16161c';
   for (const wx of [x + 22, x + w - 24]) { ctx.beginPath(); ctx.arc(wx, GROUND_Y - 4, 9, 0, 7); ctx.fill(); ctx.fillStyle = '#777'; ctx.beginPath(); ctx.arc(wx, GROUND_Y - 4, 3.5, 0, 7); ctx.fill(); ctx.fillStyle = '#16161c'; }
@@ -1088,7 +1145,7 @@ function drawPickups() {
     const sx = Math.abs(Math.cos(time * 4 + c.ph));
     ctx.fillStyle = '#c98a12'; ctx.beginPath(); ctx.ellipse(c.x, c.y, 10 * sx + 1.5, 10, 0, 0, 7); ctx.fill();
     ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.ellipse(c.x, c.y, 8 * sx + 1, 8, 0, 0, 7); ctx.fill();
-    if (sx > 0.5) { ctx.fillStyle = '#9b6a08'; ctx.font = '700 11px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('₦', c.x, c.y + 0.5); }
+    if (sx > 0.5) { ctx.fillStyle = '#9b6a08'; const sym = (CITY.cur || '★').trim(); ctx.font = `700 ${sym.length > 1 ? 6 : 11}px "Chakra Petch", sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sym, c.x, c.y + 0.5); }
   }
   for (const c of world.cells) {
     if (c.got || !inView(c.x, c.x)) continue;
@@ -1127,7 +1184,7 @@ function drawCivs() {
       const by = y - 74 + Math.sin(time * 4 + c.ph) * 2;
       ctx.fillStyle = '#fff5de'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 22, by - 10, 44, 18, 6) : ctx.rect(x - 22, by - 10, 44, 18); ctx.fill();
       ctx.beginPath(); ctx.moveTo(x - 3, by + 8); ctx.lineTo(x + 3, by + 8); ctx.lineTo(x, by + 14); ctx.fill();
-      ctx.fillStyle = '#c0392b'; ctx.font = '13px "Bowlby One", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('HELP!', x, by);
+      ctx.fillStyle = '#c0392b'; ctx.font = '13px "Bowlby One", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(CITY.help, x, by, 40);
     }
   }
 }
@@ -1263,10 +1320,10 @@ function updateHearts() { $('hearts').innerHTML = [0, 1, 2].map(i => HEART(i < p
 let hudCache = {};
 function score() { return Math.floor(stats.dist) + stats.bonus; }
 function updateHud() {
-  const s = score(), d = Math.floor(stats.dist), c = stats.coins * 50, pw = Math.round(stats.power * 100), surge = stats.surge > 0;
+  const s = score(), d = Math.floor(stats.dist), c = stats.coins * CITY.coin, pw = Math.round(stats.power * 100), surge = stats.surge > 0;
   if (hudCache.s !== s) { $('score').textContent = s.toLocaleString(); hudCache.s = s; }
   if (hudCache.d !== d) { $('dist').textContent = d.toLocaleString() + ' m'; hudCache.d = d; }
-  if (hudCache.c !== c) { $('cash').textContent = '₦' + c.toLocaleString(); hudCache.c = c; }
+  if (hudCache.c !== c) { $('cash').textContent = CITY.cur ? CITY.cur + c.toLocaleString() : stats.coins.toLocaleString() + ' coins'; hudCache.c = c; }
   if (hudCache.pw !== pw) { $('power').style.width = Math.max(4, pw) + '%'; hudCache.pw = pw; }
   if (hudCache.surge !== surge) { $('powerBar').classList.toggle('surge', surge); hudCache.surge = surge; }
 }
@@ -1291,7 +1348,28 @@ function syncSoundLabels() {
   $('btnMuteHud').innerHTML = on ? SPEAKER_ON : SPEAKER_OFF;
   $('btnMuteHud').setAttribute('aria-label', on ? 'Mute sound' : 'Turn sound on');
 }
-function show(id) { for (const s of ['menu', 'pause', 'over']) $(s).hidden = s !== id; }
+function show(id) { for (const s of ['menu', 'pause', 'over', 'controls']) $(s).hidden = s !== id; }
+const isTouch = matchMedia('(pointer: coarse)').matches;
+let controlsFrom = 'menu';
+function setControlsTab(touch) {
+  $('tabTouch').setAttribute('aria-pressed', String(touch)); $('tabKeys').setAttribute('aria-pressed', String(!touch));
+  $('keysTouch').hidden = !touch; $('keysDesk').hidden = touch;
+}
+function openControls(from) {
+  controlsFrom = from; setControlsTab(isTouch);
+  $('tipBus').textContent = `Land on a ${CITY.bus.name.toLowerCase()} roof to bounce high.`;
+  show('controls'); $('btnControlsBack').focus({ preventScroll: true });
+}
+// first-run coach: two steps, then remembered
+const COACH = [isTouch ? 'Hold anywhere to shoot a web' : 'Hold Space or the mouse to shoot a web', 'Let go as you swing upward'];
+let coachStep = store.get('coached', false) ? -1 : 0;
+function coachEvent(ev) {
+  if (coachStep < 0) { if (ev === 'web') $('hint').hidden = true; return; }
+  if (ev !== ['web', 'release'][coachStep]) return;
+  coachStep++;
+  if (coachStep >= COACH.length) { coachStep = -1; store.set('coached', true); $('hint').hidden = true; pop(player.x, player.y - 50, "You're ready. Go!", '#8af0a8', true); }
+  else $('hint').textContent = COACH[coachStep];
+}
 
 function startGame() {
   Sound.unlock();
@@ -1304,6 +1382,7 @@ function startGame() {
   updateHearts(); updateHud(); bumpCombo();
   state = 'play'; show(null);
   $('hud').hidden = false; $('hint').hidden = false;
+  if (coachStep >= 0) { coachStep = 0; $('hint').textContent = COACH[0]; } else $('hint').textContent = isTouch ? 'Hold to web · let go to fling' : 'Hold Space to web · let go to fling';
 }
 function pauseGame() {
   if (state !== 'play') return;
@@ -1313,6 +1392,22 @@ function pauseGame() {
   $('btnResume').focus({ preventScroll: true });
 }
 function resumeGame() { if (state !== 'paused') return; state = 'play'; show(null); Sound.resume(); last = performance.now(); }
+function renderCityMenu() {
+  const lc = $('logoCity'); lc.textContent = 'OF ' + CITY.name.toUpperCase(); lc.classList.toggle('long', CITY.name.length > 11);
+  $('menuEyebrow').textContent = `${CITY.name} has a web-slinger`;
+  const lede = $('lede'); lede.textContent = `Dr. Blackout has cut ${CITY.name}'s power. Swing from ${DISTRICTS[0].name} to ${DISTRICTS[3].name}, smash his drones and grab power cells until the whole skyline shouts `;
+  const st = document.createElement('strong'); st.textContent = CITY.surge; lede.appendChild(st);
+  $('citySel').value = cityChoice.id; $('cityForm').hidden = cityChoice.id !== 'custom';
+  if (cityChoice.id === 'custom') $('cityInput').value = cityChoice.custom;
+}
+function chooseCity(id, custom) {
+  if (id === 'custom') { custom = window.AnansiCities.cleanName(custom); if (!custom) return false; }
+  cityChoice = { id, custom: id === 'custom' ? custom : '' }; window.AnansiCities.saveChoice(cityChoice);
+  setCityData(window.AnansiCities.resolve(cityChoice)); setPalettes();
+  world = newWorld((Math.random() * 1e9) | 0, camX - 200); ensureGen();
+  renderCityMenu();
+  return true;
+}
 function toMenu() {
   state = 'menu'; $('hud').hidden = true; $('hint').hidden = true; $('banner').hidden = true;
   world = newWorld((Math.random() * 1e9) | 0, camX - 200); ensureGen();
@@ -1328,7 +1423,7 @@ function gameOver() {
   $('oBest').textContent = 'Best: ' + best.toLocaleString();
   $('newBest').hidden = !isBest;
   const dd = districtAt(player.x);
-  $('overSub').textContent = `Lights out at ${dd.d.name}`;
+  $('overSub').textContent = `Lights out in ${CITY.name} · ${dd.d.name}`;
   $('overTitle').textContent = isBest ? 'Gbam!' : pick(['Wahala!', 'Chai!', 'Haba!'], Math.random());
   $('hud').hidden = true; $('hint').hidden = true;
   show('over'); $('btnAgain').focus({ preventScroll: true });
@@ -1345,6 +1440,7 @@ window.addEventListener('keydown', e => {
     if (state === 'play') { e.preventDefault(); if (!e.repeat) press(); }
     return;
   }
+  if (e.code === 'Escape' && !$('controls').hidden) { show(controlsFrom); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') { if (state === 'play') pauseGame(); else if (state === 'paused') resumeGame(); }
   if (e.code === 'KeyM') { Sound.toggle(); syncSoundLabels(); }
 });
@@ -1359,7 +1455,11 @@ $('btnResume').addEventListener('click', resumeGame);
 $('btnPause').addEventListener('click', e => { e.currentTarget.blur(); pauseGame(); });
 $('btnQuit').addEventListener('click', toMenu);
 $('btnMenu').addEventListener('click', toMenu);
-$('btnHow').addEventListener('click', e => { const h = $('howto'); h.hidden = !h.hidden; e.currentTarget.setAttribute('aria-expanded', String(!h.hidden)); Sound.unlock(); });
+$('btnControls').addEventListener('click', () => { Sound.unlock(); openControls('menu'); });
+$('btnControlsPause').addEventListener('click', () => openControls('pause'));
+$('btnControlsBack').addEventListener('click', () => show(controlsFrom));
+$('tabTouch').addEventListener('click', () => setControlsTab(true));
+$('tabKeys').addEventListener('click', () => setControlsTab(false));
 for (const id of ['btnMuteMenu', 'btnMutePause', 'btnMuteHud']) $(id).addEventListener('click', e => { Sound.toggle(); syncSoundLabels(); if (id === 'btnMuteHud') e.currentTarget.blur(); });
 $('menu').addEventListener('pointerdown', () => Sound.unlock());
 
@@ -1375,6 +1475,9 @@ player = newPlayer(); player.hidden = true;
 stats = { dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.1, surge: 0, nepas: 0, dieT: 0 };
 ensureGen();
 syncSoundLabels();
+window.AnansiCities.fillSelect($('citySel')); renderCityMenu();
+$('citySel').addEventListener('change', e => { if (e.target.value === 'custom') { $('cityForm').hidden = false; $('cityInput').focus(); } else chooseCity(e.target.value); });
+$('cityForm').addEventListener('submit', e => { e.preventDefault(); if (!chooseCity('custom', $('cityInput').value)) { $('cityInput').focus(); $('cityInput').placeholder = 'Type a city name first'; } });
 $('bestLine').textContent = 'Best: ' + best.toLocaleString();
 if (document.fonts && document.fonts.load) { document.fonts.load('20px "Bowlby One"').catch(() => {}); document.fonts.load('600 12px "Chakra Petch"').catch(() => {}); }
 requestAnimationFrame(frame);

@@ -317,7 +317,7 @@
       "id": "anansi-of-lagos",
       "name": "Anansi of Lagos",
       "tagline": "A 3D web-swinging game: swing across Lagos, or your own city, and switch the lights back on.",
-      "description": "Anansi, the West African spider trickster, is now a web-slinger, and Dr. Blackout has cut the city's power. Swing through an endless 3D city from Lagos Island over the Third Mainland Bridge to Eko Atlantic, smash drones, bounce on danfos and grab power cells until the skyline shouts UP NEPA! Choose Lagos, Abuja, Accra, Cape Town, London, New York or Dubai, or type any city's name. A classic 2D version is included.",
+      "description": "Anansi, the West African spider trickster, is now a web-slinger, and Dr. Blackout has cut the city's power. Swing through an endless 3D city from Lagos Island over the Third Mainland Bridge to Eko Atlantic, smash drones, bounce on danfos and grab power cells until the skyline shouts UP NEPA! Choose Lagos, Abuja, Accra, Cape Town, London, New York or Dubai, or type any city's name, and hear local slang from the bus conductors to the rescued crowds. Missions, web-zips and a city passport keep every run fresh, and a classic 2D version is included.",
       "status": "live",
       "category": "Games",
       "platforms": ["Web"],
@@ -329,9 +329,9 @@
       "url": "https://apps.paruto.com/games/anansi-of-lagos-3d/",
       "links": [{ "label": "Play the 2D version", "url": "https://apps.paruto.com/games/anansi-of-lagos/" }],
       "highlights": [
-        "Seven cities to swing over, or type your own",
+        "Seven cities with local slang, or type your own",
+        "Missions, web-zip dashes and a city passport",
         "Real-time sky from afternoon to night, with lagoon reflections",
-        "One-touch swinging on phone or desktop",
         "Classic 2D version included"
       ],
       "cover": "assets/apps/anansi-of-lagos/lekki-night-swing.jpg",

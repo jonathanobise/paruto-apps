@@ -55,6 +55,17 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .bar i { display: block; height: 100%; width: 15%; background: linear-gradient(90deg, var(--naija), #8af0a8); transition: width .2s; }
 .bar.surge i { background: linear-gradient(90deg, var(--danfo), #fff3b0); }
 .speed { font-weight: 700; font-size: 12px; letter-spacing: .1em; color: var(--muted); text-shadow: 0 1px 2px rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
+.zip { display: flex; align-items: center; gap: 8px; }
+.bar.small { width: clamp(60px, 16vw, 90px); height: 7px; }
+.zip i { background: linear-gradient(90deg, #8ad8ff, #ffffff); }
+.zip.ready .grid-label { color: #8ad8ff; }
+.missions { list-style: none; margin: 6px 0 0; padding: 8px 10px; display: grid; gap: 4px; background: rgba(10,12,36,.55); border-radius: 10px; max-width: min(250px, 62vw); }
+.missions:empty { display: none; }
+.missions li { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; font-weight: 600; line-height: 1.25; text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.missions li b { font-variant-numeric: tabular-nums; color: var(--danfo); white-space: nowrap; }
+.missions li.done { color: #8af0a8; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.missions li.done b { color: #8af0a8; }
+.missions .lvl { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
 .combo { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 14px); transform: translateX(-50%);
   font-family: var(--display); font-size: 18px; color: var(--danfo); text-shadow: 0 2px 0 var(--adire); white-space: nowrap; transition: transform .15s; }
 .combo.bump { transform: translateX(-50%) scale(1.25); }
@@ -123,6 +134,17 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .city-row .btn { flex: 0 0 auto; font-size: 15px; padding: 11px 14px; }
 .logo .small { overflow-wrap: anywhere; }
 .logo .small.long { font-size: clamp(13px, 3.6vw, 17px); letter-spacing: .08em; }
+.passport { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.passport b { color: var(--danfo); font-weight: 700; }
+.seg.two { grid-template-columns: 1fr 1fr; }
+.keys { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.keys li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; line-height: 1.35; }
+.keys li span { flex: 1 1 150px; min-width: 0; }
+kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); background: var(--chalk); border: 2px solid var(--ink); border-bottom-width: 4px; border-radius: 8px; padding: 3px 8px; white-space: nowrap; }
+.share { display: grid; gap: 6px; justify-items: center; }
+.share .btn { width: 100%; }
+.share-status { font-size: 13px; color: var(--muted); min-height: 1em; text-align: center; }
+.share textarea { width: 100%; box-sizing: border-box; font: 600 13px var(--body); color: var(--ink); background: var(--chalk); border: 2px solid var(--ink); border-radius: 10px; padding: 8px; resize: none; height: 72px; }
 .err { background: rgba(255,107,61,.15); border: 1.5px solid var(--ember); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.4; }
 @media (max-height: 560px) { .card { padding: 14px 18px 10px; gap: 9px; } .logo .big { font-size: 44px; } .lede { font-size: 13px; } }
 @media (prefers-reduced-motion: reduce) { .hint, .banner { animation: none; } }
@@ -140,6 +162,8 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
       <div class="meta"><span id="dist">0 m</span> · <span id="cash">₦0</span></div>
       <div class="grid"><span class="grid-label">GRID</span><div class="bar" id="powerBar"><i id="power"></i></div></div>
       <div class="speed" id="speed">0 km/h</div>
+      <div class="zip" id="zipMeter"><span class="grid-label">ZIP</span><div class="bar small"><i id="zipBar"></i></div></div>
+      <ul class="missions" id="missions" aria-label="Missions"></ul>
     </div>
     <div id="combo" class="combo"></div>
     <div class="hud-right">
@@ -160,34 +184,22 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
       <div class="city-pick">
         <label class="seg-label" for="citySel">Swing over</label>
         <div class="city-row">
-          <select id="citySel">
-            <option value="lagos">Lagos, Nigeria</option><option value="abuja">Abuja, Nigeria</option><option value="accra">Accra, Ghana</option>
-            <option value="capetown">Cape Town, South Africa</option><option value="london">London, UK</option><option value="newyork">New York, USA</option>
-            <option value="dubai">Dubai, UAE</option><option value="custom">Your city…</option>
-          </select>
+          <select id="citySel"></select>
         </div>
         <form class="city-row" id="cityForm" hidden>
           <input id="cityInput" type="text" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Type a city, e.g. Kigali" aria-label="Your city">
           <button class="btn alt" type="submit" id="cityGo">Build it</button>
         </form>
       </div>
+      <div class="passport" id="passport"></div>
       <div class="err" id="err" hidden></div>
       <div class="btns">
         <button class="btn" id="btnPlay" disabled>Building Lagos…</button>
         <div class="row">
-          <button class="btn alt" id="btnHow" aria-expanded="false" aria-controls="howto">How to play</button>
+          <button class="btn alt" id="btnControls">Controls</button>
           <button class="btn alt" id="btnMuteMenu">Sound on</button>
         </div>
       </div>
-      <ul class="howto" id="howto" hidden>
-        <li><b>Web</b><span>Hold anywhere, or hold Space, to web the ringed anchor.</span></li>
-        <li><b>Steer</b><span>Drag left or right while holding, or use A / D.</span></li>
-        <li><b>Fling</b><span>Let go on the upswing for a <strong>Gbam!</strong> boost.</span></li>
-        <li><b>Dive</b><span>Hold S or ↓ to drop faster and build speed.</span></li>
-        <li><b>Drones</b><span>Hit them fast to smash them. Slow bumps hurt.</span></li>
-        <li><b>Danfo</b><span>Land on a bus roof to bounce high.</span></li>
-        <li><b>Lagoon</b><span>Falling in costs a heart.</span></li>
-      </ul>
       <div class="seg-wrap">
         <span class="seg-label">Graphics</span>
         <div class="seg" data-quality-group><button data-q="ultra">Ultra</button><button data-q="high">High</button><button data-q="low">Smooth</button></div>
@@ -207,9 +219,12 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
         <button class="btn" id="btnResume">Resume</button>
         <div class="row">
           <button class="btn alt" id="btnRestart">Restart</button>
-          <button class="btn alt" id="btnMutePause">Sound on</button>
+          <button class="btn alt" id="btnControlsPause">Controls</button>
         </div>
-        <button class="btn alt" id="btnQuit">Main menu</button>
+        <div class="row">
+          <button class="btn alt" id="btnMutePause">Sound on</button>
+          <button class="btn alt" id="btnQuit">Main menu</button>
+        </div>
       </div>
       <div class="seg-wrap">
         <span class="seg-label">Graphics</span>
@@ -233,15 +248,56 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
         <div class="stat"><span>Drones smashed</span><b id="oDrones">0</b></div>
         <div class="stat"><span>People rescued</span><b id="oRescued">0</b></div>
       </div>
+      <div class="stat-best" id="oMissions"></div>
       <div class="stat-best" id="oBest">Best: 0</div>
       <div class="row">
         <button class="btn" id="btnAgain">Swing again</button>
         <button class="btn alt" id="btnMenu">Menu</button>
       </div>
+      <div class="share">
+        <button class="btn alt" id="btnShare">Share score</button>
+        <span class="share-status" id="shareStatus" role="status"></span>
+        <textarea id="shareText" readonly hidden aria-label="Score to copy"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section id="controls" class="screen" hidden>
+    <div class="card">
+      <h2 class="over-title" style="color:var(--danfo)">Controls</h2>
+      <div class="seg two" role="group" aria-label="Device">
+        <button id="tabTouch" aria-pressed="false">Touch</button><button id="tabKeys" aria-pressed="false">Keyboard &amp; mouse</button>
+      </div>
+      <ul class="keys" id="keysTouch">
+        <li><kbd>Hold anywhere</kbd><span>Shoot a web at the ringed anchor</span></li>
+        <li><kbd>Let go</kbd><span>Fling forward. On the upswing it's a perfect release</span></li>
+        <li><kbd>Drag ← →</kbd><span>Steer while you hold</span></li>
+        <li><kbd>Double-tap</kbd><span>Web-zip towards the anchor (recharges)</span></li>
+        <li><kbd>Tap on the ground</kbd><span>Jump when no anchor is in reach</span></li>
+        <li><kbd>❚❚ button</kbd><span>Pause</span></li>
+      </ul>
+      <ul class="keys" id="keysDesk" hidden>
+        <li><kbd>Space</kbd><kbd>Click</kbd><kbd>W</kbd><span>Hold to web, let go to fling</span></li>
+        <li><kbd>A</kbd><kbd>D</kbd><kbd>← →</kbd><span>Steer</span></li>
+        <li><kbd>Shift</kbd><kbd>E</kbd><span>Web-zip (or double-tap Space)</span></li>
+        <li><kbd>S</kbd><kbd>↓</kbd><span>Dive to build speed</span></li>
+        <li><kbd>P</kbd><kbd>Esc</kbd><span>Pause</span></li>
+        <li><kbd>M</kbd><span>Sound on or off</span></li>
+      </ul>
+      <ul class="howto" id="tips">
+        <li><b>Perfect</b><span>Let go as you swing upward for a speed boost and a moment of slow motion.</span></li>
+        <li><b>Drones</b><span>Hit them fast (or zip into them) to smash them. Slow bumps hurt.</span></li>
+        <li><b>Buses</b><span id="tipBus">Land on a bus roof to bounce high.</span></li>
+        <li><b>Power</b><span>Grab green cells to fill the GRID meter and set off a power surge.</span></li>
+        <li><b>Missions</b><span>Three goals each run, top left. Clear them all for a new set.</span></li>
+        <li><b>Water</b><span>Falling in costs a heart.</span></li>
+      </ul>
+      <button class="btn" id="btnControlsBack">Got it</button>
     </div>
   </section>
 </div>
 
+<script src="../shared/cities.js"></script>
 <script>
   // Fallback if the 3D engine never arrives (blocked network, very old browser).
   setTimeout(function () {
@@ -299,80 +355,19 @@ const WATER_Y = -3;
 const HIP = 1.15;          // hip height above feet
 const VIEW_AHEAD = 900;
 
-/* Cities: each one themes the same four route types (island streets, long bridge, canals with a
-   cable-stayed crossing, glass towers by the water) with its own names, buses, money and slang. */
-const NG = {
-  cheers: ['Gbam!', 'Oya!', 'Correct!', 'Ehen!', 'Sharp!', 'Na so!'], thanks: ['Thank you o!', 'E se gan!', 'Daalụ!', 'Na gode!', 'My guy!', 'God bless!'],
-  smashes: ['Gbosa!', 'Scatter am!', 'Kpatakpata!', 'Finish!'], ouch: ['Wahala!', 'Haba!', 'Ouch o!'], surge: 'UP NEPA!', off: 'NEPA don take light!',
-};
-const EN = { cheers: ['Nice!', 'Sharp!', 'Yes!', 'Smooth!', 'Boom!'], thanks: ['Thank you!', 'My hero!', 'Thanks!'], smashes: ['Smashed!', 'Boom!', 'Gone!'], ouch: ['Ouch!', 'Hey!', 'Argh!'], wet: ['Splash!', 'Soaked!'], surge: 'LIGHTS ON!', off: 'Blackout again!' };
-const PAL = {
-  tower: ['#9aa1ad', '#b5a58e', '#7f96a3', '#cdbda3', '#8790aa', '#a39ab0', '#c4c1b8'],
-  low: ['#e2a65b', '#d9735a', '#86bf98', '#e9d57f', '#a9c0e0', '#d39abb', '#efe8d6', '#e88a6a'],
-  glass: ['#6d8fa6', '#7aa0b6', '#5f7f96', '#8aa9bb', '#b8c4cc'],
-};
-const CITIES = {
-  lagos: { name: 'Lagos', cur: '₦', coin: 50, ...NG, wet: ['Chai!', 'Na lagoon o!', 'Splash!'],
-    bus: { name: 'Danfo', color: '#ffbf18', slogans: ['NO FOOD FOR LAZY MAN', "GOD'S TIME IS THE BEST", 'NO CONDITION IS PERMANENT', 'SHINE YOUR EYE'] },
-    districts: [['Lagos Island', 'Marina · Broad Street'], ['Third Mainland Bridge', '11.8 km over the lagoon'], ['Ikoyi–Lekki Link', 'Cable-stayed over Five Cowrie Creek'], ['Eko Atlantic', 'A new city on the Atlantic']],
-    billboards: [['SUYA', 'HOT & SPICY · OPEN LATE', '#c0392b'], ['PURE WATER', '₦50 · ICE COLD', '#2e86c1'], ['JOLLOF CHAMPS', 'WE DON WIN AGAIN', '#e67e22'], ['NEPA', 'LIGHT DEY COME... SOON', '#16a085'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AFROBEATS', 'LIVE TONIGHT · TBS', '#8e44ad']] },
-  abuja: { name: 'Abuja', cur: '₦', coin: 50, ...NG, wet: ['Chai!', 'Na lake o!', 'Splash!'],
-    bus: { name: 'Bus', color: '#14935a', slogans: ['WUSE · GARKI · MAITAMA', 'NO CONDITION IS PERMANENT', 'CENTRE OF UNITY', 'SHINE YOUR EYE'] },
-    districts: [['Central Business District', 'Towers by the Federal Secretariat'], ['Jabi Lake Crossing', 'Bridges over the lake'], ['Wuse · Maitama', 'Avenues, canals and a cable-stayed link'], ['Centenary City', 'The new district by Aso Rock']],
-    billboards: [['SUYA', 'AREA ONE · OPEN LATE', '#c0392b'], ['KILISHI', 'SPICY · DRIED · SWEET', '#9a4a1a'], ['JOLLOF CHAMPS', 'WE DON WIN AGAIN', '#e67e22'], ['NEPA', 'LIGHT DEY COME... SOON', '#16a085'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AFROBEATS', 'LIVE TONIGHT · JABI', '#8e44ad']] },
-  accra: { name: 'Accra', cur: '₵', coin: 2, cheers: ['Chale!', 'Ayekoo!', 'Eiii!', 'Charley wow!', 'Sharp!'], thanks: ['Medaase!', 'Oyiwaladon!', 'Thank you o!', 'Chale, thanks!'],
-    smashes: ['Boom!', 'Chale!', 'Gone!'], ouch: ['Ei!', 'Ah!', 'Chale, why?'], wet: ['Ei, water!', 'Splash!'], surge: 'DUMSOR DONE!', off: 'Dumsor is back!',
-    bus: { name: 'Trotro', color: '#f1efe6', slogans: ['NYAME NE HENE', 'GOD IS KING', 'SWEET MOTHER', 'NO TIME TO DIE'] },
-    districts: [['Osu · Oxford Street', "Accra's busiest strip"], ['Korle Lagoon Crossing', 'Over the lagoon to Jamestown'], ['Ridge · Airport City', 'Offices, canals and a cable-stayed link'], ['Marine Drive', 'Towers along the Atlantic']],
-    billboards: [['WAAKYE', 'HOT & FRESH · OSU', '#b03a2e'], ['KELEWELE', 'SPICY PLANTAIN BITES', '#d35400'], ['JOLLOF CHAMPS', 'GHANA JOLLOF NO. 1', '#e67e22'], ['DUMSOR', 'TIMETABLE OUT SOON', '#16a085'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['HIGHLIFE', 'LIVE TONIGHT · OSU', '#8e44ad']] },
-  capetown: { name: 'Cape Town', cur: 'R', coin: 5, cheers: ['Sharp sharp!', 'Lekker!', 'Howzit!', 'Shot!'], thanks: ['Enkosi!', 'Dankie!', 'Shot, bru!', 'Thank you!'],
-    smashes: ['Boom!', 'Lekker!', 'Gone!'], ouch: ['Eish!', 'Yoh!', 'Ag no!'], wet: ['Ice cold!', 'Splash!'], surge: 'LOAD-SHEDDING OVER!', off: 'Stage 6 again!',
-    bus: { name: 'Taxi', color: '#f3f3ef', slogans: ['SHARP SHARP', 'CAPE TOWN · BELLVILLE', 'NO CHANGE NO ENTRY', 'SHOSHOLOZA'] },
-    districts: [['City Bowl', 'Adderley Street under the mountain'], ['Foreshore Freeway', 'The famous unfinished bridge'], ['V&A Waterfront', 'Canals and a cable-stayed link'], ['Century City', 'Glass towers by the canals']],
-    billboards: [['BUNNY CHOW', 'DURBAN STYLE · HOT', '#c0392b'], ['GATSBY', 'ONE ROLL FEEDS FOUR', '#d35400'], ['BRAAI SPOT', 'OPEN SUNDAYS', '#7a4a1a'], ['LOAD-SHEDDING', 'STAGE 2 TONIGHT', '#16a085'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AMAPIANO', 'LIVE TONIGHT', '#8e44ad']],
-    pal: { low: ['#e94f6a', '#4fb0e0', '#f6d04d', '#7ccf8a', '#b58ad8', '#f39a4a', '#f2efe6'] } },
-  london: { name: 'London', cur: '£', coin: 1, cheers: ['Brilliant!', 'Smashing!', 'Proper!', 'Lovely!'], thanks: ['Cheers, mate!', 'Ta!', 'Lovely, thanks!'],
-    smashes: ['Smashed it!', 'Get in!', 'Gone!'], ouch: ['Blimey!', 'Oi!', 'Ouch!'], wet: ['Into the Thames!', 'Splash!'], surge: 'LIGHTS ON, LONDON!', off: 'Blackout again, innit.',
-    bus: { name: 'Bus', color: '#d71920', slogans: ['NEXT STOP: PECKHAM', 'MIND THE GAP', 'OXFORD CIRCUS', 'HOLD ON TIGHT'] },
-    districts: [['The City', 'Bank to Liverpool Street'], ['Thames Crossing', 'Over the river'], ['Docklands', 'Canals and a cable-stayed link'], ['Nine Elms', 'Glass towers on the South Bank']],
-    billboards: [['PIE & MASH', 'PROPER LONDON GRUB', '#2e5e3a'], ['FISH & CHIPS', 'OPEN TILL LATE', '#2e86c1'], ['JOLLOF', 'PECKHAM · SINCE FOREVER', '#e67e22'], ['MIND THE GAP', 'PLEASE', '#c0392b'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['GRIME NIGHT', 'LIVE TONIGHT', '#8e44ad']],
-    pal: { low: ['#8b4a3a', '#a0583f', '#7a3e32', '#b8a48a', '#c9b79c', '#6e4b3a', '#e6e0d2'], tower: ['#c9c2b2', '#b5ada0', '#9aa1ad', '#d6cfc0', '#8790aa'] } },
-  newyork: { name: 'New York', cur: '$', coin: 1, cheers: ["Let's go!", 'Nice!', 'No way!', 'Big moves!'], thanks: ['Thanks, pal!', "You're the best!", 'Thank you!'],
-    smashes: ['Boom!', 'Outta here!', 'Gone!'], ouch: ['Hey!', 'Ow!', 'Watch it!'], wet: ['Into the river!', 'Splash!'], surge: 'LIGHTS ON, NEW YORK!', off: 'Blackout again!',
-    bus: { name: 'Cab', color: '#ffc21a', slogans: ['BROOKLYN · QUEENS', 'HONK IF YOU SWING', 'BODEGA RUN', 'NO STANDING'] },
-    districts: [['Midtown', 'Avenues of glass and stone'], ['East River Crossing', 'Bridges toward Brooklyn'], ['Hudson Yards', 'Piers and a cable-stayed link'], ['Lower Manhattan', 'Towers by the harbour']],
-    billboards: [['DOLLAR SLICE', 'HOT PIZZA 24/7', '#c0392b'], ['BAGELS', 'EVERYTHING · FRESH', '#d35400'], ['BODEGA', 'OPEN ALL NIGHT', '#2e86c1'], ['WEST AFRICAN EATS', 'LITTLE SENEGAL · HARLEM', '#e67e22'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AFROBEATS', 'LIVE IN BROOKLYN', '#8e44ad']],
-    pal: { low: ['#6e4436', '#8a5a44', '#a87b5e', '#5d3a2e', '#c2a487', '#9a6b52'], tower: ['#a8a39a', '#8f949c', '#c4bdb0', '#7a828c', '#b3a58f'] } },
-  dubai: { name: 'Dubai', cur: 'AED ', coin: 2, cheers: ['Yalla!', 'Habibi!', 'Wow!', 'Ahsant!'], thanks: ['Shukran!', 'Thank you, habibi!', 'Thank you!'],
-    smashes: ['Boom!', 'Yalla!', 'Gone!'], ouch: ['Ya salam!', 'Ouch!', 'Hey!'], wet: ['Into the creek!', 'Splash!'], surge: 'LIGHTS ON, YALLA!', off: 'Blackout again!',
-    bus: { name: 'Taxi', color: '#e8dcc0', slogans: ['DEIRA · MARINA', 'YALLA YALLA', 'KARAMA · BUR DUBAI', 'WELCOME'] },
-    districts: [['Downtown Dubai', 'Towers along Sheikh Zayed Road'], ['Dubai Creek Crossing', 'Over the old creek'], ['Dubai Marina', 'Canals and a cable-stayed link'], ['Business Bay', 'Glass towers on the canal']],
-    billboards: [['SHAWARMA', 'OPEN 24 HOURS', '#c0392b'], ['KARAK CHAI', 'HOT · SWEET · STRONG', '#b9770e'], ['GOLD SOUK', 'THIS WAY', '#8a6d1a'], ['DESERT SAFARI', 'BOOK TONIGHT', '#d35400'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['AFROBEATS', 'LIVE AT THE MARINA', '#8e44ad']],
-    pal: { low: ['#e3cfa5', '#d8bf8f', '#efe2c4', '#cdb387', '#f2ead8', '#c9a878'], glass: ['#7fa6c0', '#9fb9cc', '#6d8fa6', '#b8c8d4', '#c9d3da'] } },
-};
+/* Cities come from ../shared/cities.js (shared with the 2D game). Each themes the same four route types. */
+const { PAL } = window.AnansiCities;
 const KINDS = ['island', 'bridge', 'lekki', 'eko'], LENS = [1000, 900, 900, 1100];
-function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function customCity(name) {
-  const r = mulberry32(hashStr(name.toLowerCase())), up = name.toUpperCase();
-  const busCols = ['#ffbf18', '#d71920', '#1f6fd1', '#14935a', '#f1efe6', '#ff7a1a'];
-  const lows = [PAL.low, CITIES.capetown.pal.low, CITIES.london.pal.low, CITIES.newyork.pal.low, CITIES.dubai.pal.low];
-  return { name, custom: true, cur: '', coin: 1, ...EN,
-    bus: { name: 'Bus', color: pick(busCols, r()), slogans: [`${up} CITY`, 'NEXT STOP: DOWNTOWN', 'HOLD ON TIGHT', 'ALL ABOARD'] },
-    districts: [['Downtown', `${name} city centre`], ['River Crossing', 'Bridges over the water'], ['Harbour Link', 'Canals and a cable-stayed bridge'], ['New Town', 'Glass towers by the water']],
-    billboards: [[up.length > 12 ? 'WELCOME' : up, up.length > 12 ? `TO ${up}` : 'WELCOME TO THE CITY', '#2e86c1'], ['STREET FOOD', 'OPEN LATE', '#c0392b'], ['POWER CUTS?', 'CALL ANANSI', '#16a085'], ['LIVE MUSIC', 'TONIGHT', '#8e44ad'], ['DR. BLACKOUT', 'GENERATORS FOR SALE', '#2c2140'], ['ANANSI', `SPOTTED IN ${up}`.slice(0, 26), '#e67e22']],
-    pal: { low: pick(lows, r()) } };
-}
-let CITY, DISTRICTS, CYCLE, CHEERS, THANKS, SMASHES, OUCH, WET, SLOGANS, BILLBOARDS;
+let CITY, DISTRICTS, CYCLE, CHEERS, HYPE, SPEED, THANKS, SMASHES, OUCH, WET, SHOUTS, SLOGANS, BILLBOARDS;
 function setCityData(c) {
   CITY = c;
   DISTRICTS = c.districts.map(([name, sub], i) => ({ name, sub, len: LENS[i], kind: KINDS[i] }));
   CYCLE = DISTRICTS.reduce((t, d) => t + d.len, 0);
-  ({ cheers: CHEERS, thanks: THANKS, smashes: SMASHES, ouch: OUCH, wet: WET } = c);
+  ({ cheers: CHEERS, hype: HYPE, speed: SPEED, thanks: THANKS, smashes: SMASHES, ouch: OUCH, wet: WET, shouts: SHOUTS } = c);
   SLOGANS = c.bus.slogans; BILLBOARDS = c.billboards;
 }
-let cityChoice = store.get('city', { id: 'lagos', custom: '' });
-if (!cityChoice || (!CITIES[cityChoice.id] && !(cityChoice.id === 'custom' && cityChoice.custom))) cityChoice = { id: 'lagos', custom: '' };
-setCityData(cityChoice.id === 'custom' ? customCity(String(cityChoice.custom).slice(0, 24)) : CITIES[cityChoice.id]);
+let cityChoice = window.AnansiCities.loadChoice();
+setCityData(window.AnansiCities.resolve(cityChoice));
 function districtAt(s) {
   s = Math.max(0, s); const lap = Math.floor(s / CYCLE); let r = s - lap * CYCLE;
   for (let i = 0; i < DISTRICTS.length; i++) { if (r < DISTRICTS[i].len) return { i, lap, d: DISTRICTS[i], r }; r -= DISTRICTS[i].len; }
@@ -426,6 +421,8 @@ const Sound = (() => {
     jump() { tone('sine', 300, 600, 0.1, 0.15); },
     zap() { tone('square', 900, 300, 0.12, 0.05); },
     bonk() { tone('square', 140, 60, 0.15, 0.2); },
+    zip() { burst(900, 1.2, 0.28, 0.55, null, 0, 'bandpass', 5200); tone('sawtooth', 260, 1300, 0.22, 0.07); },
+    mission() { [784, 988, 1175, 1568].forEach((f, i) => tone('triangle', f, f, 0.16, 0.15, null, ac.currentTime + i * 0.08)); },
   };
   const BPM = 108, S16 = 60 / BPM / 4;
   const CHORDS = [[220, 261.6, 329.6], [174.6, 220, 261.6], [261.6, 329.6, 392], [196, 246.9, 293.7]];
@@ -693,7 +690,7 @@ function buildTextMaterials() {
   BB_MATS = BILLBOARDS.map(b => { const t = billboardTex(b); return new THREE.MeshStandardMaterial({ map: t, emissiveMap: t, emissive: 0xffffff, emissiveIntensity: 0, roughness: 0.5 }); });
   SLOGAN_MATS = SLOGANS.map(s => new THREE.MeshStandardMaterial({ map: sloganTex(s), roughness: 0.4 }));
   if (HELP_MAT) { HELP_MAT.map.dispose(); }
-  HELP_MAT = new THREE.SpriteMaterial({ map: labelTex('HELP!', '#fff5de', '#c0392b'), depthWrite: false });
+  HELP_MAT = new THREE.SpriteMaterial({ map: labelTex(CITY.help, '#fff5de', '#c0392b'), depthWrite: false });
 }
 buildTextMaterials();
 
@@ -1254,7 +1251,7 @@ let state = 'loading';
 let time = 0, shake = 0, attractS = 0, attractT = 0;
 let player = null, stats = null;
 let best = store.get('best', 0);
-const input = { held: false, buffer: 0, keySteer: 0, drag: 0, startX: 0, dive: false, keys: new Set() };
+const input = { lastPress: -1, held: false, buffer: 0, keySteer: 0, drag: 0, startX: 0, dive: false, keys: new Set() };
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), tmpQ = new THREE.Quaternion(), tmpM = new THREE.Matrix4();
 const UP = new THREE.Vector3(0, 1, 0), FWD = new THREE.Vector3(0, 0, -1);
 const camState = { yaw: 0, fov: 62, pos: new THREE.Vector3(0, 30, 40), look: new THREE.Vector3(0, 20, 0) };
@@ -1262,7 +1259,7 @@ const camState = { yaw: 0, fov: 62, pos: new THREE.Vector3(0, 30, 40), look: new
 function newPlayer() {
   return { pos: new THREE.Vector3(0, HIP, -4), vel: new THREE.Vector3(0, 0, -RUN), rope: null, ropeLen: 0, reel: 0, grounded: true, hearts: 3, inv: 0, web: 1, runPh: 0, target: null, dead: false, heading: 0, quat: new THREE.Quaternion() };
 }
-function newStats() { return { dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.12, surge: 0, nepas: 0, dieT: 0, droneTimer: 4, districtKey: -1 }; }
+function newStats() { return { zipCd: 0, zips: 0, slowmo: 0, missions: [], mLevel: 0, missionsDone: 0, dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.12, surge: 0, nepas: 0, dieT: 0, droneTimer: 4, districtKey: -1 }; }
 
 /* ======================= popups ======================= */
 const popLayer = $('pops'); const popPool = [];
@@ -1283,6 +1280,115 @@ function updatePops(dt) {
   }
 }
 function clearPops() { for (const p of popPool) { p.active = false; p.el.style.display = 'none'; } }
+
+/* ======================= missions ======================= */
+const plural = (n, one, many) => n === 1 ? one : many;
+const MISSIONS = [
+  { id: 'smash', n: [3, 5, 8], label: n => `Smash ${n} ${plural(n, 'drone', 'drones')}` },
+  { id: 'rescue', n: [1, 2, 3], label: n => `Rescue ${n} ${plural(n, 'person', 'people')}` },
+  { id: 'perfect', n: [4, 8, 12], label: n => `Land ${n} perfect releases` },
+  { id: 'coins', n: [30, 60, 100], label: n => `Grab ${n} coins` },
+  { id: 'combo', n: [10, 15, 25], max: true, label: n => `Chain a ${n}-swing combo` },
+  { id: 'bounce', n: [1, 2, 4], label: n => `Bounce on ${n} ${CITY.bus.name.toLowerCase()} ${plural(n, 'roof', 'roofs')}` },
+  { id: 'zip', n: [3, 6, 10], label: n => `Web-zip ${n} times` },
+  { id: 'speed', n: [180, 200, 220], max: true, label: n => `Hit ${n} km/h` },
+  { id: 'surge', n: [1], label: () => `Fill the grid: ${CITY.surge}` },
+  { id: 'reach', n: [1], label: () => `Reach ${DISTRICTS[2].name}` },
+];
+let missionsDirty = true;
+function newMissions() {
+  const pool = MISSIONS.filter(m => !(m.id === 'reach' && stats.dist > DISTRICTS[0].len + DISTRICTS[1].len));
+  const chosen = [];
+  while (chosen.length < 3 && pool.length) chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  stats.missions = chosen.map(def => ({ def, target: def.n[Math.min(stats.mLevel, def.n.length - 1)], prog: 0, done: false }));
+  missionsDirty = true;
+}
+function missionEvent(id, value = 1) {
+  if (state !== 'play') return;
+  for (const m of stats.missions) {
+    if (m.done || m.def.id !== id) continue;
+    const before = m.prog;
+    m.prog = m.def.max ? Math.max(m.prog, value) : m.prog + value;
+    if (Math.floor(m.prog) !== Math.floor(before)) missionsDirty = true;
+    if (m.prog >= m.target) {
+      m.done = true; missionsDirty = true; stats.missionsDone++;
+      const pts = 300 * (stats.mLevel + 1); stats.bonus += pts;
+      pop(tmpV.copy(player.pos).add(tmpV2.set(0, 4, -5)), `Mission done! +${pts}`, '#8af0a8', true); Sound.fx.mission();
+      if (stats.missions.every(q => q.done)) {
+        stats.mLevel++;
+        setTimeout(() => { if (state === 'play' || state === 'paused') { newMissions(); pop(tmpV.copy(player.pos).add(tmpV2.set(0, 4, -6)), pick(HYPE, Math.random()) + ' New missions!', '#ff9a3d', true); } }, 1400);
+      }
+    }
+  }
+}
+function renderMissions() {
+  if (!missionsDirty) return; missionsDirty = false;
+  const ul = $('missions'); ul.textContent = '';
+  const head = document.createElement('li'); head.className = 'lvl'; head.textContent = `Missions · level ${stats.mLevel + 1}`; ul.appendChild(head);
+  for (const m of stats.missions) {
+    const li = document.createElement('li'); if (m.done) li.className = 'done';
+    const sp = document.createElement('span'); sp.textContent = m.def.label(m.target);
+    const b = document.createElement('b'); b.textContent = m.done ? '✓' : m.def.id === 'speed' ? `${Math.floor(m.prog)}` : `${Math.min(Math.floor(m.prog), m.target)}/${m.target}`;
+    li.append(sp, b); ul.appendChild(li);
+  }
+}
+
+/* ======================= first-run coach ======================= */
+const COACH = [
+  { touch: 'Hold anywhere to shoot a web', desk: 'Hold Space or the mouse to shoot a web' },
+  { touch: 'Let go as you swing upward', desk: 'Let go as you swing upward' },
+  { touch: 'Drag left or right to steer', desk: 'Use A and D to steer' },
+  { touch: 'Double-tap to web-zip', desk: 'Press Shift to web-zip' },
+];
+const coach = { step: store.get('coached', false) ? -1 : 0, t: 0 };
+function coachShow() {
+  const h = $('hint');
+  if (coach.step < 0) return;
+  h.textContent = COACH[coach.step][isTouch ? 'touch' : 'desk']; h.hidden = false;
+}
+function coachEvent(ev) {
+  if (coach.step < 0) { if (ev === 'web') $('hint').hidden = true; return; }
+  const need = ['web', 'release', 'steer', 'zip'][coach.step];
+  if (ev !== need) return;
+  coach.step++; coach.t = 0;
+  if (coach.step >= COACH.length) { coach.step = -1; store.set('coached', true); $('hint').hidden = true; pop(tmpV.copy(player.pos).add(tmpV2.set(0, 4, -5)), "You're ready. Go!", '#8af0a8', true); }
+  else coachShow();
+}
+
+/* ======================= web-zip ======================= */
+const ZIP_CD = 3.5;
+function zip() {
+  const p = player;
+  if (state !== 'play' || p.dead || stats.zipCd > 0) return false;
+  const a = p.rope || p.target || findTarget(); if (!a) return false;
+  p.rope = null; p.grounded = false;
+  tmpV.set(a.x - p.pos.x, a.y - p.pos.y, a.z - p.pos.z); const d = tmpV.length(); tmpV.normalize();
+  p.vel.copy(tmpV).multiplyScalar(Math.min(60, 30 + d * 0.6)); p.vel.z = Math.min(p.vel.z, -22); p.vel.y = Math.max(p.vel.y, 6);
+  stats.zipCd = ZIP_CD; stats.zips++;
+  Sound.fx.zip(); addShake(0.3); camState.fov += 5;
+  burst(p.pos.x, p.pos.y, p.pos.z, 22, ['#8ad8ff', '#ffffff', '#ffc72c'], 9, 0.5, 0);
+  coachEvent('zip'); missionEvent('zip');
+  return true;
+}
+
+/* ======================= city passport & sharing ======================= */
+function cityKey() { return CITY.custom ? 'custom:' + CITY.name.toLowerCase() : CITY.id; }
+function cityBests() { const b = store.get('cityBest', {}); return b && typeof b === 'object' ? b : {}; }
+function renderPassport() {
+  const b = cityBests(), ids = window.AnansiCities.ORDER, n = ids.filter(id => b[id] > 0).length, here = b[cityKey()];
+  const el = $('passport'); el.textContent = `Passport ${n} of ${ids.length} cities · `;
+  const strong = document.createElement('b'); strong.textContent = here ? `Best in ${CITY.name}: ${here.toLocaleString()}` : `No score in ${CITY.name} yet`; el.appendChild(strong);
+}
+const SHARE_URL = 'https://apps.paruto.com/games/anansi-of-lagos-3d/';
+let shareMsg = '';
+async function shareScore() {
+  const status = $('shareStatus'), box = $('shareText');
+  if (navigator.share && isTouch) {
+    try { await navigator.share({ title: 'Anansi of Lagos 3D', text: shareMsg, url: SHARE_URL }); status.textContent = 'Shared.'; return; } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(`${shareMsg} ${SHARE_URL}`); status.textContent = 'Copied. Paste it anywhere.'; }
+  catch (e) { box.hidden = false; box.value = `${shareMsg} ${SHARE_URL}`; box.focus(); box.select(); status.textContent = "Copy didn't work here, so the text is selected below."; }
+}
 
 /* ======================= player logic ======================= */
 function comboMult() { return 1 + Math.floor(stats.combo / 4); }
@@ -1309,14 +1415,16 @@ function attach(a) {
   if (p.grounded) { p.grounded = false; p.vel.y = Math.max(p.vel.y, 7); }
   p.vel.z -= 3;
   stats.combo++; stats.swings++; input.buffer = 0;
+  if (stats.combo >= 5 && stats.combo % 5 === 0) pop(tmpV.copy(p.pos).add(tmpV2.set(0, 3.2, -3)), pick(HYPE, Math.random()), '#ff9a3d', true);
   Sound.fx.thwip();
-  $('hint').hidden = true;
+  coachEvent('web'); missionEvent('combo', stats.combo);
   bumpCombo();
 }
 function release(manual) {
   const p = player; if (!p.rope) return;
   p.rope = null;
   if (!manual) return;
+  coachEvent('release');
   const fwd = -p.vel.z, ang = Math.atan2(p.vel.y, fwd) * 180 / Math.PI;
   if (fwd > 14 && ang > 12 && ang < 70) {
     p.vel.multiplyScalar(1.06); p.vel.y += 2.5;
@@ -1324,12 +1432,18 @@ function release(manual) {
     pop(tmpV.copy(p.pos).add(tmpV2.set(0, 2.5, 0)), pick(CHEERS, Math.random()), '#ffc72c');
     Sound.fx.perfect();
     burst(p.pos.x, p.pos.y, p.pos.z, 14, ['#ffc72c', '#fff5de'], 6, 0.5, 0);
+    if (!reduceMotion) stats.slowmo = 0.38;
+    camState.fov += 6; missionEvent('perfect');
   }
 }
 function press() {
   if (state !== 'play') return;
   input.held = true;
-  const p = player; if (p.rope || p.dead) return;
+  const p = player; if (p.dead) return;
+  // a quick second tap web-zips
+  if (time - input.lastPress < 0.3 && zip()) { input.lastPress = -1; return; }
+  input.lastPress = time;
+  if (p.rope) return;
   const t = findTarget();
   if (t) attach(t);
   else if (p.grounded) { p.grounded = false; p.vel.y = 16; Sound.fx.jump(); }
@@ -1365,11 +1479,11 @@ function splash() {
   // come back up over the next solid ground, never over the same water
   const here = -p.pos.z; let safe = here + 6;
   for (const g of groundSegs) if (g.type !== 'water' && g.s1 > here + 8) { safe = Math.max(g.s0 + 4, here + 6); break; }
-  p.pos.set(clamp(p.pos.x, -8, 8), 16, -safe); p.vel.set(0, 6, -18); p.inv = 2.2;
+  p.pos.set(clamp(p.pos.x, -8, 8), 16, -safe); p.vel.set(0, 6, -18); p.inv = 2.2; camState.snap = true;
 }
 function die() { player.dead = true; state = 'dying'; stats.dieT = 1.4; Sound.setIntensity(0.2); }
 function startSurge() {
-  stats.surge = 8; stats.power = 1; stats.nepas++;
+  stats.surge = 8; stats.power = 1; stats.nepas++; missionEvent('surge');
   Sound.fx.nepa(); addShake(0.7);
   pop(tmpV.copy(player.pos).add(tmpV2.set(0, 4, -6)), CITY.surge, '#ffc72c', true);
   for (let i = 0; i < 5; i++) burst(player.pos.x + (Math.random() - 0.5) * 20, player.pos.y + 6 + Math.random() * 10, player.pos.z - 10 - Math.random() * 20, 24, ['#10a35e', '#ffffff', '#ffc72c'], 10, 1.4, 6);
@@ -1450,7 +1564,7 @@ function updateWorld(dt) {
       p.pos.y = 2.45 + HIP; p.vel.y = 26; p.vel.z = Math.min(p.vel.z, -22); p.grounded = false;
       if (p.rope) release(false);
       stats.bonus += 40 * comboMult(); stats.combo++; bumpCombo();
-      Sound.fx.bounce(); pop(tmpV.set(d.x, 4.5, -d.s), CITY.bus.name + ' bounce!', '#ffc72c');
+      Sound.fx.bounce(); pop(tmpV.set(d.x, 4.5, -d.s), CITY.bus.name + ' bounce!', '#ffc72c'); missionEvent('bounce');
     } else if (ds < 0) { p.pos.z = -(d.s - 3.25); if (p.vel.z < 0) p.vel.z = 0; }
   }
   // drones
@@ -1481,7 +1595,7 @@ function updateWorld(dt) {
       d.dead = true;
       burst(d.x, d.y, -d.s, 40, ['#ff6b3d', '#ffc72c', '#8a5cff', '#ffffff'], 14, 0.8, 12);
       if (speed > SMASH || surge) {
-        stats.drones++; const pts = 100 * comboMult(); stats.bonus += pts;
+        stats.drones++; const pts = 100 * comboMult(); stats.bonus += pts; missionEvent('smash');
         pop(d.mesh.position, pick(SMASHES, Math.random()) + ' +' + pts, '#ffc72c', true);
         Sound.fx.smash(); addShake(0.5);
         if (Math.random() < 0.4) for (let i = 0; i < 3; i++) coins.push({ x: d.x + (i - 1) * 1.6, y: d.y, s: d.s - 6, z: -(d.s - 6), ph: i });
@@ -1502,7 +1616,7 @@ function updateWorld(dt) {
     if (c.got) continue;
     const dx = p.pos.x - c.x, dy = p.pos.y - c.y, dz = p.pos.z - c.z, d = Math.hypot(dx, dy, dz);
     if (magnet && d < magnet) { const k = 40 * dt / d; c.x += dx * k; c.y += dy * k; c.z += dz * k; c.s = -c.z; }
-    if (d < 2.6 && !p.dead) { c.got = true; stats.coins++; stats.bonus += 10 * comboMult(); Sound.fx.coin(); burst(c.x, c.y, c.z, 6, ['#ffd84a', '#fff5de'], 4, 0.35, 0); }
+    if (d < 2.6 && !p.dead) { c.got = true; stats.coins++; missionEvent('coins'); stats.bonus += 10 * comboMult(); Sound.fx.coin(); burst(c.x, c.y, c.z, 6, ['#ffd84a', '#fff5de'], 4, 0.35, 0); }
   }
   for (const c of cells) {
     if (c.got) continue;
@@ -1527,7 +1641,7 @@ function updateWorld(dt) {
     if (c.rescued) { const j = Math.abs(Math.sin(c.t * 8)); c.armR.rotation.z = 2.6 + j * 0.3; c.armL.rotation.z = -2.6 - j * 0.3; c.mesh.position.y = c.y + j * 0.25; }
     else c.armR.rotation.z = 2.4 + Math.sin(time * 9 + c.ph) * 0.5;
     if (!c.rescued && !p.dead && Math.abs(p.pos.x - c.x) < 3.2 && Math.abs(ps - c.s) < 3.2 && Math.abs(p.pos.y - (c.y + 1)) < 3.4) {
-      c.rescued = true; c.t = 0; c.help.visible = false; stats.rescued++; const pts = 250 * comboMult(); stats.bonus += pts;
+      c.rescued = true; c.t = 0; c.help.visible = false; stats.rescued++; const pts = 250 * comboMult(); stats.bonus += pts; missionEvent('rescue');
       Sound.fx.rescue(); pop(tmpV.set(c.x, c.y + 3, c.z), pick(THANKS, Math.random()) + ' +' + pts, '#8af0a8', true);
       burst(c.x, c.y + 1.5, c.z, 24, ['#10a35e', '#ffffff', '#ffc72c'], 7, 0.9, 10);
     }
@@ -1623,15 +1737,31 @@ function updateCamera(dt) {
   target.x = clamp(lerp(target.x, 0, 0.45), -11, 11);
   const g = groundAt(-target.z); target.y = Math.max(target.y, (g && g.type !== 'water' ? 1.5 : WATER_Y + 1.2));
   if (p.dead) target.y = Math.max(target.y, 6);
+  const lookTarget = tmpV2.clone().copy(p.pos).addScaledVector(f, 9).add(tmpV.set(0, 1.4, 0));
+  if (camState.snap) { camState.pos.copy(target); camState.look.copy(lookTarget); camState.snap = false; }
   camState.pos.lerp(target, 1 - Math.exp(-dt * 7));
-  camState.look.lerp(tmpV2.copy(p.pos).addScaledVector(f, 9).add(tmpV.set(0, 1.4, 0)), 1 - Math.exp(-dt * 10));
-  camera.position.copy(camState.pos);
-  if (shake > 0) { camera.position.x += (Math.random() - 0.5) * shake; camera.position.y += (Math.random() - 0.5) * shake; shake = Math.max(0, shake - dt * 2.5); }
-  camera.lookAt(camState.look);
-  camera.rotateZ(clamp(-p.vel.x * 0.006, -0.12, 0.12));
+  camState.look.lerp(lookTarget, 1 - Math.exp(-dt * 10));
   const fov = 60 + clamp(speed * 0.33, 0, 28) + (stats.surge > 0 ? 4 : 0);
   camState.fov += (fov - camState.fov) * (1 - Math.exp(-dt * 3));
   camera.fov = camState.fov; camera.updateProjectionMatrix();
+  const aim = () => {
+    camera.position.copy(camState.pos);
+    camera.lookAt(camState.look);
+    camera.rotateZ(clamp(-p.vel.x * 0.006, -0.12, 0.12));
+    camera.updateMatrixWorld();
+  };
+  aim();
+  // never let the hero leave the frame: if they drift past the safe area, pull the camera onto them
+  if (!p.dead) {
+    for (let i = 0; i < 3; i++) {
+      tmpV.copy(p.pos); tmpV.y += 0.4; tmpV.project(camera);
+      if (tmpV.z < 1 && Math.abs(tmpV.x) < 0.72 && tmpV.y < 0.7 && tmpV.y > -0.8) break;
+      camState.look.lerp(tmpV.copy(p.pos), 0.5);
+      tmpV2.copy(p.pos).addScaledVector(f, -back); tmpV2.y += up; camState.pos.lerp(tmpV2, 0.35);
+      aim();
+    }
+  }
+  if (shake > 0) { camera.position.x += (Math.random() - 0.5) * shake; camera.position.y += (Math.random() - 0.5) * shake; shake = Math.max(0, shake - dt * 2.5); }
 }
 
 /* ======================= time of day ======================= */
@@ -1698,6 +1828,8 @@ function updateHud() {
   if (hudCache.pw !== pw) { $('power').style.width = Math.max(4, pw) + '%'; hudCache.pw = pw; }
   if (hudCache.surge !== surge) { $('powerBar').classList.toggle('surge', surge); hudCache.surge = surge; }
   if (hudCache.k !== kmh) { $('speed').textContent = kmh + ' km/h'; hudCache.k = kmh; }
+  const zp = Math.round((1 - stats.zipCd / ZIP_CD) * 100);
+  if (hudCache.zp !== zp) { $('zipBar').style.width = Math.max(4, zp) + '%'; $('zipMeter').classList.toggle('ready', zp >= 100); hudCache.zp = zp; }
 }
 function bumpCombo() {
   const el = $('combo'), m = comboMult();
@@ -1719,7 +1851,17 @@ function syncSoundLabels() {
   $('btnMuteMenu').textContent = on ? 'Sound on' : 'Sound off'; $('btnMutePause').textContent = on ? 'Sound on' : 'Sound off';
   $('btnMuteHud').innerHTML = on ? SPEAKER_ON : SPEAKER_OFF; $('btnMuteHud').setAttribute('aria-label', on ? 'Mute sound' : 'Turn sound on');
 }
-function show(id) { for (const s of ['menu', 'pause', 'over']) $(s).hidden = s !== id; }
+function show(id) { for (const s of ['menu', 'pause', 'over', 'controls']) $(s).hidden = s !== id; }
+let controlsFrom = 'menu';
+function setControlsTab(touch) {
+  $('tabTouch').setAttribute('aria-pressed', String(touch)); $('tabKeys').setAttribute('aria-pressed', String(!touch));
+  $('keysTouch').hidden = !touch; $('keysDesk').hidden = touch;
+}
+function openControls(from) {
+  controlsFrom = from; setControlsTab(isTouch);
+  $('tipBus').textContent = `Land on a ${CITY.bus.name.toLowerCase()} roof to bounce high.`;
+  show('controls'); $('btnControlsBack').focus({ preventScroll: true });
+}
 
 function startGame() {
   Sound.unlock();
@@ -1731,8 +1873,10 @@ function startGame() {
   hero.root.visible = true; clearPops();
   updateHearts(); updateHud(); bumpCombo();
   state = 'play'; show(null);
-  $('hud').hidden = false; $('hint').hidden = false;
-  $('hint').textContent = isTouch ? 'Hold to web · drag to steer' : 'Hold mouse or Space to web · A / D to steer';
+  $('hud').hidden = false;
+  newMissions(); renderMissions(); input.lastPress = -1;
+  if (coach.step >= 0) { coach.step = 0; coachShow(); }
+  else { $('hint').hidden = false; $('hint').textContent = isTouch ? 'Hold to web · drag to steer · double-tap to zip' : 'Hold Space to web · A / D to steer · Shift to zip'; }
   last = performance.now();
 }
 function pauseGame() {
@@ -1746,7 +1890,7 @@ function toMenu() {
   state = 'menu'; $('hud').hidden = true; $('hint').hidden = true; $('banner').hidden = true; clearPops();
   hero.root.visible = false; webMesh.visible = false; ring.visible = false;
   resetWorld((Math.random() * 1e9) | 0); attractS = 0; ensureWorld(0);
-  $('bestLine').textContent = 'Best: ' + best.toLocaleString();
+  $('bestLine').textContent = 'Best: ' + best.toLocaleString(); renderPassport();
   Sound.resume(); Sound.setIntensity(0.5); Sound.wind(0); show('menu');
 }
 function gameOver() {
@@ -1755,7 +1899,13 @@ function gameOver() {
   if (isBest) { best = s; store.set('best', best); }
   $('oScore').textContent = s.toLocaleString(); $('oDist').textContent = Math.floor(stats.dist).toLocaleString() + ' m';
   $('oDrones').textContent = stats.drones; $('oRescued').textContent = stats.rescued; $('oBest').textContent = 'Best: ' + best.toLocaleString();
-  $('newBest').hidden = !isBest;
+  const bests = cityBests(), key = cityKey(), cityBest = s > (bests[key] || 0) && s > 0;
+  if (cityBest) { bests[key] = s; store.set('cityBest', bests); }
+  $('newBest').hidden = !(isBest || cityBest);
+  $('newBest').textContent = isBest ? 'New best' : `New best in ${CITY.name}`;
+  $('oMissions').textContent = `Missions done: ${stats.missionsDone} · reached level ${stats.mLevel + 1}`;
+  shareMsg = `I swung ${Math.floor(stats.dist).toLocaleString()} m across ${CITY.name} and scored ${s.toLocaleString()} in Anansi of Lagos 3D.`;
+  $('shareStatus').textContent = ''; $('shareText').hidden = true;
   $('overSub').textContent = `Lights out in ${CITY.name} · ${districtAt(-player.pos.z).d.name}`;
   $('overTitle').textContent = isBest ? 'Gbam!' : pick(['Wahala!', 'Chai!', 'Haba!'], Math.random());
   $('hud').hidden = true; $('hint').hidden = true; hero.root.visible = false; webMesh.visible = false; ring.visible = false;
@@ -1774,15 +1924,28 @@ function update(dt) {
       p.target = p.rope ? null : findTarget();
     }
     if (p.inv > 0) p.inv -= dt;
-    const n = 4; for (let i = 0; i < n; i++) stepPlayer(dt / n);
-    updateWorld(dt);
+    let sim = dt;
+    if (stats.slowmo > 0) { stats.slowmo -= dt; sim = dt * 0.4; }
+    if (stats.zipCd > 0) stats.zipCd = Math.max(0, stats.zipCd - dt);
+    if (coach.step === 2 && Math.abs(steer()) > 0.5) { coach.t += dt; if (coach.t > 0.35) coachEvent('steer'); }
+    const n = 4; for (let i = 0; i < n; i++) stepPlayer(sim / n);
+    updateWorld(sim);
+    if (state === 'play') missionEvent('speed', p.vel.length() * 3.6);
     ensureWorld(-p.pos.z);
     stats.dist = Math.max(stats.dist, -p.pos.z - 4);
     const dd = districtAt(-p.pos.z), key = dd.lap * 10 + dd.i;
-    if (key !== stats.districtKey) { stats.districtKey = key; showBanner(dd); }
+    if (key !== stats.districtKey) { stats.districtKey = key; showBanner(dd); if (dd.i >= 2 || dd.lap > 0) missionEvent('reach'); }
     Sound.setIntensity(stats.surge > 0 ? 1 : 0.7); Sound.wind(p.vel.length());
+    if (state === 'play') {
+      if (p.vel.length() > 58 && time - (stats.speedPop || -99) > 9) { stats.speedPop = time; pop(tmpV.copy(p.pos).add(tmpV2.set(0, 2.8, -4)), pick(SPEED, Math.random()), '#8ad8ff'); }
+      if (time > (stats.nextShout || 6)) {
+        const ps = -p.pos.z, d = danfos.find(q => q.s > ps + 18 && q.s < ps + 70);
+        if (d) pop(tmpV.set(d.x, 4.2, -d.s), pick(SHOUTS, Math.random()), '#ffc72c');
+        stats.nextShout = time + 6 + Math.random() * 5;
+      }
+    }
     if (state === 'dying') { stats.dieT -= dt; if (stats.dieT <= 0) gameOver(); }
-    updateHud();
+    updateHud(); renderMissions();
     poseHero(dt);
   } else if (state === 'menu' || state === 'over' || state === 'loading') {
     ensureWorld(attractS + 40);
@@ -1820,6 +1983,8 @@ function recomputeSteer() { const k = input.keys; input.keySteer = (k.has('KeyD'
 window.addEventListener('keydown', e => {
   if (ACTION.has(e.code)) { if (state === 'play') { e.preventDefault(); if (!e.repeat) press(); } return; }
   if (['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight', 'KeyS', 'ArrowDown'].includes(e.code)) { if (state === 'play') e.preventDefault(); input.keys.add(e.code); recomputeSteer(); return; }
+  if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyE') && state === 'play') { e.preventDefault(); if (!e.repeat) zip(); return; }
+  if (e.code === 'Escape' && !$('controls').hidden) { show(controlsFrom); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') { if (state === 'play') pauseGame(); else if (state === 'paused') resumeGame(); }
   if (e.code === 'KeyM') { Sound.toggle(); syncSoundLabels(); }
 });
@@ -1837,12 +2002,18 @@ $('btnResume').addEventListener('click', resumeGame);
 $('btnPause').addEventListener('click', e => { e.currentTarget.blur(); pauseGame(); });
 $('btnQuit').addEventListener('click', toMenu);
 $('btnMenu').addEventListener('click', toMenu);
-$('btnHow').addEventListener('click', e => { const h = $('howto'); h.hidden = !h.hidden; e.currentTarget.setAttribute('aria-expanded', String(!h.hidden)); Sound.unlock(); });
+$('btnControls').addEventListener('click', () => { Sound.unlock(); openControls('menu'); });
+$('btnControlsPause').addEventListener('click', () => openControls('pause'));
+$('btnControlsBack').addEventListener('click', () => show(controlsFrom));
+$('tabTouch').addEventListener('click', () => setControlsTab(true));
+$('tabKeys').addEventListener('click', () => setControlsTab(false));
+$('btnShare').addEventListener('click', shareScore);
 for (const id of ['btnMuteMenu', 'btnMutePause', 'btnMuteHud']) $(id).addEventListener('click', e => { Sound.toggle(); syncSoundLabels(); if (id === 'btnMuteHud') e.currentTarget.blur(); });
 document.querySelectorAll('[data-quality-group] button').forEach(b => b.addEventListener('click', () => { applyQuality(b.dataset.q); slowTime = 0; if (state === 'paused') render(); }));
 $('menu').addEventListener('pointerdown', () => Sound.unlock());
 
 /* ======================= city switching ======================= */
+window.AnansiCities.fillSelect($('citySel'));
 function refreshCityLook() {
   buildTextMaterials();
   const old = coinFaceTex; coinFaceTex = canvasTex(128, 128, drawCoinFace); MAT.coinFace.map = coinFaceTex; MAT.coinFace.needsUpdate = true; old.dispose();
@@ -1858,16 +2029,16 @@ function renderCityMenu() {
   if (cityChoice.id === 'custom') $('cityInput').value = cityChoice.custom;
 }
 function chooseCity(id, custom) {
-  if (id === 'custom') { custom = String(custom || '').replace(/\s+/g, ' ').trim().slice(0, 24); if (!custom) return false; }
-  cityChoice = { id, custom: id === 'custom' ? custom : '' }; store.set('city', cityChoice);
-  setCityData(id === 'custom' ? customCity(custom) : CITIES[id]); setPalettes(); refreshCityLook();
+  if (id === 'custom') { custom = window.AnansiCities.cleanName(custom); if (!custom) return false; }
+  cityChoice = { id, custom: id === 'custom' ? custom : '' }; window.AnansiCities.saveChoice(cityChoice);
+  setCityData(window.AnansiCities.resolve(cityChoice)); setPalettes(); refreshCityLook();
   resetWorld((Math.random() * 1e9) | 0); attractS = 0; ensureWorld(0);
-  renderCityMenu();
+  renderCityMenu(); renderPassport();
   return true;
 }
 $('citySel').addEventListener('change', e => {
   const id = e.target.value;
-  if (id === 'custom') { $('cityForm').hidden = false; $('cityInput').focus(); if (cityChoice.id === 'custom') return; return; }
+  if (id === 'custom') { $('cityForm').hidden = false; $('cityInput').focus(); return; }
   chooseCity(id);
 });
 $('cityForm').addEventListener('submit', e => {
@@ -1880,7 +2051,7 @@ player = newPlayer(); stats = newStats();
 hero.root.visible = false;
 applyQuality(qName);
 resetWorld(20261011); ensureWorld(0);
-syncSoundLabels(); renderCityMenu(); MAT.danfoBody.color.set(CITY.bus.color);
+syncSoundLabels(); renderCityMenu(); renderPassport(); MAT.danfoBody.color.set(CITY.bus.color);
 $('bestLine').textContent = 'Best: ' + best.toLocaleString();
 state = 'menu';
 $('btnPlay').disabled = false; $('btnPlay').textContent = 'Swing out';
