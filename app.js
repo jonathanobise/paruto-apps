@@ -417,10 +417,12 @@
     const m = location.hash.match(/^#\/(.+)$/);
     if (!m) return;
     const id = decodeURIComponent(m[1]);
-    const app = state.apps.find((a) => a.id === id);
+    // Old ids of renamed apps (listed in "aliases") still work; the address bar switches to the current id
+    const app = state.apps.find((a) => a.id === id || (a.aliases || []).includes(id));
     if (!app) return;
+    if (app.id !== id) history.replaceState(null, "", `#/${app.id}`);
     if (!matches(app)) { state.filter = { key: "all", value: null }; renderFilters(); renderApps(); }
-    const el = $(`app-${id}`);
+    const el = $(`app-${app.id}`);
     [el, ...el.querySelectorAll(".reveal")].forEach((r) => r.classList.add("in"));
     el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
   }

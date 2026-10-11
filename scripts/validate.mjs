@@ -48,6 +48,19 @@ for (const app of data.apps ?? []) {
   if (!app.cover && !(app.media ?? []).length) warnings.push(`${app.id}: no cover/media yet (a generated cover will be shown)`);
 }
 
+// Old ids kept so renamed apps' links still work: kebab-case, and never another app's id or alias
+const aliasOwner = new Map();
+for (const app of data.apps ?? []) {
+  if (app.aliases === undefined) continue;
+  if (!Array.isArray(app.aliases)) { errors.push(`${app.id}: "aliases" must be a list of old ids`); continue; }
+  for (const a of app.aliases) {
+    if (typeof a !== "string" || !/^[a-z0-9-]+$/.test(a)) errors.push(`${app.id}: alias "${a}" must be kebab-case`);
+    else if (ids.has(a)) errors.push(`${app.id}: alias "${a}" is already another app's id`);
+    else if (aliasOwner.has(a)) errors.push(`${app.id}: alias "${a}" is also listed by ${aliasOwner.get(a)}`);
+    else aliasOwner.set(a, app.id);
+  }
+}
+
 warnings.forEach((w) => console.warn(`! ${w}`));
 if (errors.length) {
   errors.forEach((e) => console.error(`✗ ${e}`));

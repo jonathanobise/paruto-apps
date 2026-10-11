@@ -22,6 +22,7 @@ Page layout (for orientation): floating Liquid Glass nav (compacts while scrolli
 
 ### "Update an app" (status change, new link, new description)
 Edit that app's fields in `apps.json`. When an app ships, set `status` to `live` and add `url` (primary "Open app" button) and/or `links` (`[{ "label": "App Store", "url": "…" }]`).
+If you rename an app's `id`, add the old id to its `aliases` so existing `#/<old-id>` links still scroll to it.
 
 ### "Remove an app"
 Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder).
@@ -30,6 +31,7 @@ Delete its object in `apps.json` (and optionally its `assets/apps/<id>/` folder)
 | Field | Notes |
 | --- | --- |
 | `id` | kebab-case, unique, used in the URL hash |
+| `aliases` | optional list of old ids (after a rename); `#/<old-id>` links open this app and the address bar switches to the current id |
 | `name`, `tagline`, `description` | `tagline` ≈ one line; `description` ≈ 2–4 sentences |
 | `status` | `live` · `beta` · `in-development` · `coming-soon` — apps are listed in this order (live first) |
 | `category` | free text; becomes a filter option automatically |
