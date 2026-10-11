@@ -1,4 +1,4 @@
-/* Shared city data for both Anansi games (2D and 3D).
+/* Shared city data and settings for both Anansi games (3D and the light 2D version).
    Every city themes the same four route types: island streets, a long bridge, canals with a
    cable-stayed crossing, and glass towers by the water. Add a city here and it appears in both menus.
 
@@ -138,5 +138,11 @@
     sel.add(new Option('Your city…', 'custom'));
   }
 
-  window.AnansiCities = { CITIES, ORDER, PAL, customCity, cleanName, loadChoice, saveChoice, resolve, fillSelect };
+  // Settings both games read and write: sound, coach progress ('coached3d' / 'coached2d') and best scores ('best3d' / 'best2d').
+  const prefs = {
+    get(k, d) { try { const v = localStorage.getItem('anansi.shared.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('anansi.shared.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+  };
+
+  window.AnansiCities = { CITIES, ORDER, PAL, customCity, cleanName, loadChoice, saveChoice, resolve, fillSelect, prefs };
 })();
