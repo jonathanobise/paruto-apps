@@ -69,6 +69,7 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .combo { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 14px); transform: translateX(-50%);
   font-family: var(--display); font-size: 18px; color: var(--danfo); text-shadow: 0 2px 0 var(--adire); white-space: nowrap; transition: transform .15s; }
 .combo.bump { transform: translateX(-50%) scale(1.25); }
+@media (max-width: 560px) { .combo { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); font-size: 16px; } }
 .hud-right { display: flex; gap: 8px; pointer-events: auto; }
 .icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 2px solid rgba(255,245,222,.55); background: rgba(20,26,74,.72); color: var(--chalk); display: grid; place-items: center; cursor: pointer; padding: 0; }
 .icon-btn svg { width: 20px; height: 20px; }
@@ -145,6 +146,7 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
 .share .btn { width: 100%; }
 .share-status { font-size: 13px; color: var(--muted); min-height: 1em; text-align: center; }
 .share textarea { width: 100%; box-sizing: border-box; font: 600 13px var(--body); color: var(--ink); background: var(--chalk); border: 2px solid var(--ink); border-radius: 10px; padding: 8px; resize: none; height: 72px; }
+.err a { color: var(--danfo); font-weight: 700; }
 .err { background: rgba(255,107,61,.15); border: 1.5px solid var(--ember); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.4; }
 @media (max-height: 560px) { .card { padding: 14px 18px 10px; gap: 9px; } .logo .big { font-size: 44px; } .lede { font-size: 13px; } }
 @media (prefers-reduced-motion: reduce) { .hint, .banner { animation: none; } }
@@ -206,7 +208,7 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
       </div>
       <div class="stat-best" id="bestLine">Best: 0</div>
       <div class="foot">
-        <span class="stat-best" style="letter-spacing:.08em">P to pause · M for sound</span>
+        <a class="credit" href="../anansi-of-lagos/">Older phone? Play the light version</a>
         <a class="credit" href="https://paruto.com" target="_blank" rel="noopener">Built by Paruto</a>
       </div>
     </div>
@@ -303,7 +305,8 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
   setTimeout(function () {
     if (window.__anansiReady) return;
     var e = document.getElementById('err'), b = document.getElementById('btnPlay');
-    e.hidden = false; e.textContent = "The 3D engine didn't load. Check your connection and reload, or try a recent Chrome, Safari or Firefox.";
+    e.hidden = false; e.textContent = "The 3D engine didn't load. Check your connection and reload, or ";
+    var a = document.createElement('a'); a.href = '../anansi-of-lagos/'; a.textContent = 'play the light version'; e.appendChild(a); e.appendChild(document.createTextNode('.'));
     b.textContent = 'Unavailable';
   }, 15000);
 </script>
@@ -460,7 +463,8 @@ let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 } catch (e) {
-  $('err').hidden = false; $('err').textContent = "Your browser couldn't start 3D graphics. Try a recent Chrome, Safari or Firefox with hardware acceleration on.";
+  $('err').hidden = false; $('err').textContent = "Your browser couldn't start 3D graphics. Turn on hardware acceleration, or ";
+  { const a = document.createElement('a'); a.href = '../anansi-of-lagos/'; a.textContent = 'play the light version'; $('err').append(a, '.'); }
   $('btnPlay').textContent = 'Unavailable';
   window.__anansiReady = true;
   throw e;
@@ -1251,7 +1255,7 @@ let state = 'loading';
 let time = 0, shake = 0, attractS = 0, attractT = 0;
 let player = null, stats = null;
 let best = store.get('best', 0);
-const input = { lastPress: -1, held: false, buffer: 0, keySteer: 0, drag: 0, startX: 0, dive: false, keys: new Set() };
+const input = { pressAt: -1, tapAt: -1, held: false, buffer: 0, keySteer: 0, drag: 0, startX: 0, dive: false, keys: new Set() };
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), tmpQ = new THREE.Quaternion(), tmpM = new THREE.Matrix4();
 const UP = new THREE.Vector3(0, 1, 0), FWD = new THREE.Vector3(0, 0, -1);
 const camState = { yaw: 0, fov: 62, pos: new THREE.Vector3(0, 30, 40), look: new THREE.Vector3(0, 20, 0) };
@@ -1440,16 +1444,16 @@ function press() {
   if (state !== 'play') return;
   input.held = true;
   const p = player; if (p.dead) return;
-  // a quick second tap web-zips
-  if (time - input.lastPress < 0.3 && zip()) { input.lastPress = -1; return; }
-  input.lastPress = time;
+  // a short tap followed quickly by another press web-zips (a hold-and-release followed by a re-web doesn't)
+  if (time - input.tapAt < 0.28 && zip()) { input.tapAt = -1; return; }
+  input.pressAt = time;
   if (p.rope) return;
   const t = findTarget();
   if (t) attach(t);
   else if (p.grounded) { p.grounded = false; p.vel.y = 16; Sound.fx.jump(); }
   else input.buffer = 0.35;
 }
-function unpress() { input.held = false; input.buffer = 0; if (state === 'play' && player.rope) release(true); }
+function unpress() { input.tapAt = input.held && time - input.pressAt < 0.2 ? time : -1; input.held = false; input.buffer = 0; if (state === 'play' && player.rope) release(true); }
 function land(impact) {
   const p = player;
   p.pos.y = HIP; p.vel.y = 0; p.grounded = true;
@@ -1874,7 +1878,7 @@ function startGame() {
   updateHearts(); updateHud(); bumpCombo();
   state = 'play'; show(null);
   $('hud').hidden = false;
-  newMissions(); renderMissions(); input.lastPress = -1;
+  newMissions(); renderMissions(); input.tapAt = -1;
   if (coach.step >= 0) { coach.step = 0; coachShow(); }
   else { $('hint').hidden = false; $('hint').textContent = isTouch ? 'Hold to web · drag to steer · double-tap to zip' : 'Hold Space to web · A / D to steer · Shift to zip'; }
   last = performance.now();

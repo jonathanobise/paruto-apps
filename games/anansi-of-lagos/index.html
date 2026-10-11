@@ -59,6 +59,7 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .combo { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 14px); transform: translateX(-50%);
   font-family: var(--display); font-size: 18px; color: var(--danfo); text-shadow: 0 2px 0 var(--adire); white-space: nowrap; transition: transform .15s; }
 .combo.bump { transform: translateX(-50%) scale(1.25); }
+@media (max-width: 560px) { .combo { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); font-size: 16px; } }
 .hud-right { display: flex; gap: 8px; pointer-events: auto; }
 .icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 2px solid rgba(255,245,222,.55); background: rgba(20,26,74,.72);
   color: var(--chalk); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -125,7 +126,19 @@ canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; display: 
 .city-row select:focus-visible, .city-row input:focus-visible { outline: 3px solid var(--danfo); outline-offset: 2px; }
 .city-row .btn { flex: 0 0 auto; font-size: 15px; padding: 11px 14px; }
 .logo .small { overflow-wrap: anywhere; }
+.logo .small em { font-style: normal; background: #0b7a45; padding: 0 8px; border-radius: 6px; margin-left: 6px; color: var(--chalk); font-size: .8em; letter-spacing: .1em; vertical-align: .1em; }
 .logo .small.long { font-size: clamp(14px, 4vw, 18px); letter-spacing: .08em; }
+.zip { display: flex; align-items: center; gap: 8px; }
+.bar.small { width: clamp(60px, 16vw, 90px); height: 7px; }
+.zip i { background: linear-gradient(90deg, #8ad8ff, #ffffff); }
+.zip.ready .grid-label { color: #8ad8ff; }
+.missions { list-style: none; margin: 6px 0 0; padding: 8px 10px; display: grid; gap: 4px; background: rgba(10,12,36,.55); border-radius: 10px; max-width: min(250px, 62vw); }
+.missions:empty { display: none; }
+.missions li { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; font-weight: 600; line-height: 1.25; text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.missions li b { font-variant-numeric: tabular-nums; color: var(--danfo); white-space: nowrap; }
+.missions li.done { color: #8af0a8; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.missions li.done b { color: #8af0a8; }
+.missions .lvl { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--chalk); border-radius: 12px; overflow: hidden; }
 .seg button { font: 700 14px var(--body); letter-spacing: .06em; padding: 13px 4px; background: transparent; color: var(--chalk); border: 0; cursor: pointer; }
 .seg button + button { border-left: 2px solid rgba(255,245,222,.5); }
@@ -151,6 +164,8 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
       <div class="score" id="score">0</div>
       <div class="meta"><span id="dist">0 m</span> · <span id="cash">₦0</span></div>
       <div class="grid"><span class="grid-label">GRID</span><div class="bar" id="powerBar"><i id="power"></i></div></div>
+      <div class="zip" id="zipMeter"><span class="grid-label">ZIP</span><div class="bar small"><i id="zipBar"></i></div></div>
+      <ul class="missions" id="missions" aria-label="Missions"></ul>
     </div>
     <div id="combo" class="combo"></div>
     <div class="hud-right">
@@ -167,7 +182,7 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
   <section id="menu" class="screen">
     <div class="card">
       <div class="eyebrow" id="menuEyebrow">Lagos has a web-slinger</div>
-      <h1 class="logo"><span class="big">ANANSI</span><span class="small" id="logoCity">OF LAGOS</span></h1>
+      <h1 class="logo"><span class="big">ANANSI</span><span class="small" id="logoCity">OF LAGOS<em>LIGHT</em></span></h1>
       <p class="lede" id="lede">Dr. Blackout has cut the city's power. Swing across town, smash his drones and grab power cells until the whole skyline lights up.</p>
       <div class="city-pick">
         <label class="seg-label" for="citySel">Swing over</label>
@@ -223,11 +238,13 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
       <ul class="keys" id="keysTouch">
         <li><kbd>Hold anywhere</kbd><span>Shoot a web at the ringed anchor</span></li>
         <li><kbd>Let go</kbd><span>Fling forward. On the upswing it's a perfect release</span></li>
+        <li><kbd>Double-tap</kbd><span>Web-zip towards the anchor (recharges)</span></li>
         <li><kbd>Tap on the ground</kbd><span>Jump when no anchor is in reach</span></li>
         <li><kbd>❚❚ button</kbd><span>Pause</span></li>
       </ul>
       <ul class="keys" id="keysDesk" hidden>
         <li><kbd>Space</kbd><kbd>Click</kbd><kbd>↑</kbd><span>Hold to web, let go to fling</span></li>
+        <li><kbd>Shift</kbd><kbd>E</kbd><span>Web-zip (or double-tap Space)</span></li>
         <li><kbd>Space</kbd><span>Jump when you're on the ground with no anchor in reach</span></li>
         <li><kbd>P</kbd><kbd>Esc</kbd><span>Pause</span></li>
         <li><kbd>M</kbd><span>Sound on or off</span></li>
@@ -237,6 +254,7 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
         <li><b>Drones</b><span>Hit them fast to smash them. Slow bumps hurt.</span></li>
         <li><b>Buses</b><span id="tipBus">Land on a bus roof to bounce high.</span></li>
         <li><b>Power</b><span>Grab green cells to fill the GRID meter and set off a power surge.</span></li>
+        <li><b>Missions</b><span>Three goals each run, top left. Clear them all for a new set.</span></li>
         <li><b>Water</b><span>Falling in costs a heart.</span></li>
       </ul>
       <button class="btn" id="btnControlsBack">Got it</button>
@@ -254,6 +272,7 @@ kbd { font: 700 12px var(--body); letter-spacing: .04em; color: var(--ink); back
         <div class="stat"><span>Drones smashed</span><b id="oDrones">0</b></div>
         <div class="stat"><span>People rescued</span><b id="oRescued">0</b></div>
       </div>
+      <div class="stat-best" id="oMissions"></div>
       <div class="stat-best" id="oBest">Best: 0</div>
       <div class="row">
         <button class="btn" id="btnAgain">Swing again</button>
@@ -372,6 +391,8 @@ const Sound = (() => {
     nepa() { if (!ac) return; [392, 494, 587, 784, 988].forEach((f, i) => tone('sawtooth', f, f, 0.5, 0.07, null, ac.currentTime + i * 0.06)); burst(4000, 0.5, 0.8, 0.25, null, 0, 'highpass'); },
     jump() { tone('sine', 300, 600, 0.1, 0.15); },
     zap() { tone('square', 900, 300, 0.12, 0.06); },
+    zip() { burst(900, 1.2, 0.28, 0.55, null, 0, 'bandpass', 5200); tone('sawtooth', 260, 1300, 0.22, 0.07); },
+    mission() { if (!ac) return; [784, 988, 1175, 1568].forEach((f, i) => tone('triangle', f, f, 0.16, 0.15, null, ac.currentTime + i * 0.08)); },
   };
   // Afrobeats-leaning loop: syncopated kick, clap on 2 and 4, shaker 16ths, talking drum bends, highlife-style guitar arpeggio.
   const BPM = 108, S16 = 60 / BPM / 4;
@@ -424,7 +445,7 @@ let state = 'menu';       // menu | play | paused | dying | over
 let time = 0, camX = 0, camY = 0, shake = 0;
 let world, player, stats;
 let best = store.get('best', 0);
-const input = { held: false, buffer: 0 };
+const input = { held: false, buffer: 0, pressAt: -1, tapAt: -1 };
 
 function restCamY() { return GROUND_Y + 56 - visH; }
 
@@ -621,7 +642,7 @@ function attach(a) {
   if (stats.combo >= 5 && stats.combo % 5 === 0) pop(player.x, player.y - 46, pick(HYPE, Math.random()), '#ff9a3d', true);
   input.buffer = 0;
   Sound.fx.thwip();
-  coachEvent('web');
+  coachEvent('web'); missionEvent('combo', stats.combo);
   bumpCombo();
 }
 function release(manual) {
@@ -636,18 +657,23 @@ function release(manual) {
     pop(p.x, p.y - 30, pick(CHEERS, Math.random()), '#ffc72c');
     Sound.fx.perfect();
     burstParticles(p.x, p.y, 8, ['#ffc72c', '#fff5de'], 260, 0.4, 3, 0);
+    missionEvent('perfect');
   }
 }
 function press() {
   if (state !== 'play') return;
   input.held = true;
-  const p = player; if (p.rope || p.dead) return;
+  const p = player; if (p.dead) return;
+  // a short tap followed quickly by another press web-zips (a hold-and-release followed by a re-web doesn't)
+  if (time - input.tapAt < 0.28 && zip()) { input.tapAt = -1; return; }
+  input.pressAt = time;
+  if (p.rope) return;
   const t = findTarget();
   if (t) attach(t);
   else if (p.grounded) { p.grounded = null; p.vy = -720; Sound.fx.jump(); }
   else input.buffer = 0.3;
 }
-function unpress() { input.held = false; input.buffer = 0; if (state === 'play' && player.rope) release(true); }
+function unpress() { input.tapAt = input.held && time - input.pressAt < 0.2 ? time : -1; input.held = false; input.buffer = 0; if (state === 'play' && player.rope) release(true); }
 function land(g, y, impact) {
   const p = player;
   p.y = y - R; p.vy = 0; p.grounded = g;
@@ -680,7 +706,7 @@ function die() {
   Sound.setIntensity(0.2);
 }
 function startSurge() {
-  stats.surge = 7; stats.power = 1; stats.nepas++;
+  stats.surge = 7; stats.power = 1; stats.nepas++; missionEvent('surge');
   Sound.fx.nepa(); addShake(10);
   pop(player.x, player.y - 50, CITY.surge, '#ffc72c', true);
   for (let i = 0; i < 4; i++) burstParticles(player.x + (Math.random() - .5) * 300, player.y - 100 + (Math.random() - .5) * 200, 14, ['#10a35e', '#ffffff', '#ffc72c'], 380, 1.2, 4, 300);
@@ -744,7 +770,7 @@ function updateEntities(dt) {
       if (p.vy >= 0 && p.y < top + 8) {
         p.y = top - R; p.vy = -980; p.vx = Math.max(p.vx, 420); p.grounded = null;
         stats.bonus += 40 * comboMult(); stats.combo++; bumpCombo();
-        Sound.fx.bounce(); pop(d.x + 58, top - 20, CITY.bus.name + ' bounce!', '#ffc72c');
+        Sound.fx.bounce(); pop(d.x + 58, top - 20, CITY.bus.name + ' bounce!', '#ffc72c'); missionEvent('bounce');
       } else if (p.grounded) { p.x = d.x - R - 1; p.vx = Math.min(p.vx, 0); }
       else if (p.x < d.x + d.w / 2) { p.x = d.x - R - 1; p.vx = -Math.abs(p.vx) * 0.3; }
     }
@@ -775,7 +801,7 @@ function updateEntities(dt) {
       d.dead = true;
       burstParticles(d.x, d.y, 18, ['#ff6b3d', '#ffc72c', '#3a2d4f', '#ffffff'], 380, 0.6, 4);
       if (speed > SMASH_SPEED || surge) {
-        stats.drones++; const pts = 100 * comboMult(); stats.bonus += pts;
+        stats.drones++; const pts = 100 * comboMult(); stats.bonus += pts; missionEvent('smash');
         pop(d.x, d.y - 26, pick(SMASHES, Math.random()) + ' +' + pts, '#ffc72c', true);
         Sound.fx.smash(); addShake(7);
         if (Math.random() < 0.35) W.coins.push({ x: d.x, y: d.y, ph: 0 });
@@ -793,7 +819,7 @@ function updateEntities(dt) {
     if (c.got) continue;
     const dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy);
     if (magnet && d < magnet) { c.x += dx / d * 600 * dt; c.y += dy / d * 600 * dt; }
-    if (d < R + 16 && !p.dead) { c.got = true; stats.coins++; stats.bonus += 10 * comboMult(); Sound.fx.coin(); burstParticles(c.x, c.y, 4, ['#ffd84a', '#fff5de'], 150, 0.3, 2.5, 0); }
+    if (d < R + 16 && !p.dead) { c.got = true; stats.coins++; missionEvent('coins'); stats.bonus += 10 * comboMult(); Sound.fx.coin(); burstParticles(c.x, c.y, 4, ['#ffd84a', '#fff5de'], 150, 0.3, 2.5, 0); }
   }
   for (const c of W.cells) {
     if (!c.got && !p.dead && Math.hypot(p.x - c.x, p.y - c.y) < R + 20) {
@@ -812,7 +838,7 @@ function updateEntities(dt) {
   for (const c of W.civs) {
     c.t += dt;
     if (!c.rescued && !p.dead && Math.abs(p.x - c.x) < R + 22 && Math.abs(p.y - (c.y - 20)) < R + 30) {
-      c.rescued = true; c.t = 0; stats.rescued++; const pts = 250 * comboMult(); stats.bonus += pts;
+      c.rescued = true; c.t = 0; stats.rescued++; const pts = 250 * comboMult(); stats.bonus += pts; missionEvent('rescue');
       Sound.fx.rescue(); pop(c.x, c.y - 60, pick(THANKS, Math.random()) + ' +' + pts, '#8af0a8', true);
       burstParticles(c.x, c.y - 30, 12, ['#10a35e', '#ffffff', '#ffc72c'], 240, 0.7, 3, 400);
     }
@@ -866,6 +892,7 @@ function update(dt) {
     p.target = p.rope ? null : findTarget();
   }
   if (p.inv > 0) p.inv -= dt;
+  if (stats.zipCd > 0) stats.zipCd = Math.max(0, stats.zipCd - dt);
   if (p.web < 1) p.web = Math.min(1, p.web + dt * 14);
   const n = 3, h = dt / n; for (let i = 0; i < n; i++) stepPlayer(h);
   const targetAng = p.rope ? Math.atan2(p.rope.y - p.y, p.rope.x - p.x) + Math.PI / 2
@@ -879,12 +906,13 @@ function update(dt) {
 
   stats.dist = Math.max(stats.dist, (p.x - 40) / M);
   const dd = districtAt(p.x), key = dd.lap * 10 + dd.i;
-  if (key !== world.districtKey) { world.districtKey = key; showBanner(dd); }
+  if (key !== world.districtKey) { world.districtKey = key; showBanner(dd); if (dd.i >= 2 || dd.lap > 0) missionEvent('reach'); }
   Sound.setIntensity(stats.surge > 0 ? 1 : 0.7);
   if (state === 'play' && Math.hypot(p.vx, p.vy) > 1080 && time - (stats.speedPop || -99) > 9) { stats.speedPop = time; pop(p.x, p.y - 40, pick(SPEED, Math.random()), '#8ad8ff'); }
 
+  if (state === 'play') missionEvent('speed', Math.hypot(p.vx, p.vy) / M * 3.6);
   if (state === 'dying') { stats.dieT -= dt; if (stats.dieT <= 0) gameOver(); }
-  updateHud();
+  updateHud(); renderMissions();
 }
 
 /* ================= drawing ================= */
@@ -1325,6 +1353,8 @@ function updateHud() {
   if (hudCache.d !== d) { $('dist').textContent = d.toLocaleString() + ' m'; hudCache.d = d; }
   if (hudCache.c !== c) { $('cash').textContent = CITY.cur ? CITY.cur + c.toLocaleString() : stats.coins.toLocaleString() + ' coins'; hudCache.c = c; }
   if (hudCache.pw !== pw) { $('power').style.width = Math.max(4, pw) + '%'; hudCache.pw = pw; }
+  const zp = Math.round((1 - stats.zipCd / ZIP_CD) * 100);
+  if (hudCache.zp !== zp) { $('zipBar').style.width = Math.max(4, zp) + '%'; $('zipMeter').classList.toggle('ready', zp >= 100); hudCache.zp = zp; }
   if (hudCache.surge !== surge) { $('powerBar').classList.toggle('surge', surge); hudCache.surge = surge; }
 }
 function bumpCombo() {
@@ -1361,14 +1391,82 @@ function openControls(from) {
   show('controls'); $('btnControlsBack').focus({ preventScroll: true });
 }
 // first-run coach: two steps, then remembered
-const COACH = [isTouch ? 'Hold anywhere to shoot a web' : 'Hold Space or the mouse to shoot a web', 'Let go as you swing upward'];
+const COACH = [isTouch ? 'Hold anywhere to shoot a web' : 'Hold Space or the mouse to shoot a web', 'Let go as you swing upward', isTouch ? 'Double-tap to web-zip' : 'Press Shift to web-zip'];
 let coachStep = store.get('coached', false) ? -1 : 0;
 function coachEvent(ev) {
   if (coachStep < 0) { if (ev === 'web') $('hint').hidden = true; return; }
-  if (ev !== ['web', 'release'][coachStep]) return;
+  if (ev !== ['web', 'release', 'zip'][coachStep]) return;
   coachStep++;
   if (coachStep >= COACH.length) { coachStep = -1; store.set('coached', true); $('hint').hidden = true; pop(player.x, player.y - 50, "You're ready. Go!", '#8af0a8', true); }
   else $('hint').textContent = COACH[coachStep];
+}
+
+/* ================= missions ================= */
+const plural = (n, one, many) => n === 1 ? one : many;
+const MISSIONS = [
+  { id: 'smash', n: [3, 5, 8], label: n => `Smash ${n} ${plural(n, 'drone', 'drones')}` },
+  { id: 'rescue', n: [1, 2, 3], label: n => `Rescue ${n} ${plural(n, 'person', 'people')}` },
+  { id: 'perfect', n: [4, 8, 12], label: n => `Land ${n} perfect releases` },
+  { id: 'coins', n: [30, 60, 100], label: n => `Grab ${n} coins` },
+  { id: 'combo', n: [10, 15, 25], max: true, label: n => `Chain a ${n}-swing combo` },
+  { id: 'bounce', n: [1, 2, 4], label: n => `Bounce on ${n} ${CITY.bus.name.toLowerCase()} ${plural(n, 'roof', 'roofs')}` },
+  { id: 'zip', n: [3, 6, 10], label: n => `Web-zip ${n} times` },
+  { id: 'speed', n: [80, 95, 105], max: true, label: n => `Hit ${n} km/h` },
+  { id: 'surge', n: [1], label: () => `Fill the grid: ${CITY.surge}` },
+  { id: 'reach', n: [1], label: () => `Reach ${DISTRICTS[2].name}` },
+];
+let missionsDirty = true;
+function newMissions() {
+  const pool = MISSIONS.filter(m => !(m.id === 'reach' && stats.dist > DISTRICTS[0].len + DISTRICTS[1].len));
+  const chosen = [];
+  while (chosen.length < 3 && pool.length) chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  stats.missions = chosen.map(def => ({ def, target: def.n[Math.min(stats.mLevel, def.n.length - 1)], prog: 0, done: false }));
+  missionsDirty = true;
+}
+function missionEvent(id, value = 1) {
+  if (state !== 'play') return;
+  for (const m of stats.missions) {
+    if (m.done || m.def.id !== id) continue;
+    const before = m.prog;
+    m.prog = m.def.max ? Math.max(m.prog, value) : m.prog + value;
+    if (Math.floor(m.prog) !== Math.floor(before)) missionsDirty = true;
+    if (m.prog >= m.target) {
+      m.done = true; missionsDirty = true; stats.missionsDone++;
+      const pts = 300 * (stats.mLevel + 1); stats.bonus += pts;
+      pop(player.x, player.y - 64, `Mission done! +${pts}`, '#8af0a8', true); Sound.fx.mission();
+      if (stats.missions.every(q => q.done)) {
+        stats.mLevel++;
+        setTimeout(() => { if (state === 'play' || state === 'paused') { newMissions(); pop(player.x, player.y - 70, pick(HYPE, Math.random()) + ' New missions!', '#ff9a3d', true); } }, 1400);
+      }
+    }
+  }
+}
+function renderMissions() {
+  if (!missionsDirty) return; missionsDirty = false;
+  const ul = $('missions'); ul.textContent = '';
+  const head = document.createElement('li'); head.className = 'lvl'; head.textContent = `Missions · level ${stats.mLevel + 1}`; ul.appendChild(head);
+  for (const m of stats.missions) {
+    const li = document.createElement('li'); if (m.done) li.className = 'done';
+    const sp = document.createElement('span'); sp.textContent = m.def.label(m.target);
+    const b = document.createElement('b'); b.textContent = m.done ? '✓' : m.def.id === 'speed' ? `${Math.floor(m.prog)}` : `${Math.min(Math.floor(m.prog), m.target)}/${m.target}`;
+    li.append(sp, b); ul.appendChild(li);
+  }
+}
+
+/* ================= web-zip ================= */
+const ZIP_CD = 3.5;
+function zip() {
+  const p = player;
+  if (state !== 'play' || p.dead || stats.zipCd > 0) return false;
+  const a = p.rope || p.target || findTarget(); if (!a) return false;
+  p.rope = null; p.grounded = null;
+  const dx = a.x - p.x, dy = a.y - p.y, d = Math.hypot(dx, dy) || 1, sp = Math.min(1300, 700 + d * 1.2);
+  p.vx = Math.max(dx / d * sp, 520); p.vy = dy / d * sp;
+  stats.zipCd = ZIP_CD; stats.zips++;
+  Sound.fx.zip(); addShake(5);
+  burstParticles(p.x, p.y, 14, ['#8ad8ff', '#ffffff', '#ffc72c'], 320, 0.45, 3, 0);
+  coachEvent('zip'); missionEvent('zip');
+  return true;
 }
 
 function startGame() {
@@ -1377,12 +1475,13 @@ function startGame() {
   camX = player.x - visW * 0.3; camY = restCamY();
   world = newWorld((Math.random() * 1e9) | 0, camX - 100);
   ensureGen();
-  stats = { dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.1, surge: 0, nepas: 0, dieT: 0 };
+  stats = { zipCd: 0, zips: 0, missions: [], mLevel: 0, missionsDone: 0, dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.1, surge: 0, nepas: 0, dieT: 0 };
   hudCache = {}; input.held = false; input.buffer = 0;
   updateHearts(); updateHud(); bumpCombo();
   state = 'play'; show(null);
   $('hud').hidden = false; $('hint').hidden = false;
-  if (coachStep >= 0) { coachStep = 0; $('hint').textContent = COACH[0]; } else $('hint').textContent = isTouch ? 'Hold to web · let go to fling' : 'Hold Space to web · let go to fling';
+  newMissions(); renderMissions(); input.tapAt = -1;
+  if (coachStep >= 0) { coachStep = 0; $('hint').textContent = COACH[0]; } else $('hint').textContent = isTouch ? 'Hold to web · let go to fling · double-tap to zip' : 'Hold Space to web · let go to fling · Shift to zip';
 }
 function pauseGame() {
   if (state !== 'play') return;
@@ -1393,7 +1492,7 @@ function pauseGame() {
 }
 function resumeGame() { if (state !== 'paused') return; state = 'play'; show(null); Sound.resume(); last = performance.now(); }
 function renderCityMenu() {
-  const lc = $('logoCity'); lc.textContent = 'OF ' + CITY.name.toUpperCase(); lc.classList.toggle('long', CITY.name.length > 11);
+  const lc = $('logoCity'); lc.textContent = 'OF ' + CITY.name.toUpperCase(); const em = document.createElement('em'); em.textContent = 'LIGHT'; lc.appendChild(em); lc.classList.toggle('long', CITY.name.length > 11);
   $('menuEyebrow').textContent = `${CITY.name} has a web-slinger`;
   const lede = $('lede'); lede.textContent = `Dr. Blackout has cut ${CITY.name}'s power. Swing from ${DISTRICTS[0].name} to ${DISTRICTS[3].name}, smash his drones and grab power cells until the whole skyline shouts `;
   const st = document.createElement('strong'); st.textContent = CITY.surge; lede.appendChild(st);
@@ -1422,6 +1521,7 @@ function gameOver() {
   $('oDrones').textContent = stats.drones; $('oRescued').textContent = stats.rescued;
   $('oBest').textContent = 'Best: ' + best.toLocaleString();
   $('newBest').hidden = !isBest;
+  $('oMissions').textContent = `Missions done: ${stats.missionsDone} · reached level ${stats.mLevel + 1}`;
   const dd = districtAt(player.x);
   $('overSub').textContent = `Lights out in ${CITY.name} · ${dd.d.name}`;
   $('overTitle').textContent = isBest ? 'Gbam!' : pick(['Wahala!', 'Chai!', 'Haba!'], Math.random());
@@ -1440,6 +1540,7 @@ window.addEventListener('keydown', e => {
     if (state === 'play') { e.preventDefault(); if (!e.repeat) press(); }
     return;
   }
+  if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyE') && state === 'play') { e.preventDefault(); if (!e.repeat) zip(); return; }
   if (e.code === 'Escape' && !$('controls').hidden) { show(controlsFrom); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') { if (state === 'play') pauseGame(); else if (state === 'paused') resumeGame(); }
   if (e.code === 'KeyM') { Sound.toggle(); syncSoundLabels(); }
@@ -1472,7 +1573,7 @@ function frame(now) {
 }
 world = newWorld(20261011, -200); camY = restCamY();
 player = newPlayer(); player.hidden = true;
-stats = { dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.1, surge: 0, nepas: 0, dieT: 0 };
+stats = { zipCd: 0, zips: 0, missions: [], mLevel: 0, missionsDone: 0, dist: 0, bonus: 0, coins: 0, combo: 0, swings: 0, drones: 0, rescued: 0, power: 0.1, surge: 0, nepas: 0, dieT: 0 };
 ensureGen();
 syncSoundLabels();
 window.AnansiCities.fillSelect($('citySel')); renderCityMenu();
