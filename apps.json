@@ -364,30 +364,6 @@
         { "type": "image", "src": "assets/apps/anansi-swing-city/cape-town.jpg", "caption": "Cape Town: Bo-Kaap colours and minibus taxis" },
         { "type": "image", "src": "assets/apps/anansi-swing-city/lite-version.jpg", "caption": "Swing City Lite, built for older phones" }
       ]
-    },
-    {
-      "id": "paruto-post",
-      "name": "Paruto Post",
-      "tagline": "Private, fast email for the Paruto Media team, built entirely on Cloudflare.",
-      "description": "Paruto Post is the in-house email app for Paruto Media staff on @parutomedia.com. It has what a team inbox needs: threaded conversations, labels, search with filters, rich-text compose with attachments and a five-second undo send, and spam filtering that explains itself. Remote images stay blocked until you choose to show them, mail between colleagues arrives instantly, and it works well on phones.",
-      "status": "in-development",
-      "category": "Productivity",
-      "platforms": ["Web"],
-      "accent": "#f5d68a",
-      "accent2": "#b8841e",
-      "icon": "✉️",
-      "iconImage": "assets/apps/paruto-post/icon",
-      "added": "2026-10-12",
-      "featured": false,
-      "url": "",
-      "links": [],
-      "highlights": [
-        "Threads, labels, search and undo send",
-        "Private by design: tracking images blocked",
-        "Instant mail between colleagues, on any device"
-      ],
-      "cover": "",
-      "media": []
     }
   ]
 }
