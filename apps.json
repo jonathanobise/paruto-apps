@@ -19,7 +19,7 @@
       "id": "paruto-kids-world",
       "name": "Paruto Kids World",
       "tagline": "An illustrated village where little ones learn and play with Jas, Jay and baby Joe.",
-      "description": "A browser-based illustrated village for children aged 2–5. Kids explore a 2D village with six zones alongside Jas, Jay and baby Joe, play ten learning games and draw in the Colour Workshop. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
+      "description": "A browser-based illustrated village for children aged 2–5. Kids explore a 2D village with six zones alongside Jas, Jay and baby Joe, play learning games and draw in the Colour Workshop. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
       "status": "live",
       "category": "Kids & Learning",
       "platforms": ["Web"],
@@ -33,7 +33,7 @@
         { "label": "Paruto Kids", "url": "https://parutokids.com" }
       ],
       "highlights": [
-        "Ten learning games and a Colour Workshop",
+        "Learning games and a Colour Workshop",
         "Works offline, with no ads or endless scrolling",
         "Parent area behind a grown-up gate"
       ],
@@ -216,33 +216,41 @@
       "media": []
     },
     {
-      "id": "paruto-bid",
-      "name": "Paruto Bid",
-      "tagline": "AI-powered bid management, from tender discovery to submission-ready proposals.",
-      "description": "An AI-powered procurement and bid management platform. Paruto Bid analyses RFPs, tracks compliance requirements, organises evidence and past performance, and supports technical and financial proposal development, helping teams manage bids with greater accuracy, speed and control.",
-      "status": "coming-soon",
+      "id": "bidplum",
+      "aliases": ["paruto-bid"],
+      "name": "Bidplum",
+      "tagline": "AI bid management: turn any tender into a compliance matrix and a winning proposal.",
+      "description": "Bidplum turns any tender into a compliance matrix, keeps your certificates and evidence ready, and drafts technical and commercial proposals that answer every requirement. Built Nigeria-first, with naira billing, local bid formats and tender search across World Bank, UN, AfDB and government notices, for businesses and consultants bidding across Nigeria and Africa.",
+      "status": "in-development",
       "category": "Business",
       "platforms": ["Web"],
-      "accent": "#38bdf8",
-      "accent2": "#0f3a5f",
+      "accent": "#a855c8",
+      "accent2": "#6b2c7c",
       "icon": "📑",
-      "added": "2026-10-09",
+      "iconImage": "assets/apps/bidplum/icon",
+      "added": "2026-10-11",
       "featured": false,
       "url": "",
       "links": [],
       "highlights": [
-        "Analyse RFPs and track compliance requirements",
-        "Organise evidence and past performance",
-        "Develop technical and financial proposals together"
+        "A compliance matrix from any tender, in minutes",
+        "Drafts that cite your own evidence and past work",
+        "Tender search across World Bank, UN and AfDB notices"
       ],
-      "cover": "",
-      "media": []
+      "cover": "assets/apps/bidplum/compliance-matrix.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/bidplum/compliance-matrix.jpg", "caption": "Every requirement in a tender, tracked to a proposal" },
+        { "type": "image", "src": "assets/apps/bidplum/mobile-landing.jpg", "caption": "On a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/bidplum/landing.jpg", "caption": "Win more tenders with a bid team that never misses a shall" },
+        { "type": "image", "src": "assets/apps/bidplum/features.jpg", "caption": "Everything a winning bid needs" }
+      ]
     },
     {
-      "id": "abuja-lagos-hyperspeed",
-      "name": "Abuja → Lagos Hyperspeed",
-      "tagline": "A concept maglev from Abuja to Lagos, drawn on real terrain in your browser.",
-      "description": "An interactive 3D concept for a 632 km maglev line between Abuja and Lagos, built on real elevation data and OpenStreetMap buildings and roads. Tunnels, viaducts, speed limits and the 1 h 31 min nonstop trip are all computed from the terrain, with a ten-stop guided tour. A concept, not an official plan; costs are illustrative.",
+      "id": "hyperspeed-rail",
+      "aliases": ["abuja-lagos-hyperspeed"],
+      "name": "Hyperspeed Rail",
+      "tagline": "A concept maglev network for Nigeria on real terrain, and a game you can drive.",
+      "description": "A concept double-track maglev network for Nigeria: 11 lines and 54 stations drawn on real terrain in the browser, with trains running both ways every 30 minutes and a journey planner between any two stations. Drive the trains, take the daily challenge, redraw lines in build puzzles, or run the network and see whether the fares cover the costs. A concept, not an official plan; costs are benchmarks from real projects.",
       "status": "live",
       "category": "Concepts",
       "platforms": ["Web"],
@@ -254,21 +262,22 @@
       "url": "https://hyperspeed.paruto.com",
       "links": [],
       "highlights": [
-        "Real terrain and OpenStreetMap data",
-        "Tunnels, viaducts and trip times computed live",
-        "A ten-stop guided tour of the route"
+        "11 lines and 54 stations on real terrain",
+        "Drive trains, daily challenges and build puzzles",
+        "A journey planner across the whole network"
       ],
-      "cover": "assets/apps/abuja-lagos-hyperspeed/overview.jpg",
+      "cover": "assets/apps/hyperspeed-rail/network-map.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/abuja-lagos-hyperspeed/overview.jpg", "caption": "Abuja Central and the route profile" },
-        { "type": "image", "src": "assets/apps/abuja-lagos-hyperspeed/chase-view.jpg", "caption": "Chase view, leaving Abuja Central" }
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/network-map.jpg", "caption": "The network and journey planner" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/game-menu.jpg", "caption": "Drive, daily challenges, build puzzles and more" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/chase-view.jpg", "caption": "Leaving Abuja Central" }
       ]
     },
     {
       "id": "arclight",
       "name": "ARCLIGHT",
       "tagline": "An anti-gravity racer for the browser, with every mesh and sound generated in code.",
-      "description": "An original anti-gravity racing game built with Three.js. Race three circuits (Coral Causeway, Neon Arcology and Dust Mesa) in either direction, with airbrakes, side-shifts, boost pads and weapons, against skill-based AI. There are no image, model or audio files: everything is generated at runtime, down to the synthwave soundtrack.",
+      "description": "An original anti-gravity racing game built with Three.js. Race nine circuits in either direction, six of them across Nigeria, from Lagos Lagoon and Abuja's Aso Rock to Kano's ancient city, with airbrakes, boost pads and weapons against skill-based AI. Take on the six-round Naija Cup, the daily challenge and a weekly tournament, and earn medals and liveries. Every mesh, texture and sound is generated in code.",
       "status": "live",
       "category": "Games",
       "platforms": ["Web"],
@@ -280,23 +289,25 @@
       "url": "https://arclight.paruto.com",
       "links": [],
       "highlights": [
-        "Three circuits, raced in either direction",
-        "Keyboard, gamepad and touch controls",
-        "Procedural graphics and a synthwave soundtrack"
+        "Nine circuits, six of them across Nigeria",
+        "Naija Cup, daily challenge and weekly tournament",
+        "Keyboard, gamepad and touch controls"
       ],
-      "cover": "assets/apps/arclight/neon-arcology.jpg",
+      "cover": "assets/apps/arclight/lagos-lagoon.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/arclight/neon-arcology.jpg", "caption": "Neon Arcology" },
+        { "type": "image", "src": "assets/apps/arclight/lagos-lagoon.jpg", "caption": "Lagos Lagoon" },
         { "type": "image", "src": "assets/apps/arclight/menu.jpg", "caption": "Pick a circuit, craft and difficulty" },
-        { "type": "image", "src": "assets/apps/arclight/coral-causeway.jpg", "caption": "Coral Causeway" },
-        { "type": "image", "src": "assets/apps/arclight/dust-mesa.jpg", "caption": "Dust Mesa" }
+        { "type": "image", "src": "assets/apps/arclight/abuja-aso-rock.jpg", "caption": "Abuja: the Aso Rock climb" },
+        { "type": "image", "src": "assets/apps/arclight/kano-ancient-city.jpg", "caption": "Kano Ancient City" },
+        { "type": "image", "src": "assets/apps/arclight/enugu-milliken-hill.jpg", "caption": "Enugu: Milliken Hill" },
+        { "type": "image", "src": "assets/apps/arclight/neon-arcology.jpg", "caption": "Neon Arcology" }
       ]
     },
     {
       "id": "repwise",
       "name": "Repwise",
       "tagline": "A fitness app for workouts, timers and nutrition that works offline, with no account.",
-      "description": "An offline-first fitness app you can install on any phone or desktop. Log workouts with rest timers and PR alerts, follow Coach Remy as he demonstrates all 154 built-in exercises, run HIIT, Tabata, EMOM and AMRAP timers, track food and water, and watch your progress. Everything stays private on your device.",
+      "description": "An offline-first fitness app you can install on any phone or desktop. Pick from 31 programs, 14 of them with no equipment, follow Coach Remy as he demonstrates every move, log workouts with rest timers and PR alerts, run interval timers, track food and water, and earn badges as you level up. Everything stays private on your device.",
       "status": "live",
       "category": "Fitness",
       "platforms": ["Web", "Installable app"],
@@ -308,17 +319,17 @@
       "url": "https://repwise.paruto.com",
       "links": [],
       "highlights": [
-        "Coach Remy demonstrates 154 exercises",
-        "Workout logger with rest timers and PR alerts",
+        "31 programs, 14 with no equipment",
+        "Coach Remy demonstrates every move",
         "Works offline; your data stays on your device"
       ],
       "cover": "",
       "media": [
-        { "type": "image", "src": "assets/apps/repwise/coach-remy.jpg", "caption": "Coach Remy demonstrates every exercise", "device": "phone" },
-        { "type": "image", "src": "assets/apps/repwise/today.jpg", "caption": "Today", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/home.jpg", "caption": "Today's pick and 31 programs", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/program-preview.jpg", "caption": "Coach Remy previews every exercise", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/rewards.jpg", "caption": "Levels, badges and a customisable Remy", "device": "phone" },
         { "type": "image", "src": "assets/apps/repwise/timers.jpg", "caption": "HIIT, Tabata, EMOM and AMRAP timers", "device": "phone" },
-        { "type": "image", "src": "assets/apps/repwise/nutrition.jpg", "caption": "Nutrition and water", "device": "phone" },
-        { "type": "image", "src": "assets/apps/repwise/progress.jpg", "caption": "Progress", "device": "phone" }
+        { "type": "image", "src": "assets/apps/repwise/nutrition.jpg", "caption": "Nutrition and water", "device": "phone" }
       ]
     },
     {
@@ -352,6 +363,31 @@
         { "type": "image", "src": "assets/apps/anansi-swing-city/london.jpg", "caption": "London: red buses and brick terraces" },
         { "type": "image", "src": "assets/apps/anansi-swing-city/cape-town.jpg", "caption": "Cape Town: Bo-Kaap colours and minibus taxis" },
         { "type": "image", "src": "assets/apps/anansi-swing-city/lite-version.jpg", "caption": "Swing City Lite, built for older phones" }
+      ]
+    },
+    {
+      "id": "naija-life",
+      "name": "Naija Life",
+      "tagline": "A browser life-sim across Lagos, Abuja and Port Harcourt.",
+      "description": "Start with ₦5,000 in Yaba, Lagos. Work shifts, eat well, look fresh and take the bus to Wuse in Abuja or D-Line in Port Harcourt when you can afford it. This first phase brings a 2D top-down map of each city hub, jobs and pay, a market, travel between cities, and accounts with saves. Game money only.",
+      "status": "beta",
+      "category": "Games",
+      "platforms": ["Web"],
+      "accent": "#facc15",
+      "accent2": "#15803d",
+      "icon": "🛺",
+      "added": "2026-10-10",
+      "featured": false,
+      "url": "https://naija-life.casefile-africa.workers.dev",
+      "links": [],
+      "highlights": [
+        "Three city hubs: Yaba, Wuse and D-Line",
+        "Jobs, a market and travel between cities",
+        "Accounts with saved progress"
+      ],
+      "cover": "",
+      "media": [
+        { "type": "image", "src": "assets/apps/naija-life/mobile-start.jpg", "caption": "Start in Lagos with ₦5,000", "device": "phone" }
       ]
     }
   ]
