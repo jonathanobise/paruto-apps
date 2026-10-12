@@ -366,29 +366,28 @@
       ]
     },
     {
-      "id": "naija-life",
-      "name": "Naija Life",
-      "tagline": "A browser life-sim across Lagos, Abuja and Port Harcourt.",
-      "description": "Start with ₦5,000 in Yaba, Lagos. Work shifts, eat well, look fresh and take the bus to Wuse in Abuja or D-Line in Port Harcourt when you can afford it. This first phase brings a 2D top-down map of each city hub, jobs and pay, a market, travel between cities, and accounts with saves. Game money only.",
-      "status": "beta",
-      "category": "Games",
+      "id": "paruto-post",
+      "name": "Paruto Post",
+      "tagline": "Private, fast email for the Paruto Media team, built entirely on Cloudflare.",
+      "description": "Paruto Post is the in-house email app for Paruto Media staff on @parutomedia.com. It has what a team inbox needs: threaded conversations, labels, search with filters, rich-text compose with attachments and a five-second undo send, and spam filtering that explains itself. Remote images stay blocked until you choose to show them, mail between colleagues arrives instantly, and it works well on phones.",
+      "status": "in-development",
+      "category": "Productivity",
       "platforms": ["Web"],
-      "accent": "#facc15",
-      "accent2": "#15803d",
-      "icon": "🛺",
-      "added": "2026-10-10",
+      "accent": "#f5d68a",
+      "accent2": "#b8841e",
+      "icon": "✉️",
+      "iconImage": "assets/apps/paruto-post/icon",
+      "added": "2026-10-12",
       "featured": false,
-      "url": "https://naija-life.casefile-africa.workers.dev",
+      "url": "",
       "links": [],
       "highlights": [
-        "Three city hubs: Yaba, Wuse and D-Line",
-        "Jobs, a market and travel between cities",
-        "Accounts with saved progress"
+        "Threads, labels, search and undo send",
+        "Private by design: tracking images blocked",
+        "Instant mail between colleagues, on any device"
       ],
       "cover": "",
-      "media": [
-        { "type": "image", "src": "assets/apps/naija-life/mobile-start.jpg", "caption": "Start in Lagos with ₦5,000", "device": "phone" }
-      ]
+      "media": []
     }
   ]
 }
