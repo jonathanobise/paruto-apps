@@ -50,8 +50,14 @@ Site-level text (`site` object): `name`, `eyebrow`, `headline`, `subheadline`, `
 
 `site.family` lists the sister companies shown as "The Paruto family" link cards in the footer: `[{ "name": "Paruto Media", "logo": "assets/family/paruto-media-logo", "url": "https://parutomedia.com", "note": "one-liner" }]`. `logo` is optional: a path without the suffix; the site loads `<logo>-white.svg` on the dark theme and `<logo>-black.svg` on light. Lockups are copies from `~/Projects/paruto-brand/assets/logos` (never hand-edit them; regenerate there and copy over). Keep it in sync with the Companies on paruto.com (`~/Projects/paruto-com`). Paruto Apps itself isn't listed (it's this site).
 
+## Roadmap
+The showcase's own feature roadmap (what's built, in progress and still to come) is tracked at https://claude.ai/artifact/HRDvQTP7NN5VF5fK4YWLC6. When you ship a showcase feature (not routine app-listing updates), mark its item shipped there with the commit as the reference, and add new items for new feature requests. Update the data with the ArtifactData tool (collections `phases` and `items`); don't republish the page.
+
+The Anansi: Swing City games (`games/anansi-swing-city/`, `games/anansi-swing-city-lite/`, `games/shared/`, and the leaderboard Worker in `~/Projects/anansi-leaderboard`) have their own roadmap at https://claude.ai/artifact/WPt2PLvN2hMVwEqpPXjSqB, in the same shape. When game work ships, mark the matching item shipped with the commit as the reference (append to `history`, set `shipped_on` and `updated_at`, pin writes with `if_version`); add new items for new feature requests.
+
 ## Deploying
 Live at **https://apps.paruto.com** via **GitHub Pages** from `master` of the public repo `jonathanobise/paruto-apps` (no build step; `CNAME` + `.nojekyll` at the root — don't delete them). DNS: a CNAME record `apps` → `jonathanobise.github.io.` in DreamHost. HTTPS is enforced (Let's Encrypt, auto-renewed).
+- **Keep the repo public.** On the free GitHub plan, Pages only serves public repos: making `paruto-apps` private deletes the Pages site and its custom-domain settings, and apps.paruto.com goes 404 (this happened 2026-10-13 to 15 Oct). If it happens, make the repo public, re-enable Pages from `master` `/`, and set the custom domain back to `apps.paruto.com`.
 - **Every push to `master` redeploys** within a minute or two. After editing, remind the user to commit/push — don't push without being asked.
 - `gh` lives at `/opt/homebrew/bin/gh` (not on the non-interactive PATH). Local git is old (2.15): push with
   `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`
