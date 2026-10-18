@@ -118,14 +118,22 @@
     });
     if (!pool.length) { $("wall").hidden = true; return; }
 
-    const tile = ({ app, src }) => src
-      ? h("div", { class: "tile" }, h("img", { src, alt: "", decoding: "async" }))
+    // Small copies (scripts/wall-thumbs.mjs, about 1 MB for every image), falling back to the original until one exists.
+    // The first tiles load first; the rest at low priority, so they don't hold up the page.
+    const wallSrc = (src) => src.replace(/^assets\/apps\//, "assets/wall/").replace(/\.[a-z0-9]+$/i, ".webp");
+    const fallback = (e) => { const img = e.currentTarget; if (img.dataset.full) { img.src = img.dataset.full; delete img.dataset.full; } };
+    const tile = ({ app, src }, i) => src
+      ? h("div", { class: "tile" }, h("img", {
+        src: src.startsWith("assets/apps/") ? wallSrc(src) : src, "data-full": src.startsWith("assets/apps/") ? src : null, alt: "", decoding: "async",
+        // Not loading="lazy": the moving, tilted wall never reports tiles coming into view, so they'd stay blank.
+        width: 640, height: 400, fetchpriority: i < 3 ? "high" : "low", onerror: fallback,
+      }))
       : h("div", { class: "tile poster", style: accentStyle(app) }, iconEl(app), h("span", { class: "nm" }, app.name));
 
     const ROWS = 3, PER_ROW = 8;
     const rows = Array.from({ length: ROWS }, (_, r) => {
       const set = Array.from({ length: Math.max(PER_ROW, pool.length) }, (_, i) => pool[(i + r * 2) % pool.length]);
-      const nodes = [...set, ...set].map(tile); // duplicated for a seamless loop
+      const nodes = [...set, ...set].map((t, i) => tile(t, r === 0 ? i : i + 6)); // duplicated for a seamless loop
       return h("div", { class: "wall-row" }, h("div", { class: "wall-track", style: `--dur:${90 + r * 25}s` }, nodes));
     });
     $("wall").replaceChildren(h("div", { class: "wall-plane" }, rows));
@@ -434,7 +442,8 @@
   /* ---------- Boot ---------- */
   async function init() {
     try {
-      const res = await fetch(`apps.json?v=${Date.now()}`, { cache: "no-cache" });
+      // Preloaded in index.html; Cloudflare serves it with "revalidate every time", so it's never stale.
+      const res = await fetch("apps.json");
       if (!res.ok) throw new Error(res.status);
       state.data = await res.json();
     } catch {

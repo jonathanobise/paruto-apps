@@ -62,6 +62,18 @@ for (const app of data.apps ?? []) {
   }
 }
 
+// The hero wall's small copies (scripts/wall-thumbs.mjs): missing or older than the original means the wall loads the
+// full-size image instead, which still works but is slow.
+{
+  const { statSync } = await import("node:fs");
+  const at = (p) => join(root, p);
+  const wall = (src) => src.replace(/^assets\/apps\//, "assets/wall/").replace(/\.[a-z0-9]+$/i, ".webp");
+  const stale = data.apps.flatMap((app) => [app.cover, ...(app.media ?? []).filter((m) => m.type === "image").map((m) => m.src)])
+    .filter((s) => s && /^assets\/apps\/.+\.(jpe?g|png|webp)$/i.test(s) && existsSync(at(s)))
+    .filter((s) => !existsSync(at(wall(s))) || statSync(at(wall(s))).mtimeMs < statSync(at(s)).mtimeMs);
+  if (stale.length) warnings.push(`${new Set(stale).size} wall image(s) have no up-to-date small copy: run node scripts/wall-thumbs.mjs`);
+}
+
 warnings.forEach((w) => console.warn(`! ${w}`));
 if (errors.length) {
   errors.forEach((e) => console.error(`✗ ${e}`));

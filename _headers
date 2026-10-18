@@ -3,3 +3,11 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Always checked for changes (cheap: unchanged files answer 304)
+/apps.json
+  Cache-Control: no-cache
+
+# The wall's small copies change only when their original does (scripts/wall-thumbs.mjs)
+/assets/wall/*
+  Cache-Control: public, max-age=86400

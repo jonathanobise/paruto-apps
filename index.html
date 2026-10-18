@@ -13,7 +13,12 @@
   <!-- Apple devices use SF Pro / SF Mono via the system stack; these are the fallbacks elsewhere -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <!-- Fonts load without holding up the first paint (the system stack shows until they arrive) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+  <!-- Everything on the page comes from apps.json: fetch it straight away, with the script -->
+  <link rel="preload" href="apps.json" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="app.js" as="script">
   <link rel="stylesheet" href="styles.css">
   <script>
     // Dark by default; apply a saved light preference before first paint (no flash)
