@@ -119,14 +119,15 @@
     if (!pool.length) { $("wall").hidden = true; return; }
 
     // Small copies (scripts/wall-thumbs.mjs, about 1 MB for every image), falling back to the original until one exists.
-    // The first tiles load first; the rest at low priority, so they don't hold up the page.
+    // The first tiles load first; the browser decides the rest.
     const wallSrc = (src) => src.replace(/^assets\/apps\//, "assets/wall/").replace(/\.[a-z0-9]+$/i, ".webp");
     const fallback = (e) => { const img = e.currentTarget; if (img.dataset.full) { img.src = img.dataset.full; delete img.dataset.full; } };
     const tile = ({ app, src }, i) => src
       ? h("div", { class: "tile" }, h("img", {
         src: src.startsWith("assets/apps/") ? wallSrc(src) : src, "data-full": src.startsWith("assets/apps/") ? src : null, alt: "", decoding: "async",
         // Not loading="lazy": the moving, tilted wall never reports tiles coming into view, so they'd stay blank.
-        width: 640, height: 400, fetchpriority: i < 3 ? "high" : "low", onerror: fallback,
+        // No "low" either: the browser raises the priority of the tiles it can see.
+        width: 640, height: 400, fetchpriority: i < 3 ? "high" : null, onerror: fallback,
       }))
       : h("div", { class: "tile poster", style: accentStyle(app) }, iconEl(app), h("span", { class: "nm" }, app.name));
 
