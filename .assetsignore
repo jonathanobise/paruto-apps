@@ -1,0 +1,15 @@
+# Not published: repository and tooling files.
+.git
+.gitignore
+.assetsignore
+.claude
+.cloudflare
+.wrangler
+node_modules
+scripts
+wrangler.jsonc
+CLAUDE.md
+README.md
+ROLLBACK.md
+CNAME
+.nojekyll

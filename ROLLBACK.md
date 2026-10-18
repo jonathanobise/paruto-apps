@@ -1,13 +1,26 @@
 # Rollback
 
-apps.paruto.com is a static site served by GitHub Pages from `master` of `jonathanobise/paruto-apps`. There is no build step, database or migration, so rolling back means putting an earlier commit back on `master`.
+apps.paruto.com is a static site served by Cloudflare (the Worker `paruto-apps`, static files only). There is no build step, database or migration.
 
-## Roll back the last change
+## Roll back the last deploy (fastest)
+
+Cloudflare keeps every deployed version. Put the previous one back in seconds, without touching git:
+
+```bash
+npx -y wrangler@4.141.0 deployments list --name paruto-apps
+npx -y wrangler@4.141.0 rollback --name paruto-apps
+```
+
+Then fix forward in git, so the next deploy doesn't bring the bad change back.
+
+## Roll back the last change in git
 
 ```bash
 git revert --no-edit HEAD
 git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push
 ```
+
+Then deploy `master` from a clean checkout (the command is in `CLAUDE.md`, "Deploying"): pushing alone doesn't deploy.
 
 `git revert` adds a new commit that undoes the bad one, so history is kept and nothing needs a force-push. To undo several commits, revert each one, newest first (`git revert --no-edit <sha>`).
 
@@ -19,11 +32,10 @@ git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= 
 ## Confirm the rollback is live
 
 ```bash
-/opt/homebrew/bin/gh api repos/jonathanobise/paruto-apps/pages --jq .status   # wait for "built"
-curl -sI https://apps.paruto.com/ | head -1
+curl -sI https://apps.paruto.com/ | grep -iE "^HTTP|^server"   # 200, server: cloudflare
 ```
 
-Deploys take a minute or two. Every earlier version stays in git history, so any of them can be restored the same way.
+Deploys are live within seconds. Every earlier version stays in git history, so any of them can be restored the same way.
 
 ## Kill switches and data
 

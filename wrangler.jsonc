@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4.141.0/config-schema.json",
+  // apps.paruto.com: the Paruto Apps showcase, served by Cloudflare as static files (no build step, no Worker code).
+  // Everything in this folder is published except what .assetsignore lists. Deploy only committed code from master:
+  // a clean checkout, then `npx wrangler deploy` (see CLAUDE.md, "Deploying").
+  "name": "paruto-apps",
+  "compatibility_date": "2026-09-25",
+  "assets": {
+    "directory": "./",
+    // Unknown addresses get the site's own 404 page; /games/x/ serves games/x/index.html, as on GitHub Pages.
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [{ "pattern": "apps.paruto.com", "custom_domain": true }],
+  "workers_dev": true
+}

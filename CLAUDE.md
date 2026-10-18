@@ -56,13 +56,14 @@ The showcase's own feature roadmap (what's built, in progress and still to come)
 The Anansi: Swing City games (`games/anansi-swing-city/`, `games/anansi-swing-city-lite/`, `games/shared/`, and the leaderboard Worker in `~/Projects/anansi-leaderboard`) have their own roadmap at https://claude.ai/artifact/WPt2PLvN2hMVwEqpPXjSqB, in the same shape. When game work ships, mark the matching item shipped with the commit as the reference (append to `history`, set `shipped_on` and `updated_at`, pin writes with `if_version`); add new items for new feature requests.
 
 ## Deploying
-Live at **https://apps.paruto.com** via **GitHub Pages** from `master` of the public repo `jonathanobise/paruto-apps` (no build step; `CNAME` + `.nojekyll` at the root — don't delete them). DNS: a CNAME record `apps` → `jonathanobise.github.io.` in DreamHost. HTTPS is enforced (Let's Encrypt, auto-renewed).
-- **Keep the repo public.** On the free GitHub plan, Pages only serves public repos: making `paruto-apps` private deletes the Pages site and its custom-domain settings, and apps.paruto.com goes 404 (this happened 2026-10-13 to 15 Oct). If it happens, make the repo public, re-enable Pages from `master` `/`, and set the custom domain back to `apps.paruto.com`.
-- **Every push to `master` redeploys** within a minute or two. After editing, remind the user to commit/push — don't push without being asked.
+Live at **https://apps.paruto.com**, served by **Cloudflare**: the Worker `paruto-apps` (static files only, no code; config in `wrangler.jsonc`), also at https://paruto-apps.paruto.workers.dev (kept on). paruto.com's DNS is on Cloudflare and apps.paruto.com is the Worker's custom domain (Cloudflare manages the record and the certificate). Everything in the folder is published except what `.assetsignore` lists (repo and tooling files); `_headers` sets the security headers.
+- **Pushing doesn't deploy.** Deploy only committed code, from a clean checkout of `master`, because several sessions work in this folder and leave uncommitted changes:
+  `git worktree add --detach /tmp/paruto-apps-deploy master && (cd /tmp/paruto-apps-deploy && npx -y wrangler@4.141.0 deploy) ; git worktree remove --force /tmp/paruto-apps-deploy`
+  Check it with `curl -sI https://apps.paruto.com/ | grep -i server` (`cloudflare`). Don't deploy or push without being asked; after editing, remind the user.
+- The code is in the GitHub repo `jonathanobise/paruto-apps`, which no longer serves the site, so making it private doesn't take apps.paruto.com down.
 - `gh` lives at `/opt/homebrew/bin/gh` (not on the non-interactive PATH). Local git is old (2.15): push with
   `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`
   or pushes containing images fail with HTTP 400.
-- Check a deploy with `gh api repos/jonathanobise/paruto-apps/pages --jq .status` (wait for `built`).
 
 ## Style rules
 - Don't hand-edit HTML for content; keep content in `apps.json`.

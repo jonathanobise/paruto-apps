@@ -27,10 +27,6 @@ Open this folder in Claude Code and say things like:
 Claude reads `CLAUDE.md` for the rules, edits `apps.json`, copies/compresses images, and validates.
 
 ## Deploy to apps.paruto.com
-Any static host works — set **no build command** and publish the repo root.
-
-**Cloudflare Pages / Netlify / Vercel:** connect the repo (or drag-drop the folder), then add the custom domain `apps.paruto.com` and create the CNAME record they show you at your DNS provider.
-
-**GitHub Pages:** push to a repo, enable Pages on the main branch, set the custom domain to `apps.paruto.com`, and add a `CNAME` DNS record pointing to `<user>.github.io`.
+The site is served by Cloudflare as static files: the Worker `paruto-apps` in `wrangler.jsonc`, with apps.paruto.com as its custom domain. There's no build step. Commit, then deploy a clean checkout of `master` with `npx -y wrangler@4.141.0 deploy` (the exact command is in `CLAUDE.md`). Files listed in `.assetsignore` aren't published.
 
 Each app has a shareable deep link: `https://apps.paruto.com/#/paruto-kids-world`.
