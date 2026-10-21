@@ -399,8 +399,8 @@
     {
       "id": "project-meridian",
       "name": "Project Meridian",
-      "tagline": "A research workspace for testing ideas properly before they meet the real world.",
-      "description": "An AI-native workspace that takes an idea from first analysis to rigorous testing. Still under wraps: more when it's ready.",
+      "tagline": "Ninety-nine maps burned. One kept.",
+      "description": "A sailor drew a hundred maps and burned ninety-nine. The one he kept had crossed the ocean a thousand times by lamplight before it ever touched the sea.",
       "status": "in-development",
       "category": "Unannounced",
       "platforms": ["Web"],
@@ -409,14 +409,14 @@
       "icon": "🧭",
       "added": "2026-10-21",
       "featured": false,
-      "highlights": ["AI-native from the start", "Rigour before results"],
+      "highlights": ["Drawn by lamplight", "Sailed before the sea"],
       "media": []
     },
     {
       "id": "project-atlas",
       "name": "Project Atlas",
-      "tagline": "Turning flat drawings into spaces you can step inside.",
-      "description": "A 3D experience that turns something you'd normally read on paper into something you can walk through. Still under wraps: more when it's ready.",
+      "tagline": "A letter you can walk into.",
+      "description": "A child was handed a letter written only in lines and corners. She folded it once, then twice, and stepped inside.",
       "status": "in-development",
       "category": "Unannounced",
       "platforms": ["Web"],
@@ -425,14 +425,14 @@
       "icon": "🗺️",
       "added": "2026-10-21",
       "featured": false,
-      "highlights": ["Real-time 3D in the browser", "Built to scale"],
+      "highlights": ["Folded twice", "Read from the inside"],
       "media": []
     },
     {
       "id": "project-lantern",
       "name": "Project Lantern",
-      "tagline": "An AI helper for people who care for others in the field.",
-      "description": "An AI agent built to support frontline workers in their communities. Still under wraps: more when it's ready.",
+      "tagline": "The lamp that shows where to look.",
+      "description": "In a village without a doctor, a woman carried a lamp from door to door. The lamp healed no one. It only showed her where to look.",
       "status": "in-development",
       "category": "Unannounced",
       "platforms": ["Web"],
@@ -441,14 +441,14 @@
       "icon": "🏮",
       "added": "2026-10-21",
       "featured": false,
-      "highlights": ["Built for real-world conditions", "Societal impact first"],
+      "highlights": ["Door to door", "Light, not cure"],
       "media": []
     },
     {
       "id": "project-tempo",
       "name": "Project Tempo",
-      "tagline": "A real-time companion for people who track their own performance.",
-      "description": "A journal that keeps itself up to date as things happen, so the lessons are there when you need them. Still under wraps: more when it's ready.",
+      "tagline": "A diary that keeps pace.",
+      "description": "A runner never wrote a word, yet each night her diary held the whole race, every stride exactly where it fell.",
       "status": "in-development",
       "category": "Unannounced",
       "platforms": ["Web"],
@@ -457,14 +457,14 @@
       "icon": "⏱️",
       "added": "2026-10-21",
       "featured": false,
-      "highlights": ["Updates in real time", "Insight, not busywork"],
+      "highlights": ["Every stride where it fell", "Read by nightfall"],
       "media": []
     },
     {
       "id": "project-harbor",
       "name": "Project Harbor",
-      "tagline": "An AI agent that quietly gets back what's yours.",
-      "description": "An AI agent that watches the loose ends people forget about and helps put them right, with the evidence to hand. Still under wraps: more when it's ready.",
+      "tagline": "The tide that brings back the nets.",
+      "description": "A fisherman counted his nets each morning and found nothing missing. Then the tide came in carrying three he had never known were gone.",
       "status": "in-development",
       "category": "Unannounced",
       "platforms": ["Web"],
@@ -473,7 +473,7 @@
       "icon": "⚓",
       "added": "2026-10-21",
       "featured": false,
-      "highlights": ["Watches so you don't have to", "Shows its evidence"],
+      "highlights": ["Counted every morning", "Returned on the tide"],
       "media": []
     }
   ]
