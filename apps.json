@@ -101,14 +101,16 @@
         "Interview witnesses who remember, trust and lie",
         "Fair-play cases: every answer can be deduced from the evidence"
       ],
-      "cover": "assets/apps/casefile-africa/investigator-device.jpg",
+      "cover": "assets/apps/casefile-africa/case-file.jpg",
       "media": [
         { "type": "image", "src": "assets/apps/casefile-africa/title-screen.jpg", "caption": "Case 001: The Maitama Ledger" },
-        { "type": "image", "src": "assets/apps/casefile-africa/warrant-card.jpg", "caption": "Create your investigator" },
+        { "type": "image", "src": "assets/apps/casefile-africa/warrant-card.jpg", "caption": "Apply for your warrant card" },
         { "type": "image", "src": "assets/apps/casefile-africa/incoming-call.jpg", "caption": "The call comes in" },
-        { "type": "image", "src": "assets/apps/casefile-africa/arrival.jpg", "caption": "Maitama Heights, 23:58, heavy rain" },
-        { "type": "image", "src": "assets/apps/casefile-africa/crime-scene.jpg", "caption": "The crime scene" },
-        { "type": "image", "src": "assets/apps/casefile-africa/investigator-device.jpg", "caption": "The investigator device and case file" }
+        { "type": "image", "src": "assets/apps/casefile-africa/police-line.jpg", "caption": "Harmattan Crescent: police line, heavy rain" },
+        { "type": "image", "src": "assets/apps/casefile-africa/the-house.jpg", "caption": "The house on the driveway" },
+        { "type": "image", "src": "assets/apps/casefile-africa/case-file.jpg", "caption": "The investigator device: the case file" },
+        { "type": "image", "src": "assets/apps/casefile-africa/abuja-map.jpg", "caption": "The map of Abuja" },
+        { "type": "image", "src": "assets/apps/casefile-africa/forensic-camera.jpg", "caption": "The forensic camera" }
       ]
     },
     {
