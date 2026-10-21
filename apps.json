@@ -19,7 +19,7 @@
       "id": "paruto-kids-world",
       "name": "Paruto Kids World",
       "tagline": "An illustrated village where little ones learn and play with Jas, Jay and baby Joe.",
-      "description": "A browser-based illustrated village for children aged 2–5. Kids explore a 2D village with six zones alongside Jas, Jay and baby Joe, play learning games and draw in the Colour Workshop. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
+      "description": "A browser-based illustrated village for children aged 2–5. Kids walk through six zones with Jas, Jay and baby Joe and play 17 learning games, from letters, tracing and counting to music, animals, feelings, staying safe and Bible stories, plus a Colour Workshop for drawing. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
       "status": "live",
       "category": "Kids & Learning",
       "platforms": ["Web"],
@@ -33,14 +33,24 @@
         { "label": "Paruto Kids", "url": "https://parutokids.com" }
       ],
       "highlights": [
-        "Learning games and a Colour Workshop",
+        "17 learning games and a Colour Workshop",
         "Works offline, with no ads or endless scrolling",
         "Parent area behind a grown-up gate"
       ],
-      "cover": "assets/apps/paruto-kids-world/village.jpg",
+      "cover": "assets/apps/paruto-kids-world/village-square.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/paruto-kids-world/village.jpg", "caption": "The village square with the family" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/choose-your-player.jpg", "caption": "Play as Jas or Jay" }
+        { "type": "image", "src": "assets/apps/paruto-kids-world/village-square.jpg", "caption": "The Village Square with Mum, baby Joe, Jas and Jay" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/choose-your-player-phone.jpg", "caption": "Play as Jas or Jay", "device": "phone" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/learning-academy.jpg", "caption": "The Learning Academy" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/discovery-farm.jpg", "caption": "Discovery Farm, with Dad at the greenhouse" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/music-garden.jpg", "caption": "The Music Garden's bell avenue" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/life-skills-town.jpg", "caption": "Life Skills Town" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/faith-garden.jpg", "caption": "The Faith Garden" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/games.jpg", "caption": "What shall we play? Every game by subject" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/counting-market.jpg", "caption": "Counting Market" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/tracing-trail.jpg", "caption": "Tracing Trail: shapes, letters and numbers" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/animal-explorer.jpg", "caption": "Animal Explorer" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/bible-story-adventure.jpg", "caption": "Bible Story Adventure: Noah builds the ark" }
       ]
     },
     {
@@ -468,33 +478,20 @@
       "media": []
     },
     {
-      "id": "paruto-music-academy",
-      "name": "Paruto Music Academy",
-      "tagline": "Learn music, right in your browser.",
-      "description": "Read notes, understand theory and play piano, with guitar, ukulele, voice and drums on the way. Short lessons for kids, teens and adults, a daily melody, rhythm and chord challenge, and free tools: a piano you can play with your fingers, computer keys or a MIDI keyboard, a tuner and a metronome. Free to start, with nothing to install. The learning arm of Paruto Music.",
-      "status": "live",
-      "category": "Music & Learning",
-      "platforms": ["Web", "Installable app"],
-      "accent": "#e3a92b",
-      "accent2": "#5b3fd9",
-      "icon": "🎹",
-      "iconImage": "assets/apps/paruto-music-academy/icon",
+      "id": "project-willow",
+      "name": "Project Willow",
+      "tagline": "The tree that taught the wind to sing.",
+      "description": "An old woman hung a single reed beneath the willow by her gate. Every child who passed stopped to make it sing, and by summer the whole lane could hum her tunes, though none of them remembered being taught.",
+      "status": "in-development",
+      "category": "Unannounced",
+      "platforms": ["Web"],
+      "accent": "#7fb98a",
+      "accent2": "#1f3a2a",
+      "icon": "🌿",
       "added": "2026-10-16",
       "featured": false,
-      "url": "https://paruto-music-academy.paruto.workers.dev",
-      "links": [{ "label": "Paruto Music", "url": "https://parutomusic.com" }],
-      "highlights": ["Music Foundations and Piano courses, free to start", "A daily melody, rhythm and chord challenge", "Free piano, tuner and metronome", "Your microphone audio never leaves the device"],
-      "cover": "assets/apps/paruto-music-academy/landing.jpg",
-      "media": [
-        { "type": "image", "src": "assets/apps/paruto-music-academy/landing.jpg", "caption": "Learn music. Right in your browser." },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/mobile-landing.jpg", "caption": "On a phone", "device": "phone" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/piano.jpg", "caption": "A piano you can play with your fingers, computer keys or a MIDI keyboard" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/learn.jpg", "caption": "Courses and the Paruto Path" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/music-foundations.jpg", "caption": "Music Foundations: hear it, feel it, read it" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/daily.jpg", "caption": "Paruto Daily: a melody, a rhythm and a chord progression every day" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/tuner.jpg", "caption": "A tuner for guitar, ukulele or any instrument" },
-        { "type": "image", "src": "assets/apps/paruto-music-academy/metronome-phone.jpg", "caption": "A metronome from 30 to 240 bpm", "device": "phone" }
-      ]
+      "highlights": ["One reed by the gate", "A whole lane humming"],
+      "media": []
     },
     {
       "id": "project-cairn",
