@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="t" x1="0" y1="0" x2="0.5" y2="1" gradientTransform="rotate(-30 .5 .5)"><stop offset="0" stop-color="#2b2a7a"/><stop offset="0.62" stop-color="#15162a"/><stop offset="1" stop-color="#0b0c18"/></linearGradient></defs>
+<rect width="512" height="512" rx="113" fill="url(#t)"/>
+<g transform="translate(92.16 92.16) scale(5.12)">
+  <path d="M31 58 C27 49 18 41 6 37 C4 36.3 3 34.6 3.4 32.6 C3.9 30.5 6 29.3 8.1 29.9 C19.4 33 27.8 40.4 31 49 Z" fill="#e9e8ff"/>
+  <path d="M33 58 C37 49 46 41 58 37 C60 36.3 61 34.6 60.6 32.6 C60.1 30.5 58 29.3 55.9 29.9 C44.6 33 36.2 40.4 33 49 Z" fill="#e9e8ff"/>
+  <path d="M32 6 C33.2 14.5 35.5 16.8 44 18 C35.5 19.2 33.2 21.5 32 30 C30.8 21.5 28.5 19.2 20 18 C28.5 16.8 30.8 14.5 32 6 Z" fill="#e9a23b"/>
+</g>
+</svg>
