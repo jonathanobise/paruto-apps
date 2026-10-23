@@ -177,8 +177,8 @@
       "id": "ivra",
       "aliases": ["paruto-finance"],
       "name": "Ivra",
-      "tagline": "Mobile-first accounting for invoices, payments, expenses and project profitability.",
-      "description": "A mobile-first accounting platform for managing invoices, receipts, payments, expenses and project profitability. Built for Paruto and designed to scale to other organisations, it brings multi-currency finances, approvals and financial reporting into one simple workspace.",
+      "tagline": "Accounting and payroll for Nigerian businesses, with the tax worked out.",
+      "description": "One set of books for invoices, bills, expenses, banking, tax and payroll, on your phone or computer. It works out PAYE on the 2026 bands, pension, NHF, NSITF and ITF, emails payslips, and keeps VAT and withholding tax as sums you can follow to the due date. Built like a ledger: every entry balances, posted entries are never edited, and closed months stay locked. Invite-only for now.",
       "status": "beta",
       "category": "Finance",
       "platforms": ["Web"],
@@ -191,9 +191,10 @@
       "url": "https://ivra.paruto.com",
       "links": [],
       "highlights": [
-        "Invoices, receipts, payments and expenses in one workspace",
-        "Multi-currency, with approvals built in",
-        "Project profitability and financial reporting"
+        "Payroll with PAYE, pension and levies, and payslips in one tap",
+        "Invoices in naira or dollars, with VAT and withholding tax",
+        "Receipts read from a photo, and bank statements reconciled",
+        "Suppliers get a free page of what they were paid, for their tax"
       ],
       "cover": "assets/apps/ivra/overview-laptop.jpg",
       "media": [
