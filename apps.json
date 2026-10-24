@@ -285,7 +285,7 @@
       "id": "arclight",
       "name": "ARCLIGHT",
       "tagline": "An anti-gravity racer for the browser, with every mesh and sound generated in code.",
-      "description": "An original anti-gravity racing game built with Three.js. Race nine circuits in either direction, six of them across Nigeria, from Lagos Lagoon and Abuja's Aso Rock to Kano's ancient city, with airbrakes, boost pads and weapons against skill-based AI. Take on the six-round Naija Cup, the daily challenge and a weekly tournament, and earn medals and liveries. Every mesh, texture and sound is generated in code.",
+      "description": "An original anti-gravity racing game built with Three.js. Race fourteen circuits in either direction, eleven of them across Nigeria, from Lagos Lagoon and Abuja's Aso Rock to Kano's ancient city, Calabar's Carnival and Benin City's ancient kingdom, with airbrakes, boost pads and weapons against skill-based AI. Take on the Naija Cup, the daily challenge, a weekly tournament and leagues, race a friend live, and earn medals and liveries. Every mesh, texture and sound is generated in code.",
       "status": "live",
       "category": "Games",
       "platforms": ["Web"],
@@ -296,19 +296,20 @@
       "featured": false,
       "url": "https://arclight.paruto.com",
       "links": [],
-      "highlights": [
-        "Nine circuits, six of them across Nigeria",
-        "Naija Cup, daily challenge and weekly tournament",
-        "Keyboard, gamepad and touch controls"
-      ],
+      "highlights": ["Fourteen circuits, eleven of them across Nigeria", "Naija Cup, daily and weekly challenges, and live races with a friend", "Keyboard, gamepad and touch controls"],
       "cover": "assets/apps/arclight/lagos-lagoon.jpg",
       "media": [
         { "type": "image", "src": "assets/apps/arclight/lagos-lagoon.jpg", "caption": "Lagos Lagoon" },
-        { "type": "image", "src": "assets/apps/arclight/menu.jpg", "caption": "Pick a circuit, craft and difficulty" },
+        { "type": "image", "src": "assets/apps/arclight/menu.jpg", "caption": "Pick from fourteen circuits, a craft, a livery and a mode" },
         { "type": "image", "src": "assets/apps/arclight/abuja-aso-rock.jpg", "caption": "Abuja: the Aso Rock climb" },
         { "type": "image", "src": "assets/apps/arclight/kano-ancient-city.jpg", "caption": "Kano Ancient City" },
         { "type": "image", "src": "assets/apps/arclight/enugu-milliken-hill.jpg", "caption": "Enugu: Milliken Hill" },
-        { "type": "image", "src": "assets/apps/arclight/neon-arcology.jpg", "caption": "Neon Arcology" }
+        { "type": "image", "src": "assets/apps/arclight/neon-arcology.jpg", "caption": "Neon Arcology" },
+        { "type": "image", "src": "assets/apps/arclight/port-harcourt.jpg", "caption": "Port Harcourt: the Garden City, after the rain" },
+        { "type": "image", "src": "assets/apps/arclight/ibadan.jpg", "caption": "Ibadan: brown roofs on a golden morning" },
+        { "type": "image", "src": "assets/apps/arclight/jos.jpg", "caption": "Jos: the cool Plateau highlands" },
+        { "type": "image", "src": "assets/apps/arclight/calabar.jpg", "caption": "Calabar: Carnival night" },
+        { "type": "image", "src": "assets/apps/arclight/benin-city.jpg", "caption": "Benin City: the Ancient Kingdom in harmattan haze" }
       ]
     },
     {
