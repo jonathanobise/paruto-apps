@@ -226,6 +226,7 @@
       "media": [
         { "type": "image", "src": "assets/apps/churchsense/landing.jpg", "caption": "See the health of your church, every week." },
         { "type": "image", "src": "assets/apps/churchsense/mobile-landing.jpg", "caption": "On a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/churchsense/weekly-card-phone.jpg", "caption": "This week across every campus, with what needs care", "device": "phone" },
         { "type": "image", "src": "assets/apps/churchsense/dashboard.jpg", "caption": "The dashboard: an Action Centre and AI weekly insights (demo church, fictional data)" },
         { "type": "image", "src": "assets/apps/churchsense/attendance.jpg", "caption": "Weekly attendance, Sunday rhythm and demographics (demo church)" },
         { "type": "image", "src": "assets/apps/churchsense/features.jpg", "caption": "Built for how churches actually run" },
