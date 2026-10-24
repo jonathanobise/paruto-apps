@@ -256,7 +256,7 @@
       "aliases": ["abuja-lagos-hyperspeed"],
       "name": "Hyperspeed Rail",
       "tagline": "A concept maglev network for Nigeria on real terrain, and a game you can drive.",
-      "description": "A concept double-track maglev network for Nigeria: 11 lines and 54 stations drawn on real terrain in the browser, with trains running both ways every 30 minutes and a journey planner between any two stations. Drive the trains, take the daily challenge, redraw lines in build puzzles, or run the network and see whether the fares cover the costs. A concept, not an official plan; costs are benchmarks from real projects.",
+      "description": "A concept double-track maglev network for Nigeria: 11 lines and 54 stations drawn on real terrain in the browser, with trains running both ways every 30 minutes and a journey planner between any two stations. Drive the trains, take the daily challenge, build a career and play the State League, redraw lines in build puzzles, or run the network and see whether the fares cover the costs. A concept, not an official plan; costs are benchmarks from real projects.",
       "status": "live",
       "category": "Concepts",
       "platforms": ["Web"],
@@ -267,16 +267,18 @@
       "featured": false,
       "url": "https://hyperspeed.paruto.com",
       "links": [],
-      "highlights": [
-        "11 lines and 54 stations on real terrain",
-        "Drive trains, daily challenges and build puzzles",
-        "A journey planner across the whole network"
-      ],
-      "cover": "assets/apps/hyperspeed-rail/network-map.jpg",
+      "highlights": ["11 lines and 54 stations on real terrain", "Drive, daily challenges, a career and the State League", "A journey planner across the whole network"],
+      "cover": "assets/apps/hyperspeed-rail/landing.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/hyperspeed-rail/network-map.jpg", "caption": "The network and journey planner" },
-        { "type": "image", "src": "assets/apps/hyperspeed-rail/game-menu.jpg", "caption": "Drive, daily challenges, build puzzles and more" },
-        { "type": "image", "src": "assets/apps/hyperspeed-rail/chase-view.jpg", "caption": "Leaving Abuja Central" }
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/landing.jpg", "caption": "Ride a maglev across Nigeria" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/landing-phone.jpg", "caption": "On a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/network.jpg", "caption": "The network and journey planner: Kano to Calabar in 3 h 25 min" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/explore.jpg", "caption": "Explore freely: change the view, the light and the weather" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/chase-view.jpg", "caption": "Leaving Abuja Central" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/play-menu.jpg", "caption": "Drive, the daily challenge, a career, missions and the State League" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/garage.jpg", "caption": "The Garage: liveries for your train" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/run-the-network.jpg", "caption": "Run the Network: set trains and fares on every line" },
+        { "type": "image", "src": "assets/apps/hyperspeed-rail/back-the-build.jpg", "caption": "Back the Build: help build the game, from ₦500" }
       ]
     },
     {
