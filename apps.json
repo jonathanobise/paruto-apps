@@ -55,10 +55,11 @@
       ]
     },
     {
-      "id": "naija-hustle",
-      "name": "Naija Hustle",
-      "tagline": "A multiplayer life simulation set in the streets of Lagos.",
-      "description": "A persistent, mobile-first browser life sim set in Nigerian cities. Start in Lagos, earn, trade and build a life alongside other players in a living, server-driven economy.",
+      "id": "the-hustler",
+      "aliases": ["naija-hustle"],
+      "name": "The Hustler",
+      "tagline": "Solve real problems. Change your life. Leave a legacy.",
+      "description": "A persistent, multiplayer, mobile-first browser life game set in real Nigerian cities. Arrive in Lagos with ₦25,000 and a room, solve problems that matter, and build a legacy that outlives you, alongside real players writing their own. Claim a permanent @username and live your life in chapters. Formerly Naija Hustle.",
       "status": "in-development",
       "category": "Games",
       "platforms": ["Web", "Mobile"],
@@ -69,17 +70,13 @@
       "featured": false,
       "url": "https://naijahustle.paruto.com",
       "links": [],
-      "highlights": [
-        "Multiplayer, persistent world",
-        "Mobile-first",
-        "Starting with Lagos — Block One"
-      ],
-      "cover": "assets/apps/naija-hustle/landing.jpg",
+      "highlights": ["A multiplayer, persistent world in real Lagos", "Start with ₦25,000 and a room, and rise in chapters", "Mobile-first, in private preview"],
+      "cover": "assets/apps/the-hustler/landing.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/naija-hustle/landing.jpg", "caption": "Claim your username and start with ₦10m" },
-        { "type": "image", "src": "assets/apps/naija-hustle/mobile-landing.jpg", "caption": "Mobile-first", "device": "phone" },
-        { "type": "image", "src": "assets/apps/naija-hustle/enter-naija.jpg", "caption": "Enter Naija" },
-        { "type": "image", "src": "assets/apps/naija-hustle/what-you-can-build.jpg", "caption": "What you can build" }
+        { "type": "image", "src": "assets/apps/the-hustler/landing.jpg", "caption": "Solve real problems. Change your life. Leave a legacy." },
+        { "type": "image", "src": "assets/apps/the-hustler/landing-phone.jpg", "caption": "Claim your @username and start with ₦25,000", "device": "phone" },
+        { "type": "image", "src": "assets/apps/the-hustler/what-you-can-build-phone.jpg", "caption": "Live a second Naija life, hustle that helps, leave a legacy", "device": "phone" },
+        { "type": "image", "src": "assets/apps/the-hustler/enter-naija.jpg", "caption": "Enter Naija" }
       ]
     },
     {
