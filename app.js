@@ -1,4 +1,5 @@
-/* Paruto Apps showcase — renders everything from apps.json. No build step. */
+/* Paruto Apps showcase — renders everything from apps.json. No build step.
+   (01) the Atrium: every app on a turning ring · (02) the Index · (03) Files: unannounced projects, redacted. */
 (() => {
   const STATUS = {
     "live": "Live",
@@ -7,12 +8,14 @@
     "coming-soon": "Coming soon",
   };
   const STATUS_ORDER = ["live", "beta", "in-development", "coming-soon"];
+  // Unannounced projects are listed under codenames in this category, and appear only in Files
+  const SEALED = "Unannounced";
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, "0");
-  const state = { data: null, apps: [], filter: { key: "all", value: null }, lb: { items: [], i: 0 } };
+  const state = { data: null, apps: [], open: null, lastFocus: null, lb: { items: [], i: 0 } };
 
   // Tiny safe element builder (never injects HTML from data)
   function h(tag, props = {}, ...kids) {
@@ -39,19 +42,22 @@
   const EXT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11 11 5M6 5h5v5"/></svg>';
 
   const accentStyle = (app) => `--a:${app.accent || "#8e8e93"};--b:${app.accent2 || app.accent || "#636366"}`;
-  const statusEl = (s, extra = "") => h("span", { class: `status s-${s} ${extra}`.trim() }, STATUS[s] || s);
-  const numberOf = (app) => pad(state.apps.indexOf(app) + 1);
   const iconEl = (app) => app.iconImage
     ? h("span", { class: "app-icon has-img", style: accentStyle(app), "aria-hidden": "true" },
         h("img", { class: "only-dark", src: `${app.iconImage}-dark.svg`, alt: "" }),
         h("img", { class: "only-light", src: `${app.iconImage}-light.svg`, alt: "" }))
     : h("span", { class: "app-icon", style: accentStyle(app), "aria-hidden": "true" }, h("span", {}, app.icon || app.name[0]));
+  const chipsEl = (app, all = false) => h("ul", { class: "chips" },
+    h("li", { class: `chip status s-${app.status}` }, STATUS[app.status] || app.status),
+    app.category && h("li", { class: "chip" }, app.category),
+    ...(app.platforms || []).slice(0, all ? 9 : 1).map((p) => h("li", { class: "chip" }, p)));
 
   // Visual helpers
   const media = (app) => app.media || [];
   const landscapeSrc = (app) => app.cover || media(app).find((m) => m.type === "image" && m.device !== "phone")?.src;
-  const phoneMedia = (app) => media(app).find((m) => m.type === "image" && m.device === "phone");
-  const galleryOf = (app) => (media(app).length ? media(app) : app.cover ? [{ type: "image", src: app.cover }] : []);
+  const phoneSrc = (app) => media(app).find((m) => m.type === "image" && m.device === "phone")?.src;
+  // Small WebP copies made by scripts/wall-thumbs.mjs (assets/wall/...), with the original for sharp screens
+  const thumb = (src) => src.startsWith("assets/apps/") ? src.replace(/^assets\/apps\//, "assets/wall/").replace(/\.[a-z0-9]+$/i, ".webp") : src;
   const hostOf = (url) => { try { return new URL(url).host; } catch { return ""; } };
 
   /* ---------- Page chrome ---------- */
@@ -61,14 +67,9 @@
     const [first, ...rest] = s.name.split(" ");
     $("brandName").replaceChildren(first, ...(rest.length ? [h("span", { class: "dim" }, " " + rest.join(" "))] : []));
 
-    // Headline: words rise in one by one; the last word is set in italic serif
+    // Headline: the last word is set in italic serif
     const words = s.headline.trim().split(/\s+/);
-    $("headline").replaceChildren(...words.flatMap((w, i) => {
-      const last = i === words.length - 1;
-      const span = h("span", { class: `w${last ? " serif" : ""}`, style: `animation-delay:${120 + i * 80}ms` }, w);
-      return last ? [span] : [span, " "];
-    }));
-    $("subheadline").textContent = s.subheadline || "";
+    $("headline").replaceChildren(...words.flatMap((w, i) => (i === words.length - 1 ? [h("span", { class: "serif" }, w)] : [w, " "])));
     $("eyebrow").textContent = s.eyebrow || "Now building";
     $("eyebrowCount").textContent = `${pad(state.apps.length)} ${state.apps.length === 1 ? "app" : "apps"}`;
     $("footerText").textContent = s.footer || "";
@@ -92,281 +93,257 @@
     const email = s.contactEmail;
     const mail = email ? `mailto:${email}` : null;
     $("contactLink").href = mail || "#contact";
-    $("heroContact").href = mail || "#contact";
     $("footerEmail").hidden = !email;
     if (email) $("footerEmail").replaceChildren(email, svg(ARROW));
     $("footerEmail").href = mail || "#";
-
-    // Only show honest, non-zero counts
-    const stat = (n, label) => h("div", {}, h("dt", {}, label), h("dd", {}, pad(n)));
-    const byStatus = STATUS_ORDER.map((st) => [st, state.apps.filter((a) => a.status === st).length]).filter(([, n]) => n);
-    const cats = new Set(state.apps.map((a) => a.category).filter(Boolean)).size;
-    $("stats").replaceChildren(
-      stat(state.apps.length, state.apps.length === 1 ? "App" : "Apps"),
-      ...byStatus.map(([st, n]) => stat(n, STATUS[st])),
-      ...(cats ? [stat(cats, cats === 1 ? "Category" : "Categories")] : [])
-    );
-    $("stats").style.setProperty("--cols", $("stats").children.length); // one row on wider screens
   }
 
-  /* ---------- Hero wall: every app visual, drifting on a tilted plane ---------- */
-  function renderWall() {
-    const pool = state.apps.flatMap((app) => {
-      const imgs = [app.cover, ...media(app).filter((m) => m.type === "image").map((m) => m.src)].filter(Boolean);
-      const unique = [...new Set(imgs)];
-      return unique.length ? unique.map((src) => ({ app, src })) : [{ app }];
-    });
-    if (!pool.length) { $("wall").hidden = true; return; }
+  /* ---------- (01) Atrium: the ring ---------- */
+  function renderAtrium(apps) {
+    const N = apps.length, step = 360 / N;
+    const ring = $("ring"), stage = $("ringStage"), atrium = $("atrium");
+    ring.replaceChildren(...apps.map((app, i) => {
+      const wide = landscapeSrc(app), tall = phoneSrc(app);
+      const near = i < 4 || i > N - 3; // the cards that start in view load first
+      const shot = wide ? h("div", { class: "rc-shot" }, h("img", { src: thumb(wide), alt: "", decoding: "async", loading: near ? "eager" : "lazy" }))
+        : tall ? h("div", { class: "rc-shot phone" }, h("img", { src: thumb(tall), alt: "", decoding: "async", loading: near ? "eager" : "lazy" }))
+        : h("div", { class: "rc-shot" }, iconEl(app));
+      return h("div", { class: "rc", style: `${accentStyle(app)};--angle:${(i * step).toFixed(3)}deg`, "data-i": i },
+        h("button", { class: "rc-face", type: "button", tabindex: "-1", "aria-label": app.name }, shot, h("span", { class: "rc-bar" }, iconEl(app), h("b", {}, app.name))));
+    }));
+    const cards = [...ring.children];
 
-    // Small copies (scripts/wall-thumbs.mjs, about 1 MB for every image), falling back to the original until one exists.
-    // The first tiles load first; the browser decides the rest.
-    const wallSrc = (src) => src.replace(/^assets\/apps\//, "assets/wall/").replace(/\.[a-z0-9]+$/i, ".webp");
-    const fallback = (e) => { const img = e.currentTarget; if (img.dataset.full) { img.src = img.dataset.full; delete img.dataset.full; } };
-    const tile = ({ app, src }, i) => src
-      ? h("div", { class: "tile" }, h("img", {
-        src: src.startsWith("assets/apps/") ? wallSrc(src) : src, "data-full": src.startsWith("assets/apps/") ? src : null, alt: "", decoding: "async",
-        // Not loading="lazy": the moving, tilted wall never reports tiles coming into view, so they'd stay blank.
-        // No "low" either: the browser raises the priority of the tiles it can see.
-        width: 640, height: 400, fetchpriority: i < 3 ? "high" : null, onerror: fallback,
-      }))
-      : h("div", { class: "tile poster", style: accentStyle(app) }, iconEl(app), h("span", { class: "nm" }, app.name));
-
-    const ROWS = 3, PER_ROW = 8;
-    const rows = Array.from({ length: ROWS }, (_, r) => {
-      const set = Array.from({ length: Math.max(PER_ROW, pool.length) }, (_, i) => pool[(i + r * 2) % pool.length]);
-      const nodes = [...set, ...set].map((t, i) => tile(t, r === 0 ? i : i + 6)); // duplicated for a seamless loop
-      return h("div", { class: "wall-row" }, h("div", { class: "wall-track", style: `--dur:${90 + r * 25}s` }, nodes));
-    });
-    $("wall").replaceChildren(h("div", { class: "wall-plane" }, rows));
-  }
-
-  /* ---------- Filters: segmented control with a sliding glass thumb ---------- */
-  function renderFilters() {
-    const cats = [...new Set(state.apps.map((a) => a.category).filter(Boolean))].sort();
-    const statuses = STATUS_ORDER.filter((s) => state.apps.some((a) => a.status === s));
-    const items = [
-      { key: "all", value: null, label: "All", n: state.apps.length },
-      ...statuses.map((s) => ({ key: "status", value: s, label: STATUS[s], n: state.apps.filter((a) => a.status === s).length })),
-      ...cats.map((c) => ({ key: "category", value: c, label: c, n: state.apps.filter((a) => a.category === c).length })),
-    ];
-    $("filters").replaceChildren(
-      h("span", { class: "seg-thumb", "aria-hidden": "true" }),
-      ...items.map((it) =>
-        h("button", {
-          class: "filter", type: "button", role: "tab",
-          "aria-selected": String(it.key === state.filter.key && it.value === state.filter.value),
-          onclick: (e) => {
-            state.filter = { key: it.key, value: it.value };
-            $("filters").querySelectorAll(".filter").forEach((b) => b.setAttribute("aria-selected", String(b === e.currentTarget)));
-            moveThumb(); renderApps();
-          },
-        }, it.label, h("sup", {}, pad(it.n)))
-      )
-    );
-    requestAnimationFrame(() => moveThumb(true));
-  }
-  function moveThumb(instant = false) {
-    const wrap = $("filters");
-    const sel = wrap.querySelector('.filter[aria-selected="true"]');
-    const thumb = wrap.querySelector(".seg-thumb");
-    if (!sel || !thumb) return;
-    if (instant) thumb.style.transition = "none";
-    thumb.style.translate = `${sel.offsetLeft}px 0`;
-    thumb.style.width = `${sel.offsetWidth}px`;
-    if (instant) { void thumb.offsetWidth; thumb.style.transition = ""; }
-    // Keep the selected option visible when the bar scrolls (narrow screens)
-    if (wrap.scrollWidth > wrap.clientWidth) {
-      const left = sel.offsetLeft - (wrap.clientWidth - sel.offsetWidth) / 2;
-      wrap.scrollTo({ left: Math.max(0, left), behavior: instant || reduceMotion ? "auto" : "smooth" });
-    }
-    syncFilterFades();
-  }
-  // Fade whichever edge has more options, so the bar reads as scrollable
-  function syncFilterFades() {
-    const wrap = $("filters");
-    wrap.classList.toggle("more-start", wrap.scrollLeft > 2);
-    wrap.classList.toggle("more-end", wrap.scrollLeft + wrap.clientWidth < wrap.scrollWidth - 2);
-  }
-
-  const matches = (app) => {
-    const { key, value } = state.filter;
-    return key === "all" || app[key] === value;
-  };
-
-  /* ---------- Index rows ---------- */
-  function row(app) {
-    return h("li", { class: "reveal" },
-      h("a", {
-        class: "row", href: `#/${app.id}`, style: accentStyle(app), "data-id": app.id,
-        onclick: (e) => { e.preventDefault(); history.pushState(null, "", `#/${app.id}`); route(); },
-      },
-        h("span", { class: "row-num" }, numberOf(app)),
-        h("span", { class: "row-name" }, iconEl(app), app.name),
-        h("span", { class: "row-tag" }, app.tagline),
-        h("span", { class: "row-cat" }, app.category || ""),
-        statusEl(app.status),
-        h("span", { class: "row-arrow", "aria-hidden": "true" }, svg(ARROW))
-      )
-    );
-  }
-
-  /* ---------- Showcase panels ---------- */
-  function visual(app) {
-    const gallery = galleryOf(app);
-    const openAt = (src) => () => openLightbox(gallery, Math.max(0, gallery.findIndex((m) => m.src === src)));
-    const land = landscapeSrc(app);
-    const phone = phoneMedia(app);
-    const bar = h("div", { class: "bar" }, h("i"), h("i"), h("i"), h("span", { class: "url" }, hostOf(app.url) || app.name));
-
-    const frames = [];
-    if (land) {
-      frames.push(h("button", { class: "frame browser", type: "button", "aria-label": `Enlarge ${app.name} preview`, onclick: openAt(land) },
-        bar, h("img", { src: land, alt: `${app.name} screenshot`, loading: "lazy" })));
-    } else if (!phone) {
-      frames.push(h("div", { class: "frame browser poster" }, bar,
-        h("div", { class: "stage" },
-          iconEl(app),
-          h("span", { class: "soon glass" }, "Screenshots coming soon"))));
-    }
-    if (phone) {
-      frames.push(h("button", { class: "frame phone", type: "button", "aria-label": `Enlarge ${app.name} phone preview`, onclick: openAt(phone.src) },
-        h("img", { src: phone.src, alt: phone.caption || `${app.name} on a phone`, loading: "lazy" })));
-    }
-    const cls = ["app-visual", "reveal", phone && land && "has-phone", phone && !land && "phone-only"].filter(Boolean).join(" ");
-    return h("div", { class: cls },
-      h("div", { class: "glow", "aria-hidden": "true" }),
-      h("div", { class: "tilt" }, frames));
-  }
-
-  function strip(app) {
-    const gallery = galleryOf(app);
-    if (gallery.length < 2) return null;
-    return h("div", { class: "strip" },
-      h("div", { class: "strip-head" }, h("p", { class: "label mono" }, "Gallery"), h("p", { class: "label mono" }, `${pad(gallery.length)} items`)),
-      h("div", { class: "strip-row" },
-        gallery.map((m, i) =>
-          h("button", { class: "thumb", type: "button", "aria-label": m.caption || `Image ${i + 1}`, onclick: () => openLightbox(gallery, i) },
-            m.type === "video"
-              ? [h("video", { src: m.src, poster: m.poster, muted: true, playsinline: true, preload: "metadata" }), h("span", { class: "play", "aria-hidden": "true" }, "▶")]
-              : h("img", { src: m.src, alt: m.caption || "", loading: "lazy" }))
-        ))
-    );
-  }
-
-  function section(app) {
-    const links = [
-      app.url && { label: "Open app", url: app.url, primary: true },
-      ...(app.links || []),
-    ].filter(Boolean);
-
-    return h("article", { class: "app panel reveal", id: `app-${app.id}`, style: accentStyle(app) },
-      h("div", { class: "app-grid" },
-        h("div", { class: "app-info" },
-          h("div", { class: "app-top" }, iconEl(app), h("span", { class: "app-num mono" }, `${numberOf(app)} / ${pad(state.apps.length)}`)),
-          h("h3", {}, app.name),
-          h("p", { class: "app-tagline" }, app.tagline),
-          h("div", { class: "app-meta" },
-            statusEl(app.status, "pill"),
-            app.category && h("span", { class: "pill" }, app.category),
-            (app.platforms || []).map((p) => h("span", { class: "pill" }, p))),
-          app.description && h("p", { class: "app-desc" }, app.description),
-          (app.highlights || []).length > 0 && h("ul", { class: "app-hl" }, app.highlights.map((t) => h("li", {}, t))),
-          links.length > 0 && h("div", { class: "app-actions" },
-            links.map((l) => h("a", { class: `btn ${l.primary ? "primary" : "ghost glass"}`, href: l.url, target: "_blank", rel: "noopener" }, l.label, svg(EXT))))
-        ),
-        visual(app)
-      ),
-      strip(app)
-    );
-  }
-
-  function renderApps() {
-    const visible = state.apps.filter(matches);
-    $("list").replaceChildren(...visible.map(row));
-    $("apps").replaceChildren(...visible.map(section));
-    $("empty").hidden = visible.length > 0;
-    observeReveals();
-  }
-
-  /* ---------- Scroll reveal ---------- */
-  const io = "IntersectionObserver" in window && !reduceMotion
-    ? new IntersectionObserver((entries) => {
-        entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-      }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 })
-    : null;
-  function observeReveals() {
-    document.querySelectorAll(".reveal:not(.in)").forEach((el, i) => {
-      if (!io) return el.classList.add("in");
-      el.style.transitionDelay = el.closest(".list") ? `${Math.min(i, 8) * 60}ms` : el.classList.contains("app-visual") ? "120ms" : "";
-      io.observe(el);
-    });
-  }
-
-  /* ---------- Pointer effects: panel spotlight + 3D tilt on app visuals ---------- */
-  function setupPointerFx() {
-    if (!finePointer || reduceMotion) return;
-    document.addEventListener("pointermove", (e) => {
-      const panel = e.target.closest?.(".panel");
-      if (panel) {
-        const r = panel.getBoundingClientRect();
-        panel.style.setProperty("--mx", `${e.clientX - r.left}px`);
-        panel.style.setProperty("--my", `${e.clientY - r.top}px`);
-      }
-      const vis = e.target.closest?.(".app-visual");
-      if (vis) {
-        const r = vis.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width - 0.5;
-        const py = (e.clientY - r.top) / r.height - 0.5;
-        vis.style.setProperty("--ry", `${(px * 10).toFixed(2)}deg`);
-        vis.style.setProperty("--rx", `${(-py * 8).toFixed(2)}deg`);
-      }
-    }, { passive: true });
-    document.addEventListener("pointerout", (e) => {
-      const vis = e.target.closest?.(".app-visual");
-      if (vis && !vis.contains(e.relatedTarget)) { vis.style.removeProperty("--rx"); vis.style.removeProperty("--ry"); }
-      const panel = e.target.closest?.(".panel");
-      if (panel && !panel.contains(e.relatedTarget)) { panel.style.removeProperty("--mx"); panel.style.removeProperty("--my"); }
-    });
-  }
-
-  /* ---------- Cursor-following preview over the index ---------- */
-  function setupPeek() {
-    if (!finePointer) return;
-    const peek = $("peek");
-    const W = 320, H = 200;
-    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, active = false;
-    const place = () => {
-      const px = x + 28 + W > innerWidth ? x - 28 - W : x + 28;
-      const py = Math.min(Math.max(y - H / 2, 12), innerHeight - H - 12);
-      peek.style.translate = `${px}px ${py}px`;
+    const radius = () => {
+      const w = ring.getBoundingClientRect().width || 300;
+      ring.style.setProperty("--r", `${Math.round((w / 2) / Math.tan(Math.PI / N) * 1.08)}px`);
     };
-    const tick = () => {
-      x += (tx - x) * 0.18; y += (ty - y) * 0.18; place();
-      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.5 ? requestAnimationFrame(tick) : 0;
+    radius(); addEventListener("resize", radius);
+
+    let theta = 0, front = -1;
+    const norm = (d) => ((d % 360) + 540) % 360 - 180;
+    const paint = () => {
+      ring.style.setProperty("--turn", `${(-theta).toFixed(2)}deg`);
+      cards.forEach((c, i) => {
+        const d = Math.abs(norm(i * step - theta));
+        c.style.setProperty("--vis", d > 110 ? 0 : (1 - (d / 110) * 0.78).toFixed(3));
+        c.classList.toggle("is-front", d < step / 2);
+      });
+      const f = ((Math.round(theta / step) % N) + N) % N;
+      if (f !== front) { front = f; showFront(apps[f], f, N); atrium.style.cssText = accentStyle(apps[f]); }
     };
-    const hide = () => { peek.classList.remove("on"); active = false; delete peek.dataset.id; };
-    const list = $("list");
-    list.addEventListener("pointermove", (e) => {
-      tx = e.clientX; ty = e.clientY;
-      if (!active) { x = tx; y = ty; place(); }
-      if (!raf) raf = requestAnimationFrame(tick);
+    const snapTo = (t) => { ring.classList.add("snap"); theta = t; paint(); };
+    ring.addEventListener("transitionend", () => ring.classList.remove("snap"));
+    const turnBy = (k) => { stopAuto(); snapTo(Math.round(theta / step) * step + k * step); };
+    $("prev").onclick = () => turnBy(-1);
+    $("next").onclick = () => turnBy(1);
+    stage.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); turnBy(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); turnBy(-1); }
+      if (e.key === "Enter") { e.preventDefault(); openSheet(apps[front]); }
     });
-    list.addEventListener("pointerover", (e) => {
-      const r = e.target.closest(".row");
-      if (!r || r.dataset.id === peek.dataset.id) return;
-      const app = state.apps.find((a) => a.id === r.dataset.id);
-      if (!app) return;
-      const src = landscapeSrc(app) || phoneMedia(app)?.src;
-      peek.dataset.id = app.id;
-      peek.style.setProperty("--a", app.accent || "#8e8e93");
-      peek.replaceChildren(src ? h("img", { src, alt: "" }) : h("div", { class: "poster-mini" }, iconEl(app)));
-      peek.classList.add("on"); active = true;
+
+    // Drag or swipe to turn; a tap on the front card opens it, a tap on another card turns to it
+    let drag = null;
+    stage.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      stopAuto(); ring.classList.remove("snap");
+      drag = { x: e.clientX, y: e.clientY, t0: theta, moved: false, id: e.pointerId };
     });
-    list.addEventListener("pointerleave", hide);
-    addEventListener("scroll", () => { if (active) hide(); }, { passive: true });
+    addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(e.clientY - drag.y)) { drag.moved = true; stage.setPointerCapture(e.pointerId); }
+      if (drag.moved) { theta = drag.t0 - dx * (step / (ring.offsetWidth * 0.9)); paint(); }
+    });
+    addEventListener("pointerup", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null;
+      if (d.moved) { snapTo(Math.round(theta / step) * step); return; }
+      const card = e.target.closest?.(".rc");
+      if (!card) return;
+      const i = +card.dataset.i;
+      if (i === front) openSheet(apps[i]);
+      else snapTo(theta + norm(i * step - theta));
+    });
+    addEventListener("pointercancel", () => { if (drag) { drag = null; snapTo(Math.round(theta / step) * step); } });
+    stage.addEventListener("wheel", (e) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // leave vertical scrolling to the page
+      e.preventDefault(); stopAuto(); ring.classList.remove("snap");
+      theta += e.deltaX * 0.08; paint();
+      clearTimeout(stage._wheel); stage._wheel = setTimeout(() => snapTo(Math.round(theta / step) * step), 140);
+    }, { passive: false });
+
+    // A slow turn until someone takes over (never under Reduce Motion, paused off screen)
+    let auto = !reduceMotion, visible = true, last = 0, raf = 0;
+    const tick = (t) => {
+      raf = 0;
+      if (!auto || !visible || document.hidden) return;
+      if (last) { theta += Math.min(64, t - last) * 0.0045; paint(); }
+      last = t; raf = requestAnimationFrame(tick);
+    };
+    const kick = () => { last = 0; if (auto && !raf) raf = requestAnimationFrame(tick); };
+    function stopAuto() { auto = false; }
+    new IntersectionObserver(([en]) => { visible = en.isIntersecting; kick(); }).observe(stage);
+    document.addEventListener("visibilitychange", kick);
+    paint(); kick();
   }
 
-  /* ---------- Nav: compacts while scrolling down, expands on scroll up ---------- */
+  function showFront(app, i, n) {
+    $("pos").textContent = `${pad(i + 1)} / ${pad(n)}`;
+    $("now").replaceChildren(
+      h("h2", {}, app.name),
+      h("p", {}, app.tagline),
+      chipsEl(app),
+      h("div", { class: "row" },
+        app.url && h("a", { class: "btn primary", href: app.url, target: "_blank", rel: "noopener" }, "Open app", svg(EXT)),
+        h("button", { class: "btn quiet", type: "button", onclick: () => openSheet(app) }, "Up close", svg(ARROW))));
+  }
+
+  /* ---------- (02) Index ---------- */
+  function renderIndex(apps) {
+    const follow = $("follow"), img = follow.querySelector("img");
+    $("ix").replaceChildren(...apps.map((app, i) => {
+      const pic = landscapeSrc(app) || phoneSrc(app);
+      return h("li", {}, h("button", { class: "ix-row", type: "button", style: accentStyle(app), "aria-label": `${app.name}: ${app.tagline}. ${STATUS[app.status] || ""}`,
+          onclick: () => openSheet(app),
+          onpointerenter: () => { if (!finePointer || !pic) return; img.src = thumb(pic); follow.classList.add("on"); },
+          onpointerleave: () => follow.classList.remove("on") },
+        h("span", { class: "ix-num" }, pad(i + 1)),
+        h("span", { class: "ix-name" }, iconEl(app), h("span", {}, app.name)),
+        h("span", { class: "ix-cat" }, app.category || ""),
+        chipsEl(app).firstChild));
+    }));
+    // The picture eases after the pointer with a slight lean (mouse only, not under Reduce Motion)
+    if (finePointer && !reduceMotion) {
+      let x = 0, y = 0, fx = 0, fy = 0, raf = 0;
+      const loop = () => {
+        fx += (x - fx) * 0.18; fy += (y - fy) * 0.18;
+        follow.style.transform = `translate(${fx + 28}px, ${fy - 110}px) rotate(${Math.max(-6, Math.min(6, (x - fx) * 0.06))}deg)`;
+        raf = Math.abs(x - fx) + Math.abs(y - fy) > 0.5 ? requestAnimationFrame(loop) : 0;
+      };
+      addEventListener("pointermove", (e) => { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(loop); }, { passive: true });
+    }
+  }
+
+  /* ---------- (03) Files ---------- */
+  function renderFiles(apps) {
+    $("files").hidden = !apps.length;
+    $("fl").replaceChildren(...apps.map((app, i) => {
+      const id = `file-${app.id}`;
+      const words = (app.description || "").split(/\s+/).filter(Boolean);
+      const li = h("li", { class: "file", style: accentStyle(app), "data-id": app.id },
+        h("button", { class: "file-head", type: "button", "aria-expanded": "false", "aria-controls": id, onclick: () => toggleFile(li) },
+          h("span", { class: "file-no" }, `File ${pad(i + 1)}`),
+          h("span", { class: "file-name" }, app.name.replace(/^Project /, ""), " ", h("i", { "aria-hidden": "true" }, "●")),
+          h("span", { class: "file-tag" }, app.tagline),
+          h("span", { class: "file-plus", "aria-hidden": "true" })),
+        h("div", { class: "file-body", id },
+          h("div", {}, h("div", { class: "file-inner" },
+            h("span", { class: "stamp" }, `${app.name} · Classified`),
+            h("p", { class: "file-text" }, ...words.flatMap((w, k) => [h("span", { class: "ln", style: `--k:${k}` }, w), " "])),
+            h("p", { class: "file-sign" }, "Released when ready")))));
+      return li;
+    }));
+  }
+  function toggleFile(li, open = !li.hasAttribute("open-file")) {
+    li.toggleAttribute("open-file", open);
+    li.querySelector(".file-head").setAttribute("aria-expanded", String(open));
+  }
+
+  /* ---------- Sheet: an app up close ---------- */
+  function sheetContent(app) {
+    const wide = landscapeSrc(app);
+    const gallery = media(app).filter((m) => m.type === "image" || m.type === "video");
+    return h("article", { style: accentStyle(app) },
+      h("div", { class: "sh-cover" }, wide ? h("img", { src: wide, alt: `${app.name} screenshot` }) : iconEl(app)),
+      h("div", { class: "sh-main" },
+        iconEl(app),
+        h("h2", { id: "sheetTitle" }, app.name),
+        h("p", { class: "sh-tag" }, app.tagline),
+        chipsEl(app, true),
+        h("div", { class: "row", style: "display:flex;flex-wrap:wrap;gap:10px" },
+          app.url && h("a", { class: "btn primary", href: app.url, target: "_blank", rel: "noopener" }, "Open app", svg(EXT)),
+          ...(app.links || []).map((l) => h("a", { class: "btn quiet", href: l.url, target: "_blank", rel: "noopener" }, l.label, svg(EXT)))),
+        app.description && h("p", { class: "sh-desc" }, app.description),
+        (app.highlights || []).length ? h("ul", { class: "ticks" }, ...app.highlights.map((t) => h("li", {}, t))) : null,
+        gallery.length > 1 && h("div", { class: "sh-gallery" }, ...gallery.map((m, i) => {
+          const still = m.type === "video" ? m.poster : m.src;
+          return h("figure", { class: m.device === "phone" ? "tall" : "" },
+            h("button", { type: "button", "aria-label": `View ${m.caption || `image ${i + 1}`} full size`, onclick: () => openLightbox(gallery, i) },
+              still ? h("img", { src: thumb(still), srcset: `${thumb(still)} 640w, ${still} 1600w`, sizes: "300px", alt: m.caption || "", loading: "lazy" }) : h("span", {}, "▶")),
+            m.caption && h("figcaption", {}, m.caption));
+        }))));
+  }
+  function openSheet(app, push = true) {
+    if (!app) return;
+    state.lastFocus = document.activeElement;
+    state.open = app;
+    $("sheetScroll").replaceChildren(sheetContent(app));
+    $("sheetScroll").scrollTop = 0;
+    for (const id of ["scrim", "sheet"]) { $(id).hidden = false; $(id).classList.remove("out"); }
+    document.body.classList.add("locked");
+    $("sheetClose").focus({ preventScroll: true });
+    if (push) history.pushState({ app: app.id }, "", `#/${app.id}`);
+  }
+  function closeSheet(pop = false) {
+    if (!state.open) return;
+    state.open = null;
+    const done = () => { $("scrim").hidden = true; $("sheet").hidden = true; document.body.classList.remove("locked"); state.lastFocus?.focus?.({ preventScroll: true }); };
+    if (reduceMotion) done();
+    else { $("scrim").classList.add("out"); $("sheet").classList.add("out"); setTimeout(done, 340); }
+    if (!pop && location.hash.startsWith("#/")) history.back();
+  }
+
+  /* ---------- Lightbox ---------- */
+  function openLightbox(items, i) {
+    if (!items.length) return;
+    state.lb = { items, i };
+    paintLightbox();
+    $("lightbox").hidden = false;
+    $("lightbox").querySelector("[data-lb-close]").focus({ preventScroll: true });
+  }
+  function paintLightbox() {
+    const { items, i } = state.lb;
+    const m = items[i];
+    const node = m.type === "video"
+      ? h("video", { src: m.src, poster: m.poster, controls: true, autoplay: true, loop: true, playsinline: true })
+      : h("img", { src: m.src, alt: m.caption || "" });
+    $("lbFigure").replaceChildren(node, ...(m.caption ? [h("figcaption", {}, m.caption)] : []));
+    $("lbCount").textContent = `${pad(i + 1)} / ${pad(items.length)}`;
+    $("lbPrev").hidden = $("lbNext").hidden = items.length < 2;
+  }
+  function stepLightbox(d) {
+    const n = state.lb.items.length;
+    state.lb.i = (state.lb.i + d + n) % n;
+    paintLightbox();
+  }
+  function closeLightbox() {
+    $("lightbox").hidden = true;
+    $("lbFigure").replaceChildren();
+  }
+
+  /* ---------- Keyboard: Escape closes the top layer; focus stays inside it ---------- */
+  function trapFocus(e, root) {
+    const f = [...root.querySelectorAll("a[href],button:not([disabled]):not([hidden]),video")].filter((el) => el.offsetParent !== null);
+    if (!f.length) return;
+    const [first, last] = [f[0], f[f.length - 1]];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+  document.addEventListener("keydown", (e) => {
+    if (!$("lightbox").hidden) {
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") stepLightbox(-1);
+      else if (e.key === "ArrowRight") stepLightbox(1);
+      else if (e.key === "Tab") trapFocus(e, $("lightbox"));
+      return;
+    }
+    if (!state.open) return;
+    if (e.key === "Escape") closeSheet();
+    else if (e.key === "Tab") trapFocus(e, $("sheet"));
+  });
+
+  /* ---------- Nav: compacts while scrolling down, returns when scrolling up ---------- */
   function setupNav() {
     const nav = $("nav");
     let lastY = scrollY;
@@ -375,6 +352,18 @@
       if (Math.abs(y - lastY) < 6) return;
       nav.classList.toggle("compact", y > 240 && y > lastY);
       lastY = y;
+    }, { passive: true });
+  }
+
+  /* ---------- Cursor spotlight on the contact panel ---------- */
+  function setupPointerFx() {
+    if (!finePointer || reduceMotion) return;
+    document.addEventListener("pointermove", (e) => {
+      const panel = e.target.closest?.(".panel");
+      if (!panel) return;
+      const r = panel.getBoundingClientRect();
+      panel.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      panel.style.setProperty("--my", `${e.clientY - r.top}px`);
     }, { passive: true });
   }
 
@@ -396,52 +385,35 @@
     sync();
   }
 
-  /* ---------- Lightbox ---------- */
-  function openLightbox(items, i) {
-    if (!items.length) return;
-    state.lb = { items, i };
-    paintLightbox();
-    $("lightbox").hidden = false;
-    document.body.classList.add("locked");
-  }
-  function paintLightbox() {
-    const { items, i } = state.lb;
-    const m = items[i];
-    const node = m.type === "video"
-      ? h("video", { src: m.src, poster: m.poster, controls: true, autoplay: true, loop: true, playsinline: true })
-      : h("img", { src: m.src, alt: m.caption || "" });
-    $("lbFigure").replaceChildren(node, ...(m.caption ? [h("figcaption", {}, m.caption)] : []));
-    $("lbCount").textContent = `${pad(i + 1)} / ${pad(items.length)}`;
-    $("lbPrev").hidden = $("lbNext").hidden = items.length < 2;
-  }
-  function stepLightbox(d) {
-    const n = state.lb.items.length;
-    state.lb.i = (state.lb.i + d + n) % n;
-    paintLightbox();
-  }
-  function closeLightbox() {
-    $("lightbox").hidden = true;
-    $("lbFigure").replaceChildren();
-    document.body.classList.remove("locked");
-  }
-
-  /* ---------- Routing: #/app-id scrolls to that app ---------- */
-  function route() {
+  /* ---------- Routing: #/app-id opens that app (or its file, for an unannounced one) ---------- */
+  function route(push = false) {
     const m = location.hash.match(/^#\/(.+)$/);
-    if (!m) return;
+    if (!m) { closeSheet(true); return; }
     const id = decodeURIComponent(m[1]);
     // Old ids of renamed apps (listed in "aliases") still work; the address bar switches to the current id
     const app = state.apps.find((a) => a.id === id || (a.aliases || []).includes(id));
     if (!app) return;
     if (app.id !== id) history.replaceState(null, "", `#/${app.id}`);
-    if (!matches(app)) { state.filter = { key: "all", value: null }; renderFilters(); renderApps(); }
-    const el = $(`app-${app.id}`);
-    [el, ...el.querySelectorAll(".reveal")].forEach((r) => r.classList.add("in"));
-    el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    if (app.category === SEALED) {
+      const li = document.querySelector(`.file[data-id="${app.id}"]`);
+      if (!li) return;
+      toggleFile(li, true);
+      li.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+      return;
+    }
+    if (state.open?.id !== app.id) openSheet(app, push);
   }
 
   /* ---------- Boot ---------- */
   async function init() {
+    setupNav(); setupThemeToggle(); setupPointerFx();
+    $("sheetClose").onclick = () => closeSheet();
+    $("scrim").onclick = () => closeSheet();
+    $("lightbox").addEventListener("click", (e) => {
+      if (e.target.closest("[data-lb-close]") || e.target === $("lightbox") || e.target === $("lbFigure")) closeLightbox();
+    });
+    $("lbPrev").addEventListener("click", () => stepLightbox(-1));
+    $("lbNext").addEventListener("click", () => stepLightbox(1));
     try {
       // Preloaded in index.html; Cloudflare serves it with "revalidate every time", so it's never stale.
       const res = await fetch("apps.json");
@@ -449,32 +421,21 @@
       state.data = await res.json();
     } catch {
       $("headline").textContent = "Couldn't load apps.";
-      $("subheadline").textContent = "apps.json failed to load. If you opened this file directly, run a local server (see README).";
+      $("now").textContent = "apps.json failed to load. If you opened this file directly, run a local server (see README).";
       return;
     }
     // Live apps first (then beta, in development, coming soon); within a status, featured first, then newest
     const rank = (app) => { const i = STATUS_ORDER.indexOf(app.status); return i === -1 ? STATUS_ORDER.length : i; };
     state.apps = [...state.data.apps].sort((a, b) =>
       rank(a) - rank(b) || (b.featured === true) - (a.featured === true) || (b.added || "").localeCompare(a.added || ""));
+    const named = state.apps.filter((a) => a.category !== SEALED);
 
-    renderChrome(); renderWall(); renderFilters(); renderApps(); setupPeek(); setupPointerFx(); setupNav(); setupThemeToggle();
-    if (location.hash.startsWith("#/")) requestAnimationFrame(route);
-
-    addEventListener("hashchange", route);
-    addEventListener("resize", () => moveThumb(true));
-    $("filters").addEventListener("scroll", syncFilterFades, { passive: true });
-    document.fonts?.ready.then(() => moveThumb(true));
-    $("lightbox").addEventListener("click", (e) => {
-      if (e.target.closest("[data-lb-close]") || e.target === $("lightbox") || e.target === $("lbFigure")) closeLightbox();
-    });
-    $("lbPrev").addEventListener("click", () => stepLightbox(-1));
-    $("lbNext").addEventListener("click", () => stepLightbox(1));
-    document.addEventListener("keydown", (e) => {
-      if ($("lightbox").hidden) return;
-      if (e.key === "Escape") closeLightbox();
-      else if (e.key === "ArrowLeft") stepLightbox(-1);
-      else if (e.key === "ArrowRight") stepLightbox(1);
-    });
+    renderChrome();
+    renderAtrium(named);
+    renderIndex(named);
+    renderFiles(state.apps.filter((a) => a.category === SEALED));
+    if (location.hash.startsWith("#/")) route();
+    addEventListener("popstate", () => route());
   }
   init();
 })();

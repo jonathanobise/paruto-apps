@@ -46,7 +46,8 @@ for (const app of data.apps ?? []) {
     checkFile(app, `media[${i}]`, m.src);
     checkFile(app, `media[${i}].poster`, m.poster);
   });
-  if (!app.cover && !(app.media ?? []).length) warnings.push(`${app.id}: no cover/media yet (a generated cover will be shown)`);
+  // Unannounced projects (codenames) are listed in Files with no pictures on purpose
+  if (!app.cover && !(app.media ?? []).length && app.category !== "Unannounced") warnings.push(`${app.id}: no cover/media yet (its app icon will be shown)`);
 }
 
 // Old ids kept so renamed apps' links still work: kebab-case, and never another app's id or alias

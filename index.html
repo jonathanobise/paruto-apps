@@ -28,15 +28,16 @@
 <body>
   <div class="grain" aria-hidden="true"></div>
 
-  <!-- Floating Liquid Glass nav -->
+  <!-- Floating Liquid Glass nav; compacts while scrolling down -->
   <header class="nav glass" id="nav">
     <a class="brand" href="#top" aria-label="Home">
       <span class="mark" aria-hidden="true"></span>
       <span id="brandName">Paruto Apps</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
+      <a href="#atrium">Apps</a>
       <a href="#index">Index</a>
-      <a href="#work">Showcase</a>
+      <a href="#files">Files</a>
     </nav>
     <div class="nav-end">
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
@@ -48,58 +49,48 @@
   </header>
 
   <main id="top">
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-inner wrap">
-        <a class="chip-link glass" href="#index">
-          <span class="pulse" aria-hidden="true"></span>
-          <span id="eyebrow"></span>
-          <span class="chip-sep" aria-hidden="true"></span>
-          <span class="mono" id="eyebrowCount"></span>
-          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+    <!-- (01) Atrium: every app on a slowly turning ring, lit from above -->
+    <section class="atrium" id="atrium" aria-labelledby="headline">
+      <div class="at-light" aria-hidden="true"></div>
+      <div class="at-copy">
+        <p class="at-eyebrow mono"><span class="pulse" aria-hidden="true"></span><span id="eyebrow"></span> · <span id="eyebrowCount"></span></p>
         <h1 id="headline"></h1>
-        <p class="sub" id="subheadline"></p>
-        <div class="hero-ctas">
-          <a class="btn primary" href="#index">Explore the apps</a>
-          <a class="btn ghost glass" id="heroContact" href="#contact">Get in touch</a>
-        </div>
       </div>
-      <div class="wall" id="wall" aria-hidden="true"></div>
+      <div class="ring-stage" id="ringStage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Apps. Drag, swipe or use the arrow keys to turn; Enter opens the app in front.">
+        <div class="ring" id="ring"></div>
+        <div class="floor" aria-hidden="true"></div>
+      </div>
+      <div class="at-now" id="now" aria-live="polite"></div>
+      <div class="at-controls">
+        <button class="round glass" id="prev" type="button" aria-label="Turn to the previous app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <span class="at-pos mono" id="pos"></span>
+        <button class="round glass" id="next" type="button" aria-label="Turn to the next app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
     </section>
 
-    <section class="statsbar wrap" aria-label="At a glance">
-      <dl class="stats" id="stats"></dl>
-    </section>
-
-    <!-- Index -->
-    <section class="section wrap" id="index" aria-labelledby="indexTitle">
-      <header class="section-head">
-        <div>
-          <p class="label mono">(01) Index</p>
-          <h2 id="indexTitle">Everything we're <em>making</em>.</h2>
-        </div>
-        <div class="filters glass" id="filters" role="tablist" aria-label="Filter apps"></div>
+    <!-- (02) Index: every app in big type; a picture follows the pointer -->
+    <section class="index wrap" id="index" aria-labelledby="indexTitle">
+      <header class="ix-head">
+        <p class="label mono">(02) Index</p>
+        <h2 id="indexTitle">The full <em>list</em>.</h2>
       </header>
-      <ol class="list" id="list"></ol>
-      <p class="empty mono" id="empty" hidden>Nothing here yet.</p>
+      <ol class="ix" id="ix"></ol>
     </section>
 
-    <!-- Showcase -->
-    <section class="section wrap" id="work" aria-labelledby="workTitle">
-      <header class="section-head">
-        <div>
-          <p class="label mono">(02) Showcase</p>
-          <h2 id="workTitle">Up <em>close</em>.</h2>
-        </div>
+    <!-- (03) Files: unannounced projects, redacted until opened -->
+    <section class="files wrap" id="files" aria-labelledby="filesTitle" hidden>
+      <header class="ix-head">
+        <p class="label mono">(03) Files</p>
+        <h2 id="filesTitle">Classified, for <em>now</em>.</h2>
+        <p class="fl-lead">Projects we can't name yet. Open a file to read the parable it was given.</p>
       </header>
-      <div class="apps" id="apps"></div>
+      <ol class="fl" id="fl"></ol>
     </section>
   </main>
 
   <footer class="footer wrap" id="contact">
     <div class="cta panel">
-      <p class="label mono">(03) Contact</p>
+      <p class="label mono">(04) Contact</p>
       <h2>Have an idea? Let's <em>talk</em>.</h2>
       <a class="footer-email" id="footerEmail" href="#"></a>
     </div>
@@ -114,10 +105,17 @@
     </div>
   </footer>
 
-  <!-- Floating preview that follows the cursor over the index -->
-  <div class="peek glass" id="peek" aria-hidden="true"></div>
+  <!-- A picture that follows the pointer over the index -->
+  <div class="follow" id="follow" aria-hidden="true"><img alt=""></div>
 
-  <!-- Lightbox -->
+  <!-- An app up close: a sheet from the side (a bottom sheet on phones) -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+    <button class="round glass sheet-close" id="sheetClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="sheet-scroll" id="sheetScroll"></div>
+  </aside>
+
+  <!-- Lightbox for an app's screenshots -->
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
     <button class="lb-btn glass lb-close" data-lb-close aria-label="Close">
       <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
