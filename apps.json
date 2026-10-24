@@ -311,7 +311,7 @@
       "id": "repwise",
       "name": "Repwise",
       "tagline": "A free workout coach that shows every move, with no sign-up.",
-      "description": "A free fitness app you can install on any phone or desktop. Coach Remy demonstrates each exercise, counts your reps and keeps your progress. Pick from 40 programs, 23 of them with no equipment, browse 178 exercises, run interval timers, track food and water, and earn badges and outfits for Remy as you level up. No sign-up, and it works offline.",
+      "description": "A free fitness app you can install on any phone or desktop. Coach Remy demonstrates each exercise, counts your reps and keeps your progress. Pick from 40 programs, 23 of them with no equipment, browse 178 exercises, run interval timers, track food and water, and earn badges and outfits for Remy as you level up. No sign-up needed and it works offline, and an optional free account keeps your progress in sync across devices, end-to-end encrypted.",
       "status": "live",
       "category": "Fitness",
       "platforms": ["Web", "Installable app"],
@@ -333,7 +333,9 @@
         { "type": "image", "src": "assets/apps/repwise/customise-remy.jpg", "caption": "Customise Remy as you train", "device": "phone" },
         { "type": "image", "src": "assets/apps/repwise/timers.jpg", "caption": "HIIT, Tabata, EMOM and AMRAP timers", "device": "phone" },
         { "type": "image", "src": "assets/apps/repwise/nutrition.jpg", "caption": "Calories, macros and water", "device": "phone" },
-        { "type": "image", "src": "assets/apps/repwise/exercises.jpg", "caption": "178 exercises in the library", "device": "phone" }
+        { "type": "image", "src": "assets/apps/repwise/exercises.jpg", "caption": "178 exercises in the library", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/updates.jpg", "caption": "Every release in the update history", "device": "phone" },
+        { "type": "image", "src": "assets/apps/repwise/settings.jpg", "caption": "An optional account with end-to-end encrypted sync, and three dark depths", "device": "phone" }
       ]
     },
     {
