@@ -19,7 +19,7 @@
       "id": "paruto-kids-world",
       "name": "Paruto Kids World",
       "tagline": "An illustrated village where little ones learn and play with Jas, Jay and baby Joe.",
-      "description": "A browser-based illustrated village for children aged 2–5. Kids walk through six zones with Jas, Jay and baby Joe and play 17 learning games, from letters, tracing and counting to music, animals, feelings, staying safe and Bible stories, plus a Colour Workshop for drawing. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
+      "description": "A browser-based illustrated village for children aged 2–5. Kids walk through six places with Jas, Jay and baby Joe and choose from over 40 activities: letters, tracing and counting, music and dance, animals and life cycles, feelings, staying safe and Bible stories, plus a Colour Workshop for drawing. It works offline, with no ads, no social feeds and no endless scrolling, and a grown-up gate keeps the parent area separate.",
       "status": "live",
       "category": "Kids & Learning",
       "platforms": ["Web"],
@@ -33,7 +33,7 @@
         { "label": "Paruto Kids", "url": "https://parutokids.com" }
       ],
       "highlights": [
-        "17 learning games and a Colour Workshop",
+        "Over 40 activities, from ABC sounds to Bible stories",
         "Works offline, with no ads or endless scrolling",
         "Parent area behind a grown-up gate"
       ],
@@ -43,10 +43,11 @@
         { "type": "image", "src": "assets/apps/paruto-kids-world/choose-your-player-phone.jpg", "caption": "Play as Jas or Jay", "device": "phone" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/learning-academy.jpg", "caption": "The Learning Academy" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/discovery-farm.jpg", "caption": "Discovery Farm, with Dad at the greenhouse" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/music-garden.jpg", "caption": "The Music Garden's bell avenue" },
-        { "type": "image", "src": "assets/apps/paruto-kids-world/life-skills-town.jpg", "caption": "Life Skills Town" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/music-garden.jpg", "caption": "The Music Garden" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/life-skills-town.jpg", "caption": "Life Skills Town: Counting Market and Measure It!" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/faith-garden.jpg", "caption": "The Faith Garden" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/games.jpg", "caption": "What shall we play? Every game by subject" },
+        { "type": "image", "src": "assets/apps/paruto-kids-world/games-music.jpg", "caption": "Music, songs and art: Music Maker, Freeze Dance and Pretend Play are new" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/counting-market.jpg", "caption": "Counting Market" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/tracing-trail.jpg", "caption": "Tracing Trail: shapes, letters and numbers" },
         { "type": "image", "src": "assets/apps/paruto-kids-world/animal-explorer.jpg", "caption": "Animal Explorer" },
