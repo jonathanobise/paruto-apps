@@ -1,6 +1,6 @@
 # Paruto coupons: design
 
-Status: proposal, nothing built yet.
+Status: built in [`jonathanobise/paruto-coupons`](https://github.com/jonathanobise/paruto-coupons) (not yet deployed). Its README is the up-to-date reference; this page is the original design.
 
 One coupon system for every Paruto app, so a promo is defined once instead of being built into each app.
 
