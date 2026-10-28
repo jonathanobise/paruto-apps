@@ -60,6 +60,7 @@ Live at **https://apps.paruto.com**, served by **Cloudflare**: the Worker `parut
 - **Pushing doesn't deploy.** Deploy only committed code, from a clean checkout of `master`, because several sessions work in this folder and leave uncommitted changes:
   `git worktree add --detach /tmp/paruto-apps-deploy master && (cd /tmp/paruto-apps-deploy && npx -y wrangler@4.141.0 deploy) ; git worktree remove --force /tmp/paruto-apps-deploy`
   Check it with `curl -sI https://apps.paruto.com/ | grep -i server` (`cloudflare`). Don't deploy or push without being asked; after editing, remind the user.
+- `samples/` is a separate site: **https://media.paruto.com**, Paruto Media's work samples (the Worker `paruto-media-samples`, config in `samples/wrangler.jsonc`, deployed with `cd samples && npx -y wrangler@4.141.0 deploy` from a clean checkout). It is left out of apps.paruto.com by `.assetsignore`.
 - The code is in the GitHub repo `jonathanobise/paruto-apps`, which no longer serves the site, so making it private doesn't take apps.paruto.com down.
 - `gh` lives at `/opt/homebrew/bin/gh` (not on the non-interactive PATH). Local git is old (2.15): push with
   `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`

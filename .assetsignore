@@ -11,5 +11,4 @@ wrangler.jsonc
 CLAUDE.md
 README.md
 ROLLBACK.md
-samples/*/tools
-samples/*/README.md
+samples

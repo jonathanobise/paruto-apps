@@ -1,0 +1,6 @@
+# Not published: tooling and notes.
+.assetsignore
+.wrangler
+wrangler.jsonc
+*/tools
+*/README.md

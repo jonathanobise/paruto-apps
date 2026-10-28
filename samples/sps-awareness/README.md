@@ -1,7 +1,7 @@
 # Moussa's Journey: SPS awareness sample (Paruto Media)
 
 A capability sample for ARAA's call AMI028-2026 (interactive videos and audio on SPS standards).
-Open `index.html` in a browser (or serve the folder): an interactive animated story with two
+Live at https://media.paruto.com/sps-awareness/ (see `samples/wrangler.jsonc`). Open `index.html` in a browser (or serve the folder): an interactive animated story with two
 branching choices, a three-question quiz and FR / EN / PT versions.
 
 | File | What it is |
