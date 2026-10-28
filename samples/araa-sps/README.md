@@ -29,7 +29,7 @@ listed in `tools/voice.py` and `tools/capsules.py`.
     node tools/storyboard.mjs international ecowas waemu  # storyboards
     node tools/recording.mjs                              # recording kit
     node tools/hyperframes-prompts.mjs <module>           # HeyGen HyperFrames prompts for the linear cut
-    node tools/teaser.mjs                                 # teaser.mp4 + teaser.jpg for the projects page
+    node tools/teaser.mjs [fr]                            # teaser.mp4/.jpg for the projects page (teaser-fr.* in French)
     node tools/kit.mjs                                    # hub/media.js and the sources zip (run last)
     node tools/snap.mjs <module> <outdir> fr 12 choice2@3 # stills, to check frames
 

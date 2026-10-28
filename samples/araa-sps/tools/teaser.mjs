@@ -1,5 +1,6 @@
 // A silent, caption-free montage of the three modules for the projects page:
-// writes teaser.mp4 and teaser.jpg in the kit's folder.   node tools/teaser.mjs
+// writes teaser.mp4 and teaser.jpg in the kit's folder (teaser-<lang>.mp4/.jpg for other languages).
+//   node tools/teaser.mjs [lang]     (en by default; the shots show that language's on-screen text)
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -9,6 +10,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const FPS = 25, FADE = 0.6;
+const lang = process.argv[2] || 'en', suffix = lang === 'en' ? '' : `-${lang}`;
 // [module, segment, from (s), length (s)]
 const SHOTS = [
   ['ecowas', 'meet', 1.4, 3.4],
@@ -28,7 +30,7 @@ const clips = [];
 for (const [i, [mod, seg, from, len]] of SHOTS.entries()) {
   if (!pages[mod]) {
     const p = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-    await p.goto(pathToFileURL(path.join(root, 'videos', mod, 'index.html')).href + '?render&lang=en&cc=0');
+    await p.goto(pathToFileURL(path.join(root, 'videos', mod, 'index.html')).href + `?render&lang=${lang}&cc=0`);
     await p.waitForFunction(() => document.body.dataset.ready === '1');
     await p.evaluate(() => document.fonts.ready);
     pages[mod] = p;
@@ -56,8 +58,8 @@ for (let i = 1; i < clips.length; i++) {
   prev = label; t += clips[i].len - FADE;
 }
 graph += `[v]fade=t=in:st=0:d=0.5,fade=t=out:st=${(t - 0.6).toFixed(2)}:d=0.6[out]`;
-const mp4 = path.join(root, 'teaser.mp4');
+const mp4 = path.join(root, `teaser${suffix}.mp4`);
 execFileSync('ffmpeg', [...args, '-filter_complex', graph, '-map', '[out]', '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart', '-an', mp4]);
-execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(clips[0].len + clips[1].len + 1), '-i', mp4, '-frames:v', '1', '-q:v', '3', path.join(root, 'teaser.jpg')]);
+execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(clips[0].len + clips[1].len + 1), '-i', mp4, '-frames:v', '1', '-q:v', '3', path.join(root, `teaser${suffix}.jpg`)]);
 fs.rmSync(tmp, { recursive: true, force: true });
-console.log(`teaser.mp4 ${t.toFixed(1)}s, ${(fs.statSync(mp4).size / 1e6).toFixed(1)} MB`);
+console.log(`teaser${suffix}.mp4 ${t.toFixed(1)}s, ${(fs.statSync(mp4).size / 1e6).toFixed(1)} MB`);

@@ -51,7 +51,7 @@ window.MEDIA_SITE = {
         { n: 9, l: { en: 'radio capsules', fr: 'capsules radio' } },
         { n: 8, l: { en: 'languages planned', fr: 'langues prévues' } },
       ],
-      teaser: 'araa-sps/teaser.mp4', poster: 'araa-sps/teaser.jpg',
+      teaser: { en: 'araa-sps/teaser.mp4', fr: 'araa-sps/teaser-fr.mp4' }, poster: { en: 'araa-sps/teaser.jpg', fr: 'araa-sps/teaser-fr.jpg' },
       gallery: [
         { src: 'araa-sps/storyboards/international/img/hygiene-2.jpg', href: 'araa-sps/videos/international/', label: { en: 'Aïcha’s Market · International', fr: 'Le marché d’Aïcha · International' } },
         { src: 'araa-sps/storyboards/ecowas/img/vet-2.jpg', href: 'araa-sps/videos/ecowas/', label: { en: 'Moussa’s Journey · ECOWAS', fr: 'Le voyage de Moussa · CEDEAO' } },

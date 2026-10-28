@@ -86,15 +86,18 @@
     requestAnimationFrame(step);
   }
 
-  // hero teaser: plays muted while on screen; a still for reduced motion
-  const video = $('#teaser');
+  // hero teaser, in the page's language: plays muted while on screen; a still for reduced motion
+  const video = $('#teaser'); let onScreen = false;
   document.documentElement.style.setProperty('--a', latest.accent);
   document.documentElement.style.setProperty('--b', latest.accent2);
-  video.poster = latest.poster;
-  if (!reduce) {
-    video.src = latest.teaser;
-    new IntersectionObserver(([e]) => (e.isIntersecting ? video.play().catch(() => {}) : video.pause()), { threshold: 0.2 }).observe(video);
+  const pickL = (v) => (typeof v === 'string' ? v : L(v));
+  function setTeaser() {
+    const src = pickL(latest.teaser), poster = pickL(latest.poster);
+    if (video.dataset.src === src) return;
+    video.dataset.src = src; video.poster = poster;
+    if (!reduce) { video.src = src; if (onScreen) video.play().catch(() => {}); }
   }
+  if (!reduce) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; onScreen ? video.play().catch(() => {}) : video.pause(); }, { threshold: 0.2 }).observe(video);
 
   // the stage tilts a little toward the pointer
   const stage = $('#stage');
@@ -122,6 +125,6 @@
   tbtn.addEventListener('click', () => { const light = root.dataset.theme !== 'light'; if (light) root.dataset.theme = 'light'; else delete root.dataset.theme; store.set('theme', light ? 'light' : 'dark'); syncTheme(); });
   syncTheme();
 
-  $$('.seg button').forEach((b) => b.addEventListener('click', () => { if (b.dataset.lang === lang) return; lang = b.dataset.lang; store.set('kit-lang', lang); render(); $$('.reveal').forEach((el) => el.classList.add('in')); $$('[data-count]').forEach((el) => (el.textContent = el.dataset.count)); }));
-  render();
+  $$('.seg button').forEach((b) => b.addEventListener('click', () => { if (b.dataset.lang === lang) return; lang = b.dataset.lang; store.set('kit-lang', lang); render(); setTeaser(); $$('.reveal').forEach((el) => el.classList.add('in')); $$('[data-count]').forEach((el) => (el.textContent = el.dataset.count)); }));
+  render(); setTeaser();
 })();
