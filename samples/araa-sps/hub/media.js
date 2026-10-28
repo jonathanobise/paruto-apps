@@ -153,15 +153,15 @@ window.SPS_MEDIA = {
     "en": {
      "mp4": {
       "name": "koffi-en.mp4",
-      "bytes": 3909602
+      "bytes": 3875754
      },
      "vertical": {
       "name": "koffi-en-vertical.mp4",
-      "bytes": 3180990
+      "bytes": 3173942
      },
      "srt": {
       "name": "koffi-en.srt",
-      "bytes": 1523
+      "bytes": 1505
      },
      "poster": {
       "name": "koffi-en-poster.jpg",
@@ -303,7 +303,7 @@ window.SPS_MEDIA = {
  },
  "zip": {
   "name": "paruto-media-sps-kit-sources.zip",
-  "bytes": 15661308
+  "bytes": 15658515
  },
  "built": "2026-10-28"
 };

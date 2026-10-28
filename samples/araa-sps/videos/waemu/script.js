@@ -35,10 +35,10 @@ window.SPS_SCRIPT = {
       quiz: 'Quiz', score: 'Your score', replay: 'Play again',
       chapters: ['Koffi', 'The chain', 'Choice', 'Traceability', 'Alert', 'Quiz', 'Key habits'],
       nameTag: 'Koffi · butcher', reg: 'Regulation No. 007/2007/CM/UEMOA', pillars: ['Plants', 'Animals', 'Food'],
-      chain: ['Herder', 'Livestock market', 'Slaughterhouse', 'Butcher', 'Consumer'],
+      chain: ['Herder', 'Livestock market', 'Abattoir', 'Butcher', 'Consumer'],
       cheap: 'Cheaper!', noStamp: 'No stamp', inspected: 'INSPECTED',
       closed: 'CLOSED', investigation: 'Investigation under way',
-      abattoir: 'SLAUGHTERHOUSE', notebook: 'My purchases', nb: ['Date', 'Supplier', 'Origin'], trace: 'Traceability',
+      abattoir: 'ABATTOIR', notebook: 'My purchases', nb: ['Date', 'Supplier', 'Origin'], trace: 'Traceability',
       alert: 'Health alert', batch: 'Batch concerned', withdrawn: 'Batch withdrawn', carryOn: 'The market carries on',
       salesStopped: 'Sales stopped', members: 'WAEMU member states',
       recapTitle: 'Three habits',
@@ -77,7 +77,7 @@ window.SPS_SCRIPT = {
     ],
     meet: [
       { a: 0.4, b: 3.8, fr: 'Voici Koffi, boucher au marché de la ville.', en: 'This is Koffi, a butcher at the city market.', pt: 'Este é Koffi, talhante no mercado da cidade.' },
-      { a: 3.8, b: 10.8, fr: 'Sa viande vient d’éleveurs, passe par le marché à bétail et l’abattoir, avant d’arriver chez ses clients.', en: 'His meat comes from herders, passes through the livestock market and the slaughterhouse, then reaches his customers.', pt: 'A sua carne vem de criadores, passa pelo mercado de gado e pelo matadouro, antes de chegar aos seus clientes.' },
+      { a: 3.8, b: 10.8, fr: 'Sa viande vient d’éleveurs, passe par le marché à bétail et l’abattoir, avant d’arriver chez ses clients.', en: 'His meat comes from herders, passes through the livestock market and the abattoir, then reaches his customers.', pt: 'A sua carne vem de criadores, passa pelo mercado de gado e pelo matadouro, antes de chegar aos seus clientes.' },
     ],
     chain: [
       { a: 0.3, b: 10.6, fr: 'Dans l’UEMOA, le Règlement n°007/2007/CM/UEMOA fixe des règles communes de sécurité sanitaire des végétaux, des animaux et des aliments.', en: 'In WAEMU, Regulation No. 007/2007/CM/UEMOA sets common rules for the safety of plants, animals and food.', pt: 'Na UEMOA, o Regulamento n.º 007/2007/CM/UEMOA fixa regras comuns de segurança sanitária dos vegetais, dos animais e dos alimentos.' },
@@ -85,14 +85,14 @@ window.SPS_SCRIPT = {
     ],
     choice1: [
       { a: 0.3, b: 6.2, fr: 'Un vendeur propose à Koffi de la viande moins chère, sans cachet d’inspection. Que fait Koffi ?', en: 'A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?', pt: 'Um vendedor oferece a Koffi carne mais barata, sem carimbo de inspeção. O que faz Koffi?' },
-      { a: 8.0, b: 13.0, fr: 'Réponse 2 : on n’achète que de la viande inspectée, avec le cachet de l’abattoir.', en: 'Answer 2: only buy inspected meat, with the slaughterhouse stamp.', pt: 'Resposta 2: só se compra carne inspecionada, com o carimbo do matadouro.' },
+      { a: 8.0, b: 13.0, fr: 'Réponse 2 : on n’achète que de la viande inspectée, avec le cachet de l’abattoir.', en: 'Answer 2: only buy inspected meat, with the abattoir stamp.', pt: 'Resposta 2: só se compra carne inspecionada, com o carimbo do matadouro.' },
     ],
     blocked1: [
       { a: 0.3, b: 4.4, fr: 'Cette viande n’a pas été inspectée. Des clients tombent malades.', en: 'This meat was not inspected. Some customers fall ill.', pt: 'Esta carne não foi inspecionada. Alguns clientes ficam doentes.' },
       { a: 4.4, b: 10.6, fr: 'Les services vétérinaires remontent jusqu’à Koffi : sa boutique est fermée le temps de l’enquête.', en: 'The veterinary services trace it back to Koffi: his shop is closed during the investigation.', pt: 'Os serviços veterinários chegam até Koffi: o talho fica fechado durante a investigação.' },
     ],
     trace: [
-      { a: 0.3, b: 4.6, fr: 'Koffi achète à l’abattoir une viande inspectée, avec son cachet.', en: 'Koffi buys inspected meat at the slaughterhouse, with its stamp.', pt: 'Koffi compra no matadouro carne inspecionada, com o seu carimbo.' },
+      { a: 0.3, b: 4.6, fr: 'Koffi achète à l’abattoir une viande inspectée, avec son cachet.', en: 'Koffi buys inspected meat at the abattoir, with its stamp.', pt: 'Koffi compra no matadouro carne inspecionada, com o seu carimbo.' },
       { a: 4.6, b: 10.4, fr: 'Dans son cahier, il note chaque achat : la date, le fournisseur, l’origine des animaux.', en: 'In his notebook he records every purchase: the date, the supplier, where the animals came from.', pt: 'No seu caderno, regista cada compra: a data, o fornecedor, a origem dos animais.' },
       { a: 10.4, b: 15.2, fr: 'C’est la traçabilité : savoir d’où vient un produit et où il va.', en: 'That is traceability: knowing where a product comes from and where it goes.', pt: 'É a rastreabilidade: saber de onde vem um produto e para onde vai.' },
     ],
@@ -120,7 +120,7 @@ window.SPS_SCRIPT = {
       q: { fr: 'Un vendeur propose à Koffi de la viande moins chère, sans cachet d’inspection. Que fait Koffi ?', en: 'A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?', pt: 'Um vendedor oferece a Koffi carne mais barata, sem carimbo de inspeção. O que faz Koffi?' },
       options: [
         { fr: 'Il l’achète : c’est une bonne affaire', en: 'He buys it: it’s a good deal', pt: 'Compra-a: é um bom negócio', next: 'blocked1' },
-        { fr: 'Il refuse : la viande doit venir de l’abattoir et être inspectée', en: 'He refuses: meat must come from the slaughterhouse and be inspected', pt: 'Recusa: a carne tem de vir do matadouro e ser inspecionada', next: 'trace', correct: true },
+        { fr: 'Il refuse : la viande doit venir de l’abattoir et être inspectée', en: 'He refuses: meat must come from the abattoir and be inspected', pt: 'Recusa: a carne tem de vir do matadouro e ser inspecionada', next: 'trace', correct: true },
       ],
     },
     choice2: {

@@ -8,7 +8,7 @@ This is Koffi, a butcher at the city market.
 
 3
 00:00:10,800 --> 00:00:17,800
-His meat comes from herders, passes through the livestock market and the slaughterhouse, then reaches his customers.
+His meat comes from herders, passes through the livestock market and the abattoir, then reaches his customers.
 
 4
 00:00:18,300 --> 00:00:28,600
@@ -24,11 +24,11 @@ A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?
 
 7
 00:00:41,600 --> 00:00:46,600
-Answer 2: only buy inspected meat, with the slaughterhouse stamp.
+Answer 2: only buy inspected meat, with the abattoir stamp.
 
 8
 00:00:47,100 --> 00:00:51,400
-Koffi buys inspected meat at the slaughterhouse, with its stamp.
+Koffi buys inspected meat at the abattoir, with its stamp.
 
 9
 00:00:51,400 --> 00:00:57,200
