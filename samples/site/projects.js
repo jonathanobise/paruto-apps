@@ -53,9 +53,9 @@ window.MEDIA_SITE = {
       ],
       teaser: { en: 'araa-sps/teaser.mp4', fr: 'araa-sps/teaser-fr.mp4' }, poster: { en: 'araa-sps/teaser.jpg', fr: 'araa-sps/teaser-fr.jpg' },
       gallery: [
-        { src: 'araa-sps/storyboards/international/img/hygiene-2.jpg', href: 'araa-sps/videos/international/', label: { en: 'Aïcha’s Market · International', fr: 'Le marché d’Aïcha · International' } },
-        { src: 'araa-sps/storyboards/ecowas/img/vet-2.jpg', href: 'araa-sps/videos/ecowas/', label: { en: 'Moussa’s Journey · ECOWAS', fr: 'Le voyage de Moussa · CEDEAO' } },
-        { src: 'araa-sps/storyboards/waemu/img/chain-2.jpg', href: 'araa-sps/videos/waemu/', label: { en: 'Koffi’s Butcher Shop · WAEMU', fr: 'La boucherie de Koffi · UEMOA' } },
+        { src: { en: 'araa-sps/storyboards/international/img/hygiene-2.jpg', fr: 'araa-sps/storyboards/international/img/hygiene-2-fr.jpg' }, href: 'araa-sps/videos/international/', label: { en: 'Aïcha’s Market · International', fr: 'Le marché d’Aïcha · International' } },
+        { src: { en: 'araa-sps/storyboards/ecowas/img/vet-2.jpg', fr: 'araa-sps/storyboards/ecowas/img/vet-2-fr.jpg' }, href: 'araa-sps/videos/ecowas/', label: { en: 'Moussa’s Journey · ECOWAS', fr: 'Le voyage de Moussa · CEDEAO' } },
+        { src: { en: 'araa-sps/storyboards/waemu/img/chain-2.jpg', fr: 'araa-sps/storyboards/waemu/img/chain-2-fr.jpg' }, href: 'araa-sps/videos/waemu/', label: { en: 'Koffi’s Butcher Shop · WAEMU', fr: 'La boucherie de Koffi · UEMOA' } },
       ],
       open: { en: 'Open the kit', fr: 'Ouvrir le kit' },
       play: { en: 'Play a module', fr: 'Jouer un module' }, playHref: 'araa-sps/videos/ecowas/',

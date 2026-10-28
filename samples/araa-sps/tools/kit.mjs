@@ -20,8 +20,9 @@ for (const mod of fs.readdirSync(path.join(root, 'videos'))) {
     if (f.mp4 && !v.duration) v.duration = Math.round(probe(path.join(dir, f.mp4.name)) * 10) / 10;
     v.files[lang] = f;
   }
-  const sb = path.join(root, 'storyboards', mod, 'img', 'meet-2.jpg');
-  if (fs.existsSync(sb)) v.storyThumb = `storyboards/${mod}/img/meet-2.jpg`;
+  // the storyboard card's still, per language (the frames carry translated labels)
+  v.storyThumb = {};
+  for (const [lang, name] of [['en', 'meet-2.jpg'], ['fr', 'meet-2-fr.jpg']]) if (fs.existsSync(path.join(root, 'storyboards', mod, 'img', name))) v.storyThumb[lang] = `storyboards/${mod}/img/${name}`;
   media.videos[mod] = v;
 }
 for (const ep of fs.readdirSync(path.join(root, 'audio'))) {

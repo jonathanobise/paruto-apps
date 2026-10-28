@@ -15,7 +15,7 @@ Served as static files by the Cloudflare Worker `paruto-media-samples` (`wrangle
 1. Build it in its own folder, e.g. `samples/<client-call>/`, with its own `index.html`.
 2. Add an object at the top of `projects` in `site/projects.js`: `href` (the folder), `call`, `programme`, `year`,
    `accent`/`accent2`, `status`, `client`, `kicker`, `title` (`*word*` picks the italic word), `summary`, `stats`
-   (only real counts of what the proposal contains), `teaser` and `poster` (a short silent MP4 and its still; a path, or one per language `{ en, fr }`), three `gallery` stills,
+   (only real counts of what the proposal contains), `teaser` and `poster` (a short silent MP4 and its still; a path, or one per language `{ en, fr }`), three `gallery` stills (`src` a path, or `{ en, fr }`),
    `open`/`play` labels and `playHref`. The newest project plays on the hero stage.
 3. Preview with `python3 -m http.server` in `samples/`, then deploy from a clean checkout:
    `cd samples && npx -y wrangler@4.141.0 deploy`.

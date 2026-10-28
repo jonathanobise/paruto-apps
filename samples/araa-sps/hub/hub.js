@@ -223,7 +223,7 @@
       <section class="sec" id="cadrage">${head(2, t.inceptionT, t.nav[1], t.inceptionL)}
         <ol class="phases">${t.phases.map(([a, b]) => `<li class="panel reveal"><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join('')}</ol>
         <div class="reveal">${gantt(t)}</div>
-        <div class="sbs">${MODULES.map((m) => `<a class="sbcard panel reveal" href="storyboards/${m.id}/?lang=${lang}">${M.videos[m.id] && M.videos[m.id].storyThumb ? `<span class="sbimg"><img src="${M.videos[m.id].storyThumb}" alt="" loading="lazy"></span>` : ''}<span class="tag">${esc(m.tag[lang])}</span><b>${esc(m.title[lang])}</b><span class="go">${esc(t.storyboard)} ${ARROW}</span></a>`).join('')}</div>
+        <div class="sbs">${MODULES.map((m) => `<a class="sbcard panel reveal" href="storyboards/${m.id}/?lang=${lang}">${(() => { const st = (M.videos[m.id] || {}).storyThumb, src = st && (typeof st === 'string' ? st : st[lang] || st.en); return src ? `<span class="sbimg"><img src="${src}" alt="" loading="lazy"></span>` : ''; })()}<span class="tag">${esc(m.tag[lang])}</span><b>${esc(m.title[lang])}</b><span class="go">${esc(t.storyboard)} ${ARROW}</span></a>`).join('')}</div>
       </section>
 
       <section class="sec" id="revue">${head(3, t.reviewT, t.nav[2], t.reviewL)}

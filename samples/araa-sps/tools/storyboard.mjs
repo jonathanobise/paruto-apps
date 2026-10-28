@@ -38,24 +38,27 @@ async function build(mod, browser) {
   }
   const all = order.flatMap((id) => (branches[id] ? [id, branches[id]] : [id]));
 
-  // frames
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto(pathToFileURL(path.join(dir, 'index.html')).href + '?render&lang=en&cc=0');
-  await page.waitForFunction(() => document.body.dataset.ready === '1');
-  await page.evaluate(() => document.fonts.ready);
+  // frames, in each language of the page (the on-screen labels are translated): img/<seg>-<n>.jpg in English, img/<seg>-<n>-fr.jpg in French
   const frames = {};
-  for (const id of all) {
-    const s = segs[id];
-    const ts = s.kind === 'quiz' ? [TL.quizLinear.reveal + 1, TL.quizLinear.each * 2 + 1] : s.kind === 'choice' ? [1.2, TL.choiceLinear.reveal + 1] : [s.dur * 0.3, s.dur * 0.8];
-    frames[id] = [];
-    for (const [k, t] of ts.entries()) {
-      await page.evaluate(([id, t]) => window.SPS_RENDER.seg(id, t), [id, t]);
-      const name = `${id}-${k + 1}.jpg`;
-      await page.screenshot({ path: path.join(img, name), type: 'jpeg', quality: 78, clip: { x: 0, y: 0, width: 1280, height: 720 }, scale: 'css' });
-      frames[id].push(name);
+  for (const fl of ['en', 'fr']) {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+    await page.goto(pathToFileURL(path.join(dir, 'index.html')).href + `?render&lang=${fl}&cc=0`);
+    await page.waitForFunction(() => document.body.dataset.ready === '1');
+    await page.evaluate(() => document.fonts.ready);
+    frames[fl] = {};
+    for (const id of all) {
+      const s = segs[id];
+      const ts = s.kind === 'quiz' ? [TL.quizLinear.reveal + 1, TL.quizLinear.each * 2 + 1] : s.kind === 'choice' ? [1.2, TL.choiceLinear.reveal + 1] : [s.dur * 0.3, s.dur * 0.8];
+      frames[fl][id] = [];
+      for (const [k, t] of ts.entries()) {
+        await page.evaluate(([id, t]) => window.SPS_RENDER.seg(id, t), [id, t]);
+        const name = `${id}-${k + 1}${fl === 'en' ? '' : '-' + fl}.jpg`;
+        await page.screenshot({ path: path.join(img, name), type: 'jpeg', quality: 78, clip: { x: 0, y: 0, width: 1280, height: 720 }, scale: 'css' });
+        frames[fl][id].push(name);
+      }
     }
+    await page.close();
   }
-  await page.close();
   // smaller copies are enough on the page
   const { execFileSync } = await import('node:child_process');
   for (const f of fs.readdirSync(img)) execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path.join(img, f), '-vf', 'scale=640:-1', '-q:v', '5', path.join(img, f)]);
@@ -83,7 +86,7 @@ async function build(mod, browser) {
     return `<tr class="${inLinear ? '' : 'branch'}">
       <td class="n">${n + 1}</td>
       <td><b>${esc(id)}</b><br><span class="dim">${s.dur}s${s.kind === 'choice' ? ' (pause)' : ''}</span><br><span class="badge ${inLinear ? 'lin' : 'int'}">${inLinear ? u.linear : u.inter_only}</span></td>
-      <td class="fr">${frames[id].map((f) => `<img src="img/${f}" alt="" loading="lazy">`).join('')}</td>
+      <td class="fr">${frames[lang][id].map((f) => `<img src="img/${f}" alt="" loading="lazy">`).join('')}</td>
       <td class="desc">${desc ? esc(desc) : `<span class="dim">${esc(s.back ? u.branch : s.kind === 'choice' ? u.choiceDesc : '')}</span>`}</td>
       <td>${vo || u.none}</td>
       <td>${screen || u.none}${inter ? `<div class="inter"><b>${u.inter}</b><br>${inter}</div>` : ''}</td>
@@ -139,8 +142,8 @@ function set(l){document.documentElement.lang=l;document.querySelectorAll('main 
 document.querySelectorAll('.lang-btn').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.lang)})});set(p||s||((navigator.language||'').indexOf('fr')===0?'fr':'en'));})();
 </script><script src="../../shared/kit.js"></script></body></html>`;
   fs.writeFileSync(path.join(out, 'index.html'), html);
-  console.log(`storyboards/${mod}: ${all.length} segments, ${all.length * 2} frames`);
-  return frames.meet ? `storyboards/${mod}/img/${frames.meet[1]}` : null;
+  console.log(`storyboards/${mod}: ${all.length} segments, ${all.length * 4} frames (EN and FR)`);
+  return null;
 }
 
 const mods = process.argv.slice(2);

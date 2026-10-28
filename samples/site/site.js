@@ -54,7 +54,7 @@
             <dl class="p-meta"><dt>${esc(L(S.meta.client))}</dt><dd>${esc(L(p.client))}</dd><dt>${esc(L(S.meta.call))}</dt><dd>${esc(p.call)}</dd><dt>${esc(L(S.meta.programme))}</dt><dd>${esc(p.programme)}</dd></dl>
             <div class="p-cta"><a class="btn primary" href="${esc(p.href)}?lang=${lang}">${esc(L(p.open))}${arrow}</a><a class="btn ghost" href="${esc(p.playHref)}?lang=${lang}">${esc(L(p.play))}</a></div>
           </div>
-          <div class="fan">${p.gallery.map((g) => `<a href="${esc(g.href)}?lang=${lang}"><img src="${esc(g.src)}" alt="" loading="lazy"><span class="cap">${esc(L(g.label))}</span></a>`).join('')}</div>
+          <div class="fan">${p.gallery.map((g) => `<a href="${esc(g.href)}?lang=${lang}"><img src="${esc(typeof g.src === 'string' ? g.src : L(g.src))}" alt="" loading="lazy"><span class="cap">${esc(L(g.label))}</span></a>`).join('')}</div>
         </div>
       </article>`).join('') + `
       <div class="next reveal"><span class="p-no mono">${String(D.projects.length + 1).padStart(2, '0')}</span><div><b>${esc(L(S.next.title))}</b><p>${esc(L(S.next.text))}</p></div><span class="plus" aria-hidden="true">+</span></div>`;

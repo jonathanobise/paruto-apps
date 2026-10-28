@@ -60,7 +60,10 @@ window.SPS_MEDIA = {
     }
    },
    "duration": 112.6,
-   "storyThumb": "storyboards/ecowas/img/meet-2.jpg"
+   "storyThumb": {
+    "en": "storyboards/ecowas/img/meet-2.jpg",
+    "fr": "storyboards/ecowas/img/meet-2-fr.jpg"
+   }
   },
   "international": {
    "slug": "aicha",
@@ -121,7 +124,10 @@ window.SPS_MEDIA = {
     }
    },
    "duration": 131.4,
-   "storyThumb": "storyboards/international/img/meet-2.jpg"
+   "storyThumb": {
+    "en": "storyboards/international/img/meet-2.jpg",
+    "fr": "storyboards/international/img/meet-2-fr.jpg"
+   }
   },
   "waemu": {
    "slug": "koffi",
@@ -182,7 +188,10 @@ window.SPS_MEDIA = {
     }
    },
    "duration": 125,
-   "storyThumb": "storyboards/waemu/img/meet-2.jpg"
+   "storyThumb": {
+    "en": "storyboards/waemu/img/meet-2.jpg",
+    "fr": "storyboards/waemu/img/meet-2-fr.jpg"
+   }
   }
  },
  "audio": {
@@ -294,7 +303,7 @@ window.SPS_MEDIA = {
  },
  "zip": {
   "name": "paruto-media-sps-kit-sources.zip",
-  "bytes": 15661023
+  "bytes": 15661308
  },
  "built": "2026-10-28"
 };
