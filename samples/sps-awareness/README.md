@@ -13,6 +13,7 @@ branching choices, a three-question quiz and FR / EN / PT versions.
 | `moussa-xx.mp4` | Linear "WhatsApp light" cut per language, with burned-in captions |
 | `moussa-xx.srt` | The same narration as subtitles, and the timed voice-over script for the studio |
 | `vo/xx/*.mp3` | Voice-over clips, one per caption or quiz line |
+| `hyperframes-prompts.md` | Prompts to rebuild the linear cut in HeyGen HyperFrames, per language (`node tools/hyperframes-prompts.mjs`) |
 
 Re-render after changing words or art (needs Node, Playwright's Chromium and ffmpeg):
 
