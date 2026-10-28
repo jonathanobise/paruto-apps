@@ -76,12 +76,15 @@ const G = [
 fs.writeFileSync(path.join(out, 'glossary.csv'), '﻿' + [['fr', 'en', 'pt', ...LOCAL.map(([c]) => c), 'notes'].join(','), ...G.map((g) => [...g, '', '', '', '', '', ''].map(csvCell).join(','))].join('\n'));
 files.push('glossary.csv');
 
+// the brief, written for the speakers; brief-en.pdf and brief-fr.pdf in recording/ are its exports
+const BRIEF_URL = 'https://claude.ai/artifact/VkcPPPvapkd4H4yKvmjLpF';
 const T = {
   fr: {
     kit: '← Kit de sensibilisation SPS', kicker: 'Huit langues · kit d’enregistrement', title: 'Kit d’enregistrement des langues locales',
     lead: 'Tout ce qu’il faut pour traduire et enregistrer les vidéos et les capsules en haoussa, bambara, wolof, yoruba et peul. Les fichiers déposés remplacent les voix provisoires sans autre travail de montage.',
     steps: 'Étapes', s: ['Valider le glossaire SPS de la langue avec un expert (fichier glossary.csv).', 'Traduire chaque réplique depuis le français dans la colonne de la langue, en respectant la durée maximale indiquée.', 'Faire relire les passages clés par un second locuteur (rétro-traduction).', 'Enregistrer une réplique par fichier, nommé exactement comme dans la colonne « file » (remplacer <lang> par le code de la langue).', 'Renvoyer le CSV complété et les fichiers audio ; Paruto Media intègre, rend les vidéos et les capsules, puis fait valider.'],
     specs: 'Enregistrement', sp: ['WAV, 48 kHz, 24 bits, mono (ou 44,1 kHz 16 bits).', 'Pièce calme et non résonnante, micro à 15–20 cm, filtre anti-pop.', 'Une prise par réplique, environ 0,5 s de silence avant et après.', 'Voix chaleureuse et posée ; prononcer clairement les termes du glossaire.', 'Les vidéos : une voix de narration. Les capsules : deux voix, un animateur et un vétérinaire.'],
+    briefT: 'Commencez par le brief', briefL: 'Tout ce qu’il faut savoir avant de traduire et d’enregistrer : priorités, règles de traduction, direction de voix, réglages, noms des fichiers et date de retour.', briefFr: 'Brief en français (PDF)', briefEn: 'Brief en anglais (PDF)', briefLive: 'Version en ligne, pour l’équipe Paruto Media',
     dl: 'Fichiers à télécharger', lines: 'répliques à enregistrer', screen: 'textes à l’écran à traduire', mins: 'minutes au plus', caps: 'Capsules audio (trois épisodes)', gl: 'Glossaire SPS (à valider en premier)', codes: 'Codes de langue : ha haoussa, bm bambara, wo wolof, yo yoruba, ff peul (fulfulde).',
     glT: 'Glossaire de départ', glNote: 'Les colonnes des langues locales sont à remplir et à valider avec les experts avant toute traduction.',
   },
@@ -90,6 +93,7 @@ const T = {
     lead: 'Everything needed to translate and record the videos and capsules in Hausa, Bambara, Wolof, Yoruba and Fulani. The files you deliver replace the temporary voices with no further editing.',
     steps: 'Steps', s: ['Validate the language’s SPS glossary with an expert (glossary.csv).', 'Translate each line from French into the language’s column, keeping within the maximum length given.', 'Have key passages checked by a second speaker (back-translation).', 'Record one line per file, named exactly as in the “file” column (replace <lang> with the language code).', 'Return the completed CSV and the audio files; Paruto Media integrates them, renders the videos and capsules, and has them validated.'],
     specs: 'Recording', sp: ['WAV, 48 kHz, 24-bit, mono (or 44.1 kHz 16-bit).', 'A quiet, non-echoey room, microphone at 15–20 cm, pop filter.', 'One take per line, about 0.5 s of silence before and after.', 'A warm, unhurried voice; pronounce the glossary terms clearly.', 'Videos: one narrator. Capsules: two voices, a host and a veterinarian.'],
+    briefT: 'Start with the brief', briefL: 'Everything to know before translating and recording: priorities, translation rules, voice direction, settings, file names and the return date.', briefFr: 'Brief in French (PDF)', briefEn: 'Brief in English (PDF)', briefLive: 'Online version, for the Paruto Media team',
     dl: 'Files to download', lines: 'lines to record', screen: 'on-screen texts to translate', mins: 'minutes at most', caps: 'Audio capsules (three episodes)', gl: 'SPS glossary (validate first)', codes: 'Language codes: ha Hausa, bm Bambara, wo Wolof, yo Yoruba, ff Fulani (Fulfulde).',
     glT: 'Starter glossary', glNote: 'The local-language columns are to be filled in and validated with the experts before any translation.',
   },
@@ -98,6 +102,8 @@ const section = (lang) => {
   const t = T[lang], L = lang;
   return `<section data-lang="${lang}"${lang === 'fr' ? '' : ' hidden'}>
   <p class="kicker">${t.kicker}</p><h1>${t.title}</h1><p class="lead">${t.lead}</p>
+  <div class="brief"><h2>${t.briefT}</h2><p>${t.briefL}</p>
+    <div class="srcs">${(lang === 'fr' ? [['fr', t.briefFr], ['en', t.briefEn]] : [['en', t.briefEn], ['fr', t.briefFr]]).map(([l, label], i) => `<a class="btn${i ? ' ghost' : ''}" href="brief-${l}.pdf" download>${label}</a>`).join('')}<a class="btn ghost" href="${BRIEF_URL}">${t.briefLive} ↗</a></div></div>
   <h2>${t.dl}</h2>
   <div class="table-wrap"><table><tbody>
     ${modules.map((m) => `<tr><td><b>${esc(m.title[L].title)}</b></td><td>${m.lines} ${t.lines} · ${m.screen} ${t.screen} · ${(m.secs / 60).toLocaleString(L === 'fr' ? 'fr-FR' : 'en-GB', { maximumFractionDigits: 1 })} ${t.mins}</td><td><a href="recording-${m.mod}.csv" download>CSV</a></td></tr>`).join('')}
@@ -117,7 +123,7 @@ fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kit d’enregistrement · Kit SPS · Paruto Media</title><meta name="robots" content="noindex">
 <link rel="stylesheet" href="../hub/hub.css"><link rel="stylesheet" href="../storyboards/storyboard.css">
-<style>.doc{max-width:980px}.doc h2{font-size:24px;margin:36px 0 10px}.doc li{color:#e2d4bf;margin-bottom:6px}.doc td a{color:var(--accent);font-weight:700}</style></head>
+<style>.doc{max-width:980px}.doc h2{font-size:24px;margin:36px 0 10px}.doc li{color:#e2d4bf;margin-bottom:6px}.doc td a{color:var(--accent);font-weight:700}.brief{margin:30px 0 8px;padding:22px 24px;border-radius:20px;background:var(--panel);border:1px solid var(--line)}.brief h2{margin:0 0 6px!important}.brief p{margin:0 0 16px;color:var(--muted)}</style></head>
 <body>
 <header class="top"><a href="../../" class="brand" aria-label="Paruto Media · projects"><img src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../#langues" class="kitlink" data-fr="${T.fr.kit}" data-en="${T.en.kit}">${T.fr.kit}</a></nav>
 <div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
