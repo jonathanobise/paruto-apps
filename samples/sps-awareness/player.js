@@ -122,6 +122,15 @@
         order.forEach((s) => { (SCRIPT.captions[s.id] || []).forEach((c) => out.push({ a: acc + c.a, b: acc + Math.min(c.b, s.dur), text: L(c) })); acc += s.dur; });
         return out;
       },
+      voice() { // absolute start time of every voice-over clip (vo/<lang>/<name>.mp3)
+        let acc = 0; const out = [], Q = TL.quizLinear;
+        order.forEach((s) => {
+          (SCRIPT.captions[s.id] || []).forEach((c, i) => c.a < s.dur && out.push({ at: acc + c.a, name: `${s.id}-${i}` }));
+          if (TL.segments[s.id].kind === 'quiz') SCRIPT.quiz.forEach((_, i) => out.push({ at: acc + i * Q.each + 0.3, name: `quiz-${i}-q` }, { at: acc + i * Q.each + Q.reveal + 0.2, name: `quiz-${i}-why` }));
+          acc += s.dur;
+        });
+        return out;
+      },
     };
     applyLang(); window.SPS_RENDER.seek(0);
     document.body.dataset.ready = '1';
@@ -131,12 +140,33 @@
   // ---------- interactive mode ----------
   let last = 0, playing = false, started = false;
 
+  // voice-over: one clip per caption line and quiz line, started when its line comes up
+  let voOn = store.get('sps-vo') !== '0', voice = null;
+  const played = new Set();
+  function voPlay(name, offset = 0) {
+    voStop();
+    if (!voOn) return;
+    voice = new Audio(`vo/${lang}/${name}.mp3`);
+    if (offset > 0.15) voice.addEventListener('loadedmetadata', () => (voice.currentTime = offset), { once: true });
+    if (playing) voice.play().catch(() => {});
+  }
+  function voStop() { if (voice) { voice.pause(); voice = null; } }
+  function voTick(segId, t) {
+    const seg = TL.segments[segId];
+    (SCRIPT.captions[segId] || []).forEach((c, i) => {
+      if (seg.kind === 'choice' && i > 0) return; // the linear cut's answer line would give the choice away
+      const key = segId + i;
+      if (t >= c.a && t < Math.min(c.b, seg.dur) && !played.has(key)) { played.add(key); voPlay(`${segId}-${i}`, t - c.a); }
+    });
+  }
+
   function go(segId) {
     state = { seg: segId, t: 0, waiting: false, picked: null, qi: 0, score: 0 };
     const seg = TL.segments[segId];
+    voStop(); played.clear();
     choice.classList.remove('show', 'answered'); quiz.classList.remove('show', 'revealed', 'scored'); $('#backbar').classList.remove('show');
     if (seg.kind === 'choice') { fillChoice(segId); choice.dataset.k = ''; }
-    if (seg.kind === 'quiz') { fillQuiz(0); quiz.dataset.k = ''; }
+    if (seg.kind === 'quiz') { fillQuiz(0); quiz.dataset.k = ''; voPlay('quiz-0-q'); }
     renderChapters();
   }
   function onEnd() {
@@ -163,7 +193,9 @@
       idle += dt; state.t += dt;
       const seg = TL.segments[state.seg];
       if (!seg.kind && !state.waiting && state.t >= seg.dur) { state.t = seg.dur; onEnd(); }
+      if (started && state) voTick(state.seg, state.t);
     }
+    if (voice) { if (!playing && !voice.paused) voice.pause(); else if (playing && voice.paused && !voice.ended) voice.play().catch(() => {}); }
     if (started) draw(); else { idle += dt; showScene('title'); scenes.title.update(0.6, idle); }
     requestAnimationFrame(frame);
   }
@@ -181,10 +213,10 @@
   $$('.opt', quiz).forEach((b, k) => b.addEventListener('click', () => {
     if (quiz.classList.contains('revealed')) return;
     if (SCRIPT.quiz[state.qi].options[k].correct) state.score++;
-    revealQuiz(state.qi, k);
+    revealQuiz(state.qi, k); voPlay(`quiz-${state.qi}-why`);
   }));
   $('.next', quiz).addEventListener('click', () => {
-    if (state.qi < SCRIPT.quiz.length - 1) { state.qi++; fillQuiz(state.qi); }
+    if (state.qi < SCRIPT.quiz.length - 1) { state.qi++; fillQuiz(state.qi); voPlay(`quiz-${state.qi}-q`); }
     else { quiz.classList.add('scored'); $('.score-num', quiz).textContent = `${state.score}/${SCRIPT.quiz.length}`; }
   });
   $('.score-go', quiz).addEventListener('click', () => go('recap'));
@@ -205,7 +237,9 @@
   $('#replay').addEventListener('click', () => { begin(); go('title'); playing = true; updatePlay(); });
   $('#cc').addEventListener('click', () => { ccOn = !ccOn; store.set('sps-cc', ccOn ? '1' : '0'); $('#cc').classList.toggle('on', ccOn); });
   $('#cc').classList.toggle('on', ccOn);
-  const setLang = (l) => { lang = l; store.set('sps-lang', l); choice.dataset.k = quiz.dataset.k = caption.dataset.k = ''; if (state) { const s = TL.segments[state.seg]; if (s.kind === 'choice') fillChoice(state.seg); if (s.kind === 'quiz' && !quiz.classList.contains('scored')) { fillQuiz(state.qi); } } applyLang(); updatePlay(); };
+  $('#vo').addEventListener('click', () => { voOn = !voOn; store.set('sps-vo', voOn ? '1' : '0'); $('#vo').classList.toggle('on', voOn); if (!voOn) voStop(); });
+  $('#vo').classList.toggle('on', voOn);
+  const setLang = (l) => { voStop(); lang = l; store.set('sps-lang', l); choice.dataset.k = quiz.dataset.k = caption.dataset.k = ''; if (state) { const s = TL.segments[state.seg]; if (s.kind === 'choice') fillChoice(state.seg); if (s.kind === 'quiz' && !quiz.classList.contains('scored')) { fillQuiz(state.qi); } } applyLang(); updatePlay(); };
   $$('.lang-btn').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
   $('#lang').addEventListener('change', (e) => setLang(e.target.value));
   document.addEventListener('keydown', (e) => { if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); $('#play').click(); } });

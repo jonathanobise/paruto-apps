@@ -70,25 +70,25 @@ window.SPS_SCRIPT = {
       { a: 1.2, b: 6.8, fr: 'Le voyage de Moussa : les règles sanitaires du commerce du bétail.', en: 'Moussa’s journey: the animal health rules of the livestock trade.', pt: 'A viagem de Moussa: as regras sanitárias do comércio de gado.' },
     ],
     meet: [
-      { a: 0.4, b: 4.6, fr: 'Voici Moussa, commerçant de bétail au Sahel.', en: 'This is Moussa, a livestock trader in the Sahel.', pt: 'Este é Moussa, comerciante de gado no Sahel.' },
-      { a: 4.6, b: 9, fr: 'Il veut vendre 40 bœufs sur un grand marché, de l’autre côté de la frontière.', en: 'He wants to sell 40 cattle at a big market across the border.', pt: 'Quer vender 40 bois num grande mercado, do outro lado da fronteira.' },
+      { a: 0.4, b: 4.5, fr: 'Voici Moussa, commerçant de bétail au Sahel.', en: 'This is Moussa, a livestock trader in the Sahel.', pt: 'Este é Moussa, comerciante de gado no Sahel.' },
+      { a: 4.5, b: 9.3, fr: 'Il veut vendre 40 bœufs sur un grand marché, de l’autre côté de la frontière.', en: 'He wants to sell 40 cattle at a big market across the border.', pt: 'Quer vender 40 bois num grande mercado, do outro lado da fronteira.' },
     ],
     diseases: [
       { a: 0.3, b: 4.4, fr: 'Les animaux voyagent d’un pays à l’autre… et les maladies voyagent avec eux.', en: 'Animals travel from country to country… and diseases travel with them.', pt: 'Os animais viajam de país para país… e as doenças viajam com eles.' },
       { a: 4.4, b: 9, fr: 'Une seule bête malade peut contaminer d’autres troupeaux tout au long de la route.', en: 'One sick animal can infect other herds all along the route.', pt: 'Um só animal doente pode contaminar outros rebanhos ao longo do caminho.' },
     ],
     choice1: [
-      { a: 0.3, b: 4.6, fr: 'Avant de partir, que doit faire Moussa ?', en: 'Before leaving, what should Moussa do?', pt: 'Antes de partir, o que deve fazer Moussa?' },
-      { a: 4.8, b: 8, fr: 'Réponse 2 : le contrôle sanitaire commence avant le départ.', en: 'Answer 2: the health check starts before the journey.', pt: 'Resposta 2: o controlo sanitário começa antes da partida.' },
+      { a: 0.3, b: 4.4, fr: 'Avant de partir, que doit faire Moussa ?', en: 'Before leaving, what should Moussa do?', pt: 'Antes de partir, o que deve fazer Moussa?' },
+      { a: 4.8, b: 9.1, fr: 'Réponse 2 : le contrôle sanitaire commence avant le départ.', en: 'Answer 2: the health check starts before the journey.', pt: 'Resposta 2: o controlo sanitário começa antes da partida.' },
     ],
     blocked1: [
-      { a: 0.3, b: 3.6, fr: 'Sans certificat sanitaire, le troupeau est arrêté à la frontière.', en: 'Without a health certificate, the herd is stopped at the border.', pt: 'Sem certificado sanitário, o rebanho é parado na fronteira.' },
-      { a: 3.6, b: 7, fr: 'Contrôles, attente, risque de quarantaine : Moussa perd du temps et de l’argent.', en: 'Checks, waiting, possible quarantine: Moussa loses time and money.', pt: 'Controlos, espera, risco de quarentena: Moussa perde tempo e dinheiro.' },
+      { a: 0.3, b: 4.2, fr: 'Sans certificat sanitaire, le troupeau est arrêté à la frontière.', en: 'Without a health certificate, the herd is stopped at the border.', pt: 'Sem certificado sanitário, o rebanho é parado na fronteira.' },
+      { a: 4.2, b: 9.1, fr: 'Contrôles, attente, risque de quarantaine : Moussa perd du temps et de l’argent.', en: 'Checks, waiting, possible quarantine: Moussa loses time and money.', pt: 'Controlos, espera, risco de quarentena: Moussa perde tempo e dinheiro.' },
     ],
     vet: [
-      { a: 0.3, b: 4, fr: 'Moussa appelle le vétérinaire officiel, qui examine et vaccine chaque animal.', en: 'Moussa calls the official veterinarian, who examines and vaccinates each animal.', pt: 'Moussa chama o veterinário oficial, que examina e vacina cada animal.' },
-      { a: 4, b: 8, fr: 'Les animaux sont sains : le vétérinaire délivre un certificat zoosanitaire international.', en: 'The animals are healthy: the veterinarian issues an international animal health certificate.', pt: 'Os animais estão saudáveis: o veterinário emite um certificado zoossanitário internacional.' },
-      { a: 8, b: 11, fr: 'Ce certificat accompagne le troupeau pendant tout le voyage.', en: 'The certificate travels with the herd for the whole journey.', pt: 'Este certificado acompanha o rebanho durante toda a viagem.' },
+      { a: 0.3, b: 5.6, fr: 'Moussa appelle le vétérinaire officiel, qui examine et vaccine chaque animal.', en: 'Moussa calls the official veterinarian, who examines and vaccinates each animal.', pt: 'Moussa chama o veterinário oficial, que examina e vacina cada animal.' },
+      { a: 5.6, b: 11.4, fr: 'Les animaux sont sains : le vétérinaire délivre un certificat zoosanitaire international.', en: 'The animals are healthy: the veterinarian issues an international animal health certificate.', pt: 'Os animais estão saudáveis: o veterinário emite um certificado zoossanitário internacional.' },
+      { a: 11.4, b: 15.3, fr: 'Ce certificat accompagne le troupeau pendant tout le voyage.', en: 'The certificate travels with the herd for the whole journey.', pt: 'Este certificado acompanha o rebanho durante toda a viagem.' },
     ],
     borderArrive: [
       { a: 0.3, b: 6, fr: 'À la frontière, un agent des services vétérinaires contrôle les documents et les animaux.', en: 'At the border, a veterinary officer checks the documents and the animals.', pt: 'Na fronteira, um agente dos serviços veterinários controla os documentos e os animais.' },
@@ -97,12 +97,12 @@ window.SPS_SCRIPT = {
       { a: 0.3, b: 30, fr: 'L’agent demande les documents. Que présente Moussa ?', en: 'The officer asks for the documents. What does Moussa show?', pt: 'O agente pede os documentos. O que apresenta Moussa?' },
     ],
     blocked2: [
-      { a: 0.3, b: 3.6, fr: 'Un reçu d’achat ne prouve pas que les animaux sont en bonne santé.', en: 'A sales receipt does not prove the animals are healthy.', pt: 'Um recibo de compra não prova que os animais estão saudáveis.' },
-      { a: 3.6, b: 7, fr: 'Sans certificat, le troupeau ne passe pas.', en: 'Without a certificate, the herd cannot cross.', pt: 'Sem certificado, o rebanho não passa.' },
+      { a: 0.3, b: 3.9, fr: 'Un reçu d’achat ne prouve pas que les animaux sont en bonne santé.', en: 'A sales receipt does not prove the animals are healthy.', pt: 'Um recibo de compra não prova que os animais estão saudáveis.' },
+      { a: 3.9, b: 7.2, fr: 'Sans certificat, le troupeau ne passe pas.', en: 'Without a certificate, the herd cannot cross.', pt: 'Sem certificado, o rebanho não passa.' },
     ],
     borderCross: [
-      { a: 0.2, b: 4, fr: 'Le certificat est valable et les animaux sont en bonne santé : la barrière se lève.', en: 'The certificate is valid and the animals are healthy: the barrier lifts.', pt: 'O certificado é válido e os animais estão saudáveis: a cancela levanta-se.' },
-      { a: 4, b: 8, fr: 'Les règles harmonisées de la CEDEAO donnent un cadre commun aux contrôles sanitaires dans toute la région.', en: 'ECOWAS harmonised rules give health checks a common framework across the region.', pt: 'As regras harmonizadas da CEDEAO dão aos controlos sanitários um quadro comum em toda a região.' },
+      { a: 0.2, b: 5.8, fr: 'Le certificat est valable et les animaux sont en bonne santé : la barrière se lève.', en: 'The certificate is valid and the animals are healthy: the barrier lifts.', pt: 'O certificado é válido e os animais estão saudáveis: a cancela levanta-se.' },
+      { a: 5.8, b: 11.8, fr: 'Les règles harmonisées de la CEDEAO donnent un cadre commun aux contrôles sanitaires dans toute la région.', en: 'ECOWAS harmonised rules give health checks a common framework across the region.', pt: 'As regras harmonizadas da CEDEAO dão aos controlos sanitários um quadro comum em toda a região.' },
     ],
     recap: [
       { a: 0.3, b: 9, fr: 'Trois réflexes pour un commerce de bétail sûr et ouvert.', en: 'Three habits for a safe and open livestock trade.', pt: 'Três reflexos para um comércio de gado seguro e aberto.' },
@@ -152,7 +152,7 @@ window.SPS_SCRIPT = {
         { fr: 'Le code de la route', en: 'The highway code', pt: 'O código da estrada' },
         { fr: 'Le règlement du marché', en: 'The market by-laws', pt: 'O regulamento do mercado' },
       ],
-      why: { fr: 'Il fixe les règles de santé animale, végétale et de sécurité sanitaire des aliments.', en: 'It sets the rules for animal health, plant health and food safety.', pt: 'Fixa as regras de sanidade animal, vegetal e de segurança sanitária dos alimentos.' },
+      why: { fr: 'Il fixe les règles de santé animale, végétale et de sécurité des aliments.', en: 'It sets the rules for animal health, plant health and food safety.', pt: 'Fixa as regras de sanidade animal, vegetal e de segurança sanitária dos alimentos.' },
     },
   ],
 };

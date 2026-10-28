@@ -12,12 +12,17 @@ branching choices, a three-question quiz and FR / EN / PT versions.
 | `player.js` | Interactive player; `?render&lang=xx` turns it into the frame-exact linear player |
 | `moussa-xx.mp4` | Linear "WhatsApp light" cut per language, with burned-in captions |
 | `moussa-xx.srt` | The same narration as subtitles, and the timed voice-over script for the studio |
+| `vo/xx/*.mp3` | Voice-over clips, one per caption or quiz line |
 
 Re-render after changing words or art (needs Node, Playwright's Chromium and ffmpeg):
 
     node tools/render.mjs fr en pt      # MP4s, posters and SRTs
     node tools/snap.mjs /tmp/out fr 12 choice2@3   # stills, to check a frame
 
-The narration is not voiced yet: record each language from its `.srt`, then mux the audio onto
-the MP4 (`ffmpeg -i moussa-fr.mp4 -i vo-fr.wav -c:v copy -c:a aac -shortest out.mp4`).
+The narration in `vo/<lang>/` is a synthetic scratch voice (Piper TTS: French "siwis" CC BY 4.0,
+English "cori" public domain, Portuguese "tugão" CC0), one MP3 per caption or quiz line. The
+interactive player plays them as each line comes up; the renderer mixes them into the MP4s.
+To regenerate them, or after changing words: `python tools/voice.py <piper-voices-dir>` (it checks
+every line fits its slot). For studio voices, record each line from the `.srt` timings and
+replace the MP3s with the same file names, then re-run the renderer.
 Content is for demonstration and is to be validated by ARAA's technical experts.

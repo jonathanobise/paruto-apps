@@ -308,11 +308,11 @@
       }
       const examining = !walking && t > 2 && t < 6.2;
       posePerson(this.v, vx, 652, 1.04, walking, t * 8, idle, examining ? -60 + Math.sin(idle * 6) * 8 : null);
-      posePerson(this.m, 230, 640, 1.05, 0, 0, idle, t > 8.6 ? -50 : null);
+      posePerson(this.m, 230, 640, 1.05, 0, 0, idle, t > 10.4 ? -50 : null);
       [[560, 2.4], [760, 4.0], [960, 5.6]].forEach(([x, t0], i) => { const p = prog(t, t0, t0 + 0.4, ease.back); op(this.oks[i], prog(t, t0, t0 + 0.2)); tf(this.oks[i], x + 30, 470, Math.max(0.001, p)); });
       const pv = prog(t, 3.0, 3.5, ease.back); op(this.vac, prog(t, 3.0, 3.2) * (1 - prog(t, 6.0, 6.4))); tf(this.vac, 700, 420, lerp(0.6, 1, pv));
       // certificate: appears, fills, stamped, signed, then flies to Moussa
-      const pc = prog(t, 6.0, 6.6, ease.back), fly = prog(t, 8.6, 9.8, ease.inOut);
+      const pc = prog(t, 6.0, 6.6, ease.back), fly = prog(t, 10.4, 11.6, ease.inOut);
       op(this.cert, prog(t, 6.0, 6.2));
       tf(this.cert, lerp(940, 262, fly), lerp(250, 520, fly), lerp(lerp(0.5, 1, pc), 0.22, fly), lerp(-3, -14, fly));
       this.lines.forEach((l, i) => l.setAttribute('stroke-dashoffset', (1 - prog(t, 6.4 + i * 0.12, 6.8 + i * 0.12)).toFixed(3)));

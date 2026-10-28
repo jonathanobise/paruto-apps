@@ -1,4 +1,5 @@
-// Renders the linear (WhatsApp) cut of the sample to MP4, a poster JPEG and SRT subtitles.
+// Renders the linear (WhatsApp) cut of the sample to MP4, a poster JPEG and SRT subtitles,
+// and lays the voice-over clips in vo/<lang>/ (see tools/voice.py) onto the soundtrack.
 //   node tools/render.mjs [lang ...]     (default: fr en pt)
 // Needs Playwright's Chromium and ffmpeg. Frames are drawn by seeking the player, so the
 // video matches the interactive version frame for frame.
@@ -26,9 +27,10 @@ for (const lang of langs) {
   const caps = await page.evaluate(() => window.SPS_RENDER.captions());
   fs.writeFileSync(path.join(dir, `moussa-${lang}.srt`), caps.map((c, i) => `${i + 1}\n${srtTime(c.a)} --> ${srtTime(c.b)}\n${c.text}\n`).join('\n'));
 
-  const out = path.join(dir, `moussa-${lang}.mp4`);
+  const voice = await page.evaluate(() => window.SPS_RENDER.voice());
+  const out = path.join(dir, `moussa-${lang}.mp4`), silent = path.join(dir, `.moussa-${lang}-silent.mp4`);
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '24', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', '24', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart', silent], { stdio: ['pipe', 'inherit', 'inherit'] });
   const frames = Math.round(duration * FPS);
   for (let f = 0; f < frames; f++) {
     await page.evaluate((t) => window.SPS_RENDER.seek(t), f / FPS);
@@ -39,6 +41,19 @@ for (const lang of langs) {
   }
   ff.stdin.end();
   await new Promise((r, j) => ff.on('close', (c) => (c ? j(new Error('ffmpeg ' + c)) : r())));
+
+  // soundtrack: each clip delayed to its start time, mixed, padded to the video's length
+  const clips = voice.map((v) => ({ ...v, file: path.join(dir, 'vo', lang, `${v.name}.mp3`) })).filter((v) => fs.existsSync(v.file));
+  if (clips.length < voice.length) console.log(lang, `voice-over: ${voice.length - clips.length} clip(s) missing, run tools/voice.py`);
+  const args = ['-y', '-loglevel', 'error', '-i', silent];
+  clips.forEach((c) => args.push('-i', c.file));
+  if (clips.length) {
+    const fc = clips.map((c, i) => `[${i + 1}:a]adelay=${Math.round(c.at * 1000)}:all=1[a${i}]`).join(';')
+      + `;${clips.map((_, i) => `[a${i}]`).join('')}amix=inputs=${clips.length}:normalize=0,apad,atrim=0:${duration}[mix]`;
+    args.push('-filter_complex', fc, '-map', '0:v', '-map', '[mix]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k', '-ar', '44100', '-movflags', '+faststart', out);
+  } else args.push('-c', 'copy', out);
+  await new Promise((r, j) => spawn('ffmpeg', args, { stdio: 'inherit' }).on('close', (c) => (c ? j(new Error('ffmpeg mux ' + c)) : r())));
+  fs.unlinkSync(silent);
   if (errors.length) console.log(lang, 'page errors:', errors.slice(0, 5));
   console.log('wrote', out);
   await page.close();
