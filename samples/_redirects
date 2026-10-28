@@ -1,0 +1,9 @@
+# The ARAA SPS kit first lived at the root; its old addresses move to /araa-sps/.
+/videos/*       /araa-sps/videos/:splat       301
+/audio/*        /araa-sps/audio/:splat        301
+/storyboards/*  /araa-sps/storyboards/:splat  301
+/guide/*        /araa-sps/guide/:splat        301
+/recording/*    /araa-sps/recording/:splat    301
+/downloads/*    /araa-sps/downloads/:splat    301
+/hub/*          /araa-sps/hub/:splat          301
+/shared/*       /araa-sps/shared/:splat       301

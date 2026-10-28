@@ -1,28 +1,118 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kit de sensibilisation SPS · Paruto Media</title>
-  <meta name="description" content="Samples of every deliverable for ARAA's SPS awareness call AMI028-2026: interactive videos, WhatsApp versions, radio capsules, storyboards, sources and deployment guide, by Paruto Media.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Paruto Media · Proposals and sample work</title>
+  <meta name="description" content="Proposals and working samples by Paruto Media: development communication, interactive video, radio and multilingual content.">
+  <meta name="theme-color" content="#060608">
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="hub/hub.css">
+  <meta property="og:title" content="Paruto Media · Proposals and sample work">
+  <meta property="og:description" content="Every project answers a call for proposals with working samples of the deliverables.">
+  <meta property="og:image" content="https://media.paruto.com/araa-sps/teaser.jpg">
+  <link rel="icon" href="site/favicon.svg" type="image/svg+xml">
+  <!-- Apple devices use SF Pro / SF Mono via the system stack; these are the fallbacks elsewhere -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+  <link rel="stylesheet" href="site/site.css">
+  <script>
+    // Dark by default; apply a saved light preference before first paint (no flash)
+    try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}
+  </script>
 </head>
 <body>
-  <header class="top">
-    <a href="./" class="brand"><img src="shared/paruto-media-logo-white.svg" alt="Paruto Media"></a>
-    <nav id="nav" aria-label="Sections"></nav>
-    <div class="langs" role="group" aria-label="Langue / Language"><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Floating Liquid Glass nav; compacts while scrolling down -->
+  <header class="nav glass" id="nav">
+    <a class="brand" href="#top" aria-label="Paruto Media">
+      <img class="only-dark" src="site/logos/paruto-media-logo-white.svg" alt="Paruto Media">
+      <img class="only-light" src="site/logos/paruto-media-logo-black.svg" alt="" aria-hidden="true">
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#projects" data-nav="0"></a><a href="#capabilities" data-nav="1"></a><a href="#approach" data-nav="2"></a>
+    </nav>
+    <div class="nav-end">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><span class="seg-thumb" aria-hidden="true"></span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="nav-cta" href="#contact" data-t="contact"></a>
+    </div>
   </header>
-  <main id="main"></main>
-  <footer>
-    <img src="shared/paruto-media-logo-white.svg" alt="Paruto Media">
-    <p id="foot"></p>
-    <p><a href="https://parutomedia.com">parutomedia.com</a></p>
+
+  <main id="top">
+    <!-- Hero: the latest proposal plays on a lit stage -->
+    <section class="hero" aria-labelledby="headline">
+      <div class="hero-light" aria-hidden="true"></div>
+      <div class="hero-copy wrap">
+        <p class="eyebrow mono rise"><span class="pulse" aria-hidden="true"></span><span data-t="eyebrow"></span></p>
+        <h1 id="headline" class="rise" data-t="headline"></h1>
+        <p class="sub rise" data-t="sub"></p>
+      </div>
+      <div class="stage-wrap wrap rise">
+        <div class="stage" id="stage">
+          <a class="screen" id="screen" href="#projects">
+            <video id="teaser" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="screen-sheen" aria-hidden="true"></span>
+          </a>
+          <a class="now glass" id="now" href="#"></a>
+          <div class="floor" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+
+    <!-- (01) Projects -->
+    <section class="section wrap" id="projects" aria-labelledby="projectsTitle">
+      <header class="s-head reveal">
+        <p class="label mono">(01) <span data-t="projectsLabel"></span></p>
+        <h2 id="projectsTitle" data-t="projectsTitle"></h2>
+        <p class="s-lead" data-t="projectsLead"></p>
+      </header>
+      <div class="projects" id="projectList"></div>
+    </section>
+
+    <!-- (02) Capabilities -->
+    <section class="section wrap" id="capabilities" aria-labelledby="capTitle">
+      <header class="s-head reveal">
+        <p class="label mono">(02) <span data-t="capLabel"></span></p>
+        <h2 id="capTitle" data-t="capTitle"></h2>
+      </header>
+      <ul class="caps" id="caps"></ul>
+    </section>
+
+    <!-- (03) Approach -->
+    <section class="section wrap" id="approach" aria-labelledby="appTitle">
+      <header class="s-head reveal">
+        <p class="label mono">(03) <span data-t="appLabel"></span></p>
+        <h2 id="appTitle" data-t="appTitle"></h2>
+      </header>
+      <ol class="steps" id="steps"></ol>
+    </section>
+  </main>
+
+  <footer class="footer wrap" id="contact">
+    <div class="cta panel reveal">
+      <p class="label mono" data-t="ctaLabel"></p>
+      <h2 data-t="ctaTitle"></h2>
+      <a class="cta-btn" id="ctaBtn" href="#"><span data-t="ctaButton"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="family reveal">
+      <p class="label mono" data-t="familyLabel"></p>
+      <ul class="family-links" id="family"></ul>
+    </div>
+    <div class="wordmark" aria-hidden="true">Media</div>
+    <div class="footer-bottom"><span data-t="footer"></span><a href="https://parutomedia.com">parutomedia.com</a></div>
   </footer>
-  <script src="audio/capsules.js"></script>
-  <script src="audio/cues.js"></script>
-  <script src="hub/media.js"></script>
-  <script src="hub/hub.js"></script>
+
+  <script src="site/projects.js"></script>
+  <script src="site/site.js"></script>
 </body>
 </html>

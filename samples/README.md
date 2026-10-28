@@ -1,41 +1,23 @@
-# Paruto Media: SPS awareness kit (media.paruto.com)
+# media.paruto.com: Paruto Media proposals and sample work
 
-Samples of every deliverable in ARAA's call AMI028-2026 (interactive videos and audio on
-sanitary and phytosanitary standards for the livestock trade in West Africa). Served as static
-files by the Cloudflare Worker `paruto-media-samples` (`wrangler.jsonc`); `.assetsignore` keeps
-tools, notes, raw recordings and internal prompts off the site.
+The front page lists Paruto Media's proposals; each proposal is a working site in its own folder.
+Served as static files by the Cloudflare Worker `paruto-media-samples` (`wrangler.jsonc`);
+`.assetsignore` keeps tools, notes, raw recordings and internal prompts off the site, and
+`_redirects` sends the SPS kit's first addresses (at the root) to `/araa-sps/`.
 
 | Path | What it is |
 | --- | --- |
-| `index.html`, `hub/` | The kit page: one section per deliverable, FR/EN. `hub/media.js` is generated. |
-| `videos/<module>/` | Interactive video per framework (`international`, `ecowas`, `waemu`): `script.js` (every word, FR/EN/PT), `timeline.js` (segments, branching, linear order), `scenes.js` (animation), `vo/` (voice clips), MP4s 16:9 and 9:16, SRTs, posters |
-| `shared/` | The player, its styles and the illustration kit shared by the modules |
-| `audio/` | Radio/podcast capsules: `capsules.js` (scripts), one folder per episode with MP3 and WAV per language, `cues.js` |
-| `storyboards/<module>/` | Generated storyboards (frames, direction, narration, interactions, branching map) |
-| `guide/` | Deployment guide (web, WhatsApp, community radio, updating) |
-| `recording/` | Local-language recording kit: instructions, glossary, one CSV of lines per module |
-| `downloads/` | Zip of the editable sources |
-| `tools/` | Everything that generates the above |
+| `index.html`, `site/` | The front page. **All its words and projects live in `site/projects.js`** (EN/FR); `site.css` holds the design tokens (same language as apps.paruto.com: dark default, light opt-in, Liquid Glass only on floating controls); `site.js` renders it. |
+| `araa-sps/` | Project 01: the SPS awareness kit for ARAA's call AMI028-2026 (see `araa-sps/README.md`) |
 
-## Rebuilding
+## Adding a proposal
 
-Needs Node 20+, Playwright's Chromium, ffmpeg, and Python with `piper-tts` and the Piper voices
-listed in `tools/voice.py` and `tools/capsules.py`.
+1. Build it in its own folder, e.g. `samples/<client-call>/`, with its own `index.html`.
+2. Add an object at the top of `projects` in `site/projects.js`: `href` (the folder), `call`, `programme`, `year`,
+   `accent`/`accent2`, `status`, `client`, `kicker`, `title` (`*word*` picks the italic word), `summary`, `stats`
+   (only real counts of what the proposal contains), `teaser` (a short silent MP4) and `poster`, three `gallery` stills,
+   `open`/`play` labels and `playHref`. The newest project plays on the hero stage.
+3. Preview with `python3 -m http.server` in `samples/`, then deploy from a clean checkout:
+   `cd samples && npx -y wrangler@4.141.0 deploy`.
 
-    python tools/voice.py <module> <voices-dir>          # voice clips (studio recordings in videos/<module>/rec/<lang>/ win)
-    node tools/render.mjs <module>                        # 16:9 MP4s, posters, SRTs
-    node tools/render.mjs <module> --vertical             # 9:16 MP4s
-    python tools/capsules.py <voices-dir>                 # capsules (studio recordings in audio/<episode>/rec/<lang>/ win)
-    node tools/storyboard.mjs international ecowas waemu  # storyboards
-    node tools/recording.mjs                              # recording kit
-    node tools/hyperframes-prompts.mjs <module>           # HeyGen HyperFrames prompts for the linear cut
-    node tools/kit.mjs                                    # hub/media.js and the sources zip (run last)
-    node tools/snap.mjs <module> <outdir> fr 12 choice2@3 # stills, to check frames
-
-## Voices
-
-The narration is a synthetic scratch voice (Piper TTS): French "siwis" and "mls" (CC BY 4.0),
-English "cori", "john" (public domain), Portuguese "tugão" and "cadu" (CC0). Final versions are
-recorded by native speakers; the five local languages come from the recording kit.
-
-Content is for demonstration and is to be validated by ARAA's technical experts.
+Never put invented clients, figures or testimonials on the page.

@@ -127,7 +127,7 @@ async function build(mod, browser) {
 <title>Storyboard · ${esc(S.ui.fr.title)} · Paruto Media</title><meta name="robots" content="noindex">
 <link rel="stylesheet" href="../../hub/hub.css"><link rel="stylesheet" href="../storyboard.css"></head>
 <body>
-<header class="top"><a href="../../" class="brand"><img src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../../#cadrage" class="kitlink" data-fr="${esc(UI.fr.kit)}" data-en="${esc(UI.en.kit)}">${esc(UI.fr.kit)}</a></nav>
+<header class="top"><a href="../../../" class="brand" aria-label="Paruto Media · projects"><img src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../../#cadrage" class="kitlink" data-fr="${esc(UI.fr.kit)}" data-en="${esc(UI.en.kit)}">${esc(UI.fr.kit)}</a></nav>
 <div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
 <main class="sbmain">${page2('fr')}${page2('en')}</main>
 <script>

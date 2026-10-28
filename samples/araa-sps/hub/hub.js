@@ -197,7 +197,7 @@
       const c = (CUES[ep.id] || {})[l] || {}, a = M.audio[ep.id][l];
       return `<tr><td>${ep.n}. ${esc(ep.title[lang])}</td><td>${l.toUpperCase()}</td><td>${dur(a.duration || c.duration)}</td><td>« ${esc(ep.lines[0][l].split(' ').slice(0, 6).join(' ').replace(/[,.:;]$/, ''))}… »</td><td>« ${esc(c.out || '')} »</td><td><a href="audio/${ep.id}/${a.wav.name}" download>WAV</a> · <a href="audio/${ep.id}/${a.mp3.name}" download>MP3</a></td></tr>`;
     })).join('');
-    const embedCode = `<iframe src="https://media.paruto.com/videos/ecowas/?embed&lang=${lang}" width="100%" style="aspect-ratio:16/10.6;border:0" allow="autoplay; fullscreen" title="${t === T.fr ? 'Le voyage de Moussa' : 'Moussa’s Journey'}"></iframe>`;
+    const embedCode = `<iframe src="https://media.paruto.com/araa-sps/videos/ecowas/?embed&lang=${lang}" width="100%" style="aspect-ratio:16/10.6;border:0" allow="autoplay; fullscreen" title="${t === T.fr ? 'Le voyage de Moussa' : 'Moussa’s Journey'}"></iframe>`;
 
     $('#main').innerHTML = `
       <section class="hero">

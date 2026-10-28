@@ -119,7 +119,7 @@ fs.writeFileSync(path.join(out, 'index.html'), `<!doctype html>
 <link rel="stylesheet" href="../hub/hub.css"><link rel="stylesheet" href="../storyboards/storyboard.css">
 <style>.doc{max-width:980px}.doc h2{font-size:24px;margin:36px 0 10px}.doc li{color:#e2d4bf;margin-bottom:6px}.doc td a{color:var(--accent);font-weight:700}</style></head>
 <body>
-<header class="top"><a href="../" class="brand"><img src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../#langues" class="kitlink" data-fr="${T.fr.kit}" data-en="${T.en.kit}">${T.fr.kit}</a></nav>
+<header class="top"><a href="../../" class="brand" aria-label="Paruto Media · projects"><img src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../#langues" class="kitlink" data-fr="${T.fr.kit}" data-en="${T.en.kit}">${T.fr.kit}</a></nav>
 <div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
 <main class="sbmain doc">${section('fr')}${section('en')}</main>
 <script>

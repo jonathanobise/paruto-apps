@@ -2,11 +2,9 @@
 .assetsignore
 .wrangler
 wrangler.jsonc
-tools
 README.md
-*/README.md
-*/*/README.md
-videos/*/rec
-audio/*/rec
-videos/*/hyperframes.mjs
-videos/*/hyperframes-prompts.md
+**/tools
+**/README.md
+**/rec
+**/hyperframes.mjs
+**/hyperframes-prompts.md
