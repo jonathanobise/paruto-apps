@@ -1,0 +1,55 @@
+1
+00:00:01,200 --> 00:00:06,800
+Koffi’s butcher shop: food safety rules in the WAEMU area.
+
+2
+00:00:07,400 --> 00:00:10,800
+This is Koffi, a butcher at the city market.
+
+3
+00:00:10,800 --> 00:00:17,800
+His meat comes from herders, passes through the livestock market and the slaughterhouse, then reaches his customers.
+
+4
+00:00:18,300 --> 00:00:28,600
+In WAEMU, Regulation No. 007/2007/CM/UEMOA sets common rules for the safety of plants, animals and food.
+
+5
+00:00:28,600 --> 00:00:33,400
+Every actor in the chain is responsible for the safety of what they sell.
+
+6
+00:00:33,900 --> 00:00:39,800
+A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?
+
+7
+00:00:41,600 --> 00:00:46,600
+Answer 2: only buy inspected meat, with the slaughterhouse stamp.
+
+8
+00:00:47,100 --> 00:00:51,400
+Koffi buys inspected meat at the slaughterhouse, with its stamp.
+
+9
+00:00:51,400 --> 00:00:57,200
+In his notebook he records every purchase: the date, the supplier, where the animals came from.
+
+10
+00:00:57,200 --> 00:01:02,000
+That is traceability: knowing where a product comes from and where it goes.
+
+11
+00:01:02,600 --> 00:01:07,900
+One day, the veterinary services issue an alert about a batch of meat.
+
+12
+00:01:08,500 --> 00:01:14,300
+Thanks to the notebook, the batch is found and withdrawn. The rest of the market carries on.
+
+13
+00:01:14,300 --> 00:01:20,700
+In WAEMU, member states cooperate and share alerts to protect consumers.
+
+14
+00:01:51,300 --> 00:02:00,000
+A safe chain, from herd to plate.

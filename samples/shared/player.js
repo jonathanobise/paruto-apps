@@ -188,7 +188,8 @@
     scenes[seg.scene].update(seg.hold ?? (seg.offset || 0) + Math.min(t, seg.dur), idle, seg.variant);
     drawCaption(state.seg, Math.min(t, seg.dur), !seg.kind);
     if (seg.kind === 'choice') {
-      choice.classList.add('show'); choice.style.opacity = clamp((t - 0.2) / 0.5); choice.style.transform = `translateY(${(1 - clamp((t - 0.2) / 0.5)) * 20}px)`;
+      const cin = TL.choiceLinear.in; // a module can hold the card back so the scene is seen first
+      choice.classList.add('show'); choice.style.opacity = clamp((t - cin) / 0.5); choice.style.transform = `translateY(${(1 - clamp((t - cin) / 0.5)) * 20}px)`; choice.style.pointerEvents = t < cin ? 'none' : '';
       $('.hint', choice).style.opacity = 0;
     }
     if (seg.kind === 'quiz') { quiz.classList.add('show'); quiz.style.opacity = clamp(t / 0.4); }

@@ -209,7 +209,7 @@
           <tbody>${t.rows.map(([a, b, h]) => `<tr><td><a href="${h === '#cadrage' ? '#cadrage' : h === '#revue' ? '#revue' : h === '#langues' ? '#langues' : h}">${esc(a)}</a></td><td>${esc(b)}</td></tr>`).join('')}</tbody></table></div>
       </section>
 
-      <section id="approche"><h2>${esc(t.approachT)}</h2><p class="sl">${esc(t.approachL)}</p>${pipeline(t)}
+      <section id="approche"><h2>${esc(t.approachT)}</h2><p class="sl">${esc(t.approachL)}</p><div class="pipe-wrap">${pipeline(t)}</div>
         <ul class="points">${t.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></section>
 
       <section id="cadrage"><h2>${esc(t.inceptionT)}</h2><p class="sl">${esc(t.inceptionL)}</p>

@@ -122,6 +122,13 @@ footer { max-width: 1160px; margin: 40px auto 0; padding: 36px 24px 60px; border
 footer img { height: 34px; }
 
 @media (max-width: 900px) {
+  .pipe-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  .pipe { min-width: 760px; }
+  .deliv thead { display: none; }
+  .deliv tr, .deliv td { display: block; }
+  .deliv td { border-bottom: 0; padding: 4px 16px; }
+  .deliv td:first-child { padding-top: 14px; }
+  .deliv td:last-child { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
   .vgrid, .agrid, .sbs, .gates, .points { grid-template-columns: 1fr; }
   .phases { grid-template-columns: 1fr 1fr; }
   #nav { display: none; }
