@@ -1,0 +1,27 @@
+.sbmain { max-width: 1400px; }
+.sbmain section { border-top: 0; padding-top: 44px; }
+.sbmain h1 { font-size: clamp(30px, 4.4vw, 52px); }
+.sbmain h2 { font-size: 22px; margin: 34px 0 12px; }
+.meta { color: var(--muted); font-size: 14.5px; }
+.meta a { color: var(--accent); font-weight: 650; }
+.kitlink { color: var(--muted) !important; }
+.map { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 10px; margin-bottom: 26px; }
+.map svg { display: block; width: 100%; height: auto; }
+.map text { fill: var(--text); font: 600 14px var(--font); }
+.map text.lbl { font-size: 12px; fill: var(--muted); font-weight: 600; }
+.map text.no { fill: #e07a6c; }
+.sbmain table { font-size: 13.5px; }
+.sbmain td { min-width: 120px; }
+.sbmain td.n { min-width: 0; font-weight: 800; color: var(--accent); font-size: 16px; }
+.sbmain td.fr { min-width: 250px; width: 250px; }
+.sbmain td.fr img { display: block; width: 100%; border-radius: 8px; margin-bottom: 6px; }
+.sbmain td.desc { min-width: 280px; color: #d9c9b2; }
+tr.branch { background: rgba(214, 69, 52, .05); }
+.dim { color: var(--muted); }
+.tc { display: inline-block; min-width: 52px; font-family: 'SF Mono', Menlo, monospace; font-size: 12px; color: var(--teal); }
+.badge { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.badge.lin { background: rgba(95, 179, 165, .15); color: var(--teal); }
+.badge.int { background: rgba(233, 161, 75, .15); color: var(--accent); }
+.inter { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); color: #d9c9b2; }
+.ok { color: var(--green); }
+.no { color: #e07a6c; }

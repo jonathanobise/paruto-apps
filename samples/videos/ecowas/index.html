@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le voyage de Moussa · Paruto Media sample</title>
+  <meta name="description" content="Sample interactive awareness video on animal health (SPS) rules for the livestock trade in West Africa, by Paruto Media.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../../shared/player.css">
+</head>
+<body>
+  <header class="top">
+    <a href="../../" class="back">← SPS awareness kit</a>
+    <img class="brand" src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media">
+    <div class="langs" role="group" aria-label="Language">
+      <button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="pt">PT</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="kicker">Sample · Interactive video · SPS awareness</p>
+    <h1>Moussa’s Journey <span>· Le voyage de Moussa</span></h1>
+    <p class="lead">A pilot showing our approach for ARAA’s SPS awareness kit (AMI028-2026): one animated story, branching choices with consequences, a built-in quiz, and the same master versioned into French, English and Portuguese, with a light linear cut for WhatsApp.</p>
+
+    <div class="player">
+      <div class="frame" id="frame">
+        <div id="stage">
+          <svg id="svg" viewBox="0 0 1280 720" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" aria-label="Animated scene"></svg>
+
+          <div id="caption" class="caption"><span></span></div>
+
+          <div id="choice" class="choice">
+            <div class="card">
+              <div class="eyebrow"></div>
+              <h2 class="q"></h2>
+              <div class="opts">
+                <button class="opt" data-i="0"><span class="num">1</span><span class="txt"></span><span class="mark"></span></button>
+                <button class="opt" data-i="1"><span class="num">2</span><span class="txt"></span><span class="mark"></span></button>
+              </div>
+              <div class="hint"><span class="count"></span><span class="hint-text"></span></div>
+              <div class="feedback"></div>
+            </div>
+          </div>
+
+          <div id="quiz" class="quiz">
+            <div class="card">
+              <div class="eyebrow"><span class="eyebrow-label"></span> · <span class="qn"></span></div>
+              <h2 class="q"></h2>
+              <div class="opts">
+                <button class="opt"><span class="num">A</span><span class="txt"></span><span class="mark"></span></button>
+                <button class="opt"><span class="num">B</span><span class="txt"></span><span class="mark"></span></button>
+                <button class="opt"><span class="num">C</span><span class="txt"></span><span class="mark"></span></button>
+              </div>
+              <p class="why"></p>
+              <div class="actions"><button class="next pill" data-ui="next"></button></div>
+            </div>
+            <div class="card score">
+              <div class="eyebrow" data-ui="score"></div>
+              <div class="score-num"></div>
+              <button class="score-go pill" data-ui="continue"></button>
+            </div>
+          </div>
+
+          <div id="backbar" class="bar-overlay"><button id="back" class="pill" data-ui="back"></button></div>
+          <div id="endbar" class="bar-overlay"><button id="replay" class="pill" data-ui="replay"></button></div>
+
+        </div>
+        <div id="start" class="start">
+          <div class="start-card">
+            <div class="eyebrow" data-ui="demo"></div>
+            <h2 data-ui="title"></h2>
+            <p data-ui="subtitle"></p>
+            <button id="go" class="pill big"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg><span data-ui="start"></span></button>
+          </div>
+        </div>
+      </div>
+      <div id="dock" class="dock"></div>
+
+      <div class="controls">
+        <button id="play" class="ctl" data-state="paused"><svg class="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg><svg class="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg><span class="lbl"></span></button>
+        <button id="restart" class="ctl" aria-label="Restart"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg></button>
+        <div id="chapters" class="chapters"></div>
+        <button id="vo" class="ctl cc" aria-label="Voice-over"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" fill="currentColor"/></svg></button>
+        <button id="cc" class="ctl cc" aria-label="Captions">CC</button>
+        <select id="lang" class="ctl" aria-label="Language"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option></select>
+      </div>
+    </div>
+
+    <section class="notes">
+      <div>
+        <h3>What this sample shows</h3>
+        <ul>
+          <li>2D motion design built language-neutral: only the voice and captions change between versions</li>
+          <li>Two branching choices with on-screen consequences, then a three-question quiz with score</li>
+          <li>Runs in any browser and on phones, with no app to install</li>
+        </ul>
+      </div>
+      <div>
+        <h3>WhatsApp light versions</h3>
+        <p class="dl"><a href="moussa-fr.mp4" download>Français (MP4)</a><a href="moussa-en.mp4" download>English (MP4)</a><a href="moussa-pt.mp4" download>Português (MP4)</a></p>
+        <p class="small">Linear cuts with numbered pauses at the choice and the quiz answers revealed. Subtitles: <a href="moussa-fr.srt">FR</a> · <a href="moussa-en.srt">EN</a> · <a href="moussa-pt.srt">PT</a>.</p>
+      </div>
+      <div>
+        <h3>Next in production</h3>
+        <p class="small">Native-speaker voice-over recorded at Paruto Music, local-language versions (Hausa, Bambara, Wolof, Yoruba, Fulani) with validated SPS glossaries, and the H5P package for ARAA’s platforms. Content in this sample is for demonstration and is to be validated by technical experts.</p>
+        <p class="small">The narration here is a synthetic scratch voice made with Piper text-to-speech: French “siwis” (CC BY 4.0), English “cori” (public domain), Portuguese “tugão” (CC0).</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="timeline.js"></script>
+  <script src="../../shared/art.js"></script>
+  <script src="scenes.js"></script>
+  <script src="../../shared/player.js"></script>
+</body>
+</html>

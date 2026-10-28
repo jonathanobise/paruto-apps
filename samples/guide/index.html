@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide de déploiement · Kit SPS · Paruto Media</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../hub/hub.css">
+  <link rel="stylesheet" href="../storyboards/storyboard.css">
+  <style>
+    .doc { max-width: 860px; }
+    .doc h2 { font-size: 26px; margin: 40px 0 10px; }
+    .doc h3 { font-size: 17px; margin: 22px 0 6px; }
+    .doc p, .doc li { color: #e2d4bf; font-size: 16px; }
+    .doc p.kicker { color: var(--accent); font-size: 12.5px; }
+    .doc ul, .doc ol { padding-left: 22px; }
+    .doc li { margin-bottom: 6px; }
+    .doc code { font-family: 'SF Mono', Menlo, monospace; font-size: 13.5px; color: var(--accent); }
+    .doc .code pre { padding-right: 16px; }
+    .doc .table-wrap { margin: 10px 0 6px; }
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+    .toc a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+    .msg { padding: 14px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); white-space: pre-line; font-size: 14.5px; color: #e2d4bf; }
+  </style>
+</head>
+<body>
+<header class="top"><a href="../" class="brand"><img src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../#sources" class="kitlink" data-fr="← Kit de sensibilisation SPS" data-en="← SPS awareness kit">← Kit de sensibilisation SPS</a></nav>
+<div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
+<main class="sbmain doc">
+
+<section data-lang="fr">
+  <p class="kicker">Livrable 3 · Guide technique</p>
+  <h1>Guide de déploiement</h1>
+  <p class="lead">Comment diffuser le kit sur le web, sur WhatsApp et sur les radios communautaires, et comment le mettre à jour.</p>
+  <div class="toc"><a href="#fr-1">1. Contenu</a><a href="#fr-2">2. Web</a><a href="#fr-3">3. WhatsApp</a><a href="#fr-4">4. Radio</a><a href="#fr-5">5. Mettre à jour</a><a href="#fr-6">6. Suivi</a></div>
+
+  <h2 id="fr-1">1. Ce que contient le kit</h2>
+  <div class="table-wrap"><table><thead><tr><th>Élément</th><th>Format</th><th>Usage</th></tr></thead><tbody>
+    <tr><td>Vidéo interactive (une par cadre)</td><td>Page web HTML5 (dossier <code>videos/&lt;module&gt;/</code>)</td><td>Sites web, plateformes de formation, ordinateurs et téléphones, hors ligne</td></tr>
+    <tr><td>Version légère 16:9</td><td>MP4 H.264 + AAC, 1280×720, environ 4 Mo, sous-titres incrustés</td><td>Groupes et discussions WhatsApp, réseaux sociaux, projection</td></tr>
+    <tr><td>Version légère 9:16</td><td>MP4 H.264 + AAC, 720×1280</td><td>Statut WhatsApp, visionnage sur téléphone</td></tr>
+    <tr><td>Sous-titres</td><td>SRT (UTF-8)</td><td>Lecteurs vidéo, plateformes, sous-titrage d’autres montages</td></tr>
+    <tr><td>Capsule audio, version radio</td><td>WAV mono 44,1 kHz 16 bits, −23 LUFS (EBU R128)</td><td>Diffusion sur les radios communautaires</td></tr>
+    <tr><td>Capsule audio, version podcast</td><td>MP3 128 kb/s stéréo, −16 LUFS</td><td>Podcast, WhatsApp, sites web</td></tr>
+    <tr><td>Sources éditables</td><td>Archive ZIP (textes, animations, voix, outils)</td><td>Corrections, nouvelles langues, nouveaux rendus</td></tr>
+  </tbody></table></div>
+
+  <h2 id="fr-2">2. Sur le web</h2>
+  <ul>
+    <li><b>Hébergement.</b> Les vidéos interactives sont des pages statiques : copiez le dossier sur n’importe quel hébergement web, sans base de données ni serveur applicatif.</li>
+    <li><b>Intégration.</b> Insérez une vidéo dans une page avec une iframe ; le paramètre <code>lang</code> choisit la langue (<code>fr</code>, <code>en</code>, <code>pt</code>, puis les langues locales).</li>
+  </ul>
+  <div class="code"><pre><code>&lt;iframe src="https://media.paruto.com/videos/ecowas/?embed&amp;lang=fr" width="100%"
+  style="aspect-ratio:16/10.6;border:0" allow="autoplay; fullscreen"
+  title="Le voyage de Moussa"&gt;&lt;/iframe&gt;</code></pre></div>
+  <ul>
+    <li><b>Plateformes de formation.</b> Ajoutez la vidéo comme ressource « URL » ou dans un bloc iframe (Moodle, Chamilo, sites institutionnels).</li>
+    <li><b>Hors ligne.</b> Copiez le dossier sur une clé USB ou un ordinateur de formation et ouvrez <code>index.html</code> dans un navigateur : tout fonctionne sans connexion.</li>
+    <li><b>Accessibilité.</b> Sous-titres activables, narration complète pour les personnes qui ne lisent pas, commandes au clavier (barre d’espace : lecture/pause).</li>
+  </ul>
+
+  <h2 id="fr-3">3. Sur WhatsApp</h2>
+  <ul>
+    <li><b>Quel fichier.</b> Le format 16:9 pour les groupes et les discussions ; le format 9:16 pour le Statut. Les fichiers pèsent environ 4 Mo et se partagent même avec une connexion lente.</li>
+    <li><b>Relais.</b> Diffuser par les réseaux qui touchent déjà les acteurs : services vétérinaires, associations d’éleveurs et de commerçants, coopératives, interprofessions bétail-viande, canaux de communication de l’ARAA et du PACBAO-2.</li>
+    <li><b>Message d’accompagnement.</b> Envoyer la vidéo avec un court message, puis le quiz en message séparé pour lancer la discussion dans le groupe :</li>
+  </ul>
+  <div class="msg">🐄 Le voyage de Moussa : les règles sanitaires du commerce du bétail.
+Regardez la vidéo (2 min), puis répondez au quiz ci-dessous.
+Version interactive : https://media.paruto.com/videos/ecowas/?lang=fr</div>
+  <div class="msg" style="margin-top:8px">Quiz : qui délivre le certificat zoosanitaire ?
+A. Le commerçant   B. Un vétérinaire officiel   C. Le chef du marché
+Répondez A, B ou C 👇</div>
+
+  <h2 id="fr-4">4. Sur les radios communautaires</h2>
+  <ul>
+    <li><b>Fichiers.</b> Utiliser le WAV (−23 LUFS, prêt à diffuser, niveau homogène d’un épisode à l’autre). La fiche de diffusion donne la durée et les repères de début et de fin de chaque capsule.</li>
+    <li><b>Programmation proposée.</b> Chaque épisode trois fois par semaine pendant quatre semaines, de préférence la veille et le matin des jours de marché à bétail, dans la langue de la zone.</li>
+    <li><b>Animation.</b> Après la capsule, l’animateur peut reprendre les trois messages clés et ouvrir l’antenne aux questions des auditeurs, avec un agent des services vétérinaires si possible.</li>
+    <li><b>Preuve de diffusion.</b> Chaque radio renvoie la fiche de diffusion signée (dates et heures de passage).</li>
+  </ul>
+
+  <h2 id="fr-5">5. Mettre à jour ou ajouter une langue</h2>
+  <ol>
+    <li><b>Textes.</b> Tous les mots d’une vidéo sont dans <code>videos/&lt;module&gt;/script.js</code> (une clé par langue) ; ceux des capsules dans <code>audio/capsules.js</code>.</li>
+    <li><b>Voix.</b> Une réplique = un fichier : <code>videos/&lt;module&gt;/vo/&lt;langue&gt;/&lt;réplique&gt;.mp3</code>. Les enregistrements studio remplacent les voix provisoires sous le même nom (voir le kit d’enregistrement).</li>
+    <li><b>Rendus.</b> <code>node tools/render.mjs &lt;module&gt;</code> refait les MP4 16:9 et les SRT ; ajouter <code>--vertical</code> pour le 9:16. <code>python tools/capsules.py</code> refait les capsules ; <code>node tools/storyboard.mjs &lt;module&gt;</code> les storyboards ; <code>node tools/kit.mjs</code> la page du kit et l’archive des sources.</li>
+    <li><b>Prérequis.</b> Node.js 20 ou plus, Chromium (Playwright), ffmpeg, et Python avec Piper pour les voix provisoires.</li>
+  </ol>
+
+  <h2 id="fr-6">6. Suivi</h2>
+  <ul>
+    <li>Web : statistiques de l’hébergeur (pages vues, langues).</li>
+    <li>Radio : fiches de diffusion signées.</li>
+    <li>WhatsApp : nombre de groupes et de relais touchés, réponses au quiz dans les groupes.</li>
+    <li>Sur demande de l’ARAA, les réponses aux quiz interactifs peuvent être collectées (formulaire ou standard xAPI/SCORM).</li>
+  </ul>
+</section>
+
+<section data-lang="en" hidden>
+  <p class="kicker">Deliverable 3 · Technical guide</p>
+  <h1>Deployment guide</h1>
+  <p class="lead">How to distribute the kit on the web, on WhatsApp and on community radio, and how to update it.</p>
+  <div class="toc"><a href="#en-1">1. Contents</a><a href="#en-2">2. Web</a><a href="#en-3">3. WhatsApp</a><a href="#en-4">4. Radio</a><a href="#en-5">5. Updating</a><a href="#en-6">6. Monitoring</a></div>
+
+  <h2 id="en-1">1. What the kit contains</h2>
+  <div class="table-wrap"><table><thead><tr><th>Item</th><th>Format</th><th>Use</th></tr></thead><tbody>
+    <tr><td>Interactive video (one per framework)</td><td>HTML5 web page (folder <code>videos/&lt;module&gt;/</code>)</td><td>Websites, training platforms, computers and phones, offline</td></tr>
+    <tr><td>Light version 16:9</td><td>MP4 H.264 + AAC, 1280×720, about 4 MB, burned-in captions</td><td>WhatsApp groups and chats, social media, screenings</td></tr>
+    <tr><td>Light version 9:16</td><td>MP4 H.264 + AAC, 720×1280</td><td>WhatsApp Status, phone viewing</td></tr>
+    <tr><td>Subtitles</td><td>SRT (UTF-8)</td><td>Video players, platforms, captioning other edits</td></tr>
+    <tr><td>Audio capsule, radio version</td><td>WAV mono 44.1 kHz 16-bit, −23 LUFS (EBU R128)</td><td>Community radio broadcast</td></tr>
+    <tr><td>Audio capsule, podcast version</td><td>MP3 128 kb/s stereo, −16 LUFS</td><td>Podcast, WhatsApp, websites</td></tr>
+    <tr><td>Editable sources</td><td>ZIP archive (text, animation, voices, tools)</td><td>Corrections, new languages, new renders</td></tr>
+  </tbody></table></div>
+
+  <h2 id="en-2">2. On the web</h2>
+  <ul>
+    <li><b>Hosting.</b> The interactive videos are static pages: copy the folder to any web host, with no database or application server.</li>
+    <li><b>Embedding.</b> Put a video in a page with an iframe; the <code>lang</code> parameter picks the language (<code>fr</code>, <code>en</code>, <code>pt</code>, then the local languages).</li>
+  </ul>
+  <div class="code"><pre><code>&lt;iframe src="https://media.paruto.com/videos/ecowas/?embed&amp;lang=en" width="100%"
+  style="aspect-ratio:16/10.6;border:0" allow="autoplay; fullscreen"
+  title="Moussa’s Journey"&gt;&lt;/iframe&gt;</code></pre></div>
+  <ul>
+    <li><b>Training platforms.</b> Add the video as a “URL” resource or in an iframe block (Moodle, Chamilo, institutional sites).</li>
+    <li><b>Offline.</b> Copy the folder to a USB stick or a training laptop and open <code>index.html</code> in a browser: everything works without a connection.</li>
+    <li><b>Accessibility.</b> Captions on demand, full narration for people who don’t read, keyboard control (space bar: play/pause).</li>
+  </ul>
+
+  <h2 id="en-3">3. On WhatsApp</h2>
+  <ul>
+    <li><b>Which file.</b> 16:9 for groups and chats; 9:16 for Status. Files are about 4 MB and share even on a slow connection.</li>
+    <li><b>Relays.</b> Distribute through networks that already reach the actors: veterinary services, herder and trader associations, cooperatives, livestock-meat inter-professions, ARAA’s and PACBAO-2’s communication channels.</li>
+    <li><b>Accompanying message.</b> Send the video with a short message, then the quiz as a separate message to start the discussion in the group:</li>
+  </ul>
+  <div class="msg">🐄 Moussa’s Journey: the animal health rules of the livestock trade.
+Watch the video (2 min), then answer the quiz below.
+Interactive version: https://media.paruto.com/videos/ecowas/?lang=en</div>
+  <div class="msg" style="margin-top:8px">Quiz: who issues the animal health certificate?
+A. The trader   B. An official veterinarian   C. The market chief
+Reply A, B or C 👇</div>
+
+  <h2 id="en-4">4. On community radio</h2>
+  <ul>
+    <li><b>Files.</b> Use the WAV (−23 LUFS, broadcast-ready, consistent level across episodes). The cue sheet gives each capsule’s length and in/out cues.</li>
+    <li><b>Suggested schedule.</b> Each episode three times a week for four weeks, ideally the evening before and the morning of livestock market days, in the language of the area.</li>
+    <li><b>Presenting.</b> After the capsule, the presenter can repeat the three key messages and open the phone lines, with a veterinary officer if possible.</li>
+    <li><b>Proof of broadcast.</b> Each station returns the signed cue sheet (dates and times aired).</li>
+  </ul>
+
+  <h2 id="en-5">5. Updating or adding a language</h2>
+  <ol>
+    <li><b>Text.</b> Every word of a video is in <code>videos/&lt;module&gt;/script.js</code> (one key per language); the capsules’ words are in <code>audio/capsules.js</code>.</li>
+    <li><b>Voices.</b> One line = one file: <code>videos/&lt;module&gt;/vo/&lt;language&gt;/&lt;line&gt;.mp3</code>. Studio recordings replace the temporary voices under the same names (see the recording kit).</li>
+    <li><b>Renders.</b> <code>node tools/render.mjs &lt;module&gt;</code> rebuilds the 16:9 MP4s and SRTs; add <code>--vertical</code> for 9:16. <code>python tools/capsules.py</code> rebuilds the capsules; <code>node tools/storyboard.mjs &lt;module&gt;</code> the storyboards; <code>node tools/kit.mjs</code> the kit page and the sources archive.</li>
+    <li><b>Requirements.</b> Node.js 20 or later, Chromium (Playwright), ffmpeg, and Python with Piper for the temporary voices.</li>
+  </ol>
+
+  <h2 id="en-6">6. Monitoring</h2>
+  <ul>
+    <li>Web: the host’s statistics (page views, languages).</li>
+    <li>Radio: signed cue sheets.</li>
+    <li>WhatsApp: number of groups and relays reached, quiz replies in the groups.</li>
+    <li>If ARAA wishes, answers to the interactive quizzes can be collected (a form, or the xAPI/SCORM standard).</li>
+  </ul>
+</section>
+</main>
+<script>
+(function(){var p=new URLSearchParams(location.search).get('lang');var s=null;try{s=localStorage.getItem('kit-lang')}catch(e){}
+function set(l){document.documentElement.lang=l;document.querySelectorAll('main section').forEach(function(x){x.hidden=x.dataset.lang!==l});document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.dataset.lang===l)});var k=document.querySelector('.kitlink');k.textContent=k.dataset[l];document.title=l==='fr'?'Guide de déploiement · Kit SPS · Paruto Media':'Deployment guide · SPS kit · Paruto Media';try{localStorage.setItem('kit-lang',l)}catch(e){}}
+document.querySelectorAll('.lang-btn').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.lang)})});set(p||s||((navigator.language||'').indexOf('fr')===0?'fr':'en'));})();
+</script>
+</body>
+</html>

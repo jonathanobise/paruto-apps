@@ -1,6 +1,12 @@
-# Not published: tooling and notes.
+# Not published: tooling, notes, raw studio recordings and internal prompts.
 .assetsignore
 .wrangler
 wrangler.jsonc
-*/tools
+tools
+README.md
 */README.md
+*/*/README.md
+videos/*/rec
+audio/*/rec
+videos/*/hyperframes.mjs
+videos/*/hyperframes-prompts.md
