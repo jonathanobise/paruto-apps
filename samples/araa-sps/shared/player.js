@@ -11,6 +11,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const ui = () => SCRIPT.ui[lang];
   const L = (o) => (o ? o[lang] ?? o.fr : '');
+  const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   let ccOn = store.get('sps-cc') !== '0', state = null, idle = 0;
 
   // ---------- build the stage ----------
@@ -37,7 +38,8 @@
         el.innerHTML = lines.map((l, i) => `<tspan x="${x}" dy="${i ? lh : y0}">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</tspan>`).join('');
       } else el.textContent = v;
     });
-    $$('[data-ui]').forEach((el) => (el.textContent = getKey(el.dataset.ui) ?? ''));
+    // data-serif: the last word in italic serif, as in the Paruto apps' headlines
+    $$('[data-ui]').forEach((el) => { const v = getKey(el.dataset.ui) ?? ''; if (el.hasAttribute('data-serif')) { const m = v.match(/^(.*\s)(\S+?)([.!?…]*)$/); el.innerHTML = m ? `${esc(m[1])}<em>${esc(m[2])}</em>${esc(m[3])}` : esc(v); } else el.textContent = v; });
     $$('.lang-btn').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
     const sel = $('#lang'); if (sel) sel.value = lang;
     renderChapters();
@@ -250,7 +252,7 @@
   $('#vo').classList.toggle('on', voOn);
   const setLang = (l) => { voStop(); lang = l; store.set('sps-lang', l); choice.dataset.k = quiz.dataset.k = caption.dataset.k = ''; if (state) { const s = TL.segments[state.seg]; if (s.kind === 'choice') fillChoice(state.seg); if (s.kind === 'quiz' && !quiz.classList.contains('scored')) { fillQuiz(state.qi); } } applyLang(); updatePlay(); };
   $$('.lang-btn').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
-  $('#lang').addEventListener('change', (e) => setLang(e.target.value));
+  if ($('#lang')) $('#lang').addEventListener('change', (e) => setLang(e.target.value));
   document.addEventListener('keydown', (e) => { if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); $('#play').click(); } });
 
   // fit the 1280×720 stage to the frame

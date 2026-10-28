@@ -2,27 +2,41 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Kit de sensibilisation SPS · Paruto Media</title>
   <meta name="description" content="Samples of every deliverable for ARAA's SPS awareness call AMI028-2026: interactive videos, WhatsApp versions, radio capsules, storyboards, sources and deployment guide, by Paruto Media.">
+  <meta name="theme-color" content="#060608">
   <meta name="robots" content="noindex">
+  <link rel="icon" href="shared/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="shared/kit.css">
   <link rel="stylesheet" href="hub/hub.css">
+  <script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}</script>
 </head>
 <body>
-  <header class="top">
-    <a href="../" class="brand" aria-label="Paruto Media · projects"><img src="shared/paruto-media-logo-white.svg" alt="Paruto Media"></a>
-    <nav id="nav" aria-label="Sections"></nav>
-    <div class="langs" role="group" aria-label="Langue / Language"><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="nav glass">
+    <a class="brand" href="../" aria-label="Paruto Media · projects"><img class="only-dark" src="shared/paruto-media-logo-white.svg" alt="Paruto Media"><img class="only-light" src="shared/paruto-media-logo-black.svg" alt="" aria-hidden="true"></a>
+    <nav class="nav-links" id="nav" aria-label="Sections"></nav>
+    <div class="nav-end">
+      <div class="seg" role="group" aria-label="Langue / Language"><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><span class="seg-thumb" aria-hidden="true"></span></div>
+      <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
   </header>
-  <main id="main"></main>
-  <footer>
-    <img src="shared/paruto-media-logo-white.svg" alt="Paruto Media">
-    <p id="foot"></p>
-    <p><a href="https://parutomedia.com">parutomedia.com</a></p>
+  <main id="main" class="page"></main>
+  <footer class="kit-foot">
+    <div class="wordmark" aria-hidden="true">SPS</div>
+    <div class="bottom"><span id="foot"></span><a href="../" id="allProjects"></a></div>
   </footer>
   <script src="audio/capsules.js"></script>
   <script src="audio/cues.js"></script>
   <script src="hub/media.js"></script>
   <script src="hub/hub.js"></script>
+  <script src="shared/kit.js"></script>
 </body>
 </html>

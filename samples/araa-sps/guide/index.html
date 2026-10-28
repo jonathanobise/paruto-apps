@@ -5,28 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guide de déploiement · Kit SPS · Paruto Media</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="../hub/hub.css">
-  <link rel="stylesheet" href="../storyboards/storyboard.css">
-  <style>
-    .doc { max-width: 860px; }
-    .doc h2 { font-size: 26px; margin: 40px 0 10px; }
-    .doc h3 { font-size: 17px; margin: 22px 0 6px; }
-    .doc p, .doc li { color: #e2d4bf; font-size: 16px; }
-    .doc p.kicker { color: var(--accent); font-size: 12.5px; }
-    .doc ul, .doc ol { padding-left: 22px; }
-    .doc li { margin-bottom: 6px; }
-    .doc code { font-family: 'SF Mono', Menlo, monospace; font-size: 13.5px; color: var(--accent); }
-    .doc .code pre { padding-right: 16px; }
-    .doc .table-wrap { margin: 10px 0 6px; }
-    .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
-    .toc a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: 13.5px; font-weight: 600; color: var(--muted); }
-    .msg { padding: 14px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); white-space: pre-line; font-size: 14.5px; color: #e2d4bf; }
-  </style>
+  <meta name="theme-color" content="#060608"><link rel="icon" href="../shared/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'"><link rel="stylesheet" href="../shared/kit.css"><link rel="stylesheet" href="../storyboards/storyboard.css"><script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}</script>
 </head>
 <body>
-<header class="top"><a href="../../" class="brand" aria-label="Paruto Media · projects"><img src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../#sources" class="kitlink" data-fr="← Kit de sensibilisation SPS" data-en="← SPS awareness kit">← Kit de sensibilisation SPS</a></nav>
-<div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
-<main class="sbmain doc">
+<div class="grain" aria-hidden="true"></div>
+<header class="nav glass"><a class="brand" href="../../" aria-label="Paruto Media · projects"><img class="only-dark" src="../shared/paruto-media-logo-white.svg" alt="Paruto Media"><img class="only-light" src="../shared/paruto-media-logo-black.svg" alt="" aria-hidden="true"></a><nav class="nav-links"><a href="../#sources" class="kitlink crumb" data-fr="← Kit de sensibilisation SPS" data-en="← SPS awareness kit">← Kit de sensibilisation SPS</a></nav><div class="nav-end"><div class="seg" role="group" aria-label="Langue / Language"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><span class="seg-thumb" aria-hidden="true"></span></div><button class="theme-toggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button></div></header>
+<main class="sbmain doc page">
 
 <section data-lang="fr">
   <p class="kicker">Livrable 3 · Guide technique</p>
@@ -171,5 +158,6 @@ Reply A, B or C 👇</div>
 function set(l){document.documentElement.lang=l;document.querySelectorAll('main section').forEach(function(x){x.hidden=x.dataset.lang!==l});document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.dataset.lang===l)});var k=document.querySelector('.kitlink');k.textContent=k.dataset[l];document.title=l==='fr'?'Guide de déploiement · Kit SPS · Paruto Media':'Deployment guide · SPS kit · Paruto Media';try{localStorage.setItem('kit-lang',l)}catch(e){}}
 document.querySelectorAll('.lang-btn').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.lang)})});set(p||s||((navigator.language||'').indexOf('fr')===0?'fr':'en'));})();
 </script>
+<script src="../shared/kit.js"></script>
 </body>
 </html>

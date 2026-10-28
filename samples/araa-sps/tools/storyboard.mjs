@@ -94,7 +94,7 @@ async function build(mod, browser) {
   const W = 150, gap = 22, x0 = 20, y0 = 40;
   const pos = {}; order.forEach((id, i) => (pos[id] = { x: x0 + i * (W + gap), y: y0 }));
   const map = (lang) => {
-    const u = UI[lang], node = (id, x, y, kind) => `<g><rect x="${x}" y="${y}" width="${W}" height="46" rx="${kind === 'choice' ? 23 : 10}" fill="${kind === 'choice' ? 'var(--accent-soft)' : kind === 'branch' ? 'rgba(214,69,52,.12)' : 'var(--panel2)'}" stroke="${kind === 'choice' ? 'var(--accent)' : kind === 'branch' ? '#d64534' : 'var(--line)'}" stroke-width="1.4"/><text x="${x + W / 2}" y="${y + 28}" text-anchor="middle">${esc(id)}</text></g>`;
+    const u = UI[lang], node = (id, x, y, kind) => `<g><rect x="${x}" y="${y}" width="${W}" height="46" rx="${kind === 'choice' ? 23 : 10}" fill="${kind === 'choice' ? 'color-mix(in srgb, var(--a) 14%, transparent)' : kind === 'branch' ? 'rgba(214,69,52,.12)' : 'var(--panel-2)'}" stroke="${kind === 'choice' ? 'var(--a)' : kind === 'branch' ? '#d64534' : 'var(--line-2)'}" stroke-width="1.4"/><text x="${x + W / 2}" y="${y + 28}" text-anchor="middle">${esc(id)}</text></g>`;
     const arr = (d, c = 'var(--muted)') => `<path d="${d}" fill="none" stroke="${c}" stroke-width="1.5" marker-end="url(#m)"/>`;
     let svg = '';
     order.forEach((id, i) => {
@@ -125,16 +125,19 @@ async function build(mod, browser) {
   const html = `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Storyboard · ${esc(S.ui.fr.title)} · Paruto Media</title><meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../hub/hub.css"><link rel="stylesheet" href="../storyboard.css"></head>
+<meta name="theme-color" content="#060608"><link rel="icon" href="../../shared/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'"><link rel="stylesheet" href="../../shared/kit.css"><link rel="stylesheet" href="../storyboard.css"><script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}</script></head>
 <body>
-<header class="top"><a href="../../../" class="brand" aria-label="Paruto Media · projects"><img src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media"></a><nav id="nav"><a href="../../#cadrage" class="kitlink" data-fr="${esc(UI.fr.kit)}" data-en="${esc(UI.en.kit)}">${esc(UI.fr.kit)}</a></nav>
-<div class="langs"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button></div></header>
-<main class="sbmain">${page2('fr')}${page2('en')}</main>
+<div class="grain" aria-hidden="true"></div>
+<header class="nav glass"><a class="brand" href="../../../" aria-label="Paruto Media · projects"><img class="only-dark" src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media"><img class="only-light" src="../../shared/paruto-media-logo-black.svg" alt="" aria-hidden="true"></a><nav class="nav-links"><a href="../../#cadrage" class="kitlink crumb" data-fr="${esc(UI.fr.kit)}" data-en="${esc(UI.en.kit)}">${esc(UI.fr.kit)}</a></nav><div class="nav-end"><div class="seg" role="group" aria-label="Langue / Language"><button class="lang-btn on" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><span class="seg-thumb" aria-hidden="true"></span></div><button class="theme-toggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button></div></header>
+<main class="sbmain page">${page2('fr')}${page2('en')}</main>
 <script>
 (function(){var p=new URLSearchParams(location.search).get('lang');var s=null;try{s=localStorage.getItem('kit-lang')}catch(e){}
 function set(l){document.documentElement.lang=l;document.querySelectorAll('main section').forEach(function(x){x.hidden=x.dataset.lang!==l});document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.dataset.lang===l)});var k=document.querySelector('.kitlink');k.textContent=k.dataset[l];try{localStorage.setItem('kit-lang',l)}catch(e){}}
 document.querySelectorAll('.lang-btn').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.lang)})});set(p||s||((navigator.language||'').indexOf('fr')===0?'fr':'en'));})();
-</script></body></html>`;
+</script><script src="../../shared/kit.js"></script></body></html>`;
   fs.writeFileSync(path.join(out, 'index.html'), html);
   console.log(`storyboards/${mod}: ${all.length} segments, ${all.length * 2} frames`);
   return frames.meet ? `storyboards/${mod}/img/${frames.meet[1]}` : null;

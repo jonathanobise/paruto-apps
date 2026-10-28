@@ -2,25 +2,42 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Le voyage de Moussa · Paruto Media sample</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Le voyage de Moussa · Paruto Media</title>
   <meta name="description" content="Sample interactive awareness video on animal health (SPS) rules for the livestock trade in West Africa, by Paruto Media.">
+  <meta name="theme-color" content="#060608">
   <meta name="robots" content="noindex">
+  <link rel="icon" href="../../shared/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="../../shared/kit.css">
   <link rel="stylesheet" href="../../shared/player.css">
+  <script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch {}</script>
 </head>
 <body>
-  <header class="top">
-    <a href="../../" class="back">← SPS awareness kit</a>
-    <img class="brand" src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media">
-    <div class="langs" role="group" aria-label="Language">
-      <button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="pt">PT</button>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="nav glass">
+    <a class="brand" href="../../../" aria-label="Paruto Media · projects"><img class="only-dark" src="../../shared/paruto-media-logo-white.svg" alt="Paruto Media"><img class="only-light" src="../../shared/paruto-media-logo-black.svg" alt="" aria-hidden="true"></a>
+    <nav class="nav-links" aria-label="Modules">
+      <a href="../../#videos" class="crumb"><span class="l-fr">← Kit SPS</span><span class="l-en">← SPS kit</span></a>
+      <a href="../international/"><span class="l-fr">Le marché d’Aïcha</span><span class="l-en">Aïcha’s Market</span></a><a href="../ecowas/" class="here" aria-current="page"><span class="l-fr">Le voyage de Moussa</span><span class="l-en">Moussa’s Journey</span></a><a href="../waemu/"><span class="l-fr">La boucherie de Koffi</span><span class="l-en">Koffi’s Butcher Shop</span></a>
+    </nav>
+    <div class="nav-end">
+      <div class="seg" role="group" aria-label="Language"><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="pt">PT</button><span class="seg-thumb" aria-hidden="true"></span></div>
+      <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
     </div>
   </header>
 
-  <main>
-    <p class="kicker">Sample · Interactive video · SPS awareness</p>
-    <h1>Moussa’s Journey <span>· Le voyage de Moussa</span></h1>
-    <p class="lead">A pilot showing our approach for ARAA’s SPS awareness kit (AMI028-2026): one animated story, branching choices with consequences, a built-in quiz, and the same master versioned into French, English and Portuguese, with a light linear cut for WhatsApp.</p>
+  <main class="page">
+    <section class="page-head mod-head">
+      <p class="eyebrow-pill"><span class="pulse" aria-hidden="true"></span><span class="l-fr">Module 02 · Normes CEDEAO · C/REG.21/11/10</span><span class="l-en">Module 02 · ECOWAS standards · C/REG.21/11/10</span></p>
+      <h1 data-ui="title" data-serif></h1>
+      <p class="lead" data-ui="subtitle"></p>
+    </section>
 
     <div class="player">
       <div class="frame" id="frame">
@@ -63,7 +80,6 @@
 
           <div id="backbar" class="bar-overlay"><button id="back" class="pill" data-ui="back"></button></div>
           <div id="endbar" class="bar-overlay"><button id="replay" class="pill" data-ui="replay"></button></div>
-
         </div>
         <div id="start" class="start">
           <div class="start-card">
@@ -77,33 +93,41 @@
       <div id="dock" class="dock"></div>
 
       <div class="controls">
-        <button id="play" class="ctl" data-state="paused"><svg class="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg><svg class="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg><span class="lbl"></span></button>
-        <button id="restart" class="ctl" aria-label="Restart"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg></button>
+        <button id="play" class="ctl" data-state="paused"><svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><svg class="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span class="lbl"></span></button>
+        <button id="restart" class="ctl icon" aria-label="Restart"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg></button>
         <div id="chapters" class="chapters"></div>
-        <button id="vo" class="ctl cc" aria-label="Voice-over"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" fill="currentColor"/></svg></button>
-        <button id="cc" class="ctl cc" aria-label="Captions">CC</button>
-        <select id="lang" class="ctl" aria-label="Language"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option></select>
+        <button id="vo" class="ctl icon cc" aria-label="Voice-over"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" fill="currentColor"/></svg></button>
+        <button id="cc" class="ctl icon cc" aria-label="Captions">CC</button>
       </div>
     </div>
 
     <section class="notes">
-      <div>
-        <h3>What this sample shows</h3>
-        <ul>
+      <div class="panel">
+        <p class="label"><span class="l-fr">Ce que montre l’échantillon</span><span class="l-en">What this sample shows</span></p>
+        <ul class="l-fr">
+          <li>Animation 2D sans texte à l’écran : seules la voix et les sous-titres changent d’une langue à l’autre</li>
+          <li>Deux choix à embranchements avec leurs conséquences, puis un quiz de trois questions avec score</li>
+          <li>Fonctionne dans tout navigateur et sur téléphone, sans application</li>
+        </ul>
+        <ul class="l-en">
           <li>2D motion design built language-neutral: only the voice and captions change between versions</li>
-          <li>Two branching choices with on-screen consequences, then a three-question quiz with score</li>
+          <li>Two branching choices with on-screen consequences, then a three-question quiz with a score</li>
           <li>Runs in any browser and on phones, with no app to install</li>
         </ul>
       </div>
-      <div>
-        <h3>WhatsApp light versions</h3>
-        <p class="dl"><a href="moussa-fr.mp4" download>Français (MP4)</a><a href="moussa-en.mp4" download>English (MP4)</a><a href="moussa-pt.mp4" download>Português (MP4)</a></p>
-        <p class="small">Linear cuts with numbered pauses at the choice and the quiz answers revealed. Subtitles: <a href="moussa-fr.srt">FR</a> · <a href="moussa-en.srt">EN</a> · <a href="moussa-pt.srt">PT</a>.</p>
+      <div class="panel">
+        <p class="label"><span class="l-fr">Versions légères WhatsApp</span><span class="l-en">WhatsApp light versions</span></p>
+        <div class="dl-row"><span class="dl-k">16:9</span><a class="chip" href="moussa-fr.mp4" download>FR</a><a class="chip" href="moussa-en.mp4" download>EN</a><a class="chip" href="moussa-pt.mp4" download>PT</a></div>
+        <div class="dl-row"><span class="dl-k">9:16</span><a class="chip" href="moussa-fr-vertical.mp4" download>FR</a><a class="chip" href="moussa-en-vertical.mp4" download>EN</a><a class="chip" href="moussa-pt-vertical.mp4" download>PT</a></div>
+        <div class="dl-row"><span class="dl-k">SRT</span><a class="chip" href="moussa-fr.srt">FR</a><a class="chip" href="moussa-en.srt">EN</a><a class="chip" href="moussa-pt.srt">PT</a></div>
+        <p class="small"><span class="l-fr">Montages linéaires : pause numérotée au moment du choix, réponses du quiz révélées.</span><span class="l-en">Linear cuts with numbered pauses at the choice and the quiz answers revealed.</span> <a href="../../storyboards/ecowas/"><span class="l-fr">Storyboard</span><span class="l-en">Storyboard</span> →</a></p>
       </div>
-      <div>
-        <h3>Next in production</h3>
-        <p class="small">Native-speaker voice-over recorded at Paruto Music, local-language versions (Hausa, Bambara, Wolof, Yoruba, Fulani) with validated SPS glossaries, and the H5P package for ARAA’s platforms. Content in this sample is for demonstration and is to be validated by technical experts.</p>
-        <p class="small">The narration here is a synthetic scratch voice made with Piper text-to-speech: French “siwis” (CC BY 4.0), English “cori” (public domain), Portuguese “tugão” (CC0).</p>
+      <div class="panel">
+        <p class="label"><span class="l-fr">Suite de la production</span><span class="l-en">Next in production</span></p>
+        <p class="small l-fr">Voix off par des comédiens natifs au studio Paruto Music, versions en langues locales (haoussa, bambara, wolof, yoruba, peul) avec glossaires SPS validés. Contenu de démonstration, à valider par les experts techniques.</p>
+        <p class="small l-en">Native-speaker voice-over recorded at Paruto Music, local-language versions (Hausa, Bambara, Wolof, Yoruba, Fulani) with validated SPS glossaries. Content is for demonstration and is to be validated by technical experts.</p>
+        <p class="small faint l-fr">Narration provisoire de synthèse (Piper) : français « siwis » (CC BY 4.0), anglais « cori » (domaine public), portugais « tugão » (CC0).</p>
+        <p class="small faint l-en">Temporary synthetic narration (Piper): French “siwis” (CC BY 4.0), English “cori” (public domain), Portuguese “tugão” (CC0).</p>
       </div>
     </section>
   </main>
@@ -113,5 +137,6 @@
   <script src="../../shared/art.js"></script>
   <script src="scenes.js"></script>
   <script src="../../shared/player.js"></script>
+  <script src="../../shared/kit.js"></script>
 </body>
 </html>
