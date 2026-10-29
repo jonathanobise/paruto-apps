@@ -162,10 +162,18 @@ export function readRoutes(api: Hono<HonoEnv>): void {
       where.push('(t.symbol LIKE ? OR t.name LIKE ? OR c.mint = ?)');
       params.push(`%${q.q}%`, `%${q.q}%`, q.q);
     }
-    if (q.minMcap) (where.push('CAST(c.market_cap_usd AS REAL) >= ?'), params.push(Number(q.minMcap)));
-    if (q.maxMcap) (where.push('CAST(c.market_cap_usd AS REAL) <= ?'), params.push(Number(q.maxMcap)));
-    if (q.minLiq) (where.push('CAST(c.liquidity_usd AS REAL) >= ?'), params.push(Number(q.minLiq)));
-    if (q.since) (where.push('c.discovered_at >= ?'), params.push(Number(q.since)));
+    const numeric: Array<[string | undefined, string]> = [
+      [q.minMcap, 'CAST(c.market_cap_usd AS REAL) >= ?'],
+      [q.maxMcap, 'CAST(c.market_cap_usd AS REAL) <= ?'],
+      [q.minLiq, 'CAST(c.liquidity_usd AS REAL) >= ?'],
+      [q.since, 'c.discovered_at >= ?'],
+    ];
+    for (const [value, clause] of numeric) {
+      if (value && Number.isFinite(Number(value))) {
+        where.push(clause);
+        params.push(Number(value));
+      }
+    }
     const sortCols: Record<string, string> = {
       discovered: 'c.discovered_at',
       age: 'c.pair_created_at',

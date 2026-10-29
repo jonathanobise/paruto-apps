@@ -13,9 +13,9 @@ export default {
       batch.messages.map((m) => m.body.queue).filter((q) => q === 'filter' || q === 'analyst'),
     );
     for (const q of wanted) {
-      let n = 0;
-      do n = await drainQueue(ctx, q, 3);
-      while (n > 0);
+      while ((await drainQueue(ctx, q, 3)) > 0) {
+        // keep draining until the durable queue is empty
+      }
     }
     batch.ackAll();
   },
