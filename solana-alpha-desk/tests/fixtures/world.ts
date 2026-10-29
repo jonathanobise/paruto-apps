@@ -10,6 +10,7 @@ import {
   SolPrice,
   type AccountInfo,
   type DexPair,
+  type HistoryQuery,
   type Observed,
   type ParsedTx,
   type Providers,
@@ -446,10 +447,14 @@ export class World {
       get configured() {
         return w.heliusConfigured;
       },
-      transactions: async (address: string, o: { before?: string; limit?: number; type?: string } = {}) => {
-        let txs = w.history(address);
+      transactions: async (address: string, o: HistoryQuery = {}) => {
+        let txs = w.history(address); // newest first
         if (o.type) txs = txs.filter((t) => t.type === o.type);
-        const start = o.before ? txs.findIndex((t) => t.signature === o.before) + 1 : 0;
+        if (o.gteTime !== undefined) txs = txs.filter((t) => t.timestamp >= o.gteTime!);
+        if (o.lteTime !== undefined) txs = txs.filter((t) => t.timestamp <= o.lteTime!);
+        if (o.sortOrder === 'asc') txs = [...txs].reverse();
+        const cursor = o.sortOrder === 'asc' ? o.afterSignature : o.beforeSignature;
+        const start = cursor ? txs.findIndex((t) => t.signature === cursor) + 1 : 0;
         return obs(txs.slice(start, start + (o.limit ?? 100)), w.clock.now(), '/v0/addresses/transactions');
       },
       holderCount: async (mint: string) =>

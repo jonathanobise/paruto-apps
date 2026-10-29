@@ -71,7 +71,9 @@ export class SolanaRpc {
       // The public endpoint throttles hard (notably getTokenLargestAccounts); a private RPC can lower these.
       policy: url.includes('api.mainnet-beta.solana.com')
         ? { minIntervalMs: 400, maxRetries: 5, baseBackoffMs: 1_500, maxBackoffMs: 15_000 }
-        : { minIntervalMs: 60 },
+        : url.includes('helius-rpc.com')
+          ? { minIntervalMs: 110, maxRetries: 4, baseBackoffMs: 1_000 } // Helius Free: 10 req/s
+          : { minIntervalMs: 60 },
       ...opts,
     });
   }

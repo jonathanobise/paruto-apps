@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { HttpClient, ProviderError, type HttpClientOptions, type Observed } from './http.ts';
-import type { ParsedTx, TransactionIndexer } from './indexer.ts';
+import type { HistoryQuery, ParsedTx, TransactionIndexer } from './indexer.ts';
 
 const EnhancedTx = z
   .object({
@@ -49,7 +49,12 @@ export class Helius implements TransactionIndexer {
     private readonly apiKey: string | undefined,
     opts: Omit<HttpClientOptions, 'provider'> = {},
   ) {
-    this.http = new HttpClient({ provider: 'helius', policy: { minIntervalMs: 120 }, ...opts });
+    // Free plan: 2 requests/s for Enhanced Transactions and DAS; Helius asks for ~1 s initial retry backoff.
+    this.http = new HttpClient({
+      provider: 'helius',
+      policy: { minIntervalMs: 550, maxRetries: 4, baseBackoffMs: 1_000, maxBackoffMs: 16_000 },
+      ...opts,
+    });
   }
 
   get configured(): boolean {
@@ -62,16 +67,57 @@ export class Helius implements TransactionIndexer {
     return this.apiKey;
   }
 
-  async transactions(
-    address: string,
-    opts: { before?: string; limit?: number; type?: string } = {},
-  ): Promise<Observed<ParsedTx[]>> {
+  /**
+   * Enhanced Transactions history (GET /v0/addresses/{address}/transactions). Supports oldest-first
+   * (`sort-order=asc` with `after-signature`) and time windows (`gte-time`/`lte-time`, Unix seconds).
+   * A type-filtered window with no matches answers "Failed to find events within the search period",
+   * which is returned here as an empty page. Helius marks this API legacy (maintenance mode); its
+   * successor is Parsed Events.
+   */
+  async transactions(address: string, opts: HistoryQuery = {}): Promise<Observed<ParsedTx[]>> {
     const key = this.requireKey();
-    const qs = new URLSearchParams({ 'api-key': key, limit: String(opts.limit ?? 100) });
-    if (opts.before) qs.set('before', opts.before);
+    const qs = new URLSearchParams({
+      'api-key': key,
+      limit: String(opts.limit ?? 100),
+      commitment: 'confirmed',
+    });
+    if (opts.sortOrder) qs.set('sort-order', opts.sortOrder);
+    if (opts.beforeSignature) qs.set('before-signature', opts.beforeSignature);
+    if (opts.afterSignature) qs.set('after-signature', opts.afterSignature);
+    if (opts.gteTime !== undefined) qs.set('gte-time', String(Math.floor(opts.gteTime / 1000)));
+    if (opts.lteTime !== undefined) qs.set('lte-time', String(Math.ceil(opts.lteTime / 1000)));
     if (opts.type) qs.set('type', opts.type);
     const url = `https://api.helius.xyz/v0/addresses/${address}/transactions?${qs}`;
-    const res = await this.http.request('/v0/addresses/transactions', url, {}, (j) =>
+    let res: Observed<ParsedTx[]>;
+    try {
+      res = await this.fetchHistory(url);
+    } catch (e) {
+      if (/Failed to find events/i.test((e as Error).message)) {
+        const now = Date.now();
+        return {
+          data: [],
+          provenance: {
+            provider: 'helius',
+            endpoint: '/v0/addresses/transactions',
+            method: 'GET',
+            observedAt: now,
+            ingestedAt: now,
+            latencyMs: 0,
+            status: 200,
+            sha256: 'empty-window',
+            raw: '[]',
+          },
+        };
+      }
+      throw e;
+    }
+    // The API key must never reach stored evidence.
+    res.provenance.endpoint = '/v0/addresses/transactions';
+    return res;
+  }
+
+  private fetchHistory(url: string): Promise<Observed<ParsedTx[]>> {
+    return this.http.request('/v0/addresses/transactions', url, {}, (j) =>
       z
         .array(EnhancedTx)
         .parse(j)
@@ -96,9 +142,6 @@ export class Helius implements TransactionIndexer {
           })),
         })),
     );
-    // The API key must never reach stored evidence.
-    res.provenance.endpoint = '/v0/addresses/transactions';
-    return res;
   }
 
   /** Counts holders with a non-zero balance (DAS getTokenAccounts, paginated). */

@@ -33,7 +33,7 @@ export function serveWeb(req: Request): Response {
   const file = WEB[path];
   if (!file) return new Response('Not found', { status: 404 });
   const immutable = path.startsWith('/_next/static/');
-  return new Response(req.method === 'HEAD' ? null : body(path), {
+  return new Response(req.method === 'HEAD' ? null : (body(path) as unknown as BodyInit), {
     status: path === '/404.html' ? 404 : 200,
     headers: {
       'content-type': file.type,

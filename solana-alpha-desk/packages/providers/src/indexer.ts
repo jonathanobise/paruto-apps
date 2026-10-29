@@ -13,12 +13,20 @@ export interface ParsedTx {
   tokenTransfers: Array<{ from: string | null; to: string | null; mint: string; uiAmount: string }>;
 }
 
+/** History query: signature cursors, sort order and a time window (epoch ms). */
+export interface HistoryQuery {
+  beforeSignature?: string;
+  afterSignature?: string;
+  sortOrder?: 'asc' | 'desc';
+  gteTime?: number;
+  lteTime?: number;
+  limit?: number;
+  type?: string;
+}
+
 export interface TransactionIndexer {
   readonly id: string;
   readonly configured: boolean;
-  transactions(
-    address: string,
-    opts?: { before?: string; limit?: number; type?: string },
-  ): Promise<Observed<ParsedTx[]>>;
+  transactions(address: string, opts?: HistoryQuery): Promise<Observed<ParsedTx[]>>;
   holderCount(mint: string, maxPages?: number): Promise<Observed<{ holders: number; complete: boolean }>>;
 }

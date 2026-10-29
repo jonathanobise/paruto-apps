@@ -379,7 +379,9 @@ export function evaluateRules(e: SecurityEvidence, cfg: StrategyConfig['filter']
         dv.ownershipStatus,
         dv.ownershipStatus === 'PASS'
           ? `developer-linked ownership ${dv.ownershipPct}%`
-          : dv.notes.join('; ') || 'developer ownership unverified',
+          : dv.ownershipStatus === 'FAIL'
+            ? `deployer and linked wallets hold ${dv.ownershipPct ?? dv.ownershipPctLowerBound}% of circulating supply`
+            : dv.notes.join('; ') || 'developer ownership unverified',
         { lowerBound: dv.ownershipPctLowerBound, full: dv.ownershipPct, deployer: dv.deployer },
         `≤ ${cfg.maxDeveloperOwnershipPct}%`,
         d.evidenceIds,

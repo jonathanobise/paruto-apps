@@ -384,15 +384,17 @@ export async function gatherSecurityEvidence(
         deps.clock.now(),
       );
     } else {
-      const hist = await pagedHistory(
+      // Launch window read oldest-first with a time filter, so busy pools are covered however old they are.
+      const hist = await windowHistory(
         deps.helius,
         input.pairAddress,
-        30,
-        ev,
-        'IDX_POOL_HISTORY',
         input.pairCreatedAt,
+        input.pairCreatedAt + cfg.filter.launchWindowSeconds * 1000,
+        10,
+        ev,
+        'IDX_LAUNCH_WINDOW',
       );
-      const reached = hist.txs.some((t) => t.timestamp <= input.pairCreatedAt!) || hist.complete;
+      const reached = hist.complete;
       const buys = reached
         ? launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds)
         : null;
@@ -472,23 +474,53 @@ async function pagedHistory(
   stopBefore?: number,
 ): Promise<{ txs: ParsedTx[]; complete: boolean }> {
   const txs: ParsedTx[] = [];
-  let before: string | undefined;
+  let beforeSignature: string | undefined;
   for (let i = 0; i < maxPages; i++) {
-    const page = await helius.transactions(address, { before, limit: 100 });
+    const page = await helius.transactions(address, { beforeSignature, limit: 100, sortOrder: 'desc' });
     ev.add(page, kind, 'PROVIDER_CLAIM');
     txs.push(...page.data);
     if (page.data.length < 100) return { txs, complete: true };
-    before = page.data[page.data.length - 1]!.signature;
+    beforeSignature = page.data[page.data.length - 1]!.signature;
     if (stopBefore && page.data[page.data.length - 1]!.timestamp < stopBefore)
       return { txs, complete: false };
   }
   return { txs, complete: false };
 }
 
+/** Every transaction in [from, to] (epoch ms), oldest first, and whether the window was read completely. */
+async function windowHistory(
+  helius: Helius,
+  address: string,
+  from: number,
+  to: number,
+  maxPages: number,
+  ev: EvidenceCollector,
+  kind: string,
+): Promise<{ txs: ParsedTx[]; complete: boolean }> {
+  const txs: ParsedTx[] = [];
+  let afterSignature: string | undefined;
+  for (let i = 0; i < maxPages; i++) {
+    const page = await helius.transactions(address, {
+      afterSignature,
+      sortOrder: 'asc',
+      gteTime: from,
+      lteTime: to,
+      limit: 100,
+    });
+    ev.add(page, kind, 'PROVIDER_CLAIM');
+    txs.push(...page.data);
+    if (page.data.length < 100) return { txs, complete: true };
+    afterSignature = page.data[page.data.length - 1]!.signature;
+  }
+  return { txs, complete: false };
+}
+
 /** The wallet that first sent SOL to `wallet` in its oldest available page of history. */
 async function firstFunder(helius: Helius, wallet: string, ev: EvidenceCollector): Promise<string | null> {
-  const { txs } = await pagedHistory(helius, wallet, 3, ev, 'IDX_WALLET_FUNDING');
-  const ordered = [...txs].sort((a, b) => a.timestamp - b.timestamp);
+  // The oldest transactions of a wallet show who funded it.
+  const page = await helius.transactions(wallet, { sortOrder: 'asc', limit: 25 });
+  ev.add(page, 'IDX_WALLET_FUNDING', 'PROVIDER_CLAIM');
+  const ordered = [...page.data].sort((a, b) => a.timestamp - b.timestamp);
   for (const tx of ordered) {
     const n = tx.nativeTransfers.find(
       (t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n,
