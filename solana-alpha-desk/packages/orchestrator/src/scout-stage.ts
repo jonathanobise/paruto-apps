@@ -106,11 +106,19 @@ export function snapshotStmt(
 }
 
 /** Mints that already have an active run or were evaluated too recently to be worth re-checking. */
+/**
+ * Rules whose failure cannot change with time: who bought at launch (F009) and a developer's confirmed rug
+ * history (F008) are facts about the past. A token that failed one is not re-checked under the same
+ * strategy version, which saves the indexer credits a full check costs.
+ */
+export const PERMANENT_REJECTIONS = ['F008', 'F009'] as const;
+
 async function recentlyEvaluated(
   db: SqlDb,
   mints: string[],
   now: number,
   reevaluateMinutes: number,
+  configVersion: string,
 ): Promise<Set<string>> {
   const skip = new Set<string>();
   for (let i = 0; i < mints.length; i += 90) {
@@ -125,6 +133,14 @@ async function recentlyEvaluated(
        WHERE mint IN (${chunk.map(() => '?').join(',')}) AND (terminal = 0 OR updated_at > ?)`,
       [...chunk, now - 6 * HOUR],
     );
+    const permanent = await db.all<{ mint: string }>(
+      `SELECT DISTINCT a.mint FROM token_security_assessments a
+       JOIN security_rule_results r ON r.assessment_id = a.id
+       WHERE a.mint IN (${chunk.map(() => '?').join(',')}) AND a.config_version = ?
+         AND r.rule_id IN (${PERMANENT_REJECTIONS.map(() => '?').join(',')}) AND r.outcome = 'FAIL'`,
+      [...chunk, configVersion, ...PERMANENT_REJECTIONS],
+    );
+    for (const p of permanent) skip.add(p.mint);
     for (const r of rows) {
       if (r.terminal === 0) skip.add(r.mint);
       else if ((r.rejection_codes ?? '').includes('PAIR_TOO_OLD')) skip.add(r.mint);
@@ -163,7 +179,13 @@ export async function runDiscoveryCycle(ctx: Ctx): Promise<DiscoveryCycleResult>
   result.errors.push(...seeds.errors.map((e) => `${e.source}: ${e.error}`));
   result.seeds = seeds.mints.size;
   const all = [...seeds.mints.keys()];
-  const skip = await recentlyEvaluated(ctx.db, all, started, cfg.discovery.reevaluateAfterMinutes);
+  const skip = await recentlyEvaluated(
+    ctx.db,
+    all,
+    started,
+    cfg.discovery.reevaluateAfterMinutes,
+    configVersion,
+  );
   const todo = all.filter((m) => !skip.has(m)).slice(0, cfg.discovery.maxCandidatesPerCycle);
   result.skipped = all.length - todo.length;
 

@@ -43,7 +43,7 @@ open positions stay protected.
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 21 files, **166 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **166 passed**           |
+| Vitest — 22 files, **167 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **167 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |
@@ -93,6 +93,9 @@ SQL bridge is disabled in production. The owner account exists. See `docs/deploy
 - Parsed Events has no token-creation summary type: a developer's prior launches are recognised from
   instruction names (`initializeMint`, a launchpad's `create`). Transactions Helius cannot parse are
   counted, and any in a launch window or developer history leave that read incomplete (`UNVERIFIED`).
+- Tokens that failed launch bundling (F009) or developer rug history (F008) are not re-checked under the
+  same strategy version — those facts cannot change. Other rejections are re-checked after
+  `discovery.reevaluateAfterMinutes`.
 - Parsed Events has no published Free-plan rate limit; it is paced like DAS (2 requests/s).
 - Candidates whose launch window has more than 15 pages of transactions (busy launches fill a page of 100
   in seconds), whose developer history needs more than 10 pages, or with more than 100 launch buyers, stay `UNVERIFIED` unless the result cannot change (fail closed).

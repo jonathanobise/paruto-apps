@@ -63,6 +63,8 @@ export interface TokenSpec {
   legacyPool?: boolean;
   /** Holder wallets whose history shows no SOL funding (e.g. funded by a service wallet). */
   holdersUnfunded?: boolean;
+  /** Launch buyers share one funder and together buy 20% of supply (a coordinated launch). */
+  bundledLaunch?: boolean;
 }
 
 export interface WorldToken {
@@ -318,7 +320,14 @@ export class World {
             feePayer: buyer,
             failed: false,
             nativeTransfers: [],
-            tokenTransfers: [{ from: t.baseVault, to: buyer, mint: t.mint, uiAmount: '100000' }],
+            tokenTransfers: [
+              {
+                from: t.baseVault,
+                to: buyer,
+                mint: t.mint,
+                uiAmount: t.spec.bundledLaunch ? String(t.spec.supplyTokens / 50) : '100000',
+              },
+            ],
           });
         }
         for (let i = 0; i < 300; i++) {
@@ -361,7 +370,13 @@ export class World {
             source: null,
             feePayer: 'x',
             failed: false,
-            nativeTransfers: [{ from: addr(`lfunder:${address}`), to: address, lamports: 1_000_000_000n }],
+            nativeTransfers: [
+              {
+                from: addr(t.spec.bundledLaunch ? `lfunder:${t.spec.seed}` : `lfunder:${address}`),
+                to: address,
+                lamports: 1_000_000_000n,
+              },
+            ],
             tokenTransfers: [],
           },
         ];
