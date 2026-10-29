@@ -1,0 +1,35 @@
+{
+  "name": "solana-alpha-desk",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:migrate:local": "tsx apps/monitor/src/cli/migrate.ts",
+    "monitor": "tsx apps/monitor/src/main.ts",
+    "discover:once": "tsx apps/monitor/src/cli/discover-once.ts",
+    "web:dev": "pnpm --filter @alpha-desk/web dev",
+    "web:build": "pnpm --filter @alpha-desk/web build",
+    "api:dev": "pnpm --filter @alpha-desk/api dev",
+    "e2e": "playwright test -c tests/end-to-end/playwright.config.ts",
+    "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "^22.19.0",
+    "eslint": "^10.13.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}

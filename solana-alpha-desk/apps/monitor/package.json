@@ -1,0 +1,21 @@
+{
+  "name": "@alpha-desk/monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node22 --format=esm --outfile=dist/monitor.mjs --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\""
+  },
+  "dependencies": {
+    "@alpha-desk/config": "workspace:*",
+    "@alpha-desk/db": "workspace:*",
+    "@alpha-desk/orchestrator": "workspace:*",
+    "@alpha-desk/providers": "workspace:*",
+    "@alpha-desk/shared": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
