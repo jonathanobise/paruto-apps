@@ -23,6 +23,8 @@
         "max_batch_size": 10,
         "max_batch_timeout": 5,
         "max_retries": 5,
+        // One consumer at a time: provider rate limits (Helius Free: 2 req/s) are paced per invocation.
+        "max_concurrency": 1,
         "dead_letter_queue": "alpha-desk-candidates-dlq",
       },
     ],

@@ -90,6 +90,21 @@ describe('provider failures never become passes', () => {
     );
     expect(unv.map((r) => r.rule_id)).toEqual(['F006', 'F007', 'F008', 'F009']);
   });
+  it('a candidate already rejected on RPC and market data spends no indexer credits', async () => {
+    const { world, ctx, db } = await makeHarness();
+    world.addToken({ ...GOOD_TOKEN, seed: 'thin', volume: { m5: 50, h1: 1_000, h6: 4_000, h24: 9_000 } });
+    await runDiscoveryCycle(ctx);
+    await drainQueue(ctx, 'filter');
+    expect((await db.first<{ state: string }>('SELECT state FROM candidate_discoveries'))?.state).toBe(
+      'FILTER_REJECTED',
+    );
+    expect(world.heliusCalls).toBe(0);
+    const f009 = await db.first<{ outcome: string; reason: string }>(
+      `SELECT outcome, reason FROM security_rule_results WHERE rule_id = 'F009'`,
+    );
+    expect(f009?.outcome).toBe('UNVERIFIED');
+    expect(f009?.reason).toContain('already rejected by F005');
+  });
   it('Jupiter outage at the Risk stage: rejected, no order', async () => {
     const h = await makeHarness();
     h.world.jup.beforeQuote = null;

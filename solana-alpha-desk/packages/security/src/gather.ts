@@ -18,6 +18,7 @@ import { analyseBundle, launchBuysFrom } from './bundle.ts';
 import { analyseDeveloper } from './developer.ts';
 import { analyseHolders, type OwnerInfo } from './holders.ts';
 import { assessLpSafety, decodePool, onChainLiquidityUsd, orientPool, type LpHolder } from './pools.ts';
+import { evaluateRules } from './rules.ts';
 import type { Fact, MarketFacts, MintFacts, PoolFacts, RouteFacts, SecurityEvidence } from './rules.ts';
 
 export interface GatherDeps {
@@ -253,8 +254,10 @@ export async function gatherSecurityEvidence(
     }
   } else route = missing('price or mint facts unavailable; cannot size the sell test');
 
-  // ── holders
+  // ── holders (RPC; beneficial-owner clustering is added after the cheap checks below)
   let holders: Fact<ReturnType<typeof analyseHolders>>;
+  let holderBasis:
+    (Omit<Parameters<typeof analyseHolders>[0], 'clusters'> & { ids: string[]; at: number }) | null = null;
   let circulating: bigint | null = null;
   let deployerHoldings: bigint | null = null;
   const developerWallets = new Set<string>(coinCreator ? [coinCreator] : []);
@@ -287,90 +290,141 @@ export async function gatherSecurityEvidence(
         });
       });
     }
-    let clusters: Map<string, string> | null = null;
-    if (deps.helius?.configured) {
-      clusters = new Map();
-      for (const w of ownerAddrs
-        .filter((a) => owners.get(a)?.programOwner === '11111111111111111111111111111111')
-        .slice(0, 20)) {
-        const funder = await firstFunder(deps.helius, w, ev);
-        if (funder) clusters.set(w, `funder:${funder}`);
-      }
-    }
-    const analysis = analyseHolders({
+    holderBasis = {
       totalSupply: mintFacts.value.supply,
       holdings,
       owners,
       poolVaults: new Set(tokenVault ? [tokenVault] : []),
       poolAddresses: new Set([input.pairAddress, ...input.otherPoolAddresses]),
       developerWallets,
-      clusters,
       maxTop10Pct: cfg.filter.maxTop10HolderPct,
       requireClustering: cfg.filter.requireHolderClustering,
-    });
+      ids,
+      at: largest.provenance.observedAt,
+    };
+    const analysis = analyseHolders({ ...holderBasis, clusters: null });
     circulating = BigInt(analysis.circulatingSupply);
-    holders = ok(analysis, ids, largest.provenance.observedAt);
+    holders = ok(analysis, ids, holderBasis.at);
   } catch (e) {
     holders = missing((e as Error).message, [], 'ERROR');
   }
 
-  // ── developer
-  let developer: Fact<ReturnType<typeof analyseDeveloper>>;
+  // ── deployer holdings (RPC)
+  const deployer = coinCreator;
+  const devIds: string[] = [];
+  let devError: string | null = null;
   try {
-    const ids: string[] = [];
-    const deployer = coinCreator;
     if (deployer) {
       const h = await rpc.getTokenAccountsByOwner(deployer, mint);
-      ids.push(ev.add(h, 'RPC_DEPLOYER_HOLDINGS', 'ON_CHAIN'));
+      devIds.push(ev.add(h, 'RPC_DEPLOYER_HOLDINGS', 'ON_CHAIN'));
       deployerHoldings = h.data.reduce((s, a) => s + a.amount, 0n);
     }
-    let history: { txs: ParsedTx[]; complete: boolean } | null = null;
-    let linked: Map<string, bigint> | null = null;
-    if (deployer && deps.helius?.configured) {
-      history = await pagedHistory(deps.helius, deployer, 10, ev, 'IDX_DEPLOYER_HISTORY');
-    }
-    const analysis = analyseDeveloper({
+  } catch (e) {
+    devError = (e as Error).message;
+  }
+  const developerFrom = (
+    history: { txs: ParsedTx[]; complete: boolean } | null,
+    linkedHoldings: Map<string, bigint> | null,
+  ) =>
+    analyseDeveloper({
       mint,
       deployer,
       deployerSource: deployer ? 'PumpSwap pool coin_creator (on-chain)' : null,
       circulatingSupply: circulating,
       deployerHoldings,
-      linkedHoldings: null,
+      linkedHoldings,
       deployerHistory: history,
       maxOwnershipPct: cfg.filter.maxDeveloperOwnershipPct,
     });
-    if (history && deployer) {
-      linked = new Map();
-      for (const l of analysis.links
-        .filter((x) => x.strength !== 'WEAK' && x.relation !== 'DEPLOYER')
-        .slice(0, 15)) {
-        const h = await rpc.getTokenAccountsByOwner(l.wallet, mint);
-        ids.push(ev.add(h, 'RPC_LINKED_HOLDINGS', 'ON_CHAIN'));
-        linked.set(
-          l.wallet,
-          h.data.reduce((s, a) => s + a.amount, 0n),
-        );
-      }
-      const full = analyseDeveloper({
+
+  // Cheap checks first. Indexer reads cost credits (Helius bills Enhanced Transactions at 100 credits a
+  // call), so they are only spent on a candidate that no rule has already rejected on RPC and market data.
+  let indexer = deps.helius?.configured ? deps.helius : null;
+  let skipped: string | null = null;
+  if (indexer) {
+    const pending = missing<never>('pending');
+    const rejectedBy = evaluateRules(
+      {
         mint,
-        deployer,
-        deployerSource: 'PumpSwap pool coin_creator (on-chain)',
-        circulatingSupply: circulating,
-        deployerHoldings,
-        linkedHoldings: linked,
-        deployerHistory: history,
-        maxOwnershipPct: cfg.filter.maxDeveloperOwnershipPct,
-      });
-      developer = ok(full, ids, deps.clock.now());
-    } else developer = ok(analysis, ids, deps.clock.now());
-  } catch (e) {
-    developer = missing((e as Error).message, [], 'ERROR');
+        pairAddress: input.pairAddress,
+        mintFacts,
+        pool,
+        market,
+        route,
+        holders,
+        developer: devError ? pending : ok(developerFrom(null, null), devIds, deps.clock.now()),
+        bundle: pending,
+        corroboration: pending,
+      },
+      cfg.filter,
+      deps.clock.now(),
+    )
+      .filter((r) => r.outcome === 'FAIL')
+      .map((r) => r.ruleId);
+    if (rejectedBy.length) {
+      skipped = `not checked: already rejected by ${rejectedBy.join(', ')}`;
+      indexer = null;
+    }
   }
+  // Funding sources are traced over RPC (a few 1-credit calls) and shared between holder and buyer checks.
+  const funders = new Map<string, Promise<string | null>>();
+  const funderOf = (w: string) => {
+    if (!funders.has(w)) funders.set(w, firstFunder(rpc, w, ev));
+    return funders.get(w)!;
+  };
+
+  if (indexer && holderBasis) {
+    try {
+      const clusters = new Map<string, string>();
+      for (const w of [...holderBasis.owners.values()]
+        .filter((o) => o.programOwner === '11111111111111111111111111111111')
+        .map((o) => o.address)
+        .slice(0, 20)) {
+        const funder = await funderOf(w);
+        if (funder) clusters.set(w, `funder:${funder}`);
+      }
+      const analysis = analyseHolders({ ...holderBasis, clusters });
+      holders = ok(
+        analysis,
+        [...holderBasis.ids, ...ev.records.filter((r) => r.kind.startsWith('RPC_WALLET_')).map((r) => r.id)],
+        holderBasis.at,
+      );
+    } catch (e) {
+      holders = missing((e as Error).message, holderBasis.ids, 'ERROR');
+    }
+  }
+
+  // ── developer
+  let developer: Fact<ReturnType<typeof analyseDeveloper>>;
+  if (devError) developer = missing(devError, devIds, 'ERROR');
+  else
+    try {
+      const ids = [...devIds];
+      if (deployer && indexer) {
+        const history = await pagedHistory(indexer, deployer, 10, ev, 'IDX_DEPLOYER_HISTORY');
+        const analysis = developerFrom(history, null);
+        const linked = new Map<string, bigint>();
+        for (const l of analysis.links
+          .filter((x) => x.strength !== 'WEAK' && x.relation !== 'DEPLOYER')
+          .slice(0, 15)) {
+          const h = await rpc.getTokenAccountsByOwner(l.wallet, mint);
+          ids.push(ev.add(h, 'RPC_LINKED_HOLDINGS', 'ON_CHAIN'));
+          linked.set(
+            l.wallet,
+            h.data.reduce((s, a) => s + a.amount, 0n),
+          );
+        }
+        developer = ok(developerFrom(history, linked), ids, deps.clock.now());
+      } else developer = ok(developerFrom(null, null), ids, deps.clock.now());
+    } catch (e) {
+      developer = missing((e as Error).message, devIds, 'ERROR');
+    }
 
   // ── launch bundling (indexer required)
   let bundle: Fact<ReturnType<typeof analyseBundle>>;
   try {
-    if (!deps.helius?.configured || !input.pairCreatedAt || !mintFacts.value) {
+    if (skipped) bundle = missing(skipped);
+    else if (!indexer || !input.pairCreatedAt || !mintFacts.value) {
       bundle = ok(
         analyseBundle({
           buys: null,
@@ -386,7 +440,7 @@ export async function gatherSecurityEvidence(
     } else {
       // Launch window read oldest-first with a time filter, so busy pools are covered however old they are.
       const hist = await windowHistory(
-        deps.helius,
+        indexer,
         input.pairAddress,
         input.pairCreatedAt,
         input.pairCreatedAt + cfg.filter.launchWindowSeconds * 1000,
@@ -398,23 +452,25 @@ export async function gatherSecurityEvidence(
       const buys = reached
         ? launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds)
         : null;
-      const funders = new Map<string, string>();
+      const buyerFunders = new Map<string, string>();
       const buyers = [...new Set((buys ?? []).map((b) => b.buyer))];
       for (const w of buyers.slice(0, 25)) {
-        const f = await firstFunder(deps.helius, w, ev);
-        if (f) funders.set(w, f);
+        const f = await funderOf(w);
+        if (f) buyerFunders.set(w, f);
       }
       const supplyUi = fromBaseUnits(mintFacts.value.supply, mintFacts.value.decimals);
       bundle = ok(
         analyseBundle({
           buys,
           totalSupplyUi: supplyUi,
-          funders,
+          funders: buyerFunders,
           fundersComplete: buyers.length <= 25,
           windowSeconds: cfg.filter.launchWindowSeconds,
           maxBundledPct: cfg.filter.maxBundledLaunchPct,
         }),
-        ev.records.filter((r) => r.kind.startsWith('IDX_')).map((r) => r.id),
+        ev.records
+          .filter((r) => r.kind.startsWith('IDX_') || r.kind.startsWith('RPC_WALLET_'))
+          .map((r) => r.id),
         deps.clock.now(),
       );
     }
@@ -515,17 +571,62 @@ async function windowHistory(
   return { txs, complete: false };
 }
 
-/** The wallet that first sent SOL to `wallet` in its oldest available page of history. */
-async function firstFunder(helius: Helius, wallet: string, ev: EvidenceCollector): Promise<string | null> {
-  // The oldest transactions of a wallet show who funded it.
-  const page = await helius.transactions(wallet, { sortOrder: 'asc', limit: 25 });
-  ev.add(page, 'IDX_WALLET_FUNDING', 'PROVIDER_CLAIM');
-  const ordered = [...page.data].sort((a, b) => a.timestamp - b.timestamp);
-  for (const tx of ordered) {
-    const n = tx.nativeTransfers.find(
-      (t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n,
-    );
-    if (n?.from) return n.from;
+/**
+ * The wallet that first sent at least 0.01 SOL to `wallet`. Read over RPC: page back through the wallet's
+ * signatures (1,000 per call) to its origin, then open its oldest transactions. A wallet whose history is
+ * longer than `maxPages` pages gives no answer rather than a guess.
+ */
+export async function firstFunder(
+  rpc: SolanaRpc,
+  wallet: string,
+  ev: EvidenceCollector,
+  maxPages = 3,
+): Promise<string | null> {
+  let before: string | undefined;
+  let oldest: Array<{ signature: string; err: unknown }>;
+  for (let i = 0; ; i++) {
+    if (i === maxPages) return null;
+    const page = await rpc.getSignatures(wallet, { before, limit: 1000 });
+    ev.add(page, 'RPC_WALLET_SIGNATURES', 'ON_CHAIN');
+    if (page.data.length < 1000) {
+      oldest = page.data.slice(-5).reverse();
+      break;
+    }
+    before = page.data[page.data.length - 1]!.signature;
+  }
+  for (const s of oldest) {
+    if (s.err) continue;
+    const tx = await rpc.getTransaction(s.signature);
+    if (!tx.data) continue;
+    ev.add(tx, 'RPC_WALLET_FUNDING_TX', 'ON_CHAIN');
+    const from = solFundingInto(tx.data, wallet);
+    if (from) return from;
+  }
+  return null;
+}
+
+interface ParsedIx {
+  program?: string;
+  parsed?: { type?: string; info?: Record<string, unknown> };
+}
+
+/** The first System Program transfer (or account creation) of ≥ 0.01 SOL into `wallet` in a jsonParsed transaction. */
+export function solFundingInto(tx: Record<string, unknown>, wallet: string): string | null {
+  const t = tx as {
+    meta?: { err?: unknown; innerInstructions?: Array<{ index: number; instructions: ParsedIx[] }> } | null;
+    transaction?: { message?: { instructions?: ParsedIx[] } };
+  };
+  if (t.meta?.err) return null;
+  const outer = t.transaction?.message?.instructions ?? [];
+  const inner = t.meta?.innerInstructions ?? [];
+  const ordered = outer.flatMap((ix, i) => [ix, ...(inner.find((x) => x.index === i)?.instructions ?? [])]);
+  for (const ix of ordered) {
+    if (ix.program !== 'system' || !ix.parsed?.info) continue;
+    const info = ix.parsed.info;
+    const to = (info.destination ?? info.newAccount) as string | undefined;
+    const from = info.source as string | undefined;
+    const lamports = BigInt(String(info.lamports ?? 0));
+    if (to === wallet && from && from !== wallet && lamports >= 10_000_000n) return from;
   }
   return null;
 }

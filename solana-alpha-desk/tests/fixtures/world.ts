@@ -80,6 +80,8 @@ export class World {
   dexOutage = false;
   rpcOutage = false;
   heliusConfigured = true;
+  /** Indexer (Helius Enhanced Transactions) calls made, to check credit-saving behaviour. */
+  heliusCalls = 0;
   solUsd = 150;
 
   addToken(spec: TokenSpec): WorldToken {
@@ -350,6 +352,7 @@ export class World {
     const guardDex = () => {
       if (w.dexOutage) throw new ProviderError('dexscreener', 'NETWORK', 'simulated outage');
     };
+    const seen = new Map<string, ParsedTx>();
     const guardRpc = () => {
       if (w.rpcOutage) throw new ProviderError('solana-rpc', 'NETWORK', 'simulated outage');
     };
@@ -437,8 +440,48 @@ export class World {
             : 0n;
         return obs(amt > 0n ? [{ address: addr(`devacct:${owner}`), amount: amt }] : [], w.clock.now());
       },
-      getSignatures: async () => obs([], w.clock.now()),
-      getTransaction: async () => obs(null, w.clock.now()),
+      // Wallet funding traces: signatures and jsonParsed transactions rendered from the same histories.
+      getSignatures: async (address: string, o: { before?: string; limit?: number } = {}) => {
+        guardRpc();
+        const txs = w.history(address); // newest first
+        for (const t of txs) seen.set(t.signature, t);
+        const start = o.before ? txs.findIndex((t) => t.signature === o.before) + 1 : 0;
+        return obs(
+          txs.slice(start, start + (o.limit ?? 1000)).map((t) => ({
+            signature: t.signature,
+            slot: t.slot,
+            blockTime: Math.floor(t.timestamp / 1000),
+            err: t.failed ? { failed: true } : null,
+          })),
+          w.clock.now(),
+          'getSignaturesForAddress',
+        );
+      },
+      getTransaction: async (sig: string) => {
+        guardRpc();
+        const t = seen.get(sig);
+        if (!t) return obs(null, w.clock.now(), 'getTransaction');
+        return obs(
+          {
+            slot: t.slot,
+            blockTime: Math.floor(t.timestamp / 1000),
+            meta: { err: null, innerInstructions: [] },
+            transaction: {
+              message: {
+                instructions: t.nativeTransfers.map((n) => ({
+                  program: 'system',
+                  parsed: {
+                    type: 'transfer',
+                    info: { source: n.from, destination: n.to, lamports: Number(n.lamports) },
+                  },
+                })),
+              },
+            },
+          },
+          w.clock.now(),
+          'getTransaction',
+        );
+      },
       getRecentPrioritizationFees: async () => obs([0, 1000, 5000], w.clock.now()),
       circuit: 'CLOSED',
     };
@@ -448,6 +491,7 @@ export class World {
         return w.heliusConfigured;
       },
       transactions: async (address: string, o: HistoryQuery = {}) => {
+        w.heliusCalls++;
         let txs = w.history(address); // newest first
         if (o.type) txs = txs.filter((t) => t.type === o.type);
         if (o.gteTime !== undefined) txs = txs.filter((t) => t.timestamp >= o.gteTime!);
