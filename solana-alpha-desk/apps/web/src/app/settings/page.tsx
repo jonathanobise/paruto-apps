@@ -112,10 +112,10 @@ function Runtime({ d }: { d: Row }) {
           )}
         </div>
         <p className="mt-3 text-xs text-fg-3">
-          Helius history (100 credits a call) and DAS (10) reserve credits before each call; once the
-          day&apos;s budget is spent, indexer-backed checks are UNVERIFIED until midnight UTC. Plain RPC calls
-          (1 credit) are not capped, so open positions stay protected. Maximum concurrent positions, daily
-          trade count and daily risk thresholds are part of the versioned strategy (Strategy tab).
+          Helius history and DAS pages (10 credits each) reserve credits before each call; once the day&apos;s
+          budget is spent, indexer-backed checks are UNVERIFIED until midnight UTC. Plain RPC calls (1 credit)
+          are not capped, so open positions stay protected. Maximum concurrent positions, daily trade count
+          and daily risk thresholds are part of the versioned strategy (Strategy tab).
         </p>
       </Panel>
       <Panel title="Provider integrations" pad={false}>

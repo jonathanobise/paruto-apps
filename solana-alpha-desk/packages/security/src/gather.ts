@@ -8,6 +8,7 @@ import {
   sellQuote,
   type DexScreener,
   type Helius,
+  type HistoryQuery,
   type ParsedTx,
   type QuoteProvider,
   type RugCheck,
@@ -360,8 +361,8 @@ export async function gatherSecurityEvidence(
       maxOwnershipPct: cfg.filter.maxDeveloperOwnershipPct,
     });
 
-  // Cheap checks first. Indexer reads cost credits (Helius bills Enhanced Transactions at 100 credits a
-  // call), so they are only spent on a candidate that no rule has already rejected on RPC and market data.
+  // Cheap checks first. Indexer reads cost credits (Helius bills a Parsed Events history page at 10), so
+  // they are only spent on a candidate that no rule has already rejected on RPC and market data.
   let indexer = deps.helius?.configured ? deps.helius : null;
   let skipped: string | null = null;
   if (indexer) {
@@ -393,8 +394,9 @@ export async function gatherSecurityEvidence(
     try {
       const page = await indexer.transactions(mint, { sortOrder: 'asc', limit: 10 });
       const id = ev.add(page, 'IDX_MINT_ORIGIN', 'PROVIDER_CLAIM');
-      const first = page.data.filter((t) => !t.failed).sort((a, b) => a.slot - b.slot)[0];
-      if (first?.feePayer) {
+      const first = page.data.txs.filter((t) => !t.failed).sort((a, b) => a.slot - b.slot)[0];
+      // An unparsed transaction could be the earlier creation, so the page must be fully parsed.
+      if (first?.feePayer && page.data.unparsed === 0) {
         deployer = first.feePayer;
         deployerSource = "fee payer of the mint's first transaction (indexer)";
         devIds.push(id);
@@ -584,20 +586,8 @@ async function pagedHistory(
   maxPages: number,
   ev: EvidenceCollector,
   kind: string,
-  stopBefore?: number,
 ): Promise<{ txs: ParsedTx[]; complete: boolean }> {
-  const txs: ParsedTx[] = [];
-  let beforeSignature: string | undefined;
-  for (let i = 0; i < maxPages; i++) {
-    const page = await helius.transactions(address, { beforeSignature, limit: 100, sortOrder: 'desc' });
-    ev.add(page, kind, 'PROVIDER_CLAIM');
-    txs.push(...page.data);
-    if (page.data.length < 100) return { txs, complete: true };
-    beforeSignature = page.data[page.data.length - 1]!.signature;
-    if (stopBefore && page.data[page.data.length - 1]!.timestamp < stopBefore)
-      return { txs, complete: false };
-  }
-  return { txs, complete: false };
+  return readHistory(helius, address, { sortOrder: 'desc' }, maxPages, ev, kind);
 }
 
 /** Every transaction in [from, to] (epoch ms), oldest first, and whether the window was read completely. */
@@ -610,20 +600,31 @@ async function windowHistory(
   ev: EvidenceCollector,
   kind: string,
 ): Promise<{ txs: ParsedTx[]; complete: boolean }> {
+  return readHistory(helius, address, { sortOrder: 'asc', gteTime: from, lteTime: to }, maxPages, ev, kind);
+}
+
+/**
+ * Pages through an address's history. Complete only when the last page was reached within `maxPages` and
+ * every transaction on the way was parsed (an unparsed one could be the very buy or transfer that matters).
+ */
+async function readHistory(
+  helius: Helius,
+  address: string,
+  q: Omit<HistoryQuery, 'cursor' | 'limit'>,
+  maxPages: number,
+  ev: EvidenceCollector,
+  kind: string,
+): Promise<{ txs: ParsedTx[]; complete: boolean }> {
   const txs: ParsedTx[] = [];
-  let afterSignature: string | undefined;
+  let unparsed = 0;
+  let cursor: string | undefined;
   for (let i = 0; i < maxPages; i++) {
-    const page = await helius.transactions(address, {
-      afterSignature,
-      sortOrder: 'asc',
-      gteTime: from,
-      lteTime: to,
-      limit: 100,
-    });
+    const page = await helius.transactions(address, { ...q, cursor, limit: 100 });
     ev.add(page, kind, 'PROVIDER_CLAIM');
-    txs.push(...page.data);
-    if (page.data.length < 100) return { txs, complete: true };
-    afterSignature = page.data[page.data.length - 1]!.signature;
+    txs.push(...page.data.txs);
+    unparsed += page.data.unparsed;
+    if (!page.data.next) return { txs, complete: unparsed === 0 };
+    cursor = page.data.next;
   }
   return { txs, complete: false };
 }
@@ -738,13 +739,13 @@ export async function firstFunder(
     throw e;
   }
   ev.add(page, 'IDX_WALLET_FUNDING', 'PROVIDER_CLAIM');
-  for (const tx of [...page.data].sort((a, b) => a.timestamp - b.timestamp)) {
+  for (const tx of [...page.data.txs].sort((a, b) => a.timestamp - b.timestamp)) {
     const n = tx.nativeTransfers.find(
       (t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n,
     );
     if (n?.from) return { funder: n.from, traced: true };
   }
-  return { funder: null, traced: true };
+  return { funder: null, traced: page.data.unparsed === 0 };
 }
 
 interface ParsedIx {

@@ -81,20 +81,19 @@ export async function processAnalyst(ctx: Ctx, candidateId: string): Promise<Sta
   if (helius.configured && latest?.price_usd) {
     try {
       trades = [];
-      let beforeSignature: string | undefined;
+      let cursor: string | undefined;
       // Newest first within the last hour; a busy pool may not be covered completely in 10 pages, which
       // only under-counts buyers (conservative).
       for (let page = 0; page < 10; page++) {
         const res = await helius.transactions(c.pair_address, {
-          beforeSignature,
+          cursor,
           limit: 100,
-          type: 'SWAP',
           sortOrder: 'desc',
           gteTime: now - HOUR,
         });
         ev.add(res, 'IDX_POOL_SWAPS', 'PROVIDER_CLAIM');
-        for (const tx of res.data) {
-          if (tx.failed || tx.timestamp < now - HOUR) continue;
+        for (const tx of res.data.txs) {
+          if (tx.failed || tx.type !== 'SWAP' || tx.timestamp < now - HOUR) continue;
           const t = tx.tokenTransfers.find((x) => x.mint === c.mint);
           if (!t) continue;
           const usd = Number(t.uiAmount) * Number(latest.price_usd);
@@ -103,8 +102,8 @@ export async function processAnalyst(ctx: Ctx, candidateId: string): Promise<Sta
           else if (t.from === tx.feePayer)
             trades.push({ wallet: tx.feePayer, cluster: null, side: 'SELL', usd, at: tx.timestamp });
         }
-        if (res.data.length < 100 || res.data[res.data.length - 1]!.timestamp < now - HOUR) break;
-        beforeSignature = res.data[res.data.length - 1]!.signature;
+        if (!res.data.next) break;
+        cursor = res.data.next;
       }
       const hc = await helius.holderCount(c.mint);
       ev.add(hc, 'IDX_HOLDER_COUNT', 'PROVIDER_CLAIM');

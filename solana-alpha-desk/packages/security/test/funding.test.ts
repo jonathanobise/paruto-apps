@@ -120,29 +120,45 @@ describe('wallet funding over RPC', () => {
   });
   it('falls back to one indexer read (oldest page) for a wallet whose history is too long', async () => {
     const asked: unknown[] = [];
-    const indexer = {
-      transactions: async (address: string, o: unknown) => {
-        asked.push([address, o]);
-        return obs([
-          {
-            signature: 'a',
-            slot: 1,
-            timestamp: 1,
-            type: 'TRANSFER',
-            source: null,
-            feePayer: 'X',
-            failed: false,
-            nativeTransfers: [{ from: 'OldFunder', to: W, lamports: 2_000_000_000n }],
-            tokenTransfers: [],
-          },
-        ]);
-      },
-    } as unknown as Helius;
-    expect(await firstFunder(longHistory, W, new EvidenceCollector(), { indexer, maxPages: 2 })).toEqual({
+    const indexerWith = (nativeTransfers: unknown[], unparsed: number) =>
+      ({
+        transactions: async (address: string, o: unknown) => {
+          asked.push([address, o]);
+          return obs({
+            txs: [
+              {
+                signature: 'a',
+                slot: 1,
+                timestamp: 1,
+                type: 'TRANSFER',
+                source: null,
+                feePayer: 'X',
+                failed: false,
+                nativeTransfers,
+                tokenTransfers: [],
+              },
+            ],
+            next: 'more',
+            unparsed,
+          });
+        },
+      }) as unknown as Helius;
+    const funded = indexerWith([{ from: 'OldFunder', to: W, lamports: 2_000_000_000n }], 0);
+    expect(
+      await firstFunder(longHistory, W, new EvidenceCollector(), { indexer: funded, maxPages: 2 }),
+    ).toEqual({
       funder: 'OldFunder',
       traced: true,
     });
     expect(asked).toEqual([[W, { sortOrder: 'asc', limit: 25 }]]);
+    // No funder on the oldest page, but one transaction there could not be parsed: not traced.
+    const gap = indexerWith([], 1);
+    expect(await firstFunder(longHistory, W, new EvidenceCollector(), { indexer: gap, maxPages: 2 })).toEqual(
+      {
+        funder: null,
+        traced: false,
+      },
+    );
   });
 });
 

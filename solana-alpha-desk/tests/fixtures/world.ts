@@ -84,10 +84,12 @@ export class World {
   dexOutage = false;
   rpcOutage = false;
   heliusConfigured = true;
-  /** Indexer (Helius Enhanced Transactions) calls made, to check credit-saving behaviour. */
+  /** Indexer (Helius history) calls made, to check credit-saving behaviour. */
   heliusCalls = 0;
   /** Simulates a spent daily Helius credit budget: billed indexer calls are refused. */
   heliusBudgetSpent = false;
+  /** Addresses whose history pages include one transaction the indexer could not parse. */
+  readonly unparsedFor = new Set<string>();
   solUsd = 150;
 
   addToken(spec: TokenSpec): WorldToken {
@@ -518,13 +520,20 @@ export class World {
         if (w.heliusBudgetSpent)
           throw new ProviderError('helius', 'BUDGET_EXCEEDED', 'daily Helius credit budget spent');
         let txs = w.history(address); // newest first
-        if (o.type) txs = txs.filter((t) => t.type === o.type);
         if (o.gteTime !== undefined) txs = txs.filter((t) => t.timestamp >= o.gteTime!);
         if (o.lteTime !== undefined) txs = txs.filter((t) => t.timestamp <= o.lteTime!);
         if (o.sortOrder === 'asc') txs = [...txs].reverse();
-        const cursor = o.sortOrder === 'asc' ? o.afterSignature : o.beforeSignature;
-        const start = cursor ? txs.findIndex((t) => t.signature === cursor) + 1 : 0;
-        return obs(txs.slice(start, start + (o.limit ?? 100)), w.clock.now(), '/v0/addresses/transactions');
+        const start = o.cursor ? Number(o.cursor) : 0;
+        const end = start + (o.limit ?? 100);
+        return obs(
+          {
+            txs: txs.slice(start, end),
+            next: end < txs.length ? String(end) : null,
+            unparsed: w.unparsedFor.has(address) ? 1 : 0,
+          },
+          w.clock.now(),
+          '/v1/parsed-events/transaction-history',
+        );
       },
       holderCount: async (mint: string) =>
         obs(

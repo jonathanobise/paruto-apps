@@ -149,6 +149,17 @@ describe('provider failures never become passes', () => {
       0,
     );
   });
+  it('a launch-window transaction the indexer could not parse keeps the bundling check UNVERIFIED', async () => {
+    const { world, ctx, db } = await makeHarness();
+    const tok = world.addToken({ ...GOOD_TOKEN, seed: 'gap' });
+    world.unparsedFor.add(tok.pair);
+    await runDiscoveryCycle(ctx);
+    await drainQueue(ctx, 'filter');
+    const f009 = await db.first<{ outcome: string; reason: string }>(
+      `SELECT outcome, reason FROM security_rule_results WHERE rule_id = 'F009'`,
+    );
+    expect(f009?.outcome, f009?.reason).toBe('UNVERIFIED');
+  });
   it('Jupiter outage at the Risk stage: rejected, no order', async () => {
     const h = await makeHarness();
     h.world.jup.beforeQuote = null;

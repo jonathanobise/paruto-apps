@@ -12,15 +12,14 @@ complete paper-trading lifecycle and every listed failure mode on both node:sqli
 
 **Deployed and running at https://magpie.paruto.com** (five Cloudflare Workers, D1, R2, Queues, a Durable
 Object for the execution plane). Helius is configured: the Solana RPC goes through Helius and the
-Filter uses its Enhanced Transactions history for developer and launch-bundling checks. Live candidates
+Filter uses its Parsed Events transaction history for developer and launch-bundling checks. Live candidates
 are being filtered with real evidence (the first ones were rejected for holder concentration, developer
 ownership, coordinated launch buying and thin volume).
 
-**Helius Free plan budget.** Enhanced Transactions cost 100 credits per call and the Free plan has 1M
-credits a month. The Filter therefore runs the cheap RPC and market rules first and only reads indexer
-history for candidates no rule has rejected; wallet funding is traced over RPC at 1 credit a call. A
-fully checked candidate still costs up to ~2,000 credits, so a busy month can exceed the Free plan
-(Developer plan: 10M credits, 10 req/s). A daily credit budget (default 33,000, set under Settings → Runtime) caps
+**Helius Free plan budget.** History comes from Parsed Events at 10 credits a page (the legacy Enhanced
+Transactions API cost 100), and the Free plan has 1M credits a month. The Filter runs the cheap RPC and
+market rules first and only reads indexer history for candidates no rule has rejected; wallet funding is
+traced over RPC at 1 credit a call. A fully checked candidate costs a few hundred credits. A daily credit budget (default 33,000, set under Settings → Runtime) caps
 the billed indexer calls: each reserves its credits first, and once the day's budget is spent the
 indexer-backed checks are `UNVERIFIED` until midnight UTC. Plain RPC calls (1 credit) are not capped, so
 open positions stay protected.
@@ -44,7 +43,7 @@ open positions stay protected.
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 21 files, **163 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **163 passed**           |
+| Vitest — 21 files, **166 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **166 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |
@@ -66,7 +65,7 @@ replay ran on 85 recorded observations.
 | Solana RPC (via Helius)               | OPERATIONAL — derived from `HELIUS_API_KEY`; the public endpoint refuses `getTokenLargestAccounts` |
 | Jupiter (lite-api)                    | OPERATIONAL                                                                                        |
 | RugCheck                              | OPERATIONAL (corroboration only)                                                                   |
-| Helius                                | OPERATIONAL (Free plan: 2 req/s, 1M credits/month; Enhanced Transactions is legacy at 100 credits) |
+| Helius                                | OPERATIONAL — Parsed Events history (10 credits/page), DAS, RPC; Free plan 1M credits/month        |
 | Anthropic / OpenAI (report summaries) | adapters present, unused by default, never used for decisions                                      |
 | Cloudflare D1 / R2 / Queues / Workers | OPERATIONAL — deployed, magpie.paruto.com                                                          |
 
@@ -91,8 +90,10 @@ SQL bridge is disabled in production. The owner account exists. See `docs/deploy
 
 ## Known limitations
 
-- Helius Enhanced Transactions is in maintenance mode; its successor (Parsed Events, 10 credits a call)
-  is not used yet. Moving to it would cut indexer cost about tenfold.
+- Parsed Events has no token-creation summary type: a developer's prior launches are recognised from
+  instruction names (`initializeMint`, a launchpad's `create`). Transactions Helius cannot parse are
+  counted, and any in a launch window or developer history leave that read incomplete (`UNVERIFIED`).
+- Parsed Events has no published Free-plan rate limit; it is paced like DAS (2 requests/s).
 - Candidates whose launch-window or developer history needs more than 10 pages, or with more than 100
   launch buyers, stay `UNVERIFIED` unless the result cannot change (fail closed).
 - Wallet funding is the first transfer of ≥ 0.01 SOL, or the fee payer when SOL arrives indirectly.

@@ -13,20 +13,30 @@ export interface ParsedTx {
   tokenTransfers: Array<{ from: string | null; to: string | null; mint: string; uiAmount: string }>;
 }
 
-/** History query: signature cursors, sort order and a time window (epoch ms). */
+/** History query: a page cursor, sort order and a time window (epoch ms). */
 export interface HistoryQuery {
-  beforeSignature?: string;
-  afterSignature?: string;
+  /** Cursor from the previous page's `next`. */
+  cursor?: string;
   sortOrder?: 'asc' | 'desc';
   gteTime?: number;
   lteTime?: number;
   limit?: number;
-  type?: string;
+}
+
+/**
+ * One page of history. `next` is the cursor for the following page, or null at the end. `unparsed` counts
+ * transactions the indexer returned but could not parse: they are absent from `txs`, so a read that met any
+ * cannot be treated as complete.
+ */
+export interface HistoryPage {
+  txs: ParsedTx[];
+  next: string | null;
+  unparsed: number;
 }
 
 export interface TransactionIndexer {
   readonly id: string;
   readonly configured: boolean;
-  transactions(address: string, opts?: HistoryQuery): Promise<Observed<ParsedTx[]>>;
+  transactions(address: string, opts?: HistoryQuery): Promise<Observed<HistoryPage>>;
   holderCount(mint: string, maxPages?: number): Promise<Observed<{ holders: number; complete: boolean }>>;
 }
