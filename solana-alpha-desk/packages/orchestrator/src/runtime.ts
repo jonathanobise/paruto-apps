@@ -12,6 +12,7 @@ import {
   runReconciliation,
 } from './monitor-stage.ts';
 import { queueDepths } from './queue.ts';
+import { runRetention } from './retention.ts';
 import { generateReport } from './reports.ts';
 import { activeBreakers, getRuntime } from './repo.ts';
 import { runDiscoveryCycle } from './scout-stage.ts';
@@ -116,6 +117,10 @@ export class AgentRuntime {
       });
     });
     this.loop('reports', 5 * 60_000, () => this.scheduledReports());
+    this.loop('retention', 6 * HOUR, async () => {
+      const r = await runRetention(this.ctx);
+      this.ctx.log.info('retention', r);
+    });
   }
 
   stop(): void {

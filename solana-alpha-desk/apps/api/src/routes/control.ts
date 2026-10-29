@@ -17,6 +17,7 @@ import {
   type ReportKind,
 } from '@alpha-desk/orchestrator';
 import { BREAKERS, type Breaker } from '@alpha-desk/risk';
+import { runReplayStudy } from '@alpha-desk/orchestrator';
 import { DAY, RUNTIME_MODES } from '@alpha-desk/shared';
 import { fail, ok, type C, type HonoEnv } from '../app.ts';
 
@@ -210,5 +211,22 @@ export function controlRoutes(api: Hono<HonoEnv>): void {
     if (!body?.reason || body.reason.length < 10) return fail(c, 400, 'reason required (10+ characters)');
     const v = await updateStrategy(c.get('deps').ctx(), parsed.data, actor(c), body.reason);
     return ok(c, { configVersion: v });
+  });
+
+  api.post('/replay/run', async (c) => {
+    const b = await parse(
+      c,
+      z.object({
+        start: z.number(),
+        end: z.number(),
+        filterMode: z.enum(['RECORDED', 'MARKET_RULES_ONLY']),
+        folds: z.enum(['split', 'walk']).default('split'),
+        walkWindows: z.number().int().min(2).max(12).default(4),
+      }),
+    );
+    if (!b || b.start >= b.end) return fail(c, 400, 'start < end, filterMode and folds required');
+    if (b.end - b.start > 90 * DAY) return fail(c, 400, 'replay period is limited to 90 days per run');
+    const r = await runReplayStudy(c.get('deps').ctx(), { ...b, actor: actor(c) });
+    return ok(c, r);
   });
 }

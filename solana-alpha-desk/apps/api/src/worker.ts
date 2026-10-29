@@ -1,5 +1,6 @@
 import { D1Db, type D1Like } from '@alpha-desk/db';
-import { loadConfig, R2EvidenceStore, type Ctx, type QueueName } from '@alpha-desk/orchestrator';
+import { DEFAULT_STRATEGY } from '@alpha-desk/config';
+import { bootstrap, loadConfig, R2EvidenceStore, type Ctx, type QueueName } from '@alpha-desk/orchestrator';
 import { createProviders, SolPrice } from '@alpha-desk/providers';
 import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import { createApp } from './app.ts';
@@ -53,11 +54,37 @@ const app = createApp((c) => {
   };
 });
 
+let booted: Promise<void> | null = null;
+
+/** First request on a fresh D1 database creates the runtime row, strategy, owner record and portfolio. */
+export function ensureBootstrapped(env: Env): Promise<void> {
+  booted ??= (async () => {
+    const db = new D1Db(env.DB as unknown as D1Like);
+    const rt = await db.first<{ id: number }>('SELECT id FROM runtime_state WHERE id = 1').catch(() => null);
+    if (!rt) {
+      await bootstrap(db, {
+        config: DEFAULT_STRATEGY,
+        env,
+        ownerEmail: 'owner@localhost.localdomain',
+        now: Date.now(),
+        actor: 'SYSTEM',
+        initialMode: 'DISCOVERY_ONLY',
+      });
+    }
+  })().catch((e) => {
+    booted = null;
+    throw e;
+  });
+  return booted;
+}
+
 export default {
   async fetch(req: Request, env: Env, exec: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
-    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/internal/'))
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/internal/')) {
+      await ensureBootstrapped(env);
       return app.fetch(req, env, exec);
+    }
     return env.ASSETS.fetch(req);
   },
 } satisfies ExportedHandler<Env>;

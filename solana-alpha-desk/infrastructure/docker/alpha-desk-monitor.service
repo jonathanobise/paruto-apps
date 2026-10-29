@@ -1,0 +1,21 @@
+# systemd alternative to Docker for a VPS: /etc/systemd/system/alpha-desk-monitor.service
+[Unit]
+Description=Solana Alpha Desk monitor (paper trading)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=desk
+WorkingDirectory=/opt/alpha-desk
+EnvironmentFile=/etc/alpha-desk/monitor.env
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning /opt/alpha-desk/monitor.mjs
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/alpha-desk/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

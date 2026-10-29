@@ -1,0 +1,17 @@
+{
+  "name": "@alpha-desk/replay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@alpha-desk/analytics": "workspace:*",
+    "@alpha-desk/config": "workspace:*",
+    "@alpha-desk/db": "workspace:*",
+    "@alpha-desk/risk": "workspace:*",
+    "@alpha-desk/scoring": "workspace:*",
+    "@alpha-desk/shared": "workspace:*"
+  }
+}

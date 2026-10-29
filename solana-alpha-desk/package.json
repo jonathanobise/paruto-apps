@@ -20,8 +20,9 @@
     "web:dev": "pnpm --filter @alpha-desk/web dev",
     "web:build": "pnpm --filter @alpha-desk/web build",
     "api:dev": "pnpm --filter @alpha-desk/api dev",
-    "e2e": "playwright test -c tests/end-to-end/playwright.config.ts",
-    "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
+    "e2e": "pnpm web:build && playwright test -c tests/end-to-end/playwright.config.ts",
+    "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test",
+    "replay": "tsx apps/monitor/src/cli/replay.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261029.1",

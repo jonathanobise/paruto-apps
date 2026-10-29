@@ -13,7 +13,8 @@
     "@alpha-desk/orchestrator": "workspace:*",
     "@alpha-desk/providers": "workspace:*",
     "@alpha-desk/shared": "workspace:*",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "@alpha-desk/replay": "workspace:*"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"

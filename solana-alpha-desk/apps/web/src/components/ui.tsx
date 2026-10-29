@@ -16,14 +16,14 @@ export function Panel({
   pad?: boolean;
 }) {
   return (
-    <section className={`panel ${className}`}>
+    <section className={`panel min-w-0 ${className}`}>
       {(title || right) && (
         <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
           <h2 className="text-[13px] font-medium tracking-wide text-fg">{title}</h2>
           <div className="flex items-center gap-2 text-xs text-fg-3">{right}</div>
         </header>
       )}
-      <div className={pad ? 'p-4' : ''}>{children}</div>
+      <div className={pad ? 'p-4' : 'overflow-x-auto'}>{children}</div>
     </section>
   );
 }

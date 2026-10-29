@@ -17,6 +17,7 @@
     "@alpha-desk/risk": "workspace:*",
     "@alpha-desk/execution": "workspace:*",
     "@alpha-desk/ledger": "workspace:*",
-    "@alpha-desk/analytics": "workspace:*"
+    "@alpha-desk/analytics": "workspace:*",
+    "@alpha-desk/replay": "workspace:*"
   }
 }

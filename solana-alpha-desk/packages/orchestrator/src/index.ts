@@ -16,3 +16,5 @@ export * from './admin.ts';
 export * from './dispatch.ts';
 export * from './runtime.ts';
 export * from './stage-result.ts';
+export * from './replay-study.ts';
+export * from './retention.ts';

@@ -7,6 +7,7 @@ import { pct, tone, usd } from '@/lib/format';
 import type { Row } from '@/lib/types';
 import { TimeChart } from '@/components/chart';
 import { Bar, Empty, ErrorBox, Loading, Panel, Prov, Stat, Tabs } from '@/components/ui';
+import { ReplayPanel } from '@/components/replay';
 
 const SEGMENTS = [
   { id: 'tokenAge', label: 'Token age' },
@@ -118,6 +119,7 @@ export default function Analytics() {
           </table>
         )}
       </Panel>
+      <ReplayPanel />
       <div className="text-xs text-fg-3">
         Net P&L {usd(m.netPnlUsd, { sign: true })} · fees {usd(m.feesUsd)} · average holding{' '}
         {m.avgDurationMinutes ?? '—'} min.

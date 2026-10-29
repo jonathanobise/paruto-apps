@@ -1,4 +1,4 @@
-import { workerCtx, type Env } from '@alpha-desk/api/worker';
+import { ensureBootstrapped, workerCtx, type Env } from '@alpha-desk/api/worker';
 import {
   activeBreakers,
   expireStale,
@@ -15,6 +15,7 @@ import {
  */
 export default {
   async scheduled(_event: ScheduledController, env: Env, exec: ExecutionContext): Promise<void> {
+    await ensureBootstrapped(env);
     const ctx = workerCtx(env);
     const rt = await getRuntime(ctx.db);
     if (rt.mode === 'STOPPED') return;

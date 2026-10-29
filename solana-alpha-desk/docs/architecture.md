@@ -90,6 +90,11 @@ handoffs, idempotency and the pipeline that wires agents to providers and storag
 only to draft narrative report summaries from already-computed numbers. Token metadata is never passed
 to a model as instructions, and no model output can change a decision, size or stop.
 
+**ADR-13 · Replay is research, labelled as such.** `packages/replay` replays our own recorded snapshots in
+time order and only sees data observed at or before each decision. `RECORDED` mode uses Filter decisions
+exactly as recorded; `MARKET_RULES_ONLY` is an explicitly retrospective research mode (market-observable
+rules, momentum + liquidity rescaled). Results are `REPLAY_ESTIMATE`s stored apart from paper results.
+
 **ADR-12 · No live trading path.** There is no signer, no keypair handling and no `sendTransaction` in the
 codebase; ESLint forbids those calls, and a test scans the source tree for them. `RuntimeMode` has no live
 value.

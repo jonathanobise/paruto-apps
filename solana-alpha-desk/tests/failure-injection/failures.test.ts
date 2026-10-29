@@ -403,3 +403,21 @@ describe('database invariants', () => {
     ).rejects.toThrow(/UNIQUE/);
   });
 });
+
+describe('retention', () => {
+  it('archives old snapshots to object storage before pruning, and never touches the audit trail or ledger', async () => {
+    const h = await makeHarness();
+    await openPositionFlow(h);
+    const { runRetention } = await import('@alpha-desk/orchestrator');
+    const auditBefore = await count(h.db, 'SELECT COUNT(*) AS n FROM audit_events');
+    const ledgerBefore = await count(h.db, 'SELECT COUNT(*) AS n FROM ledger_entries');
+    h.world.clock.advance(20 * 86_400_000);
+    const r = await runRetention(h.ctx);
+    expect(r.market_snapshots).toBeGreaterThan(0);
+    expect([...h.store.objects.keys()].some((k) => k.startsWith('archive/market_snapshots/'))).toBe(true);
+    expect(await count(h.db, 'SELECT COUNT(*) AS n FROM audit_events')).toBe(auditBefore + 1);
+    expect(await count(h.db, 'SELECT COUNT(*) AS n FROM ledger_entries')).toBe(ledgerBefore);
+    // the discovery snapshot referenced by the candidate run is kept
+    expect(await count(h.db, 'SELECT COUNT(*) AS n FROM market_snapshots')).toBe(1);
+  });
+});

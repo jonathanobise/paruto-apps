@@ -1,0 +1,30 @@
+# Single-host deployment (VPS): the monitor writes to D1 through the API Worker's signed bridge.
+# Secrets come from an env file that is never committed: docker compose --env-file monitor.env up -d
+services:
+  monitor:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/monitor.Dockerfile
+    image: alpha-desk-monitor:latest
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      BRIDGE_URL: ${BRIDGE_URL:?set BRIDGE_URL to the API Worker origin}
+      BRIDGE_SECRET: ${BRIDGE_SECRET:?set BRIDGE_SECRET}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
+      JUPITER_API_KEY: ${JUPITER_API_KEY:-}
+      HELIUS_API_KEY: ${HELIUS_API_KEY:-}
+      RUN_PIPELINE: ${RUN_PIPELINE:-true}
+      TIMEZONE: ${TIMEZONE:-UTC}
+      EVIDENCE_DIR: /app/data/evidence
+    volumes:
+      - desk-data:/app/data
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options: { max-size: 20m, max-file: '5' }
+volumes:
+  desk-data: {}

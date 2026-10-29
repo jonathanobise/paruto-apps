@@ -15,6 +15,10 @@
     "@alpha-desk/risk": "workspace:*",
     "@alpha-desk/scoring": "workspace:*",
     "@alpha-desk/security": "workspace:*",
-    "@alpha-desk/shared": "workspace:*"
+    "@alpha-desk/shared": "workspace:*",
+    "@alpha-desk/replay": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "4.141.0"
   }
 }

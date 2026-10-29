@@ -1,0 +1,34 @@
+# CI for Solana Alpha Desk. To enable, copy to .github/workflows/alpha-desk.yml at the repository root
+# (or keep it at that path once the desk moves to its own repository and drop `working-directory`).
+name: alpha-desk
+on:
+  push:
+    paths: ['solana-alpha-desk/**']
+  pull_request:
+    paths: ['solana-alpha-desk/**']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: solana-alpha-desk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22.22.0, cache: pnpm, cache-dependency-path: solana-alpha-desk/pnpm-lock.yaml }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: npx tsc --noEmit -p apps/api/tsconfig.worker.json && npx tsc --noEmit -p workers/tsconfig.json
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm audit --prod --audit-level high
+      - run: pnpm web:build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test -c tests/end-to-end/playwright.config.ts
+        env: { PW_CHROMIUM: '' }
+      - run: pnpm --filter @alpha-desk/monitor build

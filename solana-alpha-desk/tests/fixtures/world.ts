@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { DEFAULT_STRATEGY, PROGRAMS, WSOL_MINT, type StrategyConfig } from '@alpha-desk/config';
 import { NodeSqliteDb, migrateNodeDb } from '@alpha-desk/db/node';
+import type { SqlDb } from '@alpha-desk/db';
 import { bootstrap, loadConfig, MemoryEvidenceStore, type Ctx } from '@alpha-desk/orchestrator';
 import {
   ProviderError,
@@ -495,12 +496,17 @@ export const GOOD_TOKEN: TokenSpec = {
   holderCount: 2000,
 };
 
-export async function makeHarness(
-  o: { mode?: RuntimeMode; config?: StrategyConfig; dbPath?: string } = {},
-): Promise<{ world: World; ctx: Ctx; db: NodeSqliteDb; store: MemoryEvidenceStore }> {
+export async function makeHarness<D extends SqlDb = NodeSqliteDb>(
+  o: { mode?: RuntimeMode; config?: StrategyConfig; dbPath?: string; db?: D } = {},
+): Promise<{ world: World; ctx: Ctx; db: D; store: MemoryEvidenceStore }> {
   const world = new World();
-  const db = new NodeSqliteDb(o.dbPath ?? ':memory:');
-  await migrateNodeDb(db, MIGRATIONS);
+  let db: D;
+  if (o.db) db = o.db;
+  else {
+    const local = new NodeSqliteDb(o.dbPath ?? ':memory:');
+    await migrateNodeDb(local, MIGRATIONS);
+    db = local as unknown as D;
+  }
   const config = o.config ?? DEFAULT_STRATEGY;
   await bootstrap(db, {
     config,

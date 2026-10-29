@@ -552,6 +552,14 @@ export function readRoutes(api: Hono<HonoEnv>): void {
     return r ? ok(c, { ...r, body: JSON.parse(r.body) }) : fail(c, 404, 'report not found');
   });
 
+  api.get('/replay', async (c) => {
+    const { db } = c.get('deps');
+    const rows = await db.all<{ result: string }>(
+      'SELECT id, config_version, strategy_version, filter_mode, period_start, period_end, params, result, sha256, created_by, created_at FROM replay_runs ORDER BY created_at DESC LIMIT 20',
+    );
+    return ok(c, { rows: rows.map((r) => ({ ...r, result: JSON.parse(r.result) })) });
+  });
+
   api.get('/health', async (c) => {
     const { db, now } = c.get('deps');
     const t = now();
