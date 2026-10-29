@@ -121,6 +121,16 @@ describe('provider failures never become passes', () => {
     expect(f007?.outcome).toBe('FAIL');
     expect(JSON.parse(f007!.observed).deployer).toBe(tok.deployer);
   });
+  it('holders traced to no shared funder count as independent, not as clustering unavailable', async () => {
+    const { world, ctx, db } = await makeHarness();
+    world.addToken({ ...GOOD_TOKEN, seed: 'unfunded', holdersUnfunded: true });
+    await runDiscoveryCycle(ctx);
+    await drainQueue(ctx, 'filter');
+    const f006 = await db.first<{ outcome: string; reason: string }>(
+      `SELECT outcome, reason FROM security_rule_results WHERE rule_id = 'F006'`,
+    );
+    expect(f006?.outcome, f006?.reason).toBe('PASS');
+  });
   it('Jupiter outage at the Risk stage: rejected, no order', async () => {
     const h = await makeHarness();
     h.world.jup.beforeQuote = null;

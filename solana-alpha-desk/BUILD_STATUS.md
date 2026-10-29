@@ -41,7 +41,7 @@ fully checked candidate still costs up to ~2,000 credits, so a busy month can ex
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 19 files, **155 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **155 passed**           |
+| Vitest — 19 files, **156 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **156 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |

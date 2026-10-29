@@ -61,6 +61,8 @@ export interface TokenSpec {
   deployerHoldingTokens?: number;
   /** A PumpSwap pool created before pools recorded coin_creator (the deployer must come from the mint). */
   legacyPool?: boolean;
+  /** Holder wallets whose history shows no SOL funding (e.g. funded by a service wallet). */
+  holdersUnfunded?: boolean;
 }
 
 export interface WorldToken {
@@ -269,6 +271,7 @@ export class World {
     for (const t of this.tokens.values()) {
       const holder = address === t.pair ? undefined : t.holders.find((h) => h.owner === address);
       if (holder) {
+        if (t.spec.holdersUnfunded) return [];
         return [
           {
             signature: `fund:${address}`,

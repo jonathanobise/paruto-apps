@@ -429,7 +429,9 @@ export async function gatherSecurityEvidence(
         .slice(0, 20)) {
         const trace = await funderOf(w);
         if (trace.funder) clusters.set(w, `funder:${trace.funder}`);
-        else if (!trace.traced) untraced.push(w);
+        else if (trace.traced)
+          clusters.set(w, `self:${w}`); // traced, linked to no one
+        else untraced.push(w);
       }
       const analysis = analyseHolders({ ...holderBasis, clusters, untracedWallets: untraced });
       holders = ok(
