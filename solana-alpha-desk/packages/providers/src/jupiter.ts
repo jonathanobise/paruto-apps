@@ -12,10 +12,12 @@ const QuoteSchema = z
     slippageBps: z.number(),
     priceImpactPct: z.string(),
     routePlan: z.array(
-      z.object({
-        swapInfo: z.object({ ammKey: z.string(), label: z.string().optional() }).passthrough(),
-        percent: z.number().nullable().optional(),
-      }).passthrough(),
+      z
+        .object({
+          swapInfo: z.object({ ammKey: z.string(), label: z.string().optional() }).passthrough(),
+          percent: z.number().nullable().optional(),
+        })
+        .passthrough(),
     ),
     contextSlot: z.number().optional(),
   })
@@ -54,9 +56,14 @@ export class Jupiter implements QuoteProvider {
   private readonly http: HttpClient;
   private readonly base: string;
   constructor(opts: Omit<HttpClientOptions, 'provider'> & { apiKey?: string; baseUrl?: string } = {}) {
-    this.base = opts.baseUrl ?? (opts.apiKey ? 'https://api.jup.ag/swap/v1' : 'https://lite-api.jup.ag/swap/v1');
+    this.base =
+      opts.baseUrl ?? (opts.apiKey ? 'https://api.jup.ag/swap/v1' : 'https://lite-api.jup.ag/swap/v1');
     this.headers = opts.apiKey ? { 'x-api-key': opts.apiKey } : {};
-    this.http = new HttpClient({ provider: 'jupiter', policy: { minIntervalMs: opts.apiKey ? 120 : 1_100 }, ...opts });
+    this.http = new HttpClient({
+      provider: 'jupiter',
+      policy: { minIntervalMs: opts.apiKey ? 120 : 1_100 },
+      ...opts,
+    });
   }
   private readonly headers: Record<string, string>;
 
@@ -70,21 +77,26 @@ export class Jupiter implements QuoteProvider {
       swapMode: 'ExactIn',
       restrictIntermediateTokens: 'true',
     });
-    const observed = await this.http.request('/quote', `${this.base}/quote?${qs}`, { headers: this.headers }, (j) => {
-      const q = QuoteSchema.parse(j);
-      return {
-        inputMint: q.inputMint,
-        outputMint: q.outputMint,
-        inAmount: BigInt(q.inAmount),
-        outAmount: BigInt(q.outAmount),
-        minOutAmount: BigInt(q.otherAmountThreshold),
-        slippageBps: q.slippageBps,
-        priceImpactPct: q.priceImpactPct,
-        routeLabels: q.routePlan.map((r) => r.swapInfo.label ?? 'unknown'),
-        ammKeys: q.routePlan.map((r) => r.swapInfo.ammKey),
-        contextSlot: q.contextSlot ?? null,
-      } satisfies Quote;
-    });
+    const observed = await this.http.request(
+      '/quote',
+      `${this.base}/quote?${qs}`,
+      { headers: this.headers },
+      (j) => {
+        const q = QuoteSchema.parse(j);
+        return {
+          inputMint: q.inputMint,
+          outputMint: q.outputMint,
+          inAmount: BigInt(q.inAmount),
+          outAmount: BigInt(q.outAmount),
+          minOutAmount: BigInt(q.otherAmountThreshold),
+          slippageBps: q.slippageBps,
+          priceImpactPct: q.priceImpactPct,
+          routeLabels: q.routePlan.map((r) => r.swapInfo.label ?? 'unknown'),
+          ammKeys: q.routePlan.map((r) => r.swapInfo.ammKey),
+          contextSlot: q.contextSlot ?? null,
+        } satisfies Quote;
+      },
+    );
     if (observed.data.contextSlot !== null) observed.provenance.slot = observed.data.contextSlot;
     return observed;
   }

@@ -6,10 +6,20 @@ import { complete, defer, fail, lease, type QueueName, type WorkItem } from './q
 import { recordJob } from './health.ts';
 import type { StageResult } from './stage-result.ts';
 
-const AGENT_OF: Record<QueueName, string> = { filter: 'filter', analyst: 'analyst', risk: 'risk', execute: 'executor', exit: 'executor' };
+const AGENT_OF: Record<QueueName, string> = {
+  filter: 'filter',
+  analyst: 'analyst',
+  risk: 'risk',
+  execute: 'executor',
+  exit: 'executor',
+};
 
 /** Runs one queue message through its agent. Shared by the Node monitor and the Cloudflare queue consumer. */
-export async function handle(ctx: Ctx, queue: QueueName, payload: { candidateId?: string; authorizationId?: string; positionId?: string }): Promise<StageResult> {
+export async function handle(
+  ctx: Ctx,
+  queue: QueueName,
+  payload: { candidateId?: string; authorizationId?: string; positionId?: string },
+): Promise<StageResult> {
   switch (queue) {
     case 'filter':
       return processFilter(ctx, payload.candidateId!);
@@ -50,6 +60,12 @@ async function runItem(ctx: Ctx, item: WorkItem): Promise<void> {
     const msg = (e as Error).message;
     ctx.log.error('work item failed', { queue: item.queue, id: item.id, error: msg });
     const outcome = await fail(ctx.db, item, msg, ctx.clock.now());
-    await recordJob(ctx.db, AGENT_OF[item.queue], { now: ctx.clock.now(), ok: false, error: `${outcome}: ${msg}`.slice(0, 500), latencyMs: ctx.clock.now() - started, instanceId: ctx.instanceId });
+    await recordJob(ctx.db, AGENT_OF[item.queue], {
+      now: ctx.clock.now(),
+      ok: false,
+      error: `${outcome}: ${msg}`.slice(0, 500),
+      latencyMs: ctx.clock.now() - started,
+      instanceId: ctx.instanceId,
+    });
   }
 }

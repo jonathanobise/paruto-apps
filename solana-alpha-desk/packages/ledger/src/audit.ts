@@ -1,8 +1,23 @@
 import { hashObject, newId } from '@alpha-desk/shared';
 
 export const AUDIT_CATEGORIES = [
-  'DISCOVERY', 'RULE', 'SCORE', 'RISK', 'ORDER', 'FILL', 'POSITION', 'STOP', 'API_ERROR', 'AUTOMATION',
-  'BREAKER', 'CONFIG', 'ADMIN', 'REPORT', 'RECONCILIATION', 'CORRECTION', 'AUTH',
+  'DISCOVERY',
+  'RULE',
+  'SCORE',
+  'RISK',
+  'ORDER',
+  'FILL',
+  'POSITION',
+  'STOP',
+  'API_ERROR',
+  'AUTOMATION',
+  'BREAKER',
+  'CONFIG',
+  'ADMIN',
+  'REPORT',
+  'RECONCILIATION',
+  'CORRECTION',
+  'AUTH',
 ] as const;
 export type AuditCategory = (typeof AUDIT_CATEGORIES)[number];
 

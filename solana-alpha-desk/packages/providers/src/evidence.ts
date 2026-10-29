@@ -45,5 +45,7 @@ export class EvidenceCollector {
 /** Jupiter answers 400 with these codes when no route exists — a fact about the token, not an outage. */
 export function isNoRouteError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
-  return /COULD_NOT_FIND_ANY_ROUTE|NO_ROUTES_FOUND|TOKEN_NOT_TRADABLE|ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT|No routes found/i.test(msg);
+  return /COULD_NOT_FIND_ANY_ROUTE|NO_ROUTES_FOUND|TOKEN_NOT_TRADABLE|ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT|No routes found/i.test(
+    msg,
+  );
 }

@@ -10,7 +10,10 @@ import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import type { MonitorEnv } from './env.ts';
 import { FileEvidenceStore } from './file-store.ts';
 
-export const MIGRATIONS_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../../infrastructure/migrations');
+export const MIGRATIONS_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../infrastructure/migrations',
+);
 
 export async function openDb(env: MonitorEnv): Promise<SqlDb> {
   if (env.BRIDGE_URL) return new BridgeDb(env.BRIDGE_URL, env.BRIDGE_SECRET!);
@@ -20,12 +23,22 @@ export async function openDb(env: MonitorEnv): Promise<SqlDb> {
   return db;
 }
 
-export async function buildContext(env: MonitorEnv): Promise<{ ctx: Ctx; metrics: ProviderMetrics; providers: ReturnType<typeof createProviders> }> {
+export async function buildContext(
+  env: MonitorEnv,
+): Promise<{ ctx: Ctx; metrics: ProviderMetrics; providers: ReturnType<typeof createProviders> }> {
   const log = createLogger({ service: 'monitor' }, env.LOG_LEVEL);
   const db = await openDb(env);
   const metrics = new ProviderMetrics();
   const providers = createProviders(env, { onMetric: metrics.record });
-  await bootstrap(db, { config: DEFAULT_STRATEGY, env, ownerEmail: env.OWNER_EMAIL, now: Date.now(), actor: 'SYSTEM', initialMode: env.INITIAL_MODE, timezone: env.TIMEZONE });
+  await bootstrap(db, {
+    config: DEFAULT_STRATEGY,
+    env,
+    ownerEmail: env.OWNER_EMAIL,
+    now: Date.now(),
+    actor: 'SYSTEM',
+    initialMode: env.INITIAL_MODE,
+    timezone: env.TIMEZONE,
+  });
   let cached: { at: number; value: Awaited<ReturnType<typeof loadConfig>> } | null = null;
   const ctx: Ctx = {
     db,
@@ -36,7 +49,8 @@ export async function buildContext(env: MonitorEnv): Promise<{ ctx: Ctx; metrics
     log,
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
     config: async () => {
-      if (!cached || Date.now() - cached.at > 10_000) cached = { at: Date.now(), value: await loadConfig(db) };
+      if (!cached || Date.now() - cached.at > 10_000)
+        cached = { at: Date.now(), value: await loadConfig(db) };
       return cached.value;
     },
     instanceId: newId('mon'),

@@ -1,6 +1,14 @@
 import { newId } from '@alpha-desk/shared';
 
-export const LEDGER_ACCOUNTS = ['CASH', 'POSITION_COST', 'FEES', 'REALIZED_PNL', 'CAPITAL', 'HOLDINGS', 'EXTERNAL'] as const;
+export const LEDGER_ACCOUNTS = [
+  'CASH',
+  'POSITION_COST',
+  'FEES',
+  'REALIZED_PNL',
+  'CAPITAL',
+  'HOLDINGS',
+  'EXTERNAL',
+] as const;
 export type LedgerAccount = (typeof LEDGER_ACCOUNTS)[number];
 export type JournalKind = 'CAPITAL' | 'BUY' | 'SELL' | 'FEE' | 'CORRECTION' | 'ARCHIVE';
 
@@ -26,24 +34,54 @@ export class UnbalancedJournalError extends Error {}
 export function assertBalanced(j: Journal): void {
   const sums = new Map<string, bigint>();
   for (const e of j.entries) sums.set(e.unit, (sums.get(e.unit) ?? 0n) + e.amount);
-  for (const [unit, sum] of sums) if (sum !== 0n) throw new UnbalancedJournalError(`journal ${j.kind}/${j.referenceId} unbalanced in ${unit} by ${sum}`);
+  for (const [unit, sum] of sums)
+    if (sum !== 0n)
+      throw new UnbalancedJournalError(`journal ${j.kind}/${j.referenceId} unbalanced in ${unit} by ${sum}`);
   if (j.entries.length < 2) throw new UnbalancedJournalError('journal needs at least two entries');
 }
 
-function journal(portfolioId: string, kind: JournalKind, referenceId: string, memo: string, createdAt: number, entries: LedgerEntry[]): Journal {
-  const j = { id: newId('jr', createdAt), portfolioId, kind, referenceId, memo, createdAt, entries: entries.filter((e) => e.amount !== 0n) };
+function journal(
+  portfolioId: string,
+  kind: JournalKind,
+  referenceId: string,
+  memo: string,
+  createdAt: number,
+  entries: LedgerEntry[],
+): Journal {
+  const j = {
+    id: newId('jr', createdAt),
+    portfolioId,
+    kind,
+    referenceId,
+    memo,
+    createdAt,
+    entries: entries.filter((e) => e.amount !== 0n),
+  };
   assertBalanced(j);
   return j;
 }
 
-export function capitalJournal(portfolioId: string, amountMicro: bigint, at: number, memo = 'paper capital'): Journal {
+export function capitalJournal(
+  portfolioId: string,
+  amountMicro: bigint,
+  at: number,
+  memo = 'paper capital',
+): Journal {
   return journal(portfolioId, 'CAPITAL', portfolioId, memo, at, [
     { account: 'CASH', unit: 'USD', amount: amountMicro },
     { account: 'CAPITAL', unit: 'USD', amount: -amountMicro },
   ]);
 }
 
-export function buyJournal(portfolioId: string, fillId: string, mint: string, qty: bigint, costMicro: bigint, feeMicro: bigint, at: number): Journal {
+export function buyJournal(
+  portfolioId: string,
+  fillId: string,
+  mint: string,
+  qty: bigint,
+  costMicro: bigint,
+  feeMicro: bigint,
+  at: number,
+): Journal {
   return journal(portfolioId, 'BUY', fillId, `paper buy ${mint}`, at, [
     { account: 'POSITION_COST', unit: 'USD', amount: costMicro },
     { account: 'FEES', unit: 'USD', amount: feeMicro },
@@ -57,7 +95,16 @@ export function buyJournal(portfolioId: string, fillId: string, mint: string, qt
  * Sell: cash receives proceeds net of the network fee; the position's cost basis is relieved and the
  * difference between gross proceeds and cost basis is realised (fees stay in FEES).
  */
-export function sellJournal(portfolioId: string, fillId: string, mint: string, qty: bigint, costBasisMicro: bigint, proceedsMicro: bigint, feeMicro: bigint, at: number): Journal {
+export function sellJournal(
+  portfolioId: string,
+  fillId: string,
+  mint: string,
+  qty: bigint,
+  costBasisMicro: bigint,
+  proceedsMicro: bigint,
+  feeMicro: bigint,
+  at: number,
+): Journal {
   return journal(portfolioId, 'SELL', fillId, `paper sell ${mint}`, at, [
     { account: 'CASH', unit: 'USD', amount: proceedsMicro - feeMicro },
     { account: 'FEES', unit: 'USD', amount: feeMicro },
@@ -69,13 +116,21 @@ export function sellJournal(portfolioId: string, fillId: string, mint: string, q
 }
 
 /** A correction is a new balanced journal referencing what it corrects; history is never rewritten. */
-export function correctionJournal(portfolioId: string, correctsId: string, memo: string, entries: LedgerEntry[], at: number): Journal {
+export function correctionJournal(
+  portfolioId: string,
+  correctsId: string,
+  memo: string,
+  entries: LedgerEntry[],
+  at: number,
+): Journal {
   return journal(portfolioId, 'CORRECTION', correctsId, memo, at, entries);
 }
 
 export type Balances = Map<string, bigint>; // `${account}|${unit}` → amount
 
-export function balancesFrom(rows: Array<{ account: string; unit: string; amount: string | bigint }>): Balances {
+export function balancesFrom(
+  rows: Array<{ account: string; unit: string; amount: string | bigint }>,
+): Balances {
   const b: Balances = new Map();
   for (const r of rows) {
     const k = `${r.account}|${r.unit}`;
@@ -123,15 +178,22 @@ export function reconcile(b: Balances, positions: ReconPosition[]): Reconciliati
   const open = positions.filter((p) => p.status !== 'CLOSED');
   const byMint = new Map<string, bigint>();
   for (const p of open) byMint.set(p.mint, (byMint.get(p.mint) ?? 0n) + p.quantity);
-  const mints = new Set([...byMint.keys(), ...[...b.keys()].filter((k) => k.startsWith('HOLDINGS|')).map((k) => k.split('|')[1]!)]);
+  const mints = new Set([
+    ...byMint.keys(),
+    ...[...b.keys()].filter((k) => k.startsWith('HOLDINGS|')).map((k) => k.split('|')[1]!),
+  ]);
   for (const m of mints) {
-    if (bal(b, 'HOLDINGS', m) !== (byMint.get(m) ?? 0n)) issues.push(`holdings of ${m}: ledger ${bal(b, 'HOLDINGS', m)} ≠ positions ${byMint.get(m) ?? 0n}`);
+    if (bal(b, 'HOLDINGS', m) !== (byMint.get(m) ?? 0n))
+      issues.push(`holdings of ${m}: ledger ${bal(b, 'HOLDINGS', m)} ≠ positions ${byMint.get(m) ?? 0n}`);
   }
   const openCost = open.reduce((s, p) => s + (p.entryCostMicro - p.entryFeesMicro), 0n);
-  if (bal(b, 'POSITION_COST') !== openCost) issues.push(`open cost basis: ledger ${bal(b, 'POSITION_COST')} ≠ positions ${openCost}`);
+  if (bal(b, 'POSITION_COST') !== openCost)
+    issues.push(`open cost basis: ledger ${bal(b, 'POSITION_COST')} ≠ positions ${openCost}`);
 
   const capital = -bal(b, 'CAPITAL');
-  const realisedNet = positions.filter((p) => p.status === 'CLOSED').reduce((s, p) => s + (p.realizedPnlMicro ?? 0n), 0n);
+  const realisedNet = positions
+    .filter((p) => p.status === 'CLOSED')
+    .reduce((s, p) => s + (p.realizedPnlMicro ?? 0n), 0n);
   const expectedCash = capital + realisedNet - open.reduce((s, p) => s + p.entryCostMicro, 0n);
   const cash = bal(b, 'CASH');
   if (cash !== expectedCash) issues.push(`cash: ledger ${cash} ≠ expected ${expectedCash}`);

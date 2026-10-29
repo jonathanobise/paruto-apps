@@ -33,7 +33,15 @@ export function applyCurve(curve: Array<[number, number]>, x: number): number {
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
-function result(factor: FactorName, cfg: FactorCfg, quality: DataQuality, raw: number | null, normalized: number | null, evidence: Record<string, unknown>, window: [number | null, number | null] = [null, null]): FactorResult {
+function result(
+  factor: FactorName,
+  cfg: FactorCfg,
+  quality: DataQuality,
+  raw: number | null,
+  normalized: number | null,
+  evidence: Record<string, unknown>,
+  window: [number | null, number | null] = [null, null],
+): FactorResult {
   const usable = normalized !== null && (quality === 'VERIFIED' || quality === 'PARTIAL');
   const n = usable ? clamp01(normalized!) : null;
   return {
@@ -75,13 +83,16 @@ export interface MomentumInput {
 export function momentumFactor(i: MomentumInput, cfg: FactorCfg): FactorResult {
   const { m5, h1, h6 } = i.change;
   if (h1 === null || h6 === null || m5 === null || i.volume.h1 === null || i.volume.m5 === null) {
-    return result('momentum', cfg, 'UNAVAILABLE', null, null, { reason: 'price-change or volume windows missing' });
+    return result('momentum', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'price-change or volume windows missing',
+    });
   }
   const trend = h1 <= 0 ? 0 : clamp01(h1 / 30);
   const breadth = h6 > 0 ? 1 : h6 > -10 ? 0.3 : 0;
   const avg5 = i.volume.h1 / 12;
   const ratio = avg5 > 0 ? i.volume.m5 / avg5 : 0;
-  const recency = ratio >= 0.8 && ratio <= 1.6 ? 1 : ratio < 0.8 ? clamp01(ratio / 0.8) : clamp01(1 - (ratio - 1.6) / 2.4);
+  const recency =
+    ratio >= 0.8 && ratio <= 1.6 ? 1 : ratio < 0.8 ? clamp01(ratio / 0.8) : clamp01(1 - (ratio - 1.6) / 2.4);
   const series = i.series;
   let persistence: number | null = null;
   if (series.length >= Math.max(cfg.minSamples, 2)) {
@@ -94,12 +105,26 @@ export function momentumFactor(i: MomentumInput, cfg: FactorCfg): FactorResult {
   if (spike) composite *= 0.5;
   const quality: DataQuality = persistence === null ? 'PARTIAL' : 'VERIFIED';
   const norm = applyCurve(cfg.curve, composite);
-  return result('momentum', cfg, quality, composite, norm, { trend, breadth, recency, recencyRatio: ratio, persistence, samples: series.length, spike }, [series[0]?.at ?? null, i.observedAt]);
+  return result(
+    'momentum',
+    cfg,
+    quality,
+    composite,
+    norm,
+    { trend, breadth, recency, recencyRatio: ratio, persistence, samples: series.length, spike },
+    [series[0]?.at ?? null, i.observedAt],
+  );
 }
 
 export interface TradeFlowInput {
   /** Swaps in the window from an indexer; null when no indexer is configured. */
-  trades: Array<{ wallet: string; cluster: string | null; side: 'BUY' | 'SELL'; usd: number; at: number }> | null;
+  trades: Array<{
+    wallet: string;
+    cluster: string | null;
+    side: 'BUY' | 'SELL';
+    usd: number;
+    at: number;
+  }> | null;
   windowStart: number;
   windowEnd: number;
   /** DexScreener counts, recorded as supporting evidence only. */
@@ -109,24 +134,65 @@ export interface TradeFlowInput {
 
 /** Unique buyers (unique-buyers-v1): distinct beneficial clusters (wallet when unclustered) that bought. */
 export function uniqueBuyersFactor(i: TradeFlowInput, cfg: FactorCfg): FactorResult {
-  if (!i.trades) return result('uniqueBuyers', cfg, 'UNAVAILABLE', null, null, { reason: 'trade-level data requires an indexer', dexBuyCount: i.countBuys });
+  if (!i.trades)
+    return result('uniqueBuyers', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'trade-level data requires an indexer',
+      dexBuyCount: i.countBuys,
+    });
   const buys = i.trades.filter((t) => t.side === 'BUY');
   const clusters = new Set(buys.map((t) => t.cluster ?? t.wallet));
-  if (buys.length < cfg.minSamples) return result('uniqueBuyers', cfg, 'INSUFFICIENT', clusters.size, null, { buys: buys.length, minSamples: cfg.minSamples }, [i.windowStart, i.windowEnd]);
-  return result('uniqueBuyers', cfg, 'VERIFIED', clusters.size, applyCurve(cfg.curve, clusters.size), { buys: buys.length, uniqueClusters: clusters.size, clustered: buys.some((b) => b.cluster) }, [i.windowStart, i.windowEnd]);
+  if (buys.length < cfg.minSamples)
+    return result(
+      'uniqueBuyers',
+      cfg,
+      'INSUFFICIENT',
+      clusters.size,
+      null,
+      { buys: buys.length, minSamples: cfg.minSamples },
+      [i.windowStart, i.windowEnd],
+    );
+  return result(
+    'uniqueBuyers',
+    cfg,
+    'VERIFIED',
+    clusters.size,
+    applyCurve(cfg.curve, clusters.size),
+    { buys: buys.length, uniqueClusters: clusters.size, clustered: buys.some((b) => b.cluster) },
+    [i.windowStart, i.windowEnd],
+  );
 }
 
 /** Buy/sell value ratio (buy-sell-value-v1): traded USD value, not transaction counts. Counts are recorded too. */
 export function buySellValueFactor(i: TradeFlowInput, cfg: FactorCfg): FactorResult {
   const countRatio = i.countBuys !== null && i.countSells ? i.countBuys / i.countSells : null;
-  if (!i.trades) return result('buySellValueRatio', cfg, 'UNAVAILABLE', null, null, { reason: 'traded value requires an indexer', countRatio });
+  if (!i.trades)
+    return result('buySellValueRatio', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'traded value requires an indexer',
+      countRatio,
+    });
   const buyUsd = i.trades.filter((t) => t.side === 'BUY').reduce((s, t) => s + t.usd, 0);
   const sellUsd = i.trades.filter((t) => t.side === 'SELL').reduce((s, t) => s + t.usd, 0);
   if (i.trades.length < cfg.minSamples || sellUsd <= 0) {
-    return result('buySellValueRatio', cfg, 'INSUFFICIENT', null, null, { trades: i.trades.length, buyUsd, sellUsd, countRatio }, [i.windowStart, i.windowEnd]);
+    return result(
+      'buySellValueRatio',
+      cfg,
+      'INSUFFICIENT',
+      null,
+      null,
+      { trades: i.trades.length, buyUsd, sellUsd, countRatio },
+      [i.windowStart, i.windowEnd],
+    );
   }
   const ratio = buyUsd / sellUsd;
-  return result('buySellValueRatio', cfg, 'VERIFIED', ratio, applyCurve(cfg.curve, ratio), { buyUsd, sellUsd, countRatio, trades: i.trades.length }, [i.windowStart, i.windowEnd]);
+  return result(
+    'buySellValueRatio',
+    cfg,
+    'VERIFIED',
+    ratio,
+    applyCurve(cfg.curve, ratio),
+    { buyUsd, sellUsd, countRatio, trades: i.trades.length },
+    [i.windowStart, i.windowEnd],
+  );
 }
 
 export interface HolderPoint {
@@ -138,30 +204,50 @@ export interface HolderPoint {
 
 /** Holder growth (holder-growth-v1): % growth per hour between real, timestamped holder counts. */
 export function holderGrowthFactor(points: HolderPoint[] | null, cfg: FactorCfg): FactorResult {
-  if (!points || points.length === 0) return result('holderGrowth', cfg, 'UNAVAILABLE', null, null, { reason: 'holder counts require an indexer' });
+  if (!points || points.length === 0)
+    return result('holderGrowth', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'holder counts require an indexer',
+    });
   const sorted = [...points].sort((a, b) => a.at - b.at);
-  if (sorted.length < Math.max(cfg.minSamples, 2)) return result('holderGrowth', cfg, 'INSUFFICIENT', null, null, { samples: sorted.length });
+  if (sorted.length < Math.max(cfg.minSamples, 2))
+    return result('holderGrowth', cfg, 'INSUFFICIENT', null, null, { samples: sorted.length });
   const first = sorted[0]!;
   const last = sorted[sorted.length - 1]!;
   const hours = (last.at - first.at) / 3_600_000;
-  if (hours < 0.25 || first.holders <= 0) return result('holderGrowth', cfg, 'INSUFFICIENT', null, null, { samples: sorted.length, hours });
+  if (hours < 0.25 || first.holders <= 0)
+    return result('holderGrowth', cfg, 'INSUFFICIENT', null, null, { samples: sorted.length, hours });
   const related = sorted.reduce((s, p) => s + (p.relatedNew ?? 0), 0);
   const organic = last.holders - first.holders - related;
-  const perHour = (organic / first.holders) * 100 / hours;
-  return result('holderGrowth', cfg, 'VERIFIED', perHour, applyCurve(cfg.curve, perHour), { from: first.holders, to: last.holders, relatedExcluded: related, hours }, [first.at, last.at]);
+  const perHour = ((organic / first.holders) * 100) / hours;
+  return result(
+    'holderGrowth',
+    cfg,
+    'VERIFIED',
+    perHour,
+    applyCurve(cfg.curve, perHour),
+    { from: first.holders, to: last.holders, relatedExcluded: related, hours },
+    [first.at, last.at],
+  );
 }
 
 /**
  * Liquidity strength (liquidity-mcap-v1): on-chain liquidity ÷ market cap (%), multiplied by an execution
  * depth factor from the sized sell quote (1 at ≤ 1% impact, falling linearly to 0.5 at 5%).
  */
-export function liquidityFactor(i: { onChainLiquidityUsd: number | null; marketCapUsd: number | null; sellImpactPct: number | null }, cfg: FactorCfg): FactorResult {
+export function liquidityFactor(
+  i: { onChainLiquidityUsd: number | null; marketCapUsd: number | null; sellImpactPct: number | null },
+  cfg: FactorCfg,
+): FactorResult {
   if (i.onChainLiquidityUsd === null || !i.marketCapUsd || i.sellImpactPct === null) {
     return result('liquidityToMcap', cfg, 'UNAVAILABLE', null, null, { ...i });
   }
   const pct = (i.onChainLiquidityUsd / i.marketCapUsd) * 100;
   const depth = i.sellImpactPct <= 1 ? 1 : Math.max(0.5, 1 - ((i.sellImpactPct - 1) / 4) * 0.5);
-  return result('liquidityToMcap', cfg, 'VERIFIED', pct, applyCurve(cfg.curve, pct) * depth, { liquidityPct: pct, depthFactor: depth, ...i });
+  return result('liquidityToMcap', cfg, 'VERIFIED', pct, applyCurve(cfg.curve, pct) * depth, {
+    liquidityPct: pct,
+    depthFactor: depth,
+    ...i,
+  });
 }
 
 /**
@@ -169,10 +255,25 @@ export function liquidityFactor(i: { onChainLiquidityUsd: number | null; marketC
  * The registry is built only from outcomes known *before* the decision time (no look-ahead); with an empty
  * registry the factor is INSUFFICIENT and scores 0.
  */
-export function smartWalletFactor(i: { buyers: string[] | null; registry: Set<string>; registryBuiltAt: number | null; decisionAt: number }, cfg: FactorCfg): FactorResult {
-  if (!i.buyers) return result('smartWallets', cfg, 'UNAVAILABLE', null, null, { reason: 'buyer list requires an indexer' });
-  if (i.registry.size === 0 || i.registryBuiltAt === null) return result('smartWallets', cfg, 'INSUFFICIENT', null, null, { reason: 'smart-wallet registry is empty' });
-  if (i.registryBuiltAt > i.decisionAt) return result('smartWallets', cfg, 'UNAVAILABLE', null, null, { reason: 'registry postdates decision (look-ahead refused)' });
+export function smartWalletFactor(
+  i: { buyers: string[] | null; registry: Set<string>; registryBuiltAt: number | null; decisionAt: number },
+  cfg: FactorCfg,
+): FactorResult {
+  if (!i.buyers)
+    return result('smartWallets', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'buyer list requires an indexer',
+    });
+  if (i.registry.size === 0 || i.registryBuiltAt === null)
+    return result('smartWallets', cfg, 'INSUFFICIENT', null, null, {
+      reason: 'smart-wallet registry is empty',
+    });
+  if (i.registryBuiltAt > i.decisionAt)
+    return result('smartWallets', cfg, 'UNAVAILABLE', null, null, {
+      reason: 'registry postdates decision (look-ahead refused)',
+    });
   const hits = [...new Set(i.buyers.filter((b) => i.registry.has(b)))];
-  return result('smartWallets', cfg, 'VERIFIED', hits.length, applyCurve(cfg.curve, hits.length), { hits, registrySize: i.registry.size });
+  return result('smartWallets', cfg, 'VERIFIED', hits.length, applyCurve(cfg.curve, hits.length), {
+    hits,
+    registrySize: i.registry.size,
+  });
 }

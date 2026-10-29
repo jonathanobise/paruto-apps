@@ -20,9 +20,15 @@ export interface FeeEstimate {
 }
 
 /** Base fee + priority fee (percentile of recent fees, floored) × compute units, converted at SOL/USD. */
-export function estimateNetworkFee(recentPriorityFees: number[], solUsd: Decimal, cfg: StrategyConfig['execution']): FeeEstimate {
+export function estimateNetworkFee(
+  recentPriorityFees: number[],
+  solUsd: Decimal,
+  cfg: StrategyConfig['execution'],
+): FeeEstimate {
   const sorted = [...recentPriorityFees].sort((a, b) => a - b);
-  const idx = sorted.length ? Math.min(sorted.length - 1, Math.floor((cfg.priorityFeePercentile / 100) * sorted.length)) : -1;
+  const idx = sorted.length
+    ? Math.min(sorted.length - 1, Math.floor((cfg.priorityFeePercentile / 100) * sorted.length))
+    : -1;
   const pct = idx >= 0 ? sorted[idx]! : 0;
   const perCu = Math.max(pct, cfg.minPriorityFeeMicroLamportsPerCu);
   const priorityLamports = (BigInt(perCu) * BigInt(cfg.computeUnits)) / 1_000_000n;
@@ -96,7 +102,14 @@ export async function simulateFill(deps: FillDeps, req: FillRequest): Promise<Fi
   try {
     q0 = await quote();
   } catch (e) {
-    return { status: isNoRouteError(e) ? 'REJECTED' : 'FAILED', side: req.side, reason: `initial quote failed: ${(e as Error).message.slice(0, 200)}`, quoteEvidenceId: null, requoteEvidenceId: null, simulatedAt: deps.clock.now() };
+    return {
+      status: isNoRouteError(e) ? 'REJECTED' : 'FAILED',
+      side: req.side,
+      reason: `initial quote failed: ${(e as Error).message.slice(0, 200)}`,
+      quoteEvidenceId: null,
+      requoteEvidenceId: null,
+      simulatedAt: deps.clock.now(),
+    };
   }
   const q0Id = deps.evidence.add(q0, req.side === 'BUY' ? 'JUP_BUY_QUOTE' : 'JUP_SELL_QUOTE', 'DERIVED');
   await deps.sleep(deps.latencyMs);
@@ -105,17 +118,38 @@ export async function simulateFill(deps: FillDeps, req: FillRequest): Promise<Fi
   try {
     q1 = await quote();
   } catch (e) {
-    return { status: 'FAILED', side: req.side, reason: `route unavailable at landing: ${(e as Error).message.slice(0, 200)}`, quoteEvidenceId: q0Id, requoteEvidenceId: null, simulatedAt: deps.clock.now() };
+    return {
+      status: 'FAILED',
+      side: req.side,
+      reason: `route unavailable at landing: ${(e as Error).message.slice(0, 200)}`,
+      quoteEvidenceId: q0Id,
+      requoteEvidenceId: null,
+      simulatedAt: deps.clock.now(),
+    };
   }
   const q1Id = deps.evidence.add(q1, req.side === 'BUY' ? 'JUP_BUY_REQUOTE' : 'JUP_SELL_REQUOTE', 'DERIVED');
   const landedMs = Math.max(deps.latencyMs, deps.clock.now() - startedAt);
 
   if (q1.data.outAmount < q0.data.minOutAmount) {
-    return { status: 'FAILED', side: req.side, reason: `slippage exceeded: landing quote ${q1.data.outAmount} < minimum ${q0.data.minOutAmount}`, quoteEvidenceId: q0Id, requoteEvidenceId: q1Id, simulatedAt: deps.clock.now() };
+    return {
+      status: 'FAILED',
+      side: req.side,
+      reason: `slippage exceeded: landing quote ${q1.data.outAmount} < minimum ${q0.data.minOutAmount}`,
+      quoteEvidenceId: q0Id,
+      requoteEvidenceId: q1Id,
+      simulatedAt: deps.clock.now(),
+    };
   }
   const out = q1.data.outAmount < q0.data.outAmount ? q1.data.outAmount : q0.data.outAmount;
   if (out <= 0n) {
-    return { status: 'FAILED', side: req.side, reason: 'zero output', quoteEvidenceId: q0Id, requoteEvidenceId: q1Id, simulatedAt: deps.clock.now() };
+    return {
+      status: 'FAILED',
+      side: req.side,
+      reason: 'zero output',
+      quoteEvidenceId: q0Id,
+      requoteEvidenceId: q1Id,
+      simulatedAt: deps.clock.now(),
+    };
   }
   const tokenQuantity = req.side === 'BUY' ? out : req.amountIn;
   const usdAmountMicro = req.side === 'BUY' ? req.amountIn : out;

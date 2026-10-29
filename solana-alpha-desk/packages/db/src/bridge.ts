@@ -33,7 +33,12 @@ export class BridgeDb implements SqlDb {
     const sig = await hmacSha256Hex(this.secret, bridgeSigningString(ts, nonce, body));
     const res = await this.fetchImpl(new URL(BRIDGE_PATH, this.baseUrl), {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-ad-timestamp': ts, 'x-ad-nonce': nonce, 'x-ad-signature': sig },
+      headers: {
+        'content-type': 'application/json',
+        'x-ad-timestamp': ts,
+        'x-ad-nonce': nonce,
+        'x-ad-signature': sig,
+      },
       body,
     });
     const json = (await res.json()) as { ok: boolean; result?: T; error?: string; constraint?: boolean };

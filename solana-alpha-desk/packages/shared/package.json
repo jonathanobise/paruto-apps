@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": {"decimal.js": "^10.6.0", "zod": "^4.6.7"}
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "decimal.js": "^10.6.0",
+    "zod": "^4.6.7"
+  }
 }

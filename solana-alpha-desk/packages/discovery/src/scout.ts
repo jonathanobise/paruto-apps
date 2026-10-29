@@ -61,14 +61,20 @@ export interface ScoutDecision {
   pools: PoolObservation[];
 }
 
-const n = (v: number | undefined | null): number | null => (v === undefined || v === null || !Number.isFinite(v) ? null : v);
+const n = (v: number | undefined | null): number | null =>
+  v === undefined || v === null || !Number.isFinite(v) ? null : v;
 
 /**
  * Scout Agent. Pure: given every DexScreener pair seen for one token, decide whether the token is a
  * discovery candidate. Age is measured on the relevant tradable pool (deepest pool quoted in a supported
  * quote mint); the earliest pool of any kind is kept separately for relaunch detection.
  */
-export function evaluateToken(mint: string, pairs: DexPair[], now: number, cfg: StrategyConfig['discovery']): ScoutDecision {
+export function evaluateToken(
+  mint: string,
+  pairs: DexPair[],
+  now: number,
+  cfg: StrategyConfig['discovery'],
+): ScoutDecision {
   const reasons: DiscoveryRejection[] = [];
   const own = pairs.filter((p) => p.baseToken.address === mint);
   const pools: PoolObservation[] = own.map((p) => ({
@@ -83,10 +89,24 @@ export function evaluateToken(mint: string, pairs: DexPair[], now: number, cfg: 
   }));
 
   if (own.length === 0 || own.some((p) => p.chainId !== 'solana')) {
-    return { mint, outcome: 'DISCOVERY_REJECTED', reasons: ['NOT_SOLANA'], ageMinutes: null, snapshot: null, pools };
+    return {
+      mint,
+      outcome: 'DISCOVERY_REJECTED',
+      reasons: ['NOT_SOLANA'],
+      ageMinutes: null,
+      snapshot: null,
+      pools,
+    };
   }
   if (!isSolanaAddress(mint)) {
-    return { mint, outcome: 'DISCOVERY_REJECTED', reasons: ['INVALID_MINT'], ageMinutes: null, snapshot: null, pools };
+    return {
+      mint,
+      outcome: 'DISCOVERY_REJECTED',
+      reasons: ['INVALID_MINT'],
+      ageMinutes: null,
+      snapshot: null,
+      pools,
+    };
   }
 
   const tradable = own
@@ -94,7 +114,14 @@ export function evaluateToken(mint: string, pairs: DexPair[], now: number, cfg: 
     .sort((a, b) => (n(b.liquidity?.usd) ?? 0) - (n(a.liquidity?.usd) ?? 0));
   const relevant = tradable[0];
   if (!relevant) {
-    return { mint, outcome: 'DISCOVERY_REJECTED', reasons: ['NO_TRADABLE_POOL'], ageMinutes: null, snapshot: null, pools };
+    return {
+      mint,
+      outcome: 'DISCOVERY_REJECTED',
+      reasons: ['NO_TRADABLE_POOL'],
+      ageMinutes: null,
+      snapshot: null,
+      pools,
+    };
   }
 
   const created = own.map((p) => p.pairCreatedAt).filter((t): t is number => typeof t === 'number' && t > 0);
@@ -168,7 +195,19 @@ export function evaluateToken(mint: string, pairs: DexPair[], now: number, cfg: 
 }
 
 /** Group a batch of pairs by base mint and evaluate each mint once (one token → one decision). */
-export function evaluateBatch(mints: string[], pairs: DexPair[], now: number, cfg: StrategyConfig['discovery']): ScoutDecision[] {
+export function evaluateBatch(
+  mints: string[],
+  pairs: DexPair[],
+  now: number,
+  cfg: StrategyConfig['discovery'],
+): ScoutDecision[] {
   const unique = [...new Set(mints)];
-  return unique.map((mint) => evaluateToken(mint, pairs.filter((p) => p.baseToken.address === mint), now, cfg));
+  return unique.map((mint) =>
+    evaluateToken(
+      mint,
+      pairs.filter((p) => p.baseToken.address === mint),
+      now,
+      cfg,
+    ),
+  );
 }

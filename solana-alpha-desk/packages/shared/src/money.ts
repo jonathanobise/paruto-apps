@@ -28,8 +28,14 @@ export function fromBaseUnits(amount: bigint, decimals: number): Decimal {
   return new Decimal(amount.toString()).div(new Decimal(10).pow(decimals));
 }
 
-export function toBaseUnits(amount: Decimal.Value, decimals: number, rounding: Decimal.Rounding = Decimal.ROUND_FLOOR): bigint {
-  return BigInt(new Decimal(amount).mul(new Decimal(10).pow(decimals)).toDecimalPlaces(0, rounding).toFixed(0));
+export function toBaseUnits(
+  amount: Decimal.Value,
+  decimals: number,
+  rounding: Decimal.Rounding = Decimal.ROUND_FLOOR,
+): bigint {
+  return BigInt(
+    new Decimal(amount).mul(new Decimal(10).pow(decimals)).toDecimalPlaces(0, rounding).toFixed(0),
+  );
 }
 
 export function minBig(...values: bigint[]): bigint {

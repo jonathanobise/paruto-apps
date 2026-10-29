@@ -40,7 +40,11 @@ export const HandoffEventSchema = z
       ctx.addIssue({ code: 'custom', message: 'generated_at precedes observed_at', path: ['generated_at'] });
     }
     if (e.expires_at && Date.parse(e.expires_at) <= Date.parse(e.generated_at)) {
-      ctx.addIssue({ code: 'custom', message: 'expires_at must be after generated_at', path: ['expires_at'] });
+      ctx.addIssue({
+        code: 'custom',
+        message: 'expires_at must be after generated_at',
+        path: ['expires_at'],
+      });
     }
   });
 
@@ -68,7 +72,9 @@ export interface HandoffInput {
  * The idempotency key is derived from what the transition *is* (candidate, edge, config),
  * so a redelivered message produces the same key and is deduplicated.
  */
-export async function idempotencyKeyFor(input: Pick<HandoffInput, 'candidateId' | 'previous' | 'next' | 'configVersion'>): Promise<string> {
+export async function idempotencyKeyFor(
+  input: Pick<HandoffInput, 'candidateId' | 'previous' | 'next' | 'configVersion'>,
+): Promise<string> {
   return sha256Hex(canonicalJson([input.candidateId, input.previous, input.next, input.configVersion]));
 }
 

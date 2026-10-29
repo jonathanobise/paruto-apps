@@ -1,8 +1,13 @@
 import { z } from 'zod';
 import { HttpClient, type HttpClientOptions, type Observed } from './http.ts';
 
-const num = z.union([z.number(), z.string()]).transform((v) => Number(v)).pipe(z.number().finite());
-const Window = z.object({ m5: num.optional(), h1: num.optional(), h6: num.optional(), h24: num.optional() }).partial();
+const num = z
+  .union([z.number(), z.string()])
+  .transform((v) => Number(v))
+  .pipe(z.number().finite());
+const Window = z
+  .object({ m5: num.optional(), h1: num.optional(), h6: num.optional(), h24: num.optional() })
+  .partial();
 const Txns = z.object({ buys: z.number().int().nonnegative(), sells: z.number().int().nonnegative() });
 
 export const DexPairSchema = z
@@ -16,7 +21,9 @@ export const DexPairSchema = z
     quoteToken: z.object({ address: z.string(), name: z.string().optional(), symbol: z.string().optional() }),
     priceNative: z.string().optional(),
     priceUsd: z.string().optional(),
-    txns: z.object({ m5: Txns.optional(), h1: Txns.optional(), h6: Txns.optional(), h24: Txns.optional() }).optional(),
+    txns: z
+      .object({ m5: Txns.optional(), h1: Txns.optional(), h6: Txns.optional(), h24: Txns.optional() })
+      .optional(),
     volume: Window.optional(),
     priceChange: Window.optional(),
     liquidity: z.object({ usd: num.optional(), base: num.optional(), quote: num.optional() }).optional(),
@@ -27,9 +34,7 @@ export const DexPairSchema = z
   .passthrough();
 export type DexPair = z.infer<typeof DexPairSchema>;
 
-const ProfileList = z.array(
-  z.object({ chainId: z.string(), tokenAddress: z.string() }).passthrough(),
-);
+const ProfileList = z.array(z.object({ chainId: z.string(), tokenAddress: z.string() }).passthrough());
 
 const BASE = 'https://api.dexscreener.com';
 
@@ -68,7 +73,9 @@ export class DexScreener {
   async tokens(mints: string[]): Promise<Observed<DexPair[]>> {
     if (mints.length === 0 || mints.length > 30) throw new Error('tokens() takes 1–30 mints');
     const path = `/tokens/v1/solana/${mints.join(',')}`;
-    return this.http.request('/tokens/v1/solana', BASE + path, {}, (j) => z.array(DexPairSchema).parse(j ?? []));
+    return this.http.request('/tokens/v1/solana', BASE + path, {}, (j) =>
+      z.array(DexPairSchema).parse(j ?? []),
+    );
   }
 
   /** Every pool DexScreener knows for one token (used for earliest-pool and total liquidity). */
@@ -79,10 +86,18 @@ export class DexScreener {
   }
 
   async pair(pairAddress: string): Promise<Observed<DexPair | null>> {
-    return this.http.request('/latest/dex/pairs/solana', `${BASE}/latest/dex/pairs/solana/${pairAddress}`, {}, (j) => {
-      const parsed = z.object({ pairs: z.array(DexPairSchema).nullable().optional() }).passthrough().parse(j);
-      return parsed.pairs?.[0] ?? null;
-    });
+    return this.http.request(
+      '/latest/dex/pairs/solana',
+      `${BASE}/latest/dex/pairs/solana/${pairAddress}`,
+      {},
+      (j) => {
+        const parsed = z
+          .object({ pairs: z.array(DexPairSchema).nullable().optional() })
+          .passthrough()
+          .parse(j);
+        return parsed.pairs?.[0] ?? null;
+      },
+    );
   }
 
   get circuit() {

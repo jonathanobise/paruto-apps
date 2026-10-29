@@ -15,12 +15,23 @@ export interface BundleAnalysis {
   status: 'PASS' | 'FAIL' | 'UNVERIFIED';
   windowSeconds: number;
   launchBuys: number;
-  coordinatedGroups: Array<{ key: string; wallets: string[]; pct: string; signatures: string[]; basis: string }>;
+  coordinatedGroups: Array<{
+    key: string;
+    wallets: string[];
+    pct: string;
+    signatures: string[];
+    basis: string;
+  }>;
   bundledPct: string | null;
   notes: string[];
 }
 
-export function launchBuysFrom(txs: ParsedTx[], mint: string, poolCreatedAt: number, windowSeconds: number): LaunchBuy[] {
+export function launchBuysFrom(
+  txs: ParsedTx[],
+  mint: string,
+  poolCreatedAt: number,
+  windowSeconds: number,
+): LaunchBuy[] {
   const end = poolCreatedAt + windowSeconds * 1000;
   const buys: LaunchBuy[] = [];
   for (const tx of txs) {
@@ -28,7 +39,14 @@ export function launchBuysFrom(txs: ParsedTx[], mint: string, poolCreatedAt: num
     if (tx.type !== 'SWAP') continue;
     for (const t of tx.tokenTransfers) {
       if (t.mint === mint && t.to) {
-        buys.push({ signature: tx.signature, slot: tx.slot, timestamp: tx.timestamp, buyer: t.to, feePayer: tx.feePayer, uiAmount: new Decimal(t.uiAmount) });
+        buys.push({
+          signature: tx.signature,
+          slot: tx.slot,
+          timestamp: tx.timestamp,
+          buyer: t.to,
+          feePayer: tx.feePayer,
+          uiAmount: new Decimal(t.uiAmount),
+        });
       }
     }
   }
@@ -50,7 +68,14 @@ export function analyseBundle(input: {
 }): BundleAnalysis {
   const notes: string[] = [];
   if (!input.buys) {
-    return { status: 'UNVERIFIED', windowSeconds: input.windowSeconds, launchBuys: 0, coordinatedGroups: [], bundledPct: null, notes: ['launch transactions unavailable (indexer required)'] };
+    return {
+      status: 'UNVERIFIED',
+      windowSeconds: input.windowSeconds,
+      launchBuys: 0,
+      coordinatedGroups: [],
+      bundledPct: null,
+      notes: ['launch transactions unavailable (indexer required)'],
+    };
   }
   // union-find over buyers
   const parent = new Map<string, string>();
@@ -73,13 +98,24 @@ export function analyseBundle(input: {
   const byPayer = groupBy(input.buys, (b) => b.feePayer);
   for (const [payer, list] of byPayer) {
     const wallets = [...new Set(list.map((b) => b.buyer))];
-    if (wallets.length > 1) for (const w of wallets) (union(w, wallets[0]!), note(w, `same fee payer ${payer.slice(0, 6)}…`));
+    if (wallets.length < 2) continue;
+    for (const w of wallets) {
+      union(w, wallets[0]!);
+      note(w, `same fee payer ${payer.slice(0, 6)}…`);
+    }
   }
   if (input.funders) {
-    const byFunder = groupBy(input.buys.filter((b) => input.funders!.has(b.buyer)), (b) => input.funders!.get(b.buyer)!);
+    const byFunder = groupBy(
+      input.buys.filter((b) => input.funders!.has(b.buyer)),
+      (b) => input.funders!.get(b.buyer)!,
+    );
     for (const [funder, list] of byFunder) {
       const wallets = [...new Set(list.map((b) => b.buyer))];
-      if (wallets.length > 1) for (const w of wallets) (union(w, wallets[0]!), note(w, `shared funder ${funder.slice(0, 6)}…`));
+      if (wallets.length < 2) continue;
+      for (const w of wallets) {
+        union(w, wallets[0]!);
+        note(w, `shared funder ${funder.slice(0, 6)}…`);
+      }
     }
   }
 
@@ -107,7 +143,14 @@ export function analyseBundle(input: {
     status = 'UNVERIFIED';
     notes.push('funding links of launch buyers not fully traced');
   }
-  return { status, windowSeconds: input.windowSeconds, launchBuys: input.buys.length, coordinatedGroups: coordinated, bundledPct: pct?.toFixed(4) ?? null, notes };
+  return {
+    status,
+    windowSeconds: input.windowSeconds,
+    launchBuys: input.buys.length,
+    coordinatedGroups: coordinated,
+    bundledPct: pct?.toFixed(4) ?? null,
+    notes,
+  };
 }
 
 function groupBy<T>(items: T[], key: (t: T) => string): Map<string, T[]> {

@@ -53,7 +53,19 @@ export async function persistEvidence(store: EvidenceStore, records: EvidenceRec
     stmts.push({
       sql: `INSERT OR IGNORE INTO evidence (id, kind, provider_id, endpoint, observed_at, ingested_at, slot, storage_key, sha256, size_bytes, verification)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      params: [r.id, r.kind, r.provider, r.endpoint, r.observedAt, r.ingestedAt, r.slot, key, r.sha256, r.raw.length, r.verification],
+      params: [
+        r.id,
+        r.kind,
+        r.provider,
+        r.endpoint,
+        r.observedAt,
+        r.ingestedAt,
+        r.slot,
+        key,
+        r.sha256,
+        r.raw.length,
+        r.verification,
+      ],
     });
   }
   return stmts;
@@ -63,7 +75,10 @@ export async function persistEvidence(store: EvidenceStore, records: EvidenceRec
 export async function resolveEvidenceIds(db: SqlDb, records: EvidenceRecord[]): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   for (const r of records) {
-    const row = await db.first<{ id: string }>('SELECT id FROM evidence WHERE sha256 = ? AND kind = ? AND observed_at = ?', [r.sha256, r.kind, r.observedAt]);
+    const row = await db.first<{ id: string }>(
+      'SELECT id FROM evidence WHERE sha256 = ? AND kind = ? AND observed_at = ?',
+      [r.sha256, r.kind, r.observedAt],
+    );
     map.set(r.id, row?.id ?? r.id);
   }
   return map;

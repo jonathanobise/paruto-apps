@@ -1,0 +1,20 @@
+{
+  "name": "@alpha-desk/tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@alpha-desk/analytics": "workspace:*",
+    "@alpha-desk/config": "workspace:*",
+    "@alpha-desk/db": "workspace:*",
+    "@alpha-desk/discovery": "workspace:*",
+    "@alpha-desk/execution": "workspace:*",
+    "@alpha-desk/ledger": "workspace:*",
+    "@alpha-desk/orchestrator": "workspace:*",
+    "@alpha-desk/providers": "workspace:*",
+    "@alpha-desk/risk": "workspace:*",
+    "@alpha-desk/scoring": "workspace:*",
+    "@alpha-desk/security": "workspace:*",
+    "@alpha-desk/shared": "workspace:*"
+  }
+}

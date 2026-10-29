@@ -3,7 +3,11 @@ import { ConstraintError, type RunResult, type SqlDb, type SqlValue, type Statem
 
 function wrap(err: unknown): unknown {
   const msg = err instanceof Error ? err.message : String(err);
-  if (/constraint|append-only|immutable|never deleted|final|may not be lowered|already consumed|must be positive/i.test(msg)) {
+  if (
+    /constraint|append-only|immutable|never deleted|final|may not be lowered|already consumed|must be positive/i.test(
+      msg,
+    )
+  ) {
     return new ConstraintError(msg, err);
   }
   return err;

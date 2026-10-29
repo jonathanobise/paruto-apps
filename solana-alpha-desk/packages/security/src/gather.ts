@@ -40,8 +40,17 @@ export interface GatherInput {
   cfg: StrategyConfig;
 }
 
-const ok = <T>(value: T, evidenceIds: string[], observedAt: number): Fact<T> => ({ status: 'OK', value, evidenceIds, observedAt });
-const missing = <T>(error: string, evidenceIds: string[] = [], status: 'UNAVAILABLE' | 'ERROR' = 'UNAVAILABLE'): Fact<T> => ({
+const ok = <T>(value: T, evidenceIds: string[], observedAt: number): Fact<T> => ({
+  status: 'OK',
+  value,
+  evidenceIds,
+  observedAt,
+});
+const missing = <T>(
+  error: string,
+  evidenceIds: string[] = [],
+  status: 'UNAVAILABLE' | 'ERROR' = 'UNAVAILABLE',
+): Fact<T> => ({
   status,
   value: null,
   evidenceIds,
@@ -53,7 +62,10 @@ const missing = <T>(error: string, evidenceIds: string[] = [], status: 'UNAVAILA
  * Collects every fact the Filter rules need, citing an evidence record for each. Failures are recorded
  * as UNAVAILABLE / ERROR facts — never replaced with defaults.
  */
-export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInput): Promise<{ evidence: SecurityEvidence; records: EvidenceCollector['records'] }> {
+export async function gatherSecurityEvidence(
+  deps: GatherDeps,
+  input: GatherInput,
+): Promise<{ evidence: SecurityEvidence; records: EvidenceCollector['records'] }> {
   const ev = new EvidenceCollector();
   const { rpc, cfg } = { rpc: deps.rpc, cfg: input.cfg };
   const mint = input.mint;
@@ -66,7 +78,8 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
     const info = acct.data?.parsed?.type === 'mint' ? acct.data.parsed.info : null;
     if (!acct.data || !info) mintFacts = missing('mint account not found or not a mint', [id]);
     else {
-      const exts = (info.extensions as Array<{ extension: string; state?: Record<string, unknown> }> | undefined) ?? [];
+      const exts =
+        (info.extensions as Array<{ extension: string; state?: Record<string, unknown> }> | undefined) ?? [];
       mintFacts = ok(
         {
           tokenProgram: acct.data.owner,
@@ -108,15 +121,23 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
         if (supply.data.amount > 0n) {
           const largest = await rpc.getTokenLargestAccounts(decoded.lpMint);
           ids.push(ev.add(largest, 'RPC_LP_HOLDERS', 'ON_CHAIN'));
-          const accts = await rpc.getAccounts(largest.data.map((a) => a.address), 'jsonParsed');
+          const accts = await rpc.getAccounts(
+            largest.data.map((a) => a.address),
+            'jsonParsed',
+          );
           ids.push(ev.add(accts, 'RPC_LP_HOLDER_ACCOUNTS', 'ON_CHAIN'));
-          holders = largest.data.map((a, i) => ({ tokenAccount: a.address, amount: a.amount, owner: (accts.data[i]?.parsed?.info?.owner as string | undefined) ?? null }));
+          holders = largest.data.map((a, i) => ({
+            tokenAccount: a.address,
+            amount: a.amount,
+            owner: (accts.data[i]?.parsed?.info?.owner as string | undefined) ?? null,
+          }));
         }
         lp = assessLpSafety(decoded, supply.data.amount, holders, cfg.filter.minLpNonWithdrawablePct);
 
         const vaults = await rpc.getAccounts([oriented.quoteVault], 'jsonParsed');
         ids.push(ev.add(vaults, 'RPC_POOL_VAULTS', 'ON_CHAIN'));
-        const qa = vaults.data[0]?.parsed?.info?.tokenAmount as { amount: string; decimals: number } | undefined;
+        const qa = vaults.data[0]?.parsed?.info?.tokenAmount as
+          { amount: string; decimals: number } | undefined;
         if (qa) {
           let price: Decimal | null = null;
           if (oriented.quoteMint === USDC_MINT) price = new Decimal(1);
@@ -131,7 +152,18 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
           }
         }
       }
-      pool = ok({ pairAddress: input.pairAddress, programOwner: acct.data.owner, decoded, lp, onChainLiquidityUsd: liq, quotePriceUsd: quotePrice }, ids, acct.provenance.observedAt);
+      pool = ok(
+        {
+          pairAddress: input.pairAddress,
+          programOwner: acct.data.owner,
+          decoded,
+          lp,
+          onChainLiquidityUsd: liq,
+          quotePriceUsd: quotePrice,
+        },
+        ids,
+        acct.provenance.observedAt,
+      );
     }
   } catch (e) {
     pool = missing((e as Error).message, [], 'ERROR');
@@ -170,9 +202,19 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
     const smallTokens = toBaseUnits(new Decimal(20).div(px), decimals);
     const ids: string[] = [];
     try {
-      const small = await sellQuote(deps.jupiter, mint, smallTokens > 0n ? smallTokens : 1n, cfg.execution.slippageBps);
+      const small = await sellQuote(
+        deps.jupiter,
+        mint,
+        smallTokens > 0n ? smallTokens : 1n,
+        cfg.execution.slippageBps,
+      );
       ids.push(ev.add(small, 'JUP_SELL_QUOTE_REFERENCE', 'DERIVED'));
-      const sized = await sellQuote(deps.jupiter, mint, sizedTokens > 0n ? sizedTokens : 1n, cfg.execution.slippageBps);
+      const sized = await sellQuote(
+        deps.jupiter,
+        mint,
+        sizedTokens > 0n ? sizedTokens : 1n,
+        cfg.execution.slippageBps,
+      );
       ids.push(ev.add(sized, 'JUP_SELL_QUOTE_SIZED', 'DERIVED'));
       const smallPx = quotePriceUsd(small.data, decimals, 'SELL');
       const sizedPx = quotePriceUsd(sized.data, decimals, 'SELL');
@@ -193,7 +235,20 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
       );
     } catch (e) {
       route = isNoRouteError(e)
-        ? ok({ ok: false, noRouteReason: (e as Error).message.slice(0, 200), sellAmountTokens: sizedTokens.toString(), outUsd: null, smallPriceUsd: null, sizedPriceUsd: null, priceImpactPct: null, routeLabels: [] }, ids, deps.clock.now())
+        ? ok(
+            {
+              ok: false,
+              noRouteReason: (e as Error).message.slice(0, 200),
+              sellAmountTokens: sizedTokens.toString(),
+              outUsd: null,
+              smallPriceUsd: null,
+              sizedPriceUsd: null,
+              priceImpactPct: null,
+              routeLabels: [],
+            },
+            ids,
+            deps.clock.now(),
+          )
         : missing((e as Error).message, ids, 'ERROR');
     }
   } else route = missing('price or mint facts unavailable; cannot size the sell test');
@@ -207,9 +262,16 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
     if (!mintFacts.value) throw new Error('mint facts unavailable');
     const largest = await rpc.getTokenLargestAccounts(mint);
     const ids = [ev.add(largest, 'RPC_LARGEST_HOLDERS', 'ON_CHAIN')];
-    const tokenAccts = await rpc.getAccounts(largest.data.map((a) => a.address), 'jsonParsed');
+    const tokenAccts = await rpc.getAccounts(
+      largest.data.map((a) => a.address),
+      'jsonParsed',
+    );
     ids.push(ev.add(tokenAccts, 'RPC_HOLDER_TOKEN_ACCOUNTS', 'ON_CHAIN'));
-    const holdings = largest.data.map((a, i) => ({ tokenAccount: a.address, amount: a.amount, owner: (tokenAccts.data[i]?.parsed?.info?.owner as string | undefined) ?? null }));
+    const holdings = largest.data.map((a, i) => ({
+      tokenAccount: a.address,
+      amount: a.amount,
+      owner: (tokenAccts.data[i]?.parsed?.info?.owner as string | undefined) ?? null,
+    }));
     const ownerAddrs = [...new Set(holdings.map((h) => h.owner).filter((o): o is string => !!o))];
     const owners = new Map<string, OwnerInfo>();
     if (ownerAddrs.length) {
@@ -217,13 +279,20 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
       ids.push(ev.add(infos, 'RPC_HOLDER_OWNERS', 'ON_CHAIN'));
       ownerAddrs.forEach((a, i) => {
         const inf = infos.data[i];
-        owners.set(a, { address: a, exists: !!inf, programOwner: inf?.owner ?? null, executable: inf?.executable ?? false });
+        owners.set(a, {
+          address: a,
+          exists: !!inf,
+          programOwner: inf?.owner ?? null,
+          executable: inf?.executable ?? false,
+        });
       });
     }
     let clusters: Map<string, string> | null = null;
     if (deps.helius?.configured) {
       clusters = new Map();
-      for (const w of ownerAddrs.filter((a) => owners.get(a)?.programOwner === '11111111111111111111111111111111').slice(0, 20)) {
+      for (const w of ownerAddrs
+        .filter((a) => owners.get(a)?.programOwner === '11111111111111111111111111111111')
+        .slice(0, 20)) {
         const funder = await firstFunder(deps.helius, w, ev);
         if (funder) clusters.set(w, `funder:${funder}`);
       }
@@ -272,12 +341,26 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
     });
     if (history && deployer) {
       linked = new Map();
-      for (const l of analysis.links.filter((x) => x.strength !== 'WEAK' && x.relation !== 'DEPLOYER').slice(0, 15)) {
+      for (const l of analysis.links
+        .filter((x) => x.strength !== 'WEAK' && x.relation !== 'DEPLOYER')
+        .slice(0, 15)) {
         const h = await rpc.getTokenAccountsByOwner(l.wallet, mint);
         ids.push(ev.add(h, 'RPC_LINKED_HOLDINGS', 'ON_CHAIN'));
-        linked.set(l.wallet, h.data.reduce((s, a) => s + a.amount, 0n));
+        linked.set(
+          l.wallet,
+          h.data.reduce((s, a) => s + a.amount, 0n),
+        );
       }
-      const full = analyseDeveloper({ mint, deployer, deployerSource: 'PumpSwap pool coin_creator (on-chain)', circulatingSupply: circulating, deployerHoldings, linkedHoldings: linked, deployerHistory: history, maxOwnershipPct: cfg.filter.maxDeveloperOwnershipPct });
+      const full = analyseDeveloper({
+        mint,
+        deployer,
+        deployerSource: 'PumpSwap pool coin_creator (on-chain)',
+        circulatingSupply: circulating,
+        deployerHoldings,
+        linkedHoldings: linked,
+        deployerHistory: history,
+        maxOwnershipPct: cfg.filter.maxDeveloperOwnershipPct,
+      });
       developer = ok(full, ids, deps.clock.now());
     } else developer = ok(analysis, ids, deps.clock.now());
   } catch (e) {
@@ -289,14 +372,30 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
   try {
     if (!deps.helius?.configured || !input.pairCreatedAt || !mintFacts.value) {
       bundle = ok(
-        analyseBundle({ buys: null, totalSupplyUi: new Decimal(0), funders: null, fundersComplete: false, windowSeconds: cfg.filter.launchWindowSeconds, maxBundledPct: cfg.filter.maxBundledLaunchPct }),
+        analyseBundle({
+          buys: null,
+          totalSupplyUi: new Decimal(0),
+          funders: null,
+          fundersComplete: false,
+          windowSeconds: cfg.filter.launchWindowSeconds,
+          maxBundledPct: cfg.filter.maxBundledLaunchPct,
+        }),
         [],
         deps.clock.now(),
       );
     } else {
-      const hist = await pagedHistory(deps.helius, input.pairAddress, 30, ev, 'IDX_POOL_HISTORY', input.pairCreatedAt);
+      const hist = await pagedHistory(
+        deps.helius,
+        input.pairAddress,
+        30,
+        ev,
+        'IDX_POOL_HISTORY',
+        input.pairCreatedAt,
+      );
       const reached = hist.txs.some((t) => t.timestamp <= input.pairCreatedAt!) || hist.complete;
-      const buys = reached ? launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds) : null;
+      const buys = reached
+        ? launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds)
+        : null;
       const funders = new Map<string, string>();
       const buyers = [...new Set((buys ?? []).map((b) => b.buyer))];
       for (const w of buyers.slice(0, 25)) {
@@ -305,7 +404,14 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
       }
       const supplyUi = fromBaseUnits(mintFacts.value.supply, mintFacts.value.decimals);
       bundle = ok(
-        analyseBundle({ buys, totalSupplyUi: supplyUi, funders, fundersComplete: buyers.length <= 25, windowSeconds: cfg.filter.launchWindowSeconds, maxBundledPct: cfg.filter.maxBundledLaunchPct }),
+        analyseBundle({
+          buys,
+          totalSupplyUi: supplyUi,
+          funders,
+          fundersComplete: buyers.length <= 25,
+          windowSeconds: cfg.filter.launchWindowSeconds,
+          maxBundledPct: cfg.filter.maxBundledLaunchPct,
+        }),
         ev.records.filter((r) => r.kind.startsWith('IDX_')).map((r) => r.id),
         deps.clock.now(),
       );
@@ -341,12 +447,30 @@ export async function gatherSecurityEvidence(deps: GatherDeps, input: GatherInpu
   } else corroboration = missing('not configured');
 
   return {
-    evidence: { mint, pairAddress: input.pairAddress, mintFacts, pool, market, route, holders, developer, bundle, corroboration },
+    evidence: {
+      mint,
+      pairAddress: input.pairAddress,
+      mintFacts,
+      pool,
+      market,
+      route,
+      holders,
+      developer,
+      bundle,
+      corroboration,
+    },
     records: ev.records,
   };
 }
 
-async function pagedHistory(helius: Helius, address: string, maxPages: number, ev: EvidenceCollector, kind: string, stopBefore?: number): Promise<{ txs: ParsedTx[]; complete: boolean }> {
+async function pagedHistory(
+  helius: Helius,
+  address: string,
+  maxPages: number,
+  ev: EvidenceCollector,
+  kind: string,
+  stopBefore?: number,
+): Promise<{ txs: ParsedTx[]; complete: boolean }> {
   const txs: ParsedTx[] = [];
   let before: string | undefined;
   for (let i = 0; i < maxPages; i++) {
@@ -355,7 +479,8 @@ async function pagedHistory(helius: Helius, address: string, maxPages: number, e
     txs.push(...page.data);
     if (page.data.length < 100) return { txs, complete: true };
     before = page.data[page.data.length - 1]!.signature;
-    if (stopBefore && page.data[page.data.length - 1]!.timestamp < stopBefore) return { txs, complete: false };
+    if (stopBefore && page.data[page.data.length - 1]!.timestamp < stopBefore)
+      return { txs, complete: false };
   }
   return { txs, complete: false };
 }
@@ -365,7 +490,9 @@ async function firstFunder(helius: Helius, wallet: string, ev: EvidenceCollector
   const { txs } = await pagedHistory(helius, wallet, 3, ev, 'IDX_WALLET_FUNDING');
   const ordered = [...txs].sort((a, b) => a.timestamp - b.timestamp);
   for (const tx of ordered) {
-    const n = tx.nativeTransfers.find((t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n);
+    const n = tx.nativeTransfers.find(
+      (t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n,
+    );
     if (n?.from) return n.from;
   }
   return null;

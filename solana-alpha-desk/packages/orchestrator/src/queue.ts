@@ -20,7 +20,15 @@ export interface WorkItem {
  * state-machine guard and handoff idempotency keys guarantee. Expired leases are re-delivered after a
  * crash; items that exhaust their attempts move to DEAD (the dead-letter state) and raise an alert.
  */
-export async function enqueue(db: SqlDb, queue: QueueName, idempotencyKey: string, payload: unknown, now: number, candidateId: string | null = null, delayMs = 0): Promise<boolean> {
+export async function enqueue(
+  db: SqlDb,
+  queue: QueueName,
+  idempotencyKey: string,
+  payload: unknown,
+  now: number,
+  candidateId: string | null = null,
+  delayMs = 0,
+): Promise<boolean> {
   const r = await db.run(
     `INSERT OR IGNORE INTO work_items (id, queue, candidate_id, idempotency_key, payload, status, attempts, max_attempts, available_at, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, 'PENDING', 0, 5, ?, ?, ?)`,
@@ -29,7 +37,13 @@ export async function enqueue(db: SqlDb, queue: QueueName, idempotencyKey: strin
   return r.changes > 0;
 }
 
-export async function lease(db: SqlDb, queue: QueueName, now: number, leaseMs: number, limit: number): Promise<WorkItem[]> {
+export async function lease(
+  db: SqlDb,
+  queue: QueueName,
+  now: number,
+  leaseMs: number,
+  limit: number,
+): Promise<WorkItem[]> {
   const rows = await db.all<WorkItem & { status: string }>(
     `SELECT id, queue, candidate_id, idempotency_key, payload, attempts, max_attempts, status FROM work_items
      WHERE queue = ? AND ((status = 'PENDING' AND available_at <= ?) OR (status = 'IN_PROGRESS' AND leased_until < ?))
@@ -48,29 +62,58 @@ export async function lease(db: SqlDb, queue: QueueName, now: number, leaseMs: n
 }
 
 export async function complete(db: SqlDb, id: string, now: number): Promise<void> {
-  await db.run(`UPDATE work_items SET status = 'DONE', leased_until = NULL, updated_at = ? WHERE id = ?`, [now, id]);
+  await db.run(`UPDATE work_items SET status = 'DONE', leased_until = NULL, updated_at = ? WHERE id = ?`, [
+    now,
+    id,
+  ]);
 }
 
 export async function fail(db: SqlDb, item: WorkItem, error: string, now: number): Promise<'RETRY' | 'DEAD'> {
   if (item.attempts >= item.max_attempts) {
     await db.batch([
-      { sql: `UPDATE work_items SET status = 'DEAD', last_error = ?, leased_until = NULL, updated_at = ? WHERE id = ?`, params: [error.slice(0, 1000), now, item.id] },
-      alertStmt('WARNING', `queue:${item.queue}`, `Work item dead-lettered after ${item.attempts} attempts`, error, now, `dead:${item.id}`),
-      await auditStmt({ category: 'AUTOMATION', action: 'DEAD_LETTER', actor: 'SYSTEM', subjectType: 'work_item', subjectId: item.id, detail: { queue: item.queue, error: error.slice(0, 500) }, at: now }),
+      {
+        sql: `UPDATE work_items SET status = 'DEAD', last_error = ?, leased_until = NULL, updated_at = ? WHERE id = ?`,
+        params: [error.slice(0, 1000), now, item.id],
+      },
+      alertStmt(
+        'WARNING',
+        `queue:${item.queue}`,
+        `Work item dead-lettered after ${item.attempts} attempts`,
+        error,
+        now,
+        `dead:${item.id}`,
+      ),
+      await auditStmt({
+        category: 'AUTOMATION',
+        action: 'DEAD_LETTER',
+        actor: 'SYSTEM',
+        subjectType: 'work_item',
+        subjectId: item.id,
+        detail: { queue: item.queue, error: error.slice(0, 500) },
+        at: now,
+      }),
     ]);
     return 'DEAD';
   }
   const backoff = Math.min(300_000, 5_000 * 2 ** (item.attempts - 1));
-  await db.run(`UPDATE work_items SET status = 'PENDING', last_error = ?, available_at = ?, leased_until = NULL, updated_at = ? WHERE id = ?`, [error.slice(0, 1000), now + backoff, now, item.id]);
+  await db.run(
+    `UPDATE work_items SET status = 'PENDING', last_error = ?, available_at = ?, leased_until = NULL, updated_at = ? WHERE id = ?`,
+    [error.slice(0, 1000), now + backoff, now, item.id],
+  );
   return 'RETRY';
 }
 
 export async function queueDepths(db: SqlDb): Promise<Record<string, number>> {
-  const rows = await db.all<{ queue: string; n: number }>(`SELECT queue, COUNT(*) AS n FROM work_items WHERE status IN ('PENDING','IN_PROGRESS') GROUP BY queue`);
+  const rows = await db.all<{ queue: string; n: number }>(
+    `SELECT queue, COUNT(*) AS n FROM work_items WHERE status IN ('PENDING','IN_PROGRESS') GROUP BY queue`,
+  );
   return Object.fromEntries(rows.map((r) => [r.queue, Number(r.n)]));
 }
 
 /** Re-schedules a leased item without consuming an attempt (used when a stage is waiting for data). */
 export async function defer(db: SqlDb, id: string, until: number, now: number): Promise<void> {
-  await db.run(`UPDATE work_items SET status = 'PENDING', attempts = MAX(0, attempts - 1), available_at = ?, leased_until = NULL, updated_at = ? WHERE id = ?`, [until, now, id]);
+  await db.run(
+    `UPDATE work_items SET status = 'PENDING', attempts = MAX(0, attempts - 1), available_at = ?, leased_until = NULL, updated_at = ? WHERE id = ?`,
+    [until, now, id],
+  );
 }

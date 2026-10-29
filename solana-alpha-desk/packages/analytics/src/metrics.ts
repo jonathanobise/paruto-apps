@@ -70,10 +70,13 @@ export function computeMetrics(trades: ClosedTrade[], equity: EquityPoint[]): Me
     avgLossUsd: losses.length ? microToUsd(-grossLoss).div(losses.length).toFixed(2) : null,
     expectancyUsd: trades.length ? microToUsd(net).div(trades.length).toFixed(2) : null,
     expectancyR: rs.length ? (rs.reduce((a, b) => a + b, 0) / rs.length).toFixed(3) : null,
-    profitFactor: grossLoss > 0n ? new Decimal(grossWin.toString()).div(grossLoss.toString()).toFixed(3) : null,
+    profitFactor:
+      grossLoss > 0n ? new Decimal(grossWin.toString()).div(grossLoss.toString()).toFixed(3) : null,
     netPnlUsd: microToUsd(net).toFixed(2),
     feesUsd: microToUsd(trades.reduce((s, t) => s + t.feesMicro, 0n)).toFixed(2),
-    avgDurationMinutes: trades.length ? (trades.reduce((s, t) => s + (t.exitAt - t.entryAt), 0) / trades.length / 60_000).toFixed(1) : null,
+    avgDurationMinutes: trades.length
+      ? (trades.reduce((s, t) => s + (t.exitAt - t.entryAt), 0) / trades.length / 60_000).toFixed(1)
+      : null,
     maxDrawdownPct: maxDrawdownPct(equity),
     sharpe: ratiosOk ? sharpe(daily) : null,
     sortino: ratiosOk ? sortino(daily) : null,
@@ -101,7 +104,8 @@ export function maxDrawdownPct(equity: EquityPoint[]): string | null {
 /** Last equity value per UTC day → simple daily returns. */
 export function dailyReturns(equity: EquityPoint[]): number[] {
   const byDay = new Map<string, bigint>();
-  for (const p of [...equity].sort((a, b) => a.at - b.at)) byDay.set(new Date(p.at).toISOString().slice(0, 10), p.equityMicro);
+  for (const p of [...equity].sort((a, b) => a.at - b.at))
+    byDay.set(new Date(p.at).toISOString().slice(0, 10), p.equityMicro);
   const vals = [...byDay.values()].map((v) => Number(v));
   const out: number[] = [];
   for (let i = 1; i < vals.length; i++) if (vals[i - 1]! > 0) out.push(vals[i]! / vals[i - 1]! - 1);
@@ -134,9 +138,11 @@ function bucket(v: number | null, edges: number[], labels: string[]): string {
 }
 
 export const SEGMENTERS: Record<string, (t: ClosedTrade) => string> = {
-  tokenAge: (t) => bucket(t.tokenAgeMinutesAtEntry, [120, 360, 1440, 4320], ['30m–2h', '2–6h', '6–24h', '24–72h', '>72h']),
+  tokenAge: (t) =>
+    bucket(t.tokenAgeMinutesAtEntry, [120, 360, 1440, 4320], ['30m–2h', '2–6h', '6–24h', '24–72h', '>72h']),
   marketCap: (t) => bucket(t.marketCapAtEntry, [1e6, 5e6, 2e7], ['$0.3–1M', '$1–5M', '$5–20M', '>$20M']),
-  liquidity: (t) => bucket(t.liquidityAtEntry, [1e5, 3e5, 1e6], ['$40–100k', '$100–300k', '$300k–1M', '>$1M']),
+  liquidity: (t) =>
+    bucket(t.liquidityAtEntry, [1e5, 3e5, 1e6], ['$40–100k', '$100–300k', '$300k–1M', '>$1M']),
   scoreBand: (t) => bucket(t.scoreAtEntry, [75, 80, 90], ['70–75', '75–80', '80–90', '90–100']),
   hourUtc: (t) => `${String(new Date(t.entryAt).getUTCHours()).padStart(2, '0')}:00 UTC`,
   strategy: (t) => t.strategyVersion,
@@ -154,6 +160,15 @@ export function segment(trades: ClosedTrade[], by: keyof typeof SEGMENTERS): Seg
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, ts]) => {
       const m = computeMetrics(ts, []);
-      return { key, metrics: { trades: m.trades, winRatePct: m.winRatePct, expectancyUsd: m.expectancyUsd, netPnlUsd: m.netPnlUsd, profitFactor: m.profitFactor } };
+      return {
+        key,
+        metrics: {
+          trades: m.trades,
+          winRatePct: m.winRatePct,
+          expectancyUsd: m.expectancyUsd,
+          netPnlUsd: m.netPnlUsd,
+          profitFactor: m.profitFactor,
+        },
+      };
     });
 }

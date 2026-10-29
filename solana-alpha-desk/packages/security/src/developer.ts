@@ -81,24 +81,49 @@ export function analyseDeveloper(input: {
       if (tx.failed) continue;
       for (const t of tx.tokenTransfers) {
         if (t.mint === input.mint && t.from === input.deployer && t.to && t.to !== input.deployer) {
-          addLink(links, { wallet: t.to, relation: 'TOKEN_RECIPIENT', strength: 'CONFIRMED', evidence: [tx.signature] });
+          addLink(links, {
+            wallet: t.to,
+            relation: 'TOKEN_RECIPIENT',
+            strength: 'CONFIRMED',
+            evidence: [tx.signature],
+          });
         }
       }
       for (const n of tx.nativeTransfers) {
         if (n.from === input.deployer && n.to && n.to !== input.deployer && n.lamports >= 100_000_000n) {
-          addLink(links, { wallet: n.to, relation: 'FUNDED_BY_DEPLOYER', strength: 'PROBABLE', evidence: [tx.signature] });
+          addLink(links, {
+            wallet: n.to,
+            relation: 'FUNDED_BY_DEPLOYER',
+            strength: 'PROBABLE',
+            evidence: [tx.signature],
+          });
         }
         if (n.to === input.deployer && n.from && n.from !== input.deployer && n.lamports >= 100_000_000n) {
-          addLink(links, { wallet: n.from, relation: 'FUNDER_OF_DEPLOYER', strength: 'WEAK', evidence: [tx.signature] });
+          addLink(links, {
+            wallet: n.from,
+            relation: 'FUNDER_OF_DEPLOYER',
+            strength: 'WEAK',
+            evidence: [tx.signature],
+          });
         }
       }
-      if ((tx.type === 'CREATE' || tx.type === 'TOKEN_MINT' || tx.type === 'CREATE_POOL') && tx.feePayer === input.deployer) {
+      if (
+        (tx.type === 'CREATE' || tx.type === 'TOKEN_MINT' || tx.type === 'CREATE_POOL') &&
+        tx.feePayer === input.deployer
+      ) {
         for (const t of tx.tokenTransfers) if (t.mint !== input.mint) priorTokens.add(t.mint);
       }
       if (tx.type === 'WITHDRAW_LIQUIDITY' && tx.feePayer === input.deployer) {
-        const otherMint = tx.tokenTransfers.find((t) => t.mint !== input.mint && t.to === input.deployer)?.mint ?? null;
+        const otherMint =
+          tx.tokenTransfers.find((t) => t.mint !== input.mint && t.to === input.deployer)?.mint ?? null;
         if (otherMint !== input.mint) {
-          rugFindings.push({ criterion: 'R1_LIQUIDITY_PULL', mint: otherMint, wallet: input.deployer, signature: tx.signature, at: tx.timestamp });
+          rugFindings.push({
+            criterion: 'R1_LIQUIDITY_PULL',
+            mint: otherMint,
+            wallet: input.deployer,
+            signature: tx.signature,
+            at: tx.timestamp,
+          });
         }
       }
     }
@@ -112,7 +137,9 @@ export function analyseDeveloper(input: {
     ownershipStatus = 'FAIL';
     notes.push(`deployer alone holds ${lower.toFixed(2)}%`);
   } else if (input.linkedHoldings && input.deployerHistory?.complete && input.deployerHoldings !== null) {
-    const strong = links.filter((l) => l.strength !== 'WEAK' && l.relation !== 'DEPLOYER').map((l) => l.wallet);
+    const strong = links
+      .filter((l) => l.strength !== 'WEAK' && l.relation !== 'DEPLOYER')
+      .map((l) => l.wallet);
     const total = strong.reduce((s, w) => s + (input.linkedHoldings!.get(w) ?? 0n), input.deployerHoldings);
     full = pct(total);
     ownershipStatus = full === null ? 'UNVERIFIED' : full.gt(input.maxOwnershipPct) ? 'FAIL' : 'PASS';

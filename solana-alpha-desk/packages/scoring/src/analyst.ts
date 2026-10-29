@@ -18,7 +18,11 @@ export interface AnalystDecision {
  * the threshold, every required factor is VERIFIED, enough weight is VERIFIED, and the Filter approval
  * is still valid. Scores are bounded to 0–100 by construction (Σ weights = 100, each normalised 0–1).
  */
-export function decideAnalyst(factors: FactorResult[], cfg: StrategyConfig['analyst'], ctx: { now: number; filterValidUntil: number | null }): AnalystDecision {
+export function decideAnalyst(
+  factors: FactorResult[],
+  cfg: StrategyConfig['analyst'],
+  ctx: { now: number; filterValidUntil: number | null },
+): AnalystDecision {
   const total = factors.reduce((s, f) => s.add(f.score), new Decimal(0));
   const bounded = Decimal.min(100, Decimal.max(0, total));
   const verifiedWeight = factors.filter((f) => f.quality === 'VERIFIED').reduce((s, f) => s + f.weight, 0);
@@ -44,7 +48,10 @@ export function decideAnalyst(factors: FactorResult[], cfg: StrategyConfig['anal
     outcome = 'ANALYST_APPROVED';
     reasons.push(`score ${bounded.toFixed(2)} ≥ ${cfg.passThreshold}`);
   }
-  const validUntil = outcome === 'ANALYST_APPROVED' ? Math.min(ctx.now + cfg.approvalTtlSeconds * 1000, ctx.filterValidUntil ?? Infinity) : null;
+  const validUntil =
+    outcome === 'ANALYST_APPROVED'
+      ? Math.min(ctx.now + cfg.approvalTtlSeconds * 1000, ctx.filterValidUntil ?? Infinity)
+      : null;
   return { outcome, totalScore: bounded.toFixed(4), verifiedWeight, factors, reasons, validUntil };
 }
 

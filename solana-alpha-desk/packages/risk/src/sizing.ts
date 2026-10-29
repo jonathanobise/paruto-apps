@@ -52,7 +52,13 @@ export function sizePosition(i: SizingInput, cfg: StrategyConfig['risk']): Sizin
   const cash = i.cashMicro - i.feeReserveMicro > 0n ? i.cashMicro - i.feeReserveMicro : 0n;
   const capacity = usdToMicro(equity.mul(cfg.maxCombinedExposurePct).div(100)) - i.openExposureMicro;
   const remaining = capacity > 0n ? capacity : 0n;
-  const caps = { allocationMicro: allocation, riskSizedMicro: riskSized, liquidityMicro: liquidity, cashMicro: cash, remainingCapacityMicro: remaining };
+  const caps = {
+    allocationMicro: allocation,
+    riskSizedMicro: riskSized,
+    liquidityMicro: liquidity,
+    cashMicro: cash,
+    remainingCapacityMicro: remaining,
+  };
   const notional = minBig(allocation, riskSized, liquidity, cash, remaining);
   const binding = (Object.keys(caps) as Array<keyof typeof caps>).find((k) => caps[k] === notional)!;
   return {

@@ -14,9 +14,8 @@ const ORDER: Record<LogLevel, number> = { debug: 10, info: 20, warn: 30, error: 
 export function createLogger(base: Record<string, unknown> = {}, minLevel: LogLevel = 'info'): Logger {
   const emit = (level: LogLevel, msg: string, fields?: Record<string, unknown>) => {
     if (ORDER[level] < ORDER[minLevel]) return;
-    const line = JSON.stringify(
-      { ts: new Date().toISOString(), level, msg, ...base, ...fields },
-      (_k, v) => (typeof v === 'bigint' ? v.toString() : v instanceof Error ? { name: v.name, message: v.message } : v),
+    const line = JSON.stringify({ ts: new Date().toISOString(), level, msg, ...base, ...fields }, (_k, v) =>
+      typeof v === 'bigint' ? v.toString() : v instanceof Error ? { name: v.name, message: v.message } : v,
     );
     if (level === 'error' || level === 'warn') console.error(line);
     else console.log(line);

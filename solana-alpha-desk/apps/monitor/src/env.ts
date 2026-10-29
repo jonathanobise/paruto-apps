@@ -24,6 +24,7 @@ export type MonitorEnv = z.infer<typeof Env>;
 export function loadEnv(source: Record<string, string | undefined> = process.env): MonitorEnv {
   const env = Env.parse(Object.fromEntries(Object.entries(source).filter(([, v]) => v !== '')));
   if (env.BRIDGE_URL && !env.BRIDGE_SECRET) throw new Error('BRIDGE_SECRET is required with BRIDGE_URL');
-  if (env.APP_ENV === 'production' && !env.BRIDGE_URL) throw new Error('production monitor must write to D1 through BRIDGE_URL');
+  if (env.APP_ENV === 'production' && !env.BRIDGE_URL)
+    throw new Error('production monitor must write to D1 through BRIDGE_URL');
   return env;
 }

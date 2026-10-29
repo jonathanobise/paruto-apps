@@ -1,6 +1,13 @@
 import type { SqlDb, Statement } from '@alpha-desk/db';
 import { isConstraintError } from '@alpha-desk/db';
-import { buildHandoff, sha256Hex, TERMINAL_STATES, type Agent, type CandidateState, type HandoffEvent } from '@alpha-desk/shared';
+import {
+  buildHandoff,
+  sha256Hex,
+  TERMINAL_STATES,
+  type Agent,
+  type CandidateState,
+  type HandoffEvent,
+} from '@alpha-desk/shared';
 import { auditStmt } from './audit-writer.ts';
 
 export interface CandidateRow {
@@ -44,31 +51,48 @@ export type TransitionResult =
  */
 export async function transition(db: SqlDb, t: TransitionInput): Promise<TransitionResult> {
   const { stmts, event } = await transitionStatements(t);
-  return commitTransitions(db, [...stmts, ...(t.extra ?? []), GUARD_CLEANUP], [{ candidate: t.candidate, event }]);
+  return commitTransitions(
+    db,
+    [...stmts, ...(t.extra ?? []), GUARD_CLEANUP],
+    [{ candidate: t.candidate, event }],
+  );
 }
 
 /**
  * Commits a batch that contains one or more transitions (each built by transitionStatements, in order).
  * On a constraint failure, distinguishes a redelivered duplicate from a lost race.
  */
-export async function commitTransitions(db: SqlDb, stmts: Statement[], transitions: Array<{ candidate: CandidateRow; event: HandoffEvent }>): Promise<TransitionResult> {
+export async function commitTransitions(
+  db: SqlDb,
+  stmts: Statement[],
+  transitions: Array<{ candidate: CandidateRow; event: HandoffEvent }>,
+): Promise<TransitionResult> {
   try {
     await db.batch(stmts);
     return { status: 'COMMITTED', event: transitions[transitions.length - 1]!.event };
   } catch (e) {
     if (!isConstraintError(e)) throw e;
     const first = transitions[0]!;
-    const prior = await db.first<{ next_state: CandidateState }>('SELECT next_state FROM handoff_events WHERE idempotency_key = ?', [first.event.idempotency_key]);
+    const prior = await db.first<{ next_state: CandidateState }>(
+      'SELECT next_state FROM handoff_events WHERE idempotency_key = ?',
+      [first.event.idempotency_key],
+    );
     if (prior) return { status: 'DUPLICATE', existingNextState: prior.next_state };
     const c = first.candidate;
-    const cur = await db.first<{ state: CandidateState; state_version: number }>('SELECT state, state_version FROM candidate_discoveries WHERE id = ?', [c.id]);
-    if (!cur || cur.state !== c.state || cur.state_version !== c.state_version) return { status: 'STALE', currentState: cur?.state ?? null };
+    const cur = await db.first<{ state: CandidateState; state_version: number }>(
+      'SELECT state, state_version FROM candidate_discoveries WHERE id = ?',
+      [c.id],
+    );
+    if (!cur || cur.state !== c.state || cur.state_version !== c.state_version)
+      return { status: 'STALE', currentState: cur?.state ?? null };
     throw e;
   }
 }
 
 /** The guarded statements for one transition (no cleanup; callers append GUARD_CLEANUP once at the end). */
-export async function transitionStatements(t: TransitionInput): Promise<{ stmts: Statement[]; event: HandoffEvent }> {
+export async function transitionStatements(
+  t: TransitionInput,
+): Promise<{ stmts: Statement[]; event: HandoffEvent }> {
   const c = t.candidate;
   const event = await buildHandoff({
     correlationId: c.correlation_id,
@@ -92,15 +116,32 @@ export async function transitionStatements(t: TransitionInput): Promise<{ stmts:
   const guardParams = [c.id, c.state, c.state_version];
   const sets = Object.entries(t.set ?? {});
   const stmts: Statement[] = [
-    guardStmt('EXISTS (SELECT 1 FROM candidate_discoveries WHERE id = ? AND state = ? AND state_version = ?)', guardParams),
+    guardStmt(
+      'EXISTS (SELECT 1 FROM candidate_discoveries WHERE id = ? AND state = ? AND state_version = ?)',
+      guardParams,
+    ),
     {
       sql: `INSERT INTO handoff_events (event_id, idempotency_key, correlation_id, candidate_id, token_mint, source_agent, destination_agent, event_type,
               previous_state, next_state, observed_at, generated_at, expires_at, config_version, strategy_version, body, checksum)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       params: [
-        event.event_id, event.idempotency_key, event.correlation_id, event.candidate_id, event.token_mint, event.source_agent,
-        event.destination_agent, event.event_type, event.previous_state, event.next_state, t.observedAt, t.now, t.expiresAt ?? null,
-        event.config_version, event.strategy_version, body, checksum,
+        event.event_id,
+        event.idempotency_key,
+        event.correlation_id,
+        event.candidate_id,
+        event.token_mint,
+        event.source_agent,
+        event.destination_agent,
+        event.event_type,
+        event.previous_state,
+        event.next_state,
+        t.observedAt,
+        t.now,
+        t.expiresAt ?? null,
+        event.config_version,
+        event.strategy_version,
+        body,
+        checksum,
       ],
     },
     {
@@ -116,7 +157,11 @@ export async function transitionStatements(t: TransitionInput): Promise<{ stmts:
       subjectType: 'candidate',
       subjectId: c.id,
       correlationId: c.correlation_id,
-      detail: { eventType: t.eventType, eventId: event.event_id, ...(t.payload ? { payload: t.payload } : {}) },
+      detail: {
+        eventType: t.eventType,
+        eventId: event.event_id,
+        ...(t.payload ? { payload: t.payload } : {}),
+      },
       evidenceIds: t.evidenceIds,
       at: t.now,
     }),

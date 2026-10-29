@@ -14,7 +14,9 @@ export interface D1Like {
 
 function wrap(err: unknown): unknown {
   const msg = err instanceof Error ? err.message : String(err);
-  return /constraint|append-only|immutable|never deleted|final|may not be lowered|already consumed|must be positive/i.test(msg)
+  return /constraint|append-only|immutable|never deleted|final|may not be lowered|already consumed|must be positive/i.test(
+    msg,
+  )
     ? new ConstraintError(msg, err)
     : err;
 }
@@ -26,21 +28,32 @@ export class D1Db implements SqlDb {
 
   async all<T>(sql: string, params: SqlValue[] = []): Promise<T[]> {
     try {
-      return (await this.d1.prepare(sql).bind(...params).all<T>()).results;
+      return (
+        await this.d1
+          .prepare(sql)
+          .bind(...params)
+          .all<T>()
+      ).results;
     } catch (e) {
       throw wrap(e);
     }
   }
   async first<T>(sql: string, params: SqlValue[] = []): Promise<T | null> {
     try {
-      return await this.d1.prepare(sql).bind(...params).first<T>();
+      return await this.d1
+        .prepare(sql)
+        .bind(...params)
+        .first<T>();
     } catch (e) {
       throw wrap(e);
     }
   }
   async run(sql: string, params: SqlValue[] = []): Promise<RunResult> {
     try {
-      const r = await this.d1.prepare(sql).bind(...params).run();
+      const r = await this.d1
+        .prepare(sql)
+        .bind(...params)
+        .run();
       return { changes: r.meta.changes ?? 0 };
     } catch (e) {
       throw wrap(e);
@@ -48,7 +61,9 @@ export class D1Db implements SqlDb {
   }
   async batch(statements: Statement[]): Promise<RunResult[]> {
     try {
-      const res = await this.d1.batch(statements.map((s) => this.d1.prepare(s.sql).bind(...(s.params ?? []))));
+      const res = await this.d1.batch(
+        statements.map((s) => this.d1.prepare(s.sql).bind(...(s.params ?? []))),
+      );
       return res.map((r) => ({ changes: r.meta.changes ?? 0 }));
     } catch (e) {
       throw wrap(e);

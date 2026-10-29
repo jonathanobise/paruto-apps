@@ -8,10 +8,18 @@ const { ctx, metrics, providers } = await buildContext(env);
 const runtime = new AgentRuntime(ctx, {
   metrics,
   runPipeline: env.RUN_PIPELINE === 'true',
-  circuits: () => ({ dexscreener: providers.dex.circuit, jupiter: providers.jupiter.circuit, 'solana-rpc': providers.rpc.circuit }),
+  circuits: () => ({
+    dexscreener: providers.dex.circuit,
+    jupiter: providers.jupiter.circuit,
+    'solana-rpc': providers.rpc.circuit,
+  }),
 });
 await runtime.start();
-ctx.log.info('monitor started', { instanceId: ctx.instanceId, pipeline: env.RUN_PIPELINE, db: ctx.db.driver });
+ctx.log.info('monitor started', {
+  instanceId: ctx.instanceId,
+  pipeline: env.RUN_PIPELINE,
+  db: ctx.db.driver,
+});
 
 // Liveness/readiness for the container supervisor. Exposes no data beyond status.
 const server = createServer(async (req, res) => {
@@ -19,9 +27,15 @@ const server = createServer(async (req, res) => {
     try {
       const rt = await getRuntime(ctx.db);
       const depths = await queueDepths(ctx.db);
-      res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ status: 'HEALTHY', mode: rt.mode, queues: depths, instanceId: ctx.instanceId }));
+      res
+        .writeHead(200, { 'content-type': 'application/json' })
+        .end(
+          JSON.stringify({ status: 'HEALTHY', mode: rt.mode, queues: depths, instanceId: ctx.instanceId }),
+        );
     } catch (e) {
-      res.writeHead(503, { 'content-type': 'application/json' }).end(JSON.stringify({ status: 'UNAVAILABLE', error: (e as Error).message }));
+      res
+        .writeHead(503, { 'content-type': 'application/json' })
+        .end(JSON.stringify({ status: 'UNAVAILABLE', error: (e as Error).message }));
     }
     return;
   }

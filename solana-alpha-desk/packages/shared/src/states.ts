@@ -1,4 +1,13 @@
-export const AGENTS = ['SCOUT', 'FILTER', 'ANALYST', 'RISK', 'EXECUTOR', 'LOGGER', 'SYSTEM', 'OWNER'] as const;
+export const AGENTS = [
+  'SCOUT',
+  'FILTER',
+  'ANALYST',
+  'RISK',
+  'EXECUTOR',
+  'LOGGER',
+  'SYSTEM',
+  'OWNER',
+] as const;
 export type Agent = (typeof AGENTS)[number];
 
 export const CANDIDATE_STATES = [
@@ -110,7 +119,13 @@ export function assertTransition(from: CandidateState | null, to: CandidateState
   }
 }
 
-export const RUNTIME_MODES = ['STOPPED', 'DISCOVERY_ONLY', 'PAPER_MANUAL', 'PAPER_AUTONOMOUS', 'EMERGENCY_PAUSED'] as const;
+export const RUNTIME_MODES = [
+  'STOPPED',
+  'DISCOVERY_ONLY',
+  'PAPER_MANUAL',
+  'PAPER_AUTONOMOUS',
+  'EMERGENCY_PAUSED',
+] as const;
 export type RuntimeMode = (typeof RUNTIME_MODES)[number];
 
 export const HEALTH_STATUSES = ['HEALTHY', 'DEGRADED', 'UNAVAILABLE', 'PAUSED'] as const;

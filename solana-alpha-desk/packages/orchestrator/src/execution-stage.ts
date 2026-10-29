@@ -87,7 +87,7 @@ async function commitUnderLock(
 async function feeEstimate(ctx: Ctx, accounts: string[]): Promise<FeeEstimate> {
   const { config: cfg } = await ctx.config();
   const sol = await ctx.solPrice.get(ctx.clock.now());
-  let fees: number[] = [];
+  let fees: number[];
   try {
     fees = (await ctx.providers.rpc.getRecentPrioritizationFees(accounts.slice(0, 5))).data;
   } catch {
@@ -116,7 +116,6 @@ export async function processRisk(ctx: Ctx, candidateId: string): Promise<StageR
   const { config: cfg, configVersion } = await ctx.config();
   const rt = await getRuntime(ctx.db);
   const portfolioId = rt.active_portfolio_id!;
-  const now0 = ctx.clock.now();
   const ev = new EvidenceCollector();
   const token = await ctx.db.first<{ decimals: number | null; symbol: string | null }>(
     'SELECT decimals, symbol FROM tokens WHERE mint = ?',
@@ -364,12 +363,15 @@ export async function processEntry(
     },
     cfg.risk,
   );
-  if (currentRef.lte(0)) (check.reasons.push('no fresh executable route'), (check.valid = false));
+  const refuse = (why: string) => {
+    check.reasons.push(why);
+    check.valid = false;
+  };
+  if (currentRef.lte(0)) refuse('no fresh executable route');
   const rt = await getRuntime(ctx.db);
   if (rt.mode === 'EMERGENCY_PAUSED' || rt.mode === 'STOPPED' || rt.mode === 'DISCOVERY_ONLY')
-    (check.reasons.push(`runtime mode ${rt.mode}`), (check.valid = false));
-  if (auth && (await activeBreakers(ctx.db, auth.portfolioId)).length)
-    (check.reasons.push('circuit breaker active'), (check.valid = false));
+    refuse(`runtime mode ${rt.mode}`);
+  if (auth && (await activeBreakers(ctx.db, auth.portfolioId)).length) refuse('circuit breaker active');
   if (ev.records.length) await ctx.db.batch(await persistEvidence(ctx.evidenceStore, ev.records));
 
   if (!check.valid || !auth) {

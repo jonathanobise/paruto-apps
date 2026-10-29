@@ -102,7 +102,8 @@ export const StrategyConfigSchema = z
   })
   .superRefine((c, ctx) => {
     const total = Object.values(c.analyst.factors).reduce((s, f) => s + f.weight, 0);
-    if (Math.abs(total - 100) > 1e-9) ctx.addIssue({ code: 'custom', message: `factor weights sum to ${total}, not 100` });
+    if (Math.abs(total - 100) > 1e-9)
+      ctx.addIssue({ code: 'custom', message: `factor weights sum to ${total}, not 100` });
     if (c.discovery.minMarketCapUsd >= c.discovery.maxMarketCapUsd)
       ctx.addIssue({ code: 'custom', message: 'market cap bounds inverted' });
     if (c.discovery.minPairAgeMinutes / 60 >= c.discovery.maxPairAgeHours)
@@ -169,17 +170,76 @@ export const DEFAULT_STRATEGY: StrategyConfig = {
     approvalTtlSeconds: 180,
     factors: {
       // momentum composite (0..1 already) → score
-      momentum: { weight: 20, version: 'momentum-v1', curve: [[0, 0], [1, 1]], minSamples: 3, required: true },
+      momentum: {
+        weight: 20,
+        version: 'momentum-v1',
+        curve: [
+          [0, 0],
+          [1, 1],
+        ],
+        minSamples: 3,
+        required: true,
+      },
       // distinct buyer clusters in the last hour
-      uniqueBuyers: { weight: 20, version: 'unique-buyers-v1', curve: [[20, 0], [150, 0.6], [400, 1]], minSamples: 20, required: true },
+      uniqueBuyers: {
+        weight: 20,
+        version: 'unique-buyers-v1',
+        curve: [
+          [20, 0],
+          [150, 0.6],
+          [400, 1],
+        ],
+        minSamples: 20,
+        required: true,
+      },
       // buy value / sell value over 1h
-      buySellValueRatio: { weight: 15, version: 'buy-sell-value-v1', curve: [[0.8, 0], [1.1, 0.5], [1.6, 1]], minSamples: 30, required: true },
+      buySellValueRatio: {
+        weight: 15,
+        version: 'buy-sell-value-v1',
+        curve: [
+          [0.8, 0],
+          [1.1, 0.5],
+          [1.6, 1],
+        ],
+        minSamples: 30,
+        required: true,
+      },
       // % holder growth per hour over the observation window
-      holderGrowth: { weight: 15, version: 'holder-growth-v1', curve: [[0, 0], [2, 0.5], [6, 1]], minSamples: 2, required: false },
+      holderGrowth: {
+        weight: 15,
+        version: 'holder-growth-v1',
+        curve: [
+          [0, 0],
+          [2, 0.5],
+          [6, 1],
+        ],
+        minSamples: 2,
+        required: false,
+      },
       // liquidity / market cap, %, depth-adjusted
-      liquidityToMcap: { weight: 15, version: 'liquidity-mcap-v1', curve: [[3, 0], [8, 0.5], [20, 1]], minSamples: 1, required: true },
+      liquidityToMcap: {
+        weight: 15,
+        version: 'liquidity-mcap-v1',
+        curve: [
+          [3, 0],
+          [8, 0.5],
+          [20, 1],
+        ],
+        minSamples: 1,
+        required: true,
+      },
       // count of verified smart-wallet clusters buying
-      smartWallets: { weight: 15, version: 'smart-wallets-v1', curve: [[0, 0], [2, 0.6], [5, 1]], minSamples: 1, required: false },
+      smartWallets: {
+        weight: 15,
+        version: 'smart-wallets-v1',
+        curve: [
+          [0, 0],
+          [2, 0.6],
+          [5, 1],
+        ],
+        minSamples: 1,
+        required: false,
+      },
     },
   },
   risk: {

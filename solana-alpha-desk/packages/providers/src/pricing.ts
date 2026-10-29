@@ -15,21 +15,39 @@ export function quotePriceUsd(q: Quote, tokenDecimals: number, side: 'SELL' | 'B
   return tokens.isZero() ? new Decimal(0) : fromBaseUnits(q.inAmount, 6).div(tokens);
 }
 
-export function sellQuote(jup: QuoteProvider, mint: string, amount: bigint, slippageBps: number): Promise<Observed<Quote>> {
+export function sellQuote(
+  jup: QuoteProvider,
+  mint: string,
+  amount: bigint,
+  slippageBps: number,
+): Promise<Observed<Quote>> {
   return jup.quote({ inputMint: mint, outputMint: USDC, amount, slippageBps });
 }
 
-export function buyQuote(jup: QuoteProvider, mint: string, usdcMicro: bigint, slippageBps: number): Promise<Observed<Quote>> {
+export function buyQuote(
+  jup: QuoteProvider,
+  mint: string,
+  usdcMicro: bigint,
+  slippageBps: number,
+): Promise<Observed<Quote>> {
   return jup.quote({ inputMint: USDC, outputMint: mint, amount: usdcMicro, slippageBps });
 }
 
 /** SOL/USD from an executable 1 SOL → USDC quote, cached briefly. */
 export class SolPrice {
   private cached: { price: Decimal; at: number; obs: Observed<Quote> } | null = null;
-  constructor(private readonly jup: QuoteProvider, private readonly ttlMs = 30_000) {}
+  constructor(
+    private readonly jup: QuoteProvider,
+    private readonly ttlMs = 30_000,
+  ) {}
   async get(now: number): Promise<{ price: Decimal; obs: Observed<Quote> }> {
     if (this.cached && now - this.cached.at < this.ttlMs) return this.cached;
-    const obs = await this.jup.quote({ inputMint: WSOL, outputMint: USDC, amount: 1_000_000_000n, slippageBps: 50 });
+    const obs = await this.jup.quote({
+      inputMint: WSOL,
+      outputMint: USDC,
+      amount: 1_000_000_000n,
+      slippageBps: 50,
+    });
     this.cached = { price: fromBaseUnits(obs.data.outAmount, 6), at: now, obs };
     return this.cached;
   }

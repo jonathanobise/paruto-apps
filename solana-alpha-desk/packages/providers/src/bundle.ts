@@ -22,7 +22,10 @@ export interface Providers {
   helius: Helius;
 }
 
-export function createProviders(env: ProviderEnv, hooks: { onMetric?: (m: CallMetric) => void; budget?: () => boolean; clock?: Clock } = {}): Providers {
+export function createProviders(
+  env: ProviderEnv,
+  hooks: { onMetric?: (m: CallMetric) => void; budget?: () => boolean; clock?: Clock } = {},
+): Providers {
   return {
     dex: new DexScreener(hooks),
     gecko: new GeckoTerminal(hooks),
@@ -42,11 +45,38 @@ export interface ProviderStatus {
 
 export function providerStatuses(env: ProviderEnv): ProviderStatus[] {
   return [
-    { id: 'dexscreener', integration: 'OPERATIONAL', requiresCredentials: false, note: 'Primary discovery and market data (keyless).' },
-    { id: 'geckoterminal', integration: 'OPERATIONAL', requiresCredentials: false, note: 'Supplementary new-pool discovery (keyless, shared rate limit).' },
-    { id: 'solana-rpc', integration: 'OPERATIONAL', requiresCredentials: false, note: env.SOLANA_RPC_URL ? 'Custom RPC endpoint.' : 'Public mainnet-beta endpoint (rate limited; set SOLANA_RPC_URL for production).' },
-    { id: 'jupiter', integration: 'OPERATIONAL', requiresCredentials: false, note: env.JUPITER_API_KEY ? 'api.jup.ag with API key.' : 'lite-api.jup.ag (keyless, ~1 req/s).' },
-    { id: 'rugcheck', integration: 'OPERATIONAL', requiresCredentials: false, note: 'Corroborating claims only; never decisive.' },
+    {
+      id: 'dexscreener',
+      integration: 'OPERATIONAL',
+      requiresCredentials: false,
+      note: 'Primary discovery and market data (keyless).',
+    },
+    {
+      id: 'geckoterminal',
+      integration: 'OPERATIONAL',
+      requiresCredentials: false,
+      note: 'Supplementary new-pool discovery (keyless, shared rate limit).',
+    },
+    {
+      id: 'solana-rpc',
+      integration: 'OPERATIONAL',
+      requiresCredentials: false,
+      note: env.SOLANA_RPC_URL
+        ? 'Custom RPC endpoint.'
+        : 'Public mainnet-beta endpoint (rate limited; set SOLANA_RPC_URL for production).',
+    },
+    {
+      id: 'jupiter',
+      integration: 'OPERATIONAL',
+      requiresCredentials: false,
+      note: env.JUPITER_API_KEY ? 'api.jup.ag with API key.' : 'lite-api.jup.ag (keyless, ~1 req/s).',
+    },
+    {
+      id: 'rugcheck',
+      integration: 'OPERATIONAL',
+      requiresCredentials: false,
+      note: 'Corroborating claims only; never decisive.',
+    },
     {
       id: 'helius',
       integration: env.HELIUS_API_KEY ? 'OPERATIONAL' : 'BLOCKED_BY_CREDENTIALS',

@@ -179,7 +179,12 @@ export class HttpClient {
           break;
         }
         if (!res.ok) {
-          lastErr = new ProviderError(this.provider, 'HTTP', `HTTP ${res.status} ${raw.slice(0, 200)}`, res.status);
+          lastErr = new ProviderError(
+            this.provider,
+            'HTTP',
+            `HTTP ${res.status} ${raw.slice(0, 200)}`,
+            res.status,
+          );
           this.metric(endpoint, false, latencyMs, false, `HTTP ${res.status}`);
           if (lastErr.retryable && attempt < this.policy.maxRetries) {
             await this.sleep(this.backoff(attempt));
@@ -199,7 +204,12 @@ export class HttpClient {
         try {
           data = parse(json);
         } catch (e) {
-          lastErr = new ProviderError(this.provider, 'INVALID_RESPONSE', (e as Error).message.slice(0, 300), res.status);
+          lastErr = new ProviderError(
+            this.provider,
+            'INVALID_RESPONSE',
+            (e as Error).message.slice(0, 300),
+            res.status,
+          );
           this.metric(endpoint, false, latencyMs, false, 'schema mismatch');
           break;
         }
@@ -236,8 +246,22 @@ export class HttpClient {
     throw lastErr ?? new ProviderError(this.provider, 'NETWORK', 'request failed');
   }
 
-  private metric(endpoint: string, ok: boolean, latencyMs: number, rateLimited: boolean, error?: string): void {
-    this.opts.onMetric?.({ provider: this.provider, endpoint, ok, latencyMs, rateLimited, error, at: this.clock.now() });
+  private metric(
+    endpoint: string,
+    ok: boolean,
+    latencyMs: number,
+    rateLimited: boolean,
+    error?: string,
+  ): void {
+    this.opts.onMetric?.({
+      provider: this.provider,
+      endpoint,
+      ok,
+      latencyMs,
+      rateLimited,
+      error,
+      at: this.clock.now(),
+    });
   }
 }
 

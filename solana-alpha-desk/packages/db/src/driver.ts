@@ -22,7 +22,10 @@ export interface SqlDb {
 }
 
 export class ConstraintError extends Error {
-  constructor(message: string, override readonly cause?: unknown) {
+  constructor(
+    message: string,
+    override readonly cause?: unknown,
+  ) {
     super(message);
     this.name = 'ConstraintError';
   }

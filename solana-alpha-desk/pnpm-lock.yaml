@@ -205,6 +205,45 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
+  tests:
+    dependencies:
+      '@alpha-desk/analytics':
+        specifier: workspace:*
+        version: link:../packages/analytics
+      '@alpha-desk/config':
+        specifier: workspace:*
+        version: link:../packages/config
+      '@alpha-desk/db':
+        specifier: workspace:*
+        version: link:../packages/db
+      '@alpha-desk/discovery':
+        specifier: workspace:*
+        version: link:../packages/discovery
+      '@alpha-desk/execution':
+        specifier: workspace:*
+        version: link:../packages/execution
+      '@alpha-desk/ledger':
+        specifier: workspace:*
+        version: link:../packages/ledger
+      '@alpha-desk/orchestrator':
+        specifier: workspace:*
+        version: link:../packages/orchestrator
+      '@alpha-desk/providers':
+        specifier: workspace:*
+        version: link:../packages/providers
+      '@alpha-desk/risk':
+        specifier: workspace:*
+        version: link:../packages/risk
+      '@alpha-desk/scoring':
+        specifier: workspace:*
+        version: link:../packages/scoring
+      '@alpha-desk/security':
+        specifier: workspace:*
+        version: link:../packages/security
+      '@alpha-desk/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
+
 packages:
 
   '@cacheable/memory@2.2.0':

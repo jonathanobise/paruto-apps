@@ -9,8 +9,12 @@ import type { NodeSqliteDb } from './node-sqlite.ts';
 export async function migrateNodeDb(db: NodeSqliteDb, dir: string): Promise<string[]> {
   db.exec(`CREATE TABLE IF NOT EXISTS d1_migrations (
     id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)`);
-  const applied = new Set((await db.all<{ name: string }>('SELECT name FROM d1_migrations')).map((r) => r.name));
-  const files = readdirSync(dir).filter((f) => /^\d{4}_.+\.sql$/.test(f)).sort();
+  const applied = new Set(
+    (await db.all<{ name: string }>('SELECT name FROM d1_migrations')).map((r) => r.name),
+  );
+  const files = readdirSync(dir)
+    .filter((f) => /^\d{4}_.+\.sql$/.test(f))
+    .sort();
   const ran: string[] = [];
   for (const file of files) {
     if (applied.has(file)) continue;
@@ -22,7 +26,7 @@ export async function migrateNodeDb(db: NodeSqliteDb, dir: string): Promise<stri
       db.exec('COMMIT');
     } catch (e) {
       db.exec('ROLLBACK');
-      throw new Error(`migration ${file} failed: ${(e as Error).message}`);
+      throw new Error(`migration ${file} failed: ${(e as Error).message}`, { cause: e });
     }
     ran.push(file);
   }

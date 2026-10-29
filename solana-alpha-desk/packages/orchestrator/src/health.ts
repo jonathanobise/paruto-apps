@@ -5,7 +5,17 @@ import type { HealthStatus } from '@alpha-desk/shared';
 export async function recordJob(
   db: SqlDb,
   id: string,
-  r: { now: number; ok: boolean; error: string | null; processed?: number; rejected?: number; latencyMs?: number; queueDepth?: number; instanceId: string; status?: HealthStatus },
+  r: {
+    now: number;
+    ok: boolean;
+    error: string | null;
+    processed?: number;
+    rejected?: number;
+    latencyMs?: number;
+    queueDepth?: number;
+    instanceId: string;
+    status?: HealthStatus;
+  },
 ): Promise<void> {
   const status: HealthStatus = r.status ?? (r.ok ? 'HEALTHY' : 'DEGRADED');
   await db.run(
@@ -17,8 +27,18 @@ export async function recordJob(
        queue_depth = excluded.queue_depth, processed = background_jobs.processed + excluded.processed, rejected = background_jobs.rejected + excluded.rejected,
        last_latency_ms = COALESCE(excluded.last_latency_ms, background_jobs.last_latency_ms)`,
     [
-      id, status, r.instanceId, r.now, r.now, r.ok ? r.now : null, r.error, r.error ? r.now : null,
-      r.queueDepth ?? 0, r.processed ?? 0, r.rejected ?? 0, r.latencyMs ?? null,
+      id,
+      status,
+      r.instanceId,
+      r.now,
+      r.now,
+      r.ok ? r.now : null,
+      r.error,
+      r.error ? r.now : null,
+      r.queueDepth ?? 0,
+      r.processed ?? 0,
+      r.rejected ?? 0,
+      r.latencyMs ?? null,
     ],
   );
 }
@@ -34,14 +54,33 @@ export async function recordStart(db: SqlDb, id: string, instanceId: string, now
 
 /** Buffers provider call metrics in memory and flushes them per minute bucket. */
 export class ProviderMetrics {
-  private buf = new Map<string, { calls: number; errors: number; rateLimited: number; latency: number; max: number; lastError: string | null; lastOk: number | null }>();
+  private buf = new Map<
+    string,
+    {
+      calls: number;
+      errors: number;
+      rateLimited: number;
+      latency: number;
+      max: number;
+      lastError: string | null;
+      lastOk: number | null;
+    }
+  >();
   readonly callsToday = new Map<string, number>();
   private day = '';
 
   record = (m: CallMetric): void => {
     const bucket = Math.floor(m.at / 60_000) * 60_000;
     const key = `${m.provider}|${bucket}`;
-    const b = this.buf.get(key) ?? { calls: 0, errors: 0, rateLimited: 0, latency: 0, max: 0, lastError: null, lastOk: null };
+    const b = this.buf.get(key) ?? {
+      calls: 0,
+      errors: 0,
+      rateLimited: 0,
+      latency: 0,
+      max: 0,
+      lastError: null,
+      lastOk: null,
+    };
     b.calls++;
     if (!m.ok) b.errors++;
     if (m.rateLimited) b.rateLimited++;
@@ -76,7 +115,18 @@ export class ProviderMetrics {
                   rate_limited = rate_limited + excluded.rate_limited, total_latency_ms = total_latency_ms + excluded.total_latency_ms,
                   max_latency_ms = MAX(max_latency_ms, excluded.max_latency_ms), last_error = COALESCE(excluded.last_error, last_error),
                   last_success_at = COALESCE(excluded.last_success_at, last_success_at), circuit_state = excluded.circuit_state`,
-          params: [provider!, Number(bucket), b.calls, b.errors, b.rateLimited, b.latency, b.max, b.lastError, b.lastOk, circuits[provider!] ?? 'CLOSED'],
+          params: [
+            provider!,
+            Number(bucket),
+            b.calls,
+            b.errors,
+            b.rateLimited,
+            b.latency,
+            b.max,
+            b.lastError,
+            b.lastOk,
+            circuits[provider!] ?? 'CLOSED',
+          ],
         };
       }),
     );
@@ -84,10 +134,24 @@ export class ProviderMetrics {
 }
 
 /** Provider health over the last `windowMs`, used for the data-outage and verification-quality breakers. */
-export async function providerErrorRates(db: SqlDb, now: number, windowMs: number): Promise<Record<string, { calls: number; errors: number; rate: number; lastSuccessAt: number | null }>> {
+export async function providerErrorRates(
+  db: SqlDb,
+  now: number,
+  windowMs: number,
+): Promise<Record<string, { calls: number; errors: number; rate: number; lastSuccessAt: number | null }>> {
   const rows = await db.all<{ provider_id: string; calls: number; errors: number; last_ok: number | null }>(
     `SELECT provider_id, SUM(calls) AS calls, SUM(errors) AS errors, MAX(last_success_at) AS last_ok FROM provider_health WHERE window_start >= ? GROUP BY provider_id`,
     [now - windowMs],
   );
-  return Object.fromEntries(rows.map((r) => [r.provider_id, { calls: Number(r.calls), errors: Number(r.errors), rate: Number(r.calls) ? Number(r.errors) / Number(r.calls) : 0, lastSuccessAt: r.last_ok }]));
+  return Object.fromEntries(
+    rows.map((r) => [
+      r.provider_id,
+      {
+        calls: Number(r.calls),
+        errors: Number(r.errors),
+        rate: Number(r.calls) ? Number(r.errors) / Number(r.calls) : 0,
+        lastSuccessAt: r.last_ok,
+      },
+    ]),
+  );
 }

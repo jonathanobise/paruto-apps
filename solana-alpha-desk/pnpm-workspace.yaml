@@ -1,7 +1,8 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "workers/*"
+  - 'apps/*'
+  - 'packages/*'
+  - 'workers/*'
+  - 'tests'
 onlyBuiltDependencies:
   - esbuild
   - workerd

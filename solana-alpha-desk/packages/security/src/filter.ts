@@ -1,5 +1,11 @@
 import type { StrategyConfig } from '@alpha-desk/config';
-import { aggregateFilter, evaluateRules, type FilterOutcome, type RuleResult, type SecurityEvidence } from './rules.ts';
+import {
+  aggregateFilter,
+  evaluateRules,
+  type FilterOutcome,
+  type RuleResult,
+  type SecurityEvidence,
+} from './rules.ts';
 
 export interface FilterDecision {
   outcome: FilterOutcome;
@@ -12,10 +18,16 @@ export interface FilterDecision {
 }
 
 /** Filter Agent entry point: evidence in, rule matrix and outcome out. */
-export function runFilter(evidence: SecurityEvidence, cfg: StrategyConfig['filter'], now: number): FilterDecision {
+export function runFilter(
+  evidence: SecurityEvidence,
+  cfg: StrategyConfig['filter'],
+  now: number,
+): FilterDecision {
   const results = evaluateRules(evidence, cfg, now);
   const outcome = aggregateFilter(results);
-  const times = [evidence.mintFacts, evidence.pool, evidence.market, evidence.route].map((f) => f.observedAt).filter((t): t is number => t !== null);
+  const times = [evidence.mintFacts, evidence.pool, evidence.market, evidence.route]
+    .map((f) => f.observedAt)
+    .filter((t): t is number => t !== null);
   const observedAt = times.length ? Math.min(...times) : now;
   return {
     outcome,

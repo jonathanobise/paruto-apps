@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": {"@alpha-desk/shared": "workspace:*", "@alpha-desk/config": "workspace:*", "@alpha-desk/providers": "workspace:*", "@alpha-desk/risk": "workspace:*"}
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@alpha-desk/shared": "workspace:*",
+    "@alpha-desk/config": "workspace:*",
+    "@alpha-desk/providers": "workspace:*",
+    "@alpha-desk/risk": "workspace:*"
+  }
 }

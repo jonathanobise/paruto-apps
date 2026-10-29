@@ -5,7 +5,9 @@ const PoolList = z.object({
   data: z.array(
     z.object({
       id: z.string(),
-      attributes: z.object({ address: z.string(), pool_created_at: z.string().nullable().optional() }).passthrough(),
+      attributes: z
+        .object({ address: z.string(), pool_created_at: z.string().nullable().optional() })
+        .passthrough(),
       relationships: z
         .object({
           base_token: z.object({ data: z.object({ id: z.string() }) }),
@@ -30,18 +32,26 @@ export interface NewPool {
 export class GeckoTerminal {
   private readonly http: HttpClient;
   constructor(opts: Omit<HttpClientOptions, 'provider'> = {}) {
-    this.http = new HttpClient({ provider: 'geckoterminal', policy: { minIntervalMs: 2_500, maxRetries: 1 }, ...opts });
+    this.http = new HttpClient({
+      provider: 'geckoterminal',
+      policy: { minIntervalMs: 2_500, maxRetries: 1 },
+      ...opts,
+    });
   }
 
   async newPools(page = 1): Promise<Observed<NewPool[]>> {
     const url = `https://api.geckoterminal.com/api/v2/networks/solana/new_pools?page=${page}`;
-    return this.http.request('/networks/solana/new_pools', url, { headers: { accept: 'application/json' } }, (j) =>
-      PoolList.parse(j).data.map((p) => ({
-        poolAddress: p.attributes.address,
-        baseMint: p.relationships.base_token.data.id.replace(/^solana_/, ''),
-        dex: p.relationships.dex?.data.id ?? null,
-        createdAt: p.attributes.pool_created_at ? Date.parse(p.attributes.pool_created_at) : null,
-      })),
+    return this.http.request(
+      '/networks/solana/new_pools',
+      url,
+      { headers: { accept: 'application/json' } },
+      (j) =>
+        PoolList.parse(j).data.map((p) => ({
+          poolAddress: p.attributes.address,
+          baseMint: p.relationships.base_token.data.id.replace(/^solana_/, ''),
+          dex: p.relationships.dex?.data.id ?? null,
+          createdAt: p.attributes.pool_created_at ? Date.parse(p.attributes.pool_created_at) : null,
+        })),
     );
   }
 }

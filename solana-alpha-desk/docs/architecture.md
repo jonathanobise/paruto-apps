@@ -5,13 +5,13 @@ This document is the architecture decision record (ADR) for release 1.0 and the 
 
 ## Environment found at the start (29 Oct 2026)
 
-| Item | Finding |
-| --- | --- |
-| Repository | `jonathanobise/paruto-apps` (the apps.paruto.com showcase). Only this repo is in scope for the session, so the desk lives in `solana-alpha-desk/`, listed in the showcase's `.assetsignore` so it is never published on apps.paruto.com. It can move to its own repo unchanged. |
-| Runtime | Node 22.22, pnpm 10.28, Chromium + Playwright preinstalled, `node:sqlite` (SQLite 3.50) available. |
-| Network | DexScreener, Solana public RPC, Jupiter (`lite-api.jup.ag`, `api.jup.ag`) and RugCheck answer from the container. GeckoTerminal answers but its keyless rate limit is shared and often returns 429. |
-| Cloudflare | An API proxy for `api.cloudflare.com` is attached. Nothing was deployed: the repository's own rules say deploy only when the owner asks. |
-| Credentials | None for Helius or any other paid indexer. Those integrations are `BLOCKED_BY_CREDENTIALS`. |
+| Item        | Finding                                                                                                                                                                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository  | `jonathanobise/paruto-apps` (the apps.paruto.com showcase). Only this repo is in scope for the session, so the desk lives in `solana-alpha-desk/`, listed in the showcase's `.assetsignore` so it is never published on apps.paruto.com. It can move to its own repo unchanged. |
+| Runtime     | Node 22.22, pnpm 10.28, Chromium + Playwright preinstalled, `node:sqlite` (SQLite 3.50) available.                                                                                                                                                                              |
+| Network     | DexScreener, Solana public RPC, Jupiter (`lite-api.jup.ag`, `api.jup.ag`) and RugCheck answer from the container. GeckoTerminal answers but its keyless rate limit is shared and often returns 429.                                                                             |
+| Cloudflare  | An API proxy for `api.cloudflare.com` is attached. Nothing was deployed: the repository's own rules say deploy only when the owner asks.                                                                                                                                        |
+| Credentials | None for Helius or any other paid indexer. Those integrations are `BLOCKED_BY_CREDENTIALS`.                                                                                                                                                                                     |
 
 ## Decisions
 
@@ -22,6 +22,7 @@ lets the same code run inside Cloudflare Workers, the Node monitor, tests and hi
 
 **ADR-2 · One SQL schema, three drivers.** D1 is SQLite, so one set of migrations
 (`infrastructure/migrations`) serves:
+
 - the D1 binding (Workers; `batch()` is documented as a transaction);
 - `node:sqlite` (local development, tests, replay; explicit `BEGIN`/`COMMIT`);
 - a **signed internal SQL bridge** (production monitor → API Worker → D1 binding). The D1 REST API
@@ -95,22 +96,22 @@ value.
 
 ## Code map
 
-| Path | Responsibility |
-| --- | --- |
-| `packages/shared` | ids, hashing, decimal/bigint money, candidate state machine, handoff contract (Zod), clock |
-| `packages/config` | versioned strategy configuration (all thresholds), runtime modes |
-| `packages/db` | SQL drivers (node:sqlite, D1 binding, signed bridge), migrations runner, repositories |
-| `packages/providers` | HTTP with retry/backoff/rate limits/circuit breaking + provenance; DexScreener, GeckoTerminal, Solana RPC, Jupiter, RugCheck, Helius |
-| `packages/discovery` | **Scout** agent |
-| `packages/security` | **Filter** agent: rules F001–F018, pool adapters, holder classification, developer + bundle analysis |
-| `packages/scoring` | **Analyst** agent: six versioned factors, ranking |
-| `packages/risk` | **Risk** agent: sizing, single-use authorizations, stops, circuit breakers |
-| `packages/execution` | **Executor** agent: paper fill simulator, position lifecycle |
-| `packages/ledger` | **Logger** agent: audit events, double-entry ledger, reconciliation |
-| `packages/analytics` | trade metrics, segments, reports |
-| `packages/ai` | optional AI adapter |
-| `packages/orchestrator` | pipeline, handoffs, idempotency, recovery |
-| `apps/api` | Cloudflare Worker: auth, REST `/api/v1`, signed internal bridge |
-| `apps/monitor` | Node service: continuous loops, health, reports |
-| `apps/web` | dashboard |
-| `workers/*` | Cloudflare cron + queue entry points |
+| Path                    | Responsibility                                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/shared`       | ids, hashing, decimal/bigint money, candidate state machine, handoff contract (Zod), clock                                           |
+| `packages/config`       | versioned strategy configuration (all thresholds), runtime modes                                                                     |
+| `packages/db`           | SQL drivers (node:sqlite, D1 binding, signed bridge), migrations runner, repositories                                                |
+| `packages/providers`    | HTTP with retry/backoff/rate limits/circuit breaking + provenance; DexScreener, GeckoTerminal, Solana RPC, Jupiter, RugCheck, Helius |
+| `packages/discovery`    | **Scout** agent                                                                                                                      |
+| `packages/security`     | **Filter** agent: rules F001–F018, pool adapters, holder classification, developer + bundle analysis                                 |
+| `packages/scoring`      | **Analyst** agent: six versioned factors, ranking                                                                                    |
+| `packages/risk`         | **Risk** agent: sizing, single-use authorizations, stops, circuit breakers                                                           |
+| `packages/execution`    | **Executor** agent: paper fill simulator, position lifecycle                                                                         |
+| `packages/ledger`       | **Logger** agent: audit events, double-entry ledger, reconciliation                                                                  |
+| `packages/analytics`    | trade metrics, segments, reports                                                                                                     |
+| `packages/ai`           | optional AI adapter                                                                                                                  |
+| `packages/orchestrator` | pipeline, handoffs, idempotency, recovery                                                                                            |
+| `apps/api`              | Cloudflare Worker: auth, REST `/api/v1`, signed internal bridge                                                                      |
+| `apps/monitor`          | Node service: continuous loops, health, reports                                                                                      |
+| `apps/web`              | dashboard                                                                                                                            |
+| `workers/*`             | Cloudflare cron + queue entry points                                                                                                 |

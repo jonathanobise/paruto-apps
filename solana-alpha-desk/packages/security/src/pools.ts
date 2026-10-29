@@ -80,7 +80,10 @@ export function decodePool(program: string, data: Uint8Array): DecodedPool | nul
 }
 
 /** Addresses whose LP holdings cannot be withdrawn by anyone. */
-export const BURN_ADDRESSES = new Set(['1nc1nerator11111111111111111111111111111111', '11111111111111111111111111111111']);
+export const BURN_ADDRESSES = new Set([
+  '1nc1nerator11111111111111111111111111111111',
+  '11111111111111111111111111111111',
+]);
 
 export interface LpHolder {
   tokenAccount: string;
@@ -119,19 +122,42 @@ export function assessLpSafety(
     lpSupplyOutstanding: lpOutstanding.toString(),
   };
   if (tracked <= 0n) {
-    return { status: 'UNVERIFIED', ...base, burnedViaSupply: '0', heldByBurnAddresses: '0', withdrawable: lpOutstanding.toString(), nonWithdrawablePct: null, largestWithdrawableHolders: [], notes: ['pool reports zero tracked LP supply'] };
+    return {
+      status: 'UNVERIFIED',
+      ...base,
+      burnedViaSupply: '0',
+      heldByBurnAddresses: '0',
+      withdrawable: lpOutstanding.toString(),
+      nonWithdrawablePct: null,
+      largestWithdrawableHolders: [],
+      notes: ['pool reports zero tracked LP supply'],
+    };
   }
   if (lpOutstanding > tracked) {
-    return { status: 'UNVERIFIED', ...base, burnedViaSupply: '0', heldByBurnAddresses: '0', withdrawable: lpOutstanding.toString(), nonWithdrawablePct: null, largestWithdrawableHolders: [], notes: ['outstanding LP exceeds pool accounting; model does not apply'] };
+    return {
+      status: 'UNVERIFIED',
+      ...base,
+      burnedViaSupply: '0',
+      heldByBurnAddresses: '0',
+      withdrawable: lpOutstanding.toString(),
+      nonWithdrawablePct: null,
+      largestWithdrawableHolders: [],
+      notes: ['outstanding LP exceeds pool accounting; model does not apply'],
+    };
   }
   const burnedViaSupply = tracked - lpOutstanding;
-  const heldByBurn = largestLpHolders.filter((h) => h.owner && BURN_ADDRESSES.has(h.owner)).reduce((s, h) => s + h.amount, 0n);
+  const heldByBurn = largestLpHolders
+    .filter((h) => h.owner && BURN_ADDRESSES.has(h.owner))
+    .reduce((s, h) => s + h.amount, 0n);
   const withdrawable = lpOutstanding - heldByBurn;
   const pct = new Decimal((tracked - withdrawable).toString()).div(tracked.toString()).mul(100);
   const holders = largestLpHolders
     .filter((h) => !(h.owner && BURN_ADDRESSES.has(h.owner)) && h.amount > 0n)
     .slice(0, 5)
-    .map((h) => ({ owner: h.owner, pct: new Decimal(h.amount.toString()).div(tracked.toString()).mul(100).toFixed(4) }));
+    .map((h) => ({
+      owner: h.owner,
+      pct: new Decimal(h.amount.toString()).div(tracked.toString()).mul(100).toFixed(4),
+    }));
   if (withdrawable > 0n) notes.push(`${holders.length} LP holder(s) could redeem liquidity`);
   return {
     status: pct.gte(minNonWithdrawablePct) ? 'PASS' : 'FAIL',
@@ -175,8 +201,13 @@ export function onChainLiquidityUsd(quoteVaultUi: Decimal, quotePriceUsd: Decima
 }
 
 /** Orient a decoded pool around the token being evaluated (CPMM sorts its two mints). */
-export function orientPool(pool: DecodedPool, mint: string): { tokenVault: string; quoteVault: string; quoteMint: string } | null {
-  if (pool.baseMint === mint) return { tokenVault: pool.baseVault, quoteVault: pool.quoteVault, quoteMint: pool.quoteMint };
-  if (pool.quoteMint === mint) return { tokenVault: pool.quoteVault, quoteVault: pool.baseVault, quoteMint: pool.baseMint };
+export function orientPool(
+  pool: DecodedPool,
+  mint: string,
+): { tokenVault: string; quoteVault: string; quoteMint: string } | null {
+  if (pool.baseMint === mint)
+    return { tokenVault: pool.baseVault, quoteVault: pool.quoteVault, quoteMint: pool.quoteMint };
+  if (pool.quoteMint === mint)
+    return { tokenVault: pool.quoteVault, quoteVault: pool.baseVault, quoteMint: pool.baseMint };
   return null;
 }

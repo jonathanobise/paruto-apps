@@ -26,7 +26,11 @@ export function initialStop(entryReference: Decimal, cfg: StrategyConfig['risk']
  * - The stop triggers when the reference is at or below the effective stop.
  * Callers must only pass references from fresh, executable quotes.
  */
-export function applyReference(state: StopState, reference: Decimal, cfg: StrategyConfig['risk']): { state: StopState; events: StopEvent[] } {
+export function applyReference(
+  state: StopState,
+  reference: Decimal,
+  cfg: StrategyConfig['risk'],
+): { state: StopState; events: StopEvent[] } {
   if (!reference.isFinite() || reference.lte(0)) throw new Error('reference price must be positive');
   const events: StopEvent[] = [];
   const next: StopState = { ...state, highestReference: Decimal.max(state.highestReference, reference) };

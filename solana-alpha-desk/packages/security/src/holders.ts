@@ -101,7 +101,9 @@ export function analyseHolders(input: {
     return { ...h, class: cls, label, clusterId: (h.owner && input.clusters?.get(h.owner)) ?? null };
   });
 
-  const excluded = holdings.filter((h) => ['LP_VAULT', 'DEX_VAULT', 'BURN', 'PROTOCOL'].includes(h.class)).reduce((s, h) => s + h.amount, 0n);
+  const excluded = holdings
+    .filter((h) => ['LP_VAULT', 'DEX_VAULT', 'BURN', 'PROTOCOL'].includes(h.class))
+    .reduce((s, h) => s + h.amount, 0n);
   const circulating = input.totalSupply - excluded;
   const base = {
     totalSupply: input.totalSupply.toString(),
@@ -110,7 +112,15 @@ export function analyseHolders(input: {
     holdings,
   };
   if (circulating <= 0n) {
-    return { status: 'UNVERIFIED', ...base, top10PctLowerBound: null, top10PctUpperBound: null, top10PctClustered: null, clusteringVerified: false, notes: ['no circulating supply outside pools'] };
+    return {
+      status: 'UNVERIFIED',
+      ...base,
+      top10PctLowerBound: null,
+      top10PctUpperBound: null,
+      top10PctClustered: null,
+      clusteringVerified: false,
+      notes: ['no circulating supply outside pools'],
+    };
   }
 
   const pctOfTop10 = (groups: Map<string, bigint>) => {
@@ -123,13 +133,26 @@ export function analyseHolders(input: {
     return m;
   };
 
-  const lower = pctOfTop10(group((h) => h.class === 'INDIVIDUAL' || h.class === 'DEVELOPER', (h) => h.owner ?? h.tokenAccount));
+  const lower = pctOfTop10(
+    group(
+      (h) => h.class === 'INDIVIDUAL' || h.class === 'DEVELOPER',
+      (h) => h.owner ?? h.tokenAccount,
+    ),
+  );
   const upper = pctOfTop10(
-    group((h) => ['INDIVIDUAL', 'DEVELOPER', 'UNKNOWN', 'ESCROW_OR_PROGRAM'].includes(h.class), (h) => h.owner ?? h.tokenAccount),
+    group(
+      (h) => ['INDIVIDUAL', 'DEVELOPER', 'UNKNOWN', 'ESCROW_OR_PROGRAM'].includes(h.class),
+      (h) => h.owner ?? h.tokenAccount,
+    ),
   );
   const clusteringVerified = Boolean(input.clusters && input.clusters.size > 0);
   const clustered = clusteringVerified
-    ? pctOfTop10(group((h) => h.class === 'INDIVIDUAL' || h.class === 'DEVELOPER' || h.class === 'UNKNOWN', (h) => h.clusterId ?? h.owner ?? h.tokenAccount))
+    ? pctOfTop10(
+        group(
+          (h) => h.class === 'INDIVIDUAL' || h.class === 'DEVELOPER' || h.class === 'UNKNOWN',
+          (h) => h.clusterId ?? h.owner ?? h.tokenAccount,
+        ),
+      )
     : null;
 
   let status: HolderAnalysis['status'];
@@ -143,7 +166,9 @@ export function analyseHolders(input: {
     notes.push('passed on the conservative upper bound without clustering');
   } else {
     status = 'UNVERIFIED';
-    notes.push('beneficial-owner clustering unavailable; concentration cannot be established to sufficient confidence');
+    notes.push(
+      'beneficial-owner clustering unavailable; concentration cannot be established to sufficient confidence',
+    );
   }
   const unknown = holdings.filter((h) => h.class === 'UNKNOWN' || h.class === 'ESCROW_OR_PROGRAM').length;
   if (unknown) notes.push(`${unknown} of the largest accounts have unidentified controllers`);

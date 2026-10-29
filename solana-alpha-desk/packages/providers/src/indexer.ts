@@ -16,6 +16,9 @@ export interface ParsedTx {
 export interface TransactionIndexer {
   readonly id: string;
   readonly configured: boolean;
-  transactions(address: string, opts?: { before?: string; limit?: number; type?: string }): Promise<Observed<ParsedTx[]>>;
+  transactions(
+    address: string,
+    opts?: { before?: string; limit?: number; type?: string },
+  ): Promise<Observed<ParsedTx[]>>;
   holderCount(mint: string, maxPages?: number): Promise<Observed<{ holders: number; complete: boolean }>>;
 }

@@ -50,7 +50,11 @@ export async function collectSeeds(
         observations.push(res);
         for (const p of res.data) {
           // Only pools old enough to be eligible soon and young enough to still be in range.
-          if (p.createdAt && now - p.createdAt <= maxAgeHours * HOUR && now - p.createdAt >= minAgeMinutes * MINUTE * 0.5) {
+          if (
+            p.createdAt &&
+            now - p.createdAt <= maxAgeHours * HOUR &&
+            now - p.createdAt >= minAgeMinutes * MINUTE * 0.5
+          ) {
             add(p.baseMint, 'geckoterminal:new-pools');
           }
         }
