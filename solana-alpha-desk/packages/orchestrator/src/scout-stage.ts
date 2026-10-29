@@ -7,7 +7,7 @@ import type { Ctx } from './context.ts';
 import { persistEvidence } from './evidence-store.ts';
 import { transition, type CandidateRow } from './handoffs.ts';
 import { recordJob } from './health.ts';
-import { enqueue } from './queue.ts';
+import { schedule } from './queue.ts';
 import { getRuntime } from './repo.ts';
 
 export interface DiscoveryCycleResult {
@@ -354,7 +354,7 @@ async function createCandidate(
       evidenceIds: [o.evidenceId],
     });
     if (t.status === 'COMMITTED')
-      await enqueue(ctx.db, 'filter', `filter:${id}`, { candidateId: id }, o.now, id);
+      await schedule(ctx, 'filter', `filter:${id}`, { candidateId: id }, o.now, id);
   }
   return true;
 }

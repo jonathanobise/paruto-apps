@@ -33,7 +33,10 @@ class Mutex {
 export interface RuntimeOptions {
   metrics: ProviderMetrics;
   circuits: () => Record<string, string>;
-  /** Run discovery and the decision pipeline (false when Cloudflare cron + queues do that). */
+  /**
+   * Run the data plane (discovery, filter, analyst, candidate snapshots). Set false when Cloudflare cron +
+   * queues run it; the execution plane (risk, entries, exits, stops, breakers) always runs here.
+   */
   runPipeline: boolean;
 }
 
@@ -67,9 +70,10 @@ export class AgentRuntime {
       this.ctx.log.info('discovery cycle', { ...r, errors: r.errors.slice(0, 3) });
     });
     this.loop('pipeline', 2_000, async () => {
-      if (!this.opts.runPipeline) return;
-      await drainQueue(this.ctx, 'filter', 2);
-      await drainQueue(this.ctx, 'analyst', 5);
+      if (this.opts.runPipeline) {
+        await drainQueue(this.ctx, 'filter', 2);
+        await drainQueue(this.ctx, 'analyst', 5);
+      }
       await this.exec.run(async () => {
         await drainQueue(this.ctx, 'risk', 2);
         await drainQueue(this.ctx, 'execute', 2);

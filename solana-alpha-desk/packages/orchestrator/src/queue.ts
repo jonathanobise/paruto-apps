@@ -1,6 +1,7 @@
 import type { SqlDb } from '@alpha-desk/db';
 import { newId } from '@alpha-desk/shared';
 import { alertStmt, auditStmt } from './audit-writer.ts';
+import type { Ctx } from './context.ts';
 
 export type QueueName = 'filter' | 'analyst' | 'risk' | 'execute' | 'exit';
 
@@ -116,4 +117,25 @@ export async function defer(db: SqlDb, id: string, until: number, now: number): 
     `UPDATE work_items SET status = 'PENDING', attempts = MAX(0, attempts - 1), available_at = ?, leased_until = NULL, updated_at = ? WHERE id = ?`,
     [until, now, id],
   );
+}
+
+/** Writes durable work and, when a queue transport is configured, wakes its consumer. */
+export async function schedule(
+  ctx: Ctx,
+  queue: QueueName,
+  idempotencyKey: string,
+  payload: unknown,
+  now: number,
+  candidateId: string | null = null,
+  delayMs = 0,
+): Promise<boolean> {
+  const created = await enqueue(ctx.db, queue, idempotencyKey, payload, now, candidateId, delayMs);
+  if (created && ctx.notify) {
+    try {
+      await ctx.notify(queue, Math.ceil(delayMs / 1000));
+    } catch {
+      // The work item is durable; the next sweep picks it up.
+    }
+  }
+  return created;
 }

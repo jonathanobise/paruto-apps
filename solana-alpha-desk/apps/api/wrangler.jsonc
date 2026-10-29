@@ -1,0 +1,29 @@
+// Solana Alpha Desk — control-plane Worker (API + dashboard static assets).
+// Not deployed: deploying needs the owner's approval and the resources below created first
+// (see docs/deployment.md). IDs are placeholders until then.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "solana-alpha-desk-api",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "assets": {
+    "directory": "../web/out",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/internal/*"],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "solana-alpha-desk",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "../../infrastructure/migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "EVIDENCE", "bucket_name": "solana-alpha-desk-evidence" }],
+  "queues": { "producers": [{ "binding": "CANDIDATE_QUEUE", "queue": "alpha-desk-candidates" }] },
+  "vars": { "APP_ENV": "production" },
+  "observability": { "enabled": true },
+}

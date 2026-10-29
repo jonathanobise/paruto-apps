@@ -17,7 +17,7 @@ import { auditStmt } from './audit-writer.ts';
 import type { Ctx } from './context.ts';
 import { persistEvidence } from './evidence-store.ts';
 import { transition, type CandidateRow } from './handoffs.ts';
-import { enqueue } from './queue.ts';
+import { schedule } from './queue.ts';
 import { getCandidate, getRuntime } from './repo.ts';
 import type { StageResult } from './stage-result.ts';
 
@@ -275,7 +275,7 @@ export async function processAnalyst(ctx: Ctx, candidateId: string): Promise<Sta
         expiresAt: decision.validUntil,
       });
       if (t2.status === 'COMMITTED')
-        await enqueue(ctx.db, 'risk', `risk:${c.id}`, { candidateId: c.id }, now, c.id);
+        await schedule(ctx, 'risk', `risk:${c.id}`, { candidateId: c.id }, now, c.id);
     }
   }
   return { kind: 'DONE', state: decision.outcome };

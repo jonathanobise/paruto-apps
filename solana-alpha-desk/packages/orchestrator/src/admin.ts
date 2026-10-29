@@ -8,7 +8,7 @@ import type { Ctx } from './context.ts';
 import { requestExit } from './execution-stage.ts';
 import { transition } from './handoffs.ts';
 import { tripBreaker, runReconciliation } from './monitor-stage.ts';
-import { enqueue } from './queue.ts';
+import { schedule } from './queue.ts';
 import { equityOf, getCandidate, getPortfolio, getRuntime, openPositions } from './repo.ts';
 import { providerErrorRates } from './health.ts';
 
@@ -165,7 +165,7 @@ export async function approveOpportunity(ctx: Ctx, candidateId: string, actor: s
     payload: { actor },
   });
   if (r.status !== 'COMMITTED') throw new Error(`approval not applied: ${r.status}`);
-  await enqueue(ctx.db, 'risk', `risk:${c.id}`, { candidateId: c.id }, now, c.id);
+  await schedule(ctx, 'risk', `risk:${c.id}`, { candidateId: c.id }, now, c.id);
 }
 
 export async function updateStrategy(

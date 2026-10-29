@@ -8,5 +8,5 @@
     "workers/*/src/**/*.ts",
     "tests/**/*.ts"
   ],
-  "exclude": ["**/node_modules", "apps/web"]
+  "exclude": ["**/node_modules", "apps/web", "apps/api/src/worker.ts", "workers/*/src/**"]
 }

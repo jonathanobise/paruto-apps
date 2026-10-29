@@ -16,4 +16,9 @@ export interface Ctx {
   config: () => Promise<VersionedConfig>;
   /** Identifies this process in heartbeats. */
   instanceId: string;
+  /** Optional wake-up signal (Cloudflare Queues) sent after work is written to the durable work_items table. */
+  notify?: (
+    queue: 'filter' | 'analyst' | 'risk' | 'execute' | 'exit',
+    delaySeconds?: number,
+  ) => Promise<void>;
 }

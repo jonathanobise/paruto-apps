@@ -51,4 +51,4 @@ const shutdown = (signal: string) => {
 };
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('unhandledRejection', (e) => ctx.log.error('unhandled rejection', { error: String(e) }));
+process.on('unhandledRejection', (e: unknown) => ctx.log.error('unhandled rejection', { error: String(e) }));

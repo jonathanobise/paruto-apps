@@ -23,7 +23,7 @@ import {
   transitionStatements,
   type CandidateRow,
 } from './handoffs.ts';
-import { enqueue } from './queue.ts';
+import { schedule } from './queue.ts';
 import {
   activeBreakers,
   equityOf,
@@ -287,8 +287,8 @@ export async function processRisk(ctx: Ctx, candidateId: string): Promise<StageR
   });
   if (t.status !== 'COMMITTED') return { kind: 'SKIPPED', reason: t.status };
   if (verdict.decision === 'RISK_AUTHORIZED')
-    await enqueue(
-      ctx.db,
+    await schedule(
+      ctx,
       'execute',
       `execute:${c.id}`,
       { candidateId: c.id, authorizationId: authId },

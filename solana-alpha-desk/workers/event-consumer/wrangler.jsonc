@@ -1,0 +1,21 @@
+// Not deployed — see docs/deployment.md. Resource IDs are placeholders.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "alpha-desk-event-consumer",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "solana-alpha-desk",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+    },
+  ],
+  "r2_buckets": [{ "binding": "EVIDENCE", "bucket_name": "solana-alpha-desk-evidence" }],
+  "queues": {
+    "consumers": [{ "queue": "alpha-desk-candidates-dlq", "max_batch_size": 10, "max_retries": 10 }],
+  },
+  "observability": { "enabled": true },
+}
