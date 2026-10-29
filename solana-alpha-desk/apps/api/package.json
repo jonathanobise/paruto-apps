@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx src/node.ts",
     "dev:worker": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "node scripts/embed-web.mjs && wrangler deploy",
+    "embed": "node scripts/embed-web.mjs"
   },
   "dependencies": {
     "@alpha-desk/analytics": "workspace:*",

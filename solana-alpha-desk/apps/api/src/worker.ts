@@ -11,11 +11,11 @@ import {
 import { createProviders, SolPrice } from '@alpha-desk/providers';
 import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import { createApp } from './app.ts';
+import { serveWeb } from './web.ts';
 
 export interface Env {
   DB: D1Database;
   EVIDENCE: R2Bucket;
-  ASSETS: Fetcher;
   CANDIDATE_QUEUE?: Queue<{ queue: QueueName }>;
   BRIDGE_SECRET?: string;
   SETUP_TOKEN?: string;
@@ -92,6 +92,6 @@ export default {
       await ensureBootstrapped(env);
       return app.fetch(req, env, exec);
     }
-    return env.ASSETS.fetch(req);
+    return serveWeb(req);
   },
 } satisfies ExportedHandler<Env>;

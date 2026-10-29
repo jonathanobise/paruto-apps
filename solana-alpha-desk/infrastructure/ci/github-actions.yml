@@ -21,6 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22.22.0, cache: pnpm, cache-dependency-path: solana-alpha-desk/pnpm-lock.yaml }
       - run: pnpm install --frozen-lockfile
+      - run: node apps/api/scripts/embed-web.mjs
       - run: pnpm typecheck
       - run: npx tsc --noEmit -p apps/api/tsconfig.worker.json && npx tsc --noEmit -p workers/tsconfig.json
       - run: pnpm lint

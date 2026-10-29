@@ -1,22 +1,42 @@
 # Deployment
 
-**Status: not deployed.** Nothing has been created on Cloudflare. Deploying creates billable resources on
-the owner's account and publishes a login page, so it waits for the owner's go-ahead.
+**Status: deployed 29 Oct 2026 to https://magpie.paruto.com** (Cloudflare account
+`Obise.jonathan@gmail.com's Account`, zone `paruto.com`).
 
-## Target topology
+| Worker                           | Role                                                                                                                                                                    | Trigger                             |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `solana-alpha-desk-api`          | API, auth, owner controls, dashboard (embedded static export)                                                                                                           | custom domain `magpie.paruto.com`   |
+| `alpha-desk-execution`           | execution plane: Durable Object `ExecutionEngine` ("primary") ticking every ~2 s via alarms — risk, entries, exits, stops, breakers, reconciliation, reports, retention | cron every minute re-arms the alarm |
+| `alpha-desk-discovery-scheduler` | Scout cycle, candidate snapshots, re-announces waiting work                                                                                                             | cron every minute                   |
+| `alpha-desk-candidate-processor` | Filter and Analyst                                                                                                                                                      | queue `alpha-desk-candidates`       |
+| `alpha-desk-event-consumer`      | dead letters → alerts                                                                                                                                                   | queue `alpha-desk-candidates-dlq`   |
 
-- **Control plane** — Worker `solana-alpha-desk-api` (`apps/api`): REST API, auth, the signed bridge,
-  and the dashboard as static assets on the same origin. Bindings: D1 `DB`, R2 `EVIDENCE`, queue producer
-  `CANDIDATE_QUEUE`. Suggested route: a private hostname such as `desk.paruto.com` behind Cloudflare
-  Access (defence in depth on top of the app's own auth). `workers_dev` is off.
-- **Data plane (optional)** — `workers/discovery-scheduler` (cron every minute), `workers/candidate-processor`
-  (queue consumer: filter + analyst), `workers/event-consumer` (dead-letter queue → alerts). When these
-  run, start the monitor with `RUN_PIPELINE=false`.
-- **Execution plane** — the monitor container (`infrastructure/docker`) on an always-on host (Fly.io,
-  Railway, a VPS…) with `APP_ENV=production`, `BRIDGE_URL`, `BRIDGE_SECRET`. It runs risk, entries,
-  exits, stops, breakers, reconciliation, reports and retention, and writes D1 through the bridge.
+Resources: D1 `solana-alpha-desk` (`e01c7217-af7a-48ad-bbb0-e8ec4a5829b9`), R2 `solana-alpha-desk-evidence`,
+queues `alpha-desk-candidates` and `alpha-desk-candidates-dlq`. No Worker has a `workers.dev` or preview URL;
+only the API has a route. The signed SQL bridge is disabled (no `BRIDGE_SECRET`) because the execution plane
+runs on Cloudflare; set it only if you run the Node monitor elsewhere.
 
-## Steps
+Secrets: `SETUP_TOKEN` on the API. `HELIUS_API_KEY` belongs on `alpha-desk-candidate-processor` and
+`alpha-desk-execution` (it also provides the private Solana RPC unless `SOLANA_RPC_URL` is set).
+
+## Why the dashboard is embedded
+
+The build environment reaches Cloudflare through a proxy that injects the account API token, which breaks
+the Workers Assets upload (it authenticates with a per-session JWT). `apps/api/scripts/embed-web.mjs`
+embeds `apps/web/out` into the Worker instead (≈ 870 KB gzipped), served by `src/web.ts` with CSP, HSTS
+and immutable caching for hashed assets. `pnpm --filter @alpha-desk/api deploy` runs the embed first.
+
+## Redeploying
+
+```bash
+pnpm install --frozen-lockfile && pnpm web:build
+(cd apps/api && node scripts/embed-web.mjs && npx wrangler deploy)
+for w in execution-engine discovery-scheduler candidate-processor event-consumer; do (cd workers/$w && npx wrangler deploy); done
+```
+
+New migrations: `cd apps/api && npx wrangler d1 migrations apply solana-alpha-desk --remote` before deploying code that needs them.
+
+## Original provisioning steps (for a fresh account)
 
 1. Create resources (once): `infrastructure/cloudflare/setup.sh` (D1, R2, queues). Paste the D1 id into
    `apps/api/wrangler.jsonc` and `workers/*/wrangler.jsonc`.
@@ -32,7 +52,7 @@ the owner's account and publishes a login page, so it waits for the owner's go-a
 7. Switch the runtime mode from DISCOVERY_ONLY to PAPER_AUTONOMOUS only once System Health is green and
    at least the RPC and indexer credentials are configured.
 
-## Verified locally
+## Verified before deployment
 
 - `wrangler d1 migrations apply --local` applies all migrations.
 - `wrangler dev` runs the API Worker on workerd with local D1: first-run bootstrap, setup, login, the
@@ -42,8 +62,7 @@ the owner's account and publishes a login page, so it waits for the owner's go-a
 - The full paper lifecycle test passes on a real D1 binding (`tests/integration/d1.test.ts`).
 - The bundled monitor (`apps/monitor/dist/monitor.mjs`) starts and serves `/healthz`.
 
-Not verified: a Docker image build (no Docker daemon in the build environment), and anything on
-Cloudflare's network.
+Not verified: a Docker image build for the optional Node monitor (no Docker daemon in the build environment).
 
 ## Rollback
 

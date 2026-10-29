@@ -2,8 +2,22 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/.next/**', '**/out/**', '**/dist/**', '**/.wrangler/**', 'data/**'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/*.generated.ts',
+      '**/.next/**',
+      '**/out/**',
+      '**/dist/**',
+      '**/.wrangler/**',
+      'data/**',
+    ],
+  },
   js.configs.recommended,
+  {
+    files: ['**/*.mjs'],
+    languageOptions: { globals: { URL: 'readonly', console: 'readonly', process: 'readonly' } },
+  },
   ...tseslint.configs.recommended,
   {
     rules: {
