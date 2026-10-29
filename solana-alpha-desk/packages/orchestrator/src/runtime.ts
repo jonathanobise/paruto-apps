@@ -149,34 +149,38 @@ export class AgentRuntime {
     this.timers.push(setTimeout(tick, 100));
   }
 
-  /** Morning report at the configured local hour, daily P&L and funnel for the previous local day, weekly on Mondays. */
-  private async scheduledReports(): Promise<void> {
-    const rt = await getRuntime(this.ctx.db);
-    const now = this.ctx.clock.now();
-    const hour = Number(
-      new Intl.DateTimeFormat('en-GB', { timeZone: rt.timezone, hour: '2-digit', hour12: false }).format(
-        new Date(now),
-      ),
-    );
-    if (hour !== rt.report_hour_local) return;
-    const today = localDate(now, rt.timezone);
-    const done = await this.ctx.db.first<{ n: number }>(
-      `SELECT COUNT(*) AS n FROM report_runs WHERE kind = 'MORNING' AND created_at > ?`,
-      [now - 20 * HOUR],
-    );
-    if (Number(done?.n ?? 0) > 0) return;
-    const end = now;
-    await generateReport(this.ctx, 'MORNING', end - DAY, end);
-    await generateReport(this.ctx, 'DAILY_PNL', end - DAY, end);
-    await generateReport(this.ctx, 'REJECTION_FUNNEL', end - DAY, end);
-    await generateReport(this.ctx, 'AGENT_RELIABILITY', end - DAY, end);
-    const weekday = new Intl.DateTimeFormat('en-GB', { timeZone: rt.timezone, weekday: 'short' }).format(
-      new Date(now),
-    );
-    if (weekday === 'Mon') {
-      await generateReport(this.ctx, 'WEEKLY', end - 7 * DAY, end);
-      await generateReport(this.ctx, 'STRATEGY_COMPARISON', end - 7 * DAY, end);
-    }
-    this.ctx.log.info('scheduled reports generated', { day: today });
+  private scheduledReports(): Promise<void> {
+    return runScheduledReports(this.ctx);
   }
+}
+
+/** Morning report at the configured local hour, daily P&L and funnel for the previous local day, weekly on Mondays. */
+export async function runScheduledReports(ctx: Ctx): Promise<void> {
+  const rt = await getRuntime(ctx.db);
+  const now = ctx.clock.now();
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', { timeZone: rt.timezone, hour: '2-digit', hour12: false }).format(
+      new Date(now),
+    ),
+  );
+  if (hour !== rt.report_hour_local) return;
+  const today = localDate(now, rt.timezone);
+  const done = await ctx.db.first<{ n: number }>(
+    `SELECT COUNT(*) AS n FROM report_runs WHERE kind = 'MORNING' AND created_at > ?`,
+    [now - 20 * HOUR],
+  );
+  if (Number(done?.n ?? 0) > 0) return;
+  const end = now;
+  await generateReport(ctx, 'MORNING', end - DAY, end);
+  await generateReport(ctx, 'DAILY_PNL', end - DAY, end);
+  await generateReport(ctx, 'REJECTION_FUNNEL', end - DAY, end);
+  await generateReport(ctx, 'AGENT_RELIABILITY', end - DAY, end);
+  const weekday = new Intl.DateTimeFormat('en-GB', { timeZone: rt.timezone, weekday: 'short' }).format(
+    new Date(now),
+  );
+  if (weekday === 'Mon') {
+    await generateReport(ctx, 'WEEKLY', end - 7 * DAY, end);
+    await generateReport(ctx, 'STRATEGY_COMPARISON', end - 7 * DAY, end);
+  }
+  ctx.log.info('scheduled reports generated', { day: today });
 }

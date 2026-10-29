@@ -18,3 +18,4 @@ export * from './runtime.ts';
 export * from './stage-result.ts';
 export * from './replay-study.ts';
 export * from './retention.ts';
+export * from './ticker.ts';

@@ -1,4 +1,4 @@
-// Not deployed — see docs/deployment.md. Resource IDs are placeholders.
+// Part of Solana Alpha Desk (see docs/deployment.md). No public route.
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "alpha-desk-discovery-scheduler",
@@ -6,11 +6,12 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "solana-alpha-desk",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "e01c7217-af7a-48ad-bbb0-e8ec4a5829b9",
     },
   ],
   "r2_buckets": [{ "binding": "EVIDENCE", "bucket_name": "solana-alpha-desk-evidence" }],

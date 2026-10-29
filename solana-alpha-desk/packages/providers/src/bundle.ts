@@ -22,6 +22,14 @@ export interface Providers {
   helius: Helius;
 }
 
+/** A configured RPC wins; otherwise a Helius key gives a private Helius RPC; otherwise the public endpoint. */
+export function rpcUrl(env: ProviderEnv): string {
+  if (env.SOLANA_RPC_URL) return env.SOLANA_RPC_URL;
+  if (env.HELIUS_API_KEY)
+    return `https://mainnet.helius-rpc.com/?api-key=${encodeURIComponent(env.HELIUS_API_KEY)}`;
+  return 'https://api.mainnet-beta.solana.com';
+}
+
 export function createProviders(
   env: ProviderEnv,
   hooks: { onMetric?: (m: CallMetric) => void; budget?: () => boolean; clock?: Clock } = {},
@@ -29,7 +37,7 @@ export function createProviders(
   return {
     dex: new DexScreener(hooks),
     gecko: new GeckoTerminal(hooks),
-    rpc: new SolanaRpc(env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com', hooks),
+    rpc: new SolanaRpc(rpcUrl(env), hooks),
     jupiter: new Jupiter({ ...hooks, apiKey: env.JUPITER_API_KEY || undefined }),
     rugcheck: new RugCheck(hooks),
     helius: new Helius(env.HELIUS_API_KEY || undefined, hooks),
@@ -63,7 +71,9 @@ export function providerStatuses(env: ProviderEnv): ProviderStatus[] {
       requiresCredentials: false,
       note: env.SOLANA_RPC_URL
         ? 'Custom RPC endpoint.'
-        : 'Public mainnet-beta endpoint (rate limited; set SOLANA_RPC_URL for production).',
+        : env.HELIUS_API_KEY
+          ? 'Helius RPC (derived from HELIUS_API_KEY).'
+          : 'Public mainnet-beta endpoint (rate limited; set SOLANA_RPC_URL or HELIUS_API_KEY).',
     },
     {
       id: 'jupiter',

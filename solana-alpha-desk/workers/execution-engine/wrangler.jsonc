@@ -1,0 +1,23 @@
+// Solana Alpha Desk — execution plane (Durable Object with self-rearming alarms). No public route.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "alpha-desk-execution",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "durable_objects": { "bindings": [{ "name": "ENGINE", "class_name": "ExecutionEngine" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ExecutionEngine"] }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "solana-alpha-desk",
+      "database_id": "e01c7217-af7a-48ad-bbb0-e8ec4a5829b9",
+    },
+  ],
+  "r2_buckets": [{ "binding": "EVIDENCE", "bucket_name": "solana-alpha-desk-evidence" }],
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": { "APP_ENV": "production" },
+  "observability": { "enabled": true },
+}

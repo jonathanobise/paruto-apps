@@ -1,6 +1,13 @@
 import { D1Db, type D1Like } from '@alpha-desk/db';
 import { DEFAULT_STRATEGY } from '@alpha-desk/config';
-import { bootstrap, loadConfig, R2EvidenceStore, type Ctx, type QueueName } from '@alpha-desk/orchestrator';
+import {
+  bootstrap,
+  loadConfig,
+  R2EvidenceStore,
+  type Ctx,
+  type ProviderMetrics,
+  type QueueName,
+} from '@alpha-desk/orchestrator';
 import { createProviders, SolPrice } from '@alpha-desk/providers';
 import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import { createApp } from './app.ts';
@@ -18,9 +25,9 @@ export interface Env {
   APP_ENV?: 'development' | 'test' | 'production';
 }
 
-export function workerCtx(env: Env): Ctx {
+export function workerCtx(env: Env, metrics?: ProviderMetrics): Ctx {
   const db = new D1Db(env.DB as unknown as D1Like);
-  const providers = createProviders(env);
+  const providers = createProviders(env, metrics ? { onMetric: metrics.record } : {});
   return {
     db,
     providers,

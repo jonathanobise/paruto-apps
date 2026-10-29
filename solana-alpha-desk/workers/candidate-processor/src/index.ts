@@ -1,5 +1,5 @@
 import { workerCtx, type Env } from '@alpha-desk/api/worker';
-import { drainQueue, type QueueName } from '@alpha-desk/orchestrator';
+import { drainQueue, ProviderMetrics, type QueueName } from '@alpha-desk/orchestrator';
 
 /**
  * Queue consumer for the data plane. Messages are wake-up signals; the durable work lives in work_items,
@@ -8,7 +8,8 @@ import { drainQueue, type QueueName } from '@alpha-desk/orchestrator';
  */
 export default {
   async queue(batch: MessageBatch<{ queue: QueueName }>, env: Env): Promise<void> {
-    const ctx = workerCtx(env);
+    const metrics = new ProviderMetrics();
+    const ctx = workerCtx(env, metrics);
     const wanted = new Set(
       batch.messages.map((m) => m.body.queue).filter((q) => q === 'filter' || q === 'analyst'),
     );
@@ -17,6 +18,7 @@ export default {
         // keep draining until the durable queue is empty
       }
     }
+    await metrics.flush(ctx.db, {}).catch(() => undefined);
     batch.ackAll();
   },
 } satisfies ExportedHandler<Env, { queue: QueueName }>;
