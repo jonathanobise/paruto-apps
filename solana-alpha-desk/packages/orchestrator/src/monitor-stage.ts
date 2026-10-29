@@ -12,7 +12,7 @@ import type { Ctx } from './context.ts';
 import { persistEvidence } from './evidence-store.ts';
 import { requestExit, processExit, type ExitReason } from './execution-stage.ts';
 import { transition } from './handoffs.ts';
-import { providerErrorRates, recordJob } from './health.ts';
+import { CRITICAL_FEEDS, providerErrorRates, recordJob } from './health.ts';
 import {
   candidatesInState,
   equityOf,
@@ -425,8 +425,7 @@ export async function equityAndBreakers(
   if (rf) await tripBreaker(ctx, rf.breaker, pid, rf.detail);
 
   const rates = await providerErrorRates(ctx.db, now, 5 * 60_000);
-  const critical = ['dexscreener', 'jupiter', 'solana-rpc'];
-  const down = critical.filter(
+  const down = CRITICAL_FEEDS.filter(
     (p) =>
       rates[p] &&
       rates[p]!.calls >= 5 &&

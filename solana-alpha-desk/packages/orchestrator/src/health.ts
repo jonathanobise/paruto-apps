@@ -2,6 +2,14 @@ import type { SqlDb } from '@alpha-desk/db';
 import type { CallMetric } from '@alpha-desk/providers';
 import type { HealthStatus } from '@alpha-desk/shared';
 
+/** Feeds whose outage trips DATA_OUTAGE: discovery, on-chain reads and executable quotes. */
+export const CRITICAL_FEEDS = ['dexscreener', 'jupiter', 'solana-rpc'];
+/**
+ * Feeds that decisions depend on, so a high error rate marks the desk DEGRADED. GeckoTerminal (a second
+ * discovery source) and RugCheck (corroboration only) are supplementary: their errors show on System Health.
+ */
+export const DECISION_FEEDS = [...CRITICAL_FEEDS, 'helius'];
+
 export async function recordJob(
   db: SqlDb,
   id: string,

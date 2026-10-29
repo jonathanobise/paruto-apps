@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BRIDGE_PATH, bridgeSigningString } from '@alpha-desk/db';
+import { recordJob } from '@alpha-desk/orchestrator';
 import { hmacSha256Hex } from '@alpha-desk/shared';
 import { createApp } from '../src/app.ts';
 import { totp } from '../src/crypto.ts';
@@ -271,6 +272,25 @@ describe('dashboard endpoints return persisted data', () => {
     expect(
       (await call(`/api/v1/positions/${pos[0]!.id}/close`, { method: 'POST', cookie, csrf })).status,
     ).toBe(200);
+  });
+  it('marks the desk DEGRADED only when a feed that decisions depend on is failing', async () => {
+    const { call, h } = await setup();
+    const { cookie } = await signIn(call);
+    const now = h.world.clock.now();
+    await recordJob(h.db, 'monitor', { now, ok: true, error: null, instanceId: 'test' });
+    const health = (p: string, calls: number, errors: number) =>
+      h.db.run(
+        `INSERT INTO provider_health (provider_id, window_start, calls, errors, rate_limited) VALUES (?, ?, ?, ?, ?)`,
+        [p, now - 60_000, calls, errors, errors],
+      );
+    const status = async () =>
+      ((await (await call('/api/v1/overview', { cookie })).json()) as { data: { systemStatus: string } }).data
+        .systemStatus;
+    await health('dexscreener', 90, 10);
+    await health('geckoterminal', 40, 28); // supplementary discovery feed, shared-IP rate limits
+    expect(await status()).toBe('HEALTHY');
+    await health('helius', 20, 9);
+    expect(await status()).toBe('DEGRADED');
   });
   it('validates breaker resets with the documented phrase', async () => {
     const { call } = await setup();

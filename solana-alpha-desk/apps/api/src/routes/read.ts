@@ -2,7 +2,14 @@ import type { Hono } from 'hono';
 import { computeMetrics, segment, SEGMENTERS } from '@alpha-desk/analytics';
 import { big } from '@alpha-desk/db';
 import { markValueMicro } from '@alpha-desk/execution';
-import { closedTrades, equityOf, getRuntime, loadConfig, queueDepths } from '@alpha-desk/orchestrator';
+import {
+  closedTrades,
+  DECISION_FEEDS,
+  equityOf,
+  getRuntime,
+  loadConfig,
+  queueDepths,
+} from '@alpha-desk/orchestrator';
 import { BREAKERS, resetPhrase } from '@alpha-desk/risk';
 import { RULE_TITLES } from '@alpha-desk/security';
 import { DAY, Decimal, HOUR } from '@alpha-desk/shared';
@@ -138,7 +145,12 @@ export function readRoutes(api: Hono<HonoEnv>): void {
         ? 'PAUSED'
         : !monitorAlive
           ? 'UNAVAILABLE'
-          : feeds.some((f) => Number(f.calls) > 0 && Number(f.errors) / Number(f.calls) > 0.3)
+          : feeds.some(
+                (f) =>
+                  DECISION_FEEDS.includes(f.provider_id) &&
+                  Number(f.calls) > 0 &&
+                  Number(f.errors) / Number(f.calls) > 0.3,
+              )
             ? 'DEGRADED'
             : 'HEALTHY',
     });
