@@ -10,10 +10,17 @@ Solana RPC, Jupiter executable quotes, scoring, risk authorization, simulated fi
 breakers, ledger, audit, reports, replay, and an authenticated dashboard. Automated tests prove the
 complete paper-trading lifecycle and every listed failure mode on both node:sqlite and a real D1 binding.
 
-**What stops live paper trades today is credentials, by design.** Without a holder/transaction indexer
-(Helius) the Filter cannot establish beneficial-owner clustering, developer history or launch bundling,
-so it returns `FILTER_UNVERIFIED` and nothing advances. Without a private RPC, the public endpoint refuses
-`getTokenLargestAccounts`, which makes the holder check error and keeps the DATA_OUTAGE breaker tripped.
+**Deployed and running at https://magpie.paruto.com** (five Cloudflare Workers, D1, R2, Queues, a Durable
+Object for the execution plane). Helius is configured: the Solana RPC goes through Helius and the
+Filter uses its Enhanced Transactions history for developer and launch-bundling checks. Live candidates
+are being filtered with real evidence (the first ones were rejected for holder concentration, developer
+ownership, coordinated launch buying and thin volume).
+
+**Helius Free plan budget.** Enhanced Transactions cost 100 credits per call and the Free plan has 1M
+credits a month. The Filter therefore runs the cheap RPC and market rules first and only reads indexer
+history for candidates no rule has rejected; wallet funding is traced over RPC at 1 credit a call. A
+fully checked candidate still costs up to ~2,000 credits, so a busy month can exceed the Free plan
+(Developer plan: 10M credits, 10 req/s).
 
 ## Completed features
 
@@ -34,7 +41,7 @@ so it returns `FILTER_UNVERIFIED` and nothing advances. Without a private RPC, t
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 16 files, **136 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **136 passed**           |
+| Vitest — 19 files, **145 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **145 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |
@@ -49,16 +56,16 @@ replay ran on 85 recorded observations.
 
 ## Integration status
 
-| Integration                           | Status                                                                                              |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| DexScreener                           | OPERATIONAL                                                                                         |
-| GeckoTerminal                         | OPERATIONAL (frequent 429 on shared IPs; supplementary)                                             |
-| Solana RPC (public)                   | DEGRADED — `getTokenLargestAccounts` refused from this host; ~65 % of calls rate limited in testing |
-| Jupiter (lite-api)                    | OPERATIONAL                                                                                         |
-| RugCheck                              | OPERATIONAL (corroboration only)                                                                    |
-| Helius                                | **BLOCKED_BY_CREDENTIALS** — adapter implemented to the documented API, not exercised live          |
-| Anthropic / OpenAI (report summaries) | adapters present, unused by default, never used for decisions                                       |
-| Cloudflare D1 / R2 / Queues / Workers | code and configs ready; verified locally (workerd); **not provisioned or deployed**                 |
+| Integration                           | Status                                                                                             |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| DexScreener                           | OPERATIONAL                                                                                        |
+| GeckoTerminal                         | OPERATIONAL (frequent 429 on shared IPs; supplementary)                                            |
+| Solana RPC (via Helius)               | OPERATIONAL — derived from `HELIUS_API_KEY`; the public endpoint refuses `getTokenLargestAccounts` |
+| Jupiter (lite-api)                    | OPERATIONAL                                                                                        |
+| RugCheck                              | OPERATIONAL (corroboration only)                                                                   |
+| Helius                                | OPERATIONAL (Free plan: 2 req/s, 1M credits/month; Enhanced Transactions is legacy at 100 credits) |
+| Anthropic / OpenAI (report summaries) | adapters present, unused by default, never used for decisions                                      |
+| Cloudflare D1 / R2 / Queues / Workers | OPERATIONAL — deployed, magpie.paruto.com                                                          |
 
 ## Required credentials
 
@@ -73,15 +80,18 @@ replay ran on 85 recorded observations.
 
 ## Deployment status
 
-Not deployed. No Cloudflare resources were created; the commits have not been pushed (pushing and
-deploying need the owner's go-ahead, per this repository's rules). See `docs/deployment.md` for the
-exact steps. The Docker image for the monitor is written but was not built (no Docker daemon in the
-build environment); the esbuild bundle it packages was run and served `/healthz`.
+Deployed on 29 Oct 2026 to the owner's Cloudflare account: the API Worker (dashboard embedded) on
+`magpie.paruto.com`, plus the discovery-scheduler, candidate-processor, execution-engine (Durable
+Object) and event-consumer Workers, D1 `solana-alpha-desk`, R2 `solana-alpha-desk-evidence` and the
+candidate queues. Secrets: `SETUP_TOKEN` and `HELIUS_API_KEY`. `BRIDGE_SECRET` is not set, so the signed
+SQL bridge is disabled in production. The owner account exists. See `docs/deployment.md`.
 
 ## Known limitations
 
-- No live paper trades are possible until an indexer key (and ideally a private RPC) is configured — the
-  intended fail-closed behaviour.
+- Helius Enhanced Transactions is in maintenance mode; its successor (Parsed Events, 10 credits a call)
+  is not used yet. Moving to it would cut indexer cost about tenfold.
+- Candidates whose launch-window or developer history needs more than 10 pages, or whose launch buyers
+  exceed 25, stay `UNVERIFIED` (fail closed).
 - Supported pools: PumpSwap AMM, Raydium CPMM, Raydium AMM v4. Concentrated-liquidity pools, bonding
   curves and LP lock programs are rejected (F017) or treated as withdrawable.
 - Partial fills are not modelled (Jupiter swaps are atomic); fills use the worse of quote and landing
@@ -99,22 +109,22 @@ build environment); the esbuild bundle it packages was run and served `/healthz`
 
 ## Remaining acceptance criteria
 
-| Definition of done item                                        | Status                                          |
-| -------------------------------------------------------------- | ----------------------------------------------- |
-| 1 deployed and authenticated                                   | authentication ✅; deployment ⏳ owner approval |
-| 2 six agents as independent logical services                   | ✅                                              |
-| 3 real Solana data feeds connected                             | ✅ (keyless); indexer ⏳ credentials            |
-| 4 every security check implemented or blocks when unverifiable | ✅                                              |
-| 5 scores from genuine observations                             | ✅                                              |
-| 6 risk approvals enforce every limit                           | ✅                                              |
-| 7 defensible execution simulation                              | ✅                                              |
-| 8 balances reconcile                                           | ✅                                              |
-| 9 stops and breakers survive restarts                          | ✅ (tested)                                     |
-| 10 every rejection recorded                                    | ✅                                              |
-| 11 dashboard shows persisted results                           | ✅                                              |
-| 12 overnight paper operation functional                        | ✅ runtime; real fills ⏳ credentials           |
-| 13 accurate daily reports                                      | ✅                                              |
-| 14 critical tests pass                                         | ✅                                              |
-| 15 no live transaction can be submitted                        | ✅ (enforced and tested)                        |
-| 16 source and deployment docs                                  | ✅                                              |
-| 17 limitations and dependencies documented                     | ✅                                              |
+| Definition of done item                                        | Status                               |
+| -------------------------------------------------------------- | ------------------------------------ |
+| 1 deployed and authenticated                                   | ✅ magpie.paruto.com                 |
+| 2 six agents as independent logical services                   | ✅                                   |
+| 3 real Solana data feeds connected                             | ✅ incl. Helius                      |
+| 4 every security check implemented or blocks when unverifiable | ✅                                   |
+| 5 scores from genuine observations                             | ✅                                   |
+| 6 risk approvals enforce every limit                           | ✅                                   |
+| 7 defensible execution simulation                              | ✅                                   |
+| 8 balances reconcile                                           | ✅                                   |
+| 9 stops and breakers survive restarts                          | ✅ (tested)                          |
+| 10 every rejection recorded                                    | ✅                                   |
+| 11 dashboard shows persisted results                           | ✅                                   |
+| 12 overnight paper operation functional                        | ✅ runtime; first real fills pending |
+| 13 accurate daily reports                                      | ✅                                   |
+| 14 critical tests pass                                         | ✅                                   |
+| 15 no live transaction can be submitted                        | ✅ (enforced and tested)             |
+| 16 source and deployment docs                                  | ✅                                   |
+| 17 limitations and dependencies documented                     | ✅                                   |
