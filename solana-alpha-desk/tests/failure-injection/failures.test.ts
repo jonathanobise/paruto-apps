@@ -105,6 +105,22 @@ describe('provider failures never become passes', () => {
     expect(f009?.outcome).toBe('UNVERIFIED');
     expect(f009?.reason).toContain('already rejected by F005');
   });
+  it("without an on-chain coin creator the deployer is the mint's first fee payer, so developer checks still run", async () => {
+    const { world, ctx, db } = await makeHarness();
+    const tok = world.addToken({
+      ...GOOD_TOKEN,
+      seed: 'legacy',
+      legacyPool: true,
+      deployerHoldingTokens: 80_000_000,
+    });
+    await runDiscoveryCycle(ctx);
+    await drainQueue(ctx, 'filter');
+    const f007 = await db.first<{ outcome: string; observed: string }>(
+      `SELECT outcome, observed FROM security_rule_results WHERE rule_id = 'F007'`,
+    );
+    expect(f007?.outcome).toBe('FAIL');
+    expect(JSON.parse(f007!.observed).deployer).toBe(tok.deployer);
+  });
   it('Jupiter outage at the Risk stage: rejected, no order', async () => {
     const h = await makeHarness();
     h.world.jup.beforeQuote = null;

@@ -136,10 +136,20 @@ export function analyseBundle(input: {
     });
   }
   const pct = input.totalSupplyUi.gt(0) ? bundled.div(input.totalSupplyUi).mul(100) : null;
+  const allBuysPct = input.totalSupplyUi.gt(0)
+    ? input.buys
+        .reduce((sum, b) => sum.add(b.uiAmount), new Decimal(0))
+        .div(input.totalSupplyUi)
+        .mul(100)
+    : null;
   let status: BundleAnalysis['status'];
   if (pct && pct.gt(input.maxBundledPct)) status = 'FAIL';
   else if (pct && input.funders && input.fundersComplete) status = 'PASS';
-  else {
+  else if (allBuysPct && allBuysPct.lte(input.maxBundledPct)) {
+    // Coordinated buying cannot exceed all launch buying together, so the limit holds whatever the links.
+    status = 'PASS';
+    notes.push(`all launch buys together are ${allBuysPct.toFixed(4)}% of supply`);
+  } else {
     status = 'UNVERIFIED';
     notes.push('funding links of launch buyers not fully traced');
   }

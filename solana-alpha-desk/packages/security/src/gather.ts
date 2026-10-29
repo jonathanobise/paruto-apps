@@ -254,13 +254,31 @@ export async function gatherSecurityEvidence(
     }
   } else route = missing('price or mint facts unavailable; cannot size the sell test');
 
+  // ── deployer: PumpSwap pools record the coin creator on-chain; for other pools it is the fee payer of
+  // the mint's first transaction (over RPC when the mint's history is short, else from the indexer below).
+  let deployer = coinCreator;
+  let deployerSource: string | null = coinCreator ? 'PumpSwap pool coin_creator (on-chain)' : null;
+  let mintOriginRead = Boolean(coinCreator);
+  if (!deployer) {
+    try {
+      const origin = await mintCreator(rpc, mint, ev);
+      mintOriginRead = origin.reached;
+      if (origin.creator) {
+        deployer = origin.creator;
+        deployerSource = "fee payer of the mint's first transaction (on-chain)";
+      }
+    } catch {
+      // the indexer can still answer after the cheap checks
+    }
+  }
+
   // ── holders (RPC; beneficial-owner clustering is added after the cheap checks below)
   let holders: Fact<ReturnType<typeof analyseHolders>>;
   let holderBasis:
     (Omit<Parameters<typeof analyseHolders>[0], 'clusters'> & { ids: string[]; at: number }) | null = null;
   let circulating: bigint | null = null;
   let deployerHoldings: bigint | null = null;
-  const developerWallets = new Set<string>(coinCreator ? [coinCreator] : []);
+  const developerWallets = new Set<string>(deployer ? [deployer] : []);
   try {
     if (!mintFacts.value) throw new Error('mint facts unavailable');
     const largest = await rpc.getTokenLargestAccounts(mint);
@@ -310,18 +328,18 @@ export async function gatherSecurityEvidence(
   }
 
   // ── deployer holdings (RPC)
-  const deployer = coinCreator;
-  const devIds: string[] = [];
+  const devIds: string[] = ev.records.filter((r) => r.kind.startsWith('RPC_MINT_')).map((r) => r.id);
   let devError: string | null = null;
-  try {
-    if (deployer) {
-      const h = await rpc.getTokenAccountsByOwner(deployer, mint);
+  const readDeployerHoldings = async (wallet: string) => {
+    try {
+      const h = await rpc.getTokenAccountsByOwner(wallet, mint);
       devIds.push(ev.add(h, 'RPC_DEPLOYER_HOLDINGS', 'ON_CHAIN'));
       deployerHoldings = h.data.reduce((s, a) => s + a.amount, 0n);
+    } catch (e) {
+      devError = (e as Error).message;
     }
-  } catch (e) {
-    devError = (e as Error).message;
-  }
+  };
+  if (deployer) await readDeployerHoldings(deployer);
   const developerFrom = (
     history: { txs: ParsedTx[]; complete: boolean } | null,
     linkedHoldings: Map<string, bigint> | null,
@@ -329,7 +347,7 @@ export async function gatherSecurityEvidence(
     analyseDeveloper({
       mint,
       deployer,
-      deployerSource: deployer ? 'PumpSwap pool coin_creator (on-chain)' : null,
+      deployerSource,
       circulatingSupply: circulating,
       deployerHoldings,
       linkedHoldings,
@@ -366,24 +384,54 @@ export async function gatherSecurityEvidence(
       indexer = null;
     }
   }
-  // Funding sources are traced over RPC (a few 1-credit calls) and shared between holder and buyer checks.
-  const funders = new Map<string, Promise<string | null>>();
+  if (indexer && !deployer && !mintOriginRead) {
+    try {
+      const page = await indexer.transactions(mint, { sortOrder: 'asc', limit: 10 });
+      const id = ev.add(page, 'IDX_MINT_ORIGIN', 'PROVIDER_CLAIM');
+      const first = page.data.filter((t) => !t.failed).sort((a, b) => a.slot - b.slot)[0];
+      if (first?.feePayer) {
+        deployer = first.feePayer;
+        deployerSource = "fee payer of the mint's first transaction (indexer)";
+        devIds.push(id);
+        developerWallets.add(deployer);
+        await readDeployerHoldings(deployer);
+      }
+    } catch {
+      // deployer stays unidentified: the developer checks are UNVERIFIED
+    }
+  }
+
+  // Funding sources are traced over RPC (a few 1-credit calls), falling back to one indexer read for
+  // wallets whose history is too long to page through, and shared between holder and buyer checks.
+  // A shared funding hub (exchange, trading-bot service) links nobody, so hub funders are dropped.
+  const funders = new Map<string, Promise<FundingTrace>>();
+  const hubs = new Map<string, Promise<boolean>>();
   const funderOf = (w: string) => {
-    if (!funders.has(w)) funders.set(w, firstFunder(rpc, w, ev));
+    if (!funders.has(w))
+      funders.set(
+        w,
+        firstFunder(rpc, w, ev, { indexer }).then(async (t) => {
+          if (!t.funder) return t;
+          if (!hubs.has(t.funder)) hubs.set(t.funder, isFundingHub(rpc, t.funder, ev));
+          return (await hubs.get(t.funder)!) ? { funder: null, traced: true } : t;
+        }),
+      );
     return funders.get(w)!;
   };
 
   if (indexer && holderBasis) {
     try {
       const clusters = new Map<string, string>();
+      const untraced: string[] = [];
       for (const w of [...holderBasis.owners.values()]
         .filter((o) => o.programOwner === '11111111111111111111111111111111')
         .map((o) => o.address)
         .slice(0, 20)) {
-        const funder = await funderOf(w);
-        if (funder) clusters.set(w, `funder:${funder}`);
+        const trace = await funderOf(w);
+        if (trace.funder) clusters.set(w, `funder:${trace.funder}`);
+        else if (!trace.traced) untraced.push(w);
       }
-      const analysis = analyseHolders({ ...holderBasis, clusters });
+      const analysis = analyseHolders({ ...holderBasis, clusters, untracedWallets: untraced });
       holders = ok(
         analysis,
         [...holderBasis.ids, ...ev.records.filter((r) => r.kind.startsWith('RPC_WALLET_')).map((r) => r.id)],
@@ -454,9 +502,11 @@ export async function gatherSecurityEvidence(
         : null;
       const buyerFunders = new Map<string, string>();
       const buyers = [...new Set((buys ?? []).map((b) => b.buyer))];
-      for (const w of buyers.slice(0, 25)) {
-        const f = await funderOf(w);
-        if (f) buyerFunders.set(w, f);
+      let allTraced = buyers.length <= MAX_TRACED_BUYERS;
+      for (const w of buyers.slice(0, MAX_TRACED_BUYERS)) {
+        const trace = await funderOf(w);
+        if (trace.funder) buyerFunders.set(w, trace.funder);
+        else if (!trace.traced) allTraced = false;
       }
       const supplyUi = fromBaseUnits(mintFacts.value.supply, mintFacts.value.decimals);
       bundle = ok(
@@ -464,7 +514,7 @@ export async function gatherSecurityEvidence(
           buys,
           totalSupplyUi: supplyUi,
           funders: buyerFunders,
-          fundersComplete: buyers.length <= 25,
+          fundersComplete: allTraced,
           windowSeconds: cfg.filter.launchWindowSeconds,
           maxBundledPct: cfg.filter.maxBundledLaunchPct,
         }),
@@ -571,38 +621,117 @@ async function windowHistory(
   return { txs, complete: false };
 }
 
+/** Launch buyers whose funding is traced; with more, the bundling check cannot be completed. */
+export const MAX_TRACED_BUYERS = 100;
+
+/**
+ * The oldest signatures of an address (oldest first, up to five), paging back 1,000 at a time, or null
+ * when the history is longer than `maxPages` pages.
+ */
+async function originSignatures(
+  rpc: SolanaRpc,
+  address: string,
+  ev: EvidenceCollector,
+  kind: string,
+  maxPages: number,
+): Promise<Array<{ signature: string; err: unknown }> | null> {
+  let before: string | undefined;
+  for (let i = 0; i < maxPages; i++) {
+    const page = await rpc.getSignatures(address, { before, limit: 1000 });
+    ev.add(page, kind, 'ON_CHAIN');
+    if (page.data.length < 1000) return page.data.slice(-5).reverse();
+    before = page.data[page.data.length - 1]!.signature;
+  }
+  return null;
+}
+
+/**
+ * Who created a mint: the fee payer of its first successful transaction (the InitializeMint), when the
+ * mint's history is short enough to page back to. `reached` says whether the origin was read.
+ */
+export async function mintCreator(
+  rpc: SolanaRpc,
+  mint: string,
+  ev: EvidenceCollector,
+  maxPages = 3,
+): Promise<{ creator: string | null; reached: boolean }> {
+  const origin = await originSignatures(rpc, mint, ev, 'RPC_MINT_SIGNATURES', maxPages);
+  if (!origin) return { creator: null, reached: false };
+  for (const s of origin) {
+    if (s.err) continue;
+    const tx = await rpc.getTransaction(s.signature);
+    if (!tx.data) continue;
+    ev.add(tx, 'RPC_MINT_ORIGIN_TX', 'ON_CHAIN');
+    return { creator: feePayerOf(tx.data), reached: true };
+  }
+  return { creator: null, reached: true };
+}
+
+/**
+ * Whether a funder is a service wallet (exchange, trading-bot or relayer hot wallet) rather than a
+ * person's: its 1,000 most recent transactions span less than a day. Wallets funded by the same hub are
+ * not linked by it; a bundler's funding wallet makes a handful of transfers, not one every few minutes.
+ */
+export async function isFundingHub(rpc: SolanaRpc, wallet: string, ev: EvidenceCollector): Promise<boolean> {
+  const page = await rpc.getSignatures(wallet, { limit: 1000 });
+  ev.add(page, 'RPC_WALLET_FUNDER_ACTIVITY', 'ON_CHAIN');
+  if (page.data.length < 1000) return false;
+  const newest = page.data[0]!.blockTime;
+  const oldest = page.data[page.data.length - 1]!.blockTime;
+  return newest !== null && oldest !== null && newest - oldest < 86_400;
+}
+
+/** The fee payer (first account key) of a jsonParsed transaction. */
+export function feePayerOf(tx: Record<string, unknown>): string | null {
+  const keys = (tx as { transaction?: { message?: { accountKeys?: Array<string | { pubkey: string }> } } })
+    .transaction?.message?.accountKeys;
+  const k = keys?.[0];
+  return typeof k === 'string' ? k : (k?.pubkey ?? null);
+}
+
+/**
+ * A wallet's first funder and whether the trace reached the start of its history. `traced` with no
+ * funder means the earliest transactions show no SOL funding of at least 0.01 SOL; not `traced` means the
+ * history could not be read back to the start, so the wallet may be linked to anyone.
+ */
+export interface FundingTrace {
+  funder: string | null;
+  traced: boolean;
+}
+
 /**
  * The wallet that first sent at least 0.01 SOL to `wallet`. Read over RPC: page back through the wallet's
- * signatures (1,000 per call) to its origin, then open its oldest transactions. A wallet whose history is
- * longer than `maxPages` pages gives no answer rather than a guess.
+ * signatures (1,000 per call) to its origin, then open its oldest transactions. A wallet with a longer
+ * history costs one indexer read (oldest page first) instead, when an indexer is available.
  */
 export async function firstFunder(
   rpc: SolanaRpc,
   wallet: string,
   ev: EvidenceCollector,
-  maxPages = 3,
-): Promise<string | null> {
-  let before: string | undefined;
-  let oldest: Array<{ signature: string; err: unknown }>;
-  for (let i = 0; ; i++) {
-    if (i === maxPages) return null;
-    const page = await rpc.getSignatures(wallet, { before, limit: 1000 });
-    ev.add(page, 'RPC_WALLET_SIGNATURES', 'ON_CHAIN');
-    if (page.data.length < 1000) {
-      oldest = page.data.slice(-5).reverse();
-      break;
+  opts: { indexer?: Helius | null; maxPages?: number } = {},
+): Promise<FundingTrace> {
+  const origin = await originSignatures(rpc, wallet, ev, 'RPC_WALLET_SIGNATURES', opts.maxPages ?? 3);
+  if (origin) {
+    for (const s of origin) {
+      if (s.err) continue;
+      const tx = await rpc.getTransaction(s.signature);
+      if (!tx.data) continue;
+      ev.add(tx, 'RPC_WALLET_FUNDING_TX', 'ON_CHAIN');
+      const from = solFundingInto(tx.data, wallet);
+      if (from) return { funder: from, traced: true };
     }
-    before = page.data[page.data.length - 1]!.signature;
+    return { funder: null, traced: true };
   }
-  for (const s of oldest) {
-    if (s.err) continue;
-    const tx = await rpc.getTransaction(s.signature);
-    if (!tx.data) continue;
-    ev.add(tx, 'RPC_WALLET_FUNDING_TX', 'ON_CHAIN');
-    const from = solFundingInto(tx.data, wallet);
-    if (from) return from;
+  if (!opts.indexer) return { funder: null, traced: false };
+  const page = await opts.indexer.transactions(wallet, { sortOrder: 'asc', limit: 25 });
+  ev.add(page, 'IDX_WALLET_FUNDING', 'PROVIDER_CLAIM');
+  for (const tx of [...page.data].sort((a, b) => a.timestamp - b.timestamp)) {
+    const n = tx.nativeTransfers.find(
+      (t) => t.to === wallet && t.from && t.from !== wallet && t.lamports >= 10_000_000n,
+    );
+    if (n?.from) return { funder: n.from, traced: true };
   }
-  return null;
+  return { funder: null, traced: true };
 }
 
 interface ParsedIx {
@@ -610,10 +739,19 @@ interface ParsedIx {
   parsed?: { type?: string; info?: Record<string, unknown> };
 }
 
-/** The first System Program transfer (or account creation) of ≥ 0.01 SOL into `wallet` in a jsonParsed transaction. */
+/**
+ * Who funded `wallet` with at least 0.01 SOL in a jsonParsed transaction: the source of a System Program
+ * transfer (or account creation) into it, else — for indirect routes such as a temporary wrapped-SOL
+ * account closed into the wallet — the fee payer, when the wallet's balance rose by at least 0.01 SOL.
+ */
 export function solFundingInto(tx: Record<string, unknown>, wallet: string): string | null {
   const t = tx as {
-    meta?: { err?: unknown; innerInstructions?: Array<{ index: number; instructions: ParsedIx[] }> } | null;
+    meta?: {
+      err?: unknown;
+      innerInstructions?: Array<{ index: number; instructions: ParsedIx[] }>;
+      preBalances?: number[];
+      postBalances?: number[];
+    } | null;
     transaction?: { message?: { instructions?: ParsedIx[] } };
   };
   if (t.meta?.err) return null;
@@ -628,5 +766,20 @@ export function solFundingInto(tx: Record<string, unknown>, wallet: string): str
     const lamports = BigInt(String(info.lamports ?? 0));
     if (to === wallet && from && from !== wallet && lamports >= 10_000_000n) return from;
   }
+  const keys = (tx as { transaction?: { message?: { accountKeys?: Array<string | { pubkey: string }> } } })
+    .transaction?.message?.accountKeys;
+  const i = keys?.findIndex((k) => (typeof k === 'string' ? k : k.pubkey) === wallet) ?? -1;
+  const payer = feePayerOf(tx);
+  const pre = t.meta?.preBalances?.[i];
+  const post = t.meta?.postBalances?.[i];
+  if (
+    i > 0 &&
+    payer &&
+    payer !== wallet &&
+    pre !== undefined &&
+    post !== undefined &&
+    post - pre >= 10_000_000
+  )
+    return payer;
   return null;
 }

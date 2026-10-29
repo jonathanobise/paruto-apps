@@ -41,7 +41,7 @@ fully checked candidate still costs up to ~2,000 credits, so a busy month can ex
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 19 files, **145 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **145 passed**           |
+| Vitest — 19 files, **155 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **155 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |
@@ -90,8 +90,13 @@ SQL bridge is disabled in production. The owner account exists. See `docs/deploy
 
 - Helius Enhanced Transactions is in maintenance mode; its successor (Parsed Events, 10 credits a call)
   is not used yet. Moving to it would cut indexer cost about tenfold.
-- Candidates whose launch-window or developer history needs more than 10 pages, or whose launch buyers
-  exceed 25, stay `UNVERIFIED` (fail closed).
+- Candidates whose launch-window or developer history needs more than 10 pages, or with more than 100
+  launch buyers, stay `UNVERIFIED` unless the result cannot change (fail closed).
+- Wallet funding is the first transfer of ≥ 0.01 SOL, or the fee payer when SOL arrives indirectly.
+  Funders whose last 1,000 transactions span under a day are treated as service wallets (exchanges,
+  bots) and link nobody — a bundler funding from such a busy wallet would not be linked.
+- Without an on-chain coin creator (non-PumpSwap and older PumpSwap pools) the deployer is the fee payer
+  of the mint's first transaction.
 - Supported pools: PumpSwap AMM, Raydium CPMM, Raydium AMM v4. Concentrated-liquidity pools, bonding
   curves and LP lock programs are rejected (F017) or treated as withdrawable.
 - Partial fills are not modelled (Jupiter swaps are atomic); fills use the worse of quote and landing

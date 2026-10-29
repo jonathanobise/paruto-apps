@@ -59,6 +59,8 @@ export interface TokenSpec {
   lpBurned?: boolean;
   holderCount?: number;
   deployerHoldingTokens?: number;
+  /** A PumpSwap pool created before pools recorded coin_creator (the deployer must come from the mint). */
+  legacyPool?: boolean;
 }
 
 export interface WorldToken {
@@ -164,6 +166,7 @@ export class World {
     put(139, t.baseVault);
     put(171, t.quoteVault);
     new DataView(d.buffer).setBigUint64(203, 1_000_000_000n, true);
+    if (t.spec.legacyPool) return d.slice(0, 211);
     put(211, t.deployer);
     return d;
   }
@@ -281,6 +284,20 @@ export class World {
         ];
       }
       if (address === t.deployer) return [];
+      if (address === t.mint)
+        return [
+          {
+            signature: `create:${t.spec.seed}`,
+            slot: 1,
+            timestamp: t.createdAt - 600_000,
+            type: 'CREATE',
+            source: null,
+            feePayer: t.deployer,
+            failed: false,
+            nativeTransfers: [],
+            tokenTransfers: [],
+          },
+        ];
       if (address === t.pair) {
         const txs: ParsedTx[] = [];
         for (let i = 0; i < 10; i++) {
@@ -468,6 +485,7 @@ export class World {
             meta: { err: null, innerInstructions: [] },
             transaction: {
               message: {
+                accountKeys: [{ pubkey: t.feePayer, signer: true }],
                 instructions: t.nativeTransfers.map((n) => ({
                   program: 'system',
                   parsed: {

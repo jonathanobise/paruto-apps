@@ -212,6 +212,16 @@ describe('holder concentration', () => {
       clusters: new Map(holdings.map((h) => [h.owner, 'one-funder'])),
     });
     expect(merged.status).toBe('FAIL');
+    // A wallet whose funding could not be traced may belong to any cluster: under the limit is not a pass.
+    const partly = analyseHolders({
+      ...base,
+      owners,
+      holdings,
+      clusters: new Map(holdings.slice(1).map((h) => [h.owner, h.owner])),
+      untracedWallets: ['w0'],
+    });
+    expect(partly.status).toBe('UNVERIFIED');
+    expect(partly.notes.join(' ')).toContain('lower bound');
   });
 });
 
@@ -346,5 +356,27 @@ describe('developer and bundle analysis', () => {
         maxBundledPct: 10,
       }).status,
     ).toBe('UNVERIFIED');
+  });
+  it('passes untraced launch buying only when all of it together is within the limit', () => {
+    const buys = (amount: number) =>
+      Array.from({ length: 5 }, (_, i) => ({
+        signature: `s${i}`,
+        slot: 100,
+        timestamp: 1,
+        buyer: `b${i}`,
+        feePayer: `b${i}`,
+        uiAmount: new Decimal(amount),
+      }));
+    const untraced = (amount: number) =>
+      analyseBundle({
+        buys: buys(amount),
+        totalSupplyUi: new Decimal(1000),
+        funders: new Map(),
+        fundersComplete: false,
+        windowSeconds: 120,
+        maxBundledPct: 10,
+      });
+    expect(untraced(10).status).toBe('PASS'); // 5 × 10 = 5% of supply in total
+    expect(untraced(30).status).toBe('UNVERIFIED'); // 15% in total could be one group
   });
 });

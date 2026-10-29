@@ -63,6 +63,8 @@ export function analyseHolders(input: {
   poolAddresses: Set<string>;
   developerWallets: Set<string>;
   clusters?: Map<string, string> | null; // wallet → cluster id, from an indexer
+  /** Holder wallets whose funding could not be traced: they may belong to any cluster. */
+  untracedWallets?: string[];
   maxTop10Pct: number;
   requireClustering: boolean;
 }): HolderAnalysis {
@@ -159,8 +161,17 @@ export function analyseHolders(input: {
   if (lower.gt(input.maxTop10Pct)) {
     status = 'FAIL';
     notes.push(`top-10 individual owners hold at least ${lower.toFixed(2)}% of circulating supply`);
+  } else if (clustered && clustered.gt(input.maxTop10Pct)) {
+    status = 'FAIL';
+  } else if (clustered && input.untracedWallets?.length) {
+    // Untraced wallets could belong to the largest clusters, so a clustered figure under the limit is a
+    // lower bound only.
+    status = 'UNVERIFIED';
+    notes.push(
+      `${input.untracedWallets.length} holder wallet(s) could not be traced to a funder; clustered concentration ${clustered.toFixed(2)}% is a lower bound`,
+    );
   } else if (clustered) {
-    status = clustered.gt(input.maxTop10Pct) ? 'FAIL' : 'PASS';
+    status = 'PASS';
   } else if (!input.requireClustering && upper.lte(input.maxTop10Pct)) {
     status = 'PASS';
     notes.push('passed on the conservative upper bound without clustering');
