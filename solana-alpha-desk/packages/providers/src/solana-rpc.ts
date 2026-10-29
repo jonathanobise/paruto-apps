@@ -215,10 +215,11 @@ export class SolanaRpc {
     );
   }
 
+  /** jsonParsed; asks for transaction versions up to 1, or the RPC refuses newer (version 1) transactions. */
   getTransaction(signature: string): Promise<Observed<Record<string, unknown> | null>> {
     return this.call(
       'getTransaction',
-      [signature, { encoding: 'jsonParsed', commitment: 'confirmed', maxSupportedTransactionVersion: 0 }],
+      [signature, { encoding: 'jsonParsed', commitment: 'confirmed', maxSupportedTransactionVersion: 1 }],
       (r) => (r === null ? null : z.record(z.string(), z.unknown()).parse(r)),
     );
   }

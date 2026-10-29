@@ -44,7 +44,7 @@ open positions stay protected.
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 20 files, **162 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **162 passed**           |
+| Vitest — 21 files, **163 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **163 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |
