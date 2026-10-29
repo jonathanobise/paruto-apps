@@ -181,20 +181,20 @@ export function evaluateRules(e: SecurityEvidence, cfg: StrategyConfig['filter']
             'FAIL',
             `mint authority ${m.value.mintAuthority} can mint more supply`,
             m.value.mintAuthority,
-            'null',
+            'revoked',
             m.evidenceIds,
           )
-        : r('F001', 'PASS', 'mint authority is revoked on-chain', null, 'null', m.evidenceIds),
+        : r('F001', 'PASS', 'mint authority is revoked on-chain', null, 'revoked', m.evidenceIds),
       m.value.freezeAuthority
         ? r(
             'F002',
             'FAIL',
             `freeze authority ${m.value.freezeAuthority} can freeze holders`,
             m.value.freezeAuthority,
-            'null',
+            'revoked',
             m.evidenceIds,
           )
-        : r('F002', 'PASS', 'freeze authority is revoked on-chain', null, 'null', m.evidenceIds),
+        : r('F002', 'PASS', 'freeze authority is revoked on-chain', null, 'revoked', m.evidenceIds),
     );
   }
 

@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+
+/* Alpha Desk design tokens — dark-first institutional terminal. */
+@theme {
+  --color-ink: #090b0e;
+  --color-panel: #0f1218;
+  --color-panel-2: #141821;
+  --color-panel-3: #1a1f2a;
+  --color-line: #1f2531;
+  --color-line-strong: #2a3140;
+  --color-fg: #e6e9ef;
+  --color-fg-2: #a0a8b8;
+  --color-fg-3: #6c7486;
+  --color-signal: #8a94ff;
+  --color-signal-dim: #2a2f5c;
+  --color-up: #35c48f;
+  --color-up-dim: #10291f;
+  --color-down: #f0615b;
+  --color-down-dim: #2c1415;
+  --color-warn: #e3a93c;
+  --color-warn-dim: #2c2310;
+  --color-info: #5bb4e9;
+  --color-info-dim: #0f2230;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-panel: 10px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.panel {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-panel);
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-fg-3);
+  font-weight: 500;
+}
+
+table.grid-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+table.grid-table th {
+  position: sticky;
+  top: 0;
+  background: var(--color-panel);
+  text-align: left;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-fg-3);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-line);
+  white-space: nowrap;
+  z-index: 1;
+}
+table.grid-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--color-line);
+  white-space: nowrap;
+}
+table.grid-table tbody tr:hover td {
+  background: var(--color-panel-2);
+}
+table.grid-table td.r,
+table.grid-table th.r {
+  text-align: right;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-signal-dim);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: 6px;
+  border: 2px solid var(--color-ink);
+}

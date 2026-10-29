@@ -14,7 +14,7 @@ const AGENTS = [
   { id: 'analyst', name: 'Analyst', role: 'Scores approved candidates on six versioned factors' },
   { id: 'risk', name: 'Risk', role: 'Sizes and authorizes paper orders; supervises open positions' },
   { id: 'executor', name: 'Executor', role: 'Simulates fills from executable Jupiter quotes' },
-  { id: 'position-monitor', name: 'Logger', role: 'Audit log, ledger, reconciliation and reports' },
+  { id: 'logger', name: 'Logger', role: 'Audit log, double-entry ledger, reconciliation and reports' },
 ];
 
 export function readRoutes(api: Hono<HonoEnv>): void {
@@ -280,6 +280,47 @@ export function readRoutes(api: Hono<HonoEnv>): void {
     );
     const changes = await db.all('SELECT * FROM ranking_changes ORDER BY created_at DESC LIMIT 50');
     return ok(c, { rows, changes });
+  });
+
+  api.get('/portfolio', async (c) => {
+    const { db } = c.get('deps');
+    const rt = await getRuntime(db);
+    const pid = rt.active_portfolio_id;
+    const portfolio = await db.first('SELECT * FROM portfolios WHERE id = ?', [pid]);
+    const balances = await db.all(
+      `SELECT account, unit, SUM(CAST(amount AS INTEGER)) AS amount FROM ledger_entries WHERE portfolio_id = ? GROUP BY account, unit ORDER BY account, unit`,
+      [pid],
+    );
+    const journals = await db.all(
+      `SELECT j.id, j.kind, j.reference_id, j.memo, j.created_at FROM ledger_journals j WHERE j.portfolio_id = ? ORDER BY j.created_at DESC LIMIT 100`,
+      [pid],
+    );
+    const snaps = await db.all<{
+      observed_at: number;
+      equity_micro: string;
+      cash_micro: string;
+      drawdown_pct: string;
+      exposure_pct: string;
+    }>(
+      `SELECT observed_at, equity_micro, cash_micro, drawdown_pct, exposure_pct FROM portfolio_equity_snapshots WHERE portfolio_id = ? ORDER BY observed_at`,
+      [pid],
+    );
+    const step = Math.max(1, Math.floor(snaps.length / 800));
+    const archived = await db.all(
+      `SELECT id, name, status, starting_equity_micro, created_at, archived_at, archived_reason FROM portfolios ORDER BY created_at DESC`,
+    );
+    const eq = pid ? await equityOf(db, pid) : null;
+    return ok(c, {
+      portfolio,
+      equityMicro: eq?.equity.toString() ?? null,
+      cashMicro: eq?.cash.toString() ?? null,
+      positionsValueMicro: eq?.positionsValue.toString() ?? null,
+      marksComplete: eq?.complete ?? false,
+      balances,
+      journals,
+      equityCurve: snaps.filter((_, i) => i % step === 0 || i === snaps.length - 1),
+      portfolios: archived,
+    });
   });
 
   api.get('/positions', async (c) => {

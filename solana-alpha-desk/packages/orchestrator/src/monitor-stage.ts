@@ -12,7 +12,7 @@ import type { Ctx } from './context.ts';
 import { persistEvidence } from './evidence-store.ts';
 import { requestExit, processExit, type ExitReason } from './execution-stage.ts';
 import { transition } from './handoffs.ts';
-import { providerErrorRates } from './health.ts';
+import { providerErrorRates, recordJob } from './health.ts';
 import {
   candidatesInState,
   equityOf,
@@ -587,6 +587,13 @@ export async function runReconciliation(ctx: Ctx): Promise<{ ok: boolean; issues
     }),
   ];
   await ctx.db.batch(stmts);
+  await recordJob(ctx.db, 'logger', {
+    now,
+    ok: r.ok,
+    error: r.ok ? null : r.issues.join('; ').slice(0, 500),
+    processed: 1,
+    instanceId: ctx.instanceId,
+  });
   if (!r.ok) {
     await tripBreaker(ctx, 'DB_INTEGRITY', pid, r.issues.join('; ').slice(0, 1000), 'LOGGER');
     await ctx.db.run(

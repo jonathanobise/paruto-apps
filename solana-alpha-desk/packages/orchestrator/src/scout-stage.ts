@@ -223,7 +223,8 @@ export async function runDiscoveryCycle(ctx: Ctx): Promise<DiscoveryCycleResult>
   }
   await recordJob(ctx.db, 'scout', {
     now: ctx.clock.now(),
-    ok: result.errors.length === 0 || result.evaluated > 0,
+    // Supplementary feeds (GeckoTerminal) failing does not degrade the Scout; DexScreener failing does.
+    ok: !result.errors.some((e) => e.startsWith('dexscreener')),
     error: result.errors[0] ?? null,
     processed: result.evaluated,
     rejected: result.rejected,
