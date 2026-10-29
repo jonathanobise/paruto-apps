@@ -4,6 +4,7 @@ import { big } from '@alpha-desk/db';
 import { markValueMicro } from '@alpha-desk/execution';
 import {
   closedTrades,
+  creditUsageToday,
   DECISION_FEEDS,
   equityOf,
   getRuntime,
@@ -600,6 +601,7 @@ export function readRoutes(api: Hono<HonoEnv>): void {
     return ok(c, {
       providers,
       health,
+      credits: await creditUsageToday(db, t),
       series,
       jobs,
       alerts,
@@ -642,6 +644,7 @@ export function readRoutes(api: Hono<HonoEnv>): void {
     const providers = await db.all(
       'SELECT id, integration_status, requires_credentials, licence_note FROM data_providers ORDER BY id',
     );
-    return ok(c, { runtime: rt, config, configVersion, versions, changes, providers });
+    const credits = await creditUsageToday(db, c.get('deps').now());
+    return ok(c, { runtime: rt, config, configVersion, versions, changes, providers, credits });
   });
 }

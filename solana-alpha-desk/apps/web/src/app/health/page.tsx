@@ -13,10 +13,24 @@ export default function Health() {
   if (!q.data) return <Loading />;
   const d = q.data;
   const recon = d.reconciliation as Row | null;
+  const credits = d.credits as { credits: number; cap: number; calls: number; refused: number };
+  const creditPct = credits.cap > 0 ? (credits.credits / credits.cap) * 100 : 100;
   return (
     <div className="space-y-5">
       <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-        <Panel title="Data providers" pad={false}>
+        <Panel
+          title="Data providers"
+          pad={false}
+          right={
+            <Badge
+              tone={credits.refused ? 'down' : creditPct >= 80 ? 'warn' : 'muted'}
+              title="Helius credits used today (UTC) against the daily budget set in Settings"
+            >
+              Helius {credits.credits.toLocaleString()} / {credits.cap.toLocaleString()} credits today
+              {credits.refused ? ` · ${credits.refused} refused` : ''}
+            </Badge>
+          }
+        >
           <table className="grid-table">
             <thead>
               <tr>

@@ -38,13 +38,15 @@ function Runtime({ d }: { d: Row }) {
   const [tz, setTz] = useState(rt.timezone);
   const [hour, setHour] = useState(String(rt.report_hour_local));
   const [cap, setCap] = useState(String(rt.api_daily_call_cap));
+  const [credits, setCredits] = useState(String(rt.helius_daily_credit_cap));
+  const used = d.credits as { credits: number; calls: number; refused: number; cap: number; day: string };
   const [msg, setMsg] = useState<unknown>(null);
   const input =
     'num rounded-md border border-line-strong bg-ink px-2.5 py-1.5 text-[13px] outline-none focus:border-signal';
   return (
     <div className="grid gap-5 xl:grid-cols-2">
       <Panel title="Schedule and budgets">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <label className="flex flex-col gap-1">
             <span className="label">Timezone (IANA)</span>
             <input className={input} value={tz} onChange={(e) => setTz(e.target.value)} />
@@ -64,7 +66,21 @@ function Runtime({ d }: { d: Row }) {
             <span className="label">Daily API call cap</span>
             <input className={input} type="number" value={cap} onChange={(e) => setCap(e.target.value)} />
           </label>
+          <label className="flex flex-col gap-1">
+            <span className="label">Helius credits per day</span>
+            <input
+              className={input}
+              type="number"
+              min={0}
+              value={credits}
+              onChange={(e) => setCredits(e.target.value)}
+            />
+          </label>
         </div>
+        <p className="num mt-3 text-xs text-fg-2">
+          Helius today ({used.day} UTC): {used.credits.toLocaleString()} of {used.cap.toLocaleString()}{' '}
+          credits, {used.calls} billed calls{used.refused ? `, ${used.refused} refused at the cap` : ''}.
+        </p>
         <div className="mt-4 flex items-center gap-3">
           <Button
             tone="primary"
@@ -73,7 +89,12 @@ function Runtime({ d }: { d: Row }) {
               try {
                 await api('/settings/runtime', {
                   method: 'PUT',
-                  body: { timezone: tz, reportHourLocal: Number(hour), apiDailyCallCap: Number(cap) },
+                  body: {
+                    timezone: tz,
+                    reportHourLocal: Number(hour),
+                    apiDailyCallCap: Number(cap),
+                    heliusDailyCreditCap: Number(credits),
+                  },
                 });
                 await qc.invalidateQueries();
                 setMsg('Saved.');
@@ -91,8 +112,10 @@ function Runtime({ d }: { d: Row }) {
           )}
         </div>
         <p className="mt-3 text-xs text-fg-3">
-          Maximum concurrent positions, daily trade count and daily risk thresholds are part of the versioned
-          strategy (Strategy tab).
+          Helius history (100 credits a call) and DAS (10) reserve credits before each call; once the
+          day&apos;s budget is spent, indexer-backed checks are UNVERIFIED until midnight UTC. Plain RPC calls
+          (1 credit) are not capped, so open positions stay protected. Maximum concurrent positions, daily
+          trade count and daily risk thresholds are part of the versioned strategy (Strategy tab).
         </p>
       </Panel>
       <Panel title="Provider integrations" pad={false}>

@@ -131,6 +131,24 @@ describe('provider failures never become passes', () => {
     );
     expect(f006?.outcome, f006?.reason).toBe('PASS');
   });
+  it('a spent Helius credit budget leaves indexer checks UNVERIFIED, not errors, so nothing advances', async () => {
+    const { world, ctx, db } = await makeHarness();
+    world.heliusBudgetSpent = true;
+    world.addToken({ ...GOOD_TOKEN, seed: 'budget', legacyPool: true });
+    await runDiscoveryCycle(ctx);
+    await drainQueue(ctx, 'filter');
+    expect((await db.first<{ state: string }>('SELECT state FROM candidate_discoveries'))?.state).toBe(
+      'FILTER_UNVERIFIED',
+    );
+    const f009 = await db.first<{ outcome: string; reason: string }>(
+      `SELECT outcome, reason FROM security_rule_results WHERE rule_id = 'F009'`,
+    );
+    expect(f009?.outcome).toBe('UNVERIFIED');
+    expect(f009?.reason).toContain('credit budget');
+    expect(await count(db, `SELECT COUNT(*) AS n FROM security_rule_results WHERE outcome = 'ERROR'`)).toBe(
+      0,
+    );
+  });
   it('Jupiter outage at the Risk stage: rejected, no order', async () => {
     const h = await makeHarness();
     h.world.jup.beforeQuote = null;

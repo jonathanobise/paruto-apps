@@ -19,11 +19,12 @@ export interface RuntimeState {
   timezone: string;
   report_hour_local: number;
   api_daily_call_cap: number;
+  helius_daily_credit_cap: number;
 }
 
 export async function getRuntime(db: SqlDb): Promise<RuntimeState> {
   const r = await db.first<RuntimeState>(
-    'SELECT mode, active_config_version, active_portfolio_id, entries_paused_reason, timezone, report_hour_local, api_daily_call_cap FROM runtime_state WHERE id = 1',
+    'SELECT mode, active_config_version, active_portfolio_id, entries_paused_reason, timezone, report_hour_local, api_daily_call_cap, helius_daily_credit_cap FROM runtime_state WHERE id = 1',
   );
   if (!r) throw new Error('runtime_state not initialised — run bootstrap');
   return r;

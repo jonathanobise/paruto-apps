@@ -20,13 +20,16 @@ ownership, coordinated launch buying and thin volume).
 credits a month. The Filter therefore runs the cheap RPC and market rules first and only reads indexer
 history for candidates no rule has rejected; wallet funding is traced over RPC at 1 credit a call. A
 fully checked candidate still costs up to ~2,000 credits, so a busy month can exceed the Free plan
-(Developer plan: 10M credits, 10 req/s).
+(Developer plan: 10M credits, 10 req/s). A daily credit budget (default 33,000, set under Settings → Runtime) caps
+the billed indexer calls: each reserves its credits first, and once the day's budget is spent the
+indexer-backed checks are `UNVERIFIED` until midnight UTC. Plain RPC calls (1 credit) are not capped, so
+open positions stay protected.
 
 ## Completed features
 
 | Milestone                | Status     | Notes                                                                                                                                                                                                                                |
 | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0 Foundation             | ✅         | pnpm monorepo, strict TS, migrations (3), config versioning, auth (setup token, PBKDF2, TOTP MFA, sessions, CSRF, rate limits), provider interfaces, test scaffolding, CI workflow template                                          |
+| 0 Foundation             | ✅         | pnpm monorepo, strict TS, migrations (4), config versioning, auth (setup token, PBKDF2, TOTP MFA, sessions, CSRF, rate limits), provider interfaces, test scaffolding, CI workflow template                                          |
 | 1 Real discovery         | ✅         | DexScreener feeds + `/tokens/v1`, GeckoTerminal new pools, normalised tokens/pools/snapshots, dedup (one active run per token), Discover terminal with real timestamps                                                               |
 | 2 Security verification  | ✅         | F001–F018 with evidence matrix; pool adapters PumpSwap / Raydium CPMM / Raydium AMM v4 (verified on live accounts); holder classification; developer and bundle analysis (indexer-backed); rejection ledger; Token Intelligence page |
 | 3 Analyst                | ✅         | six versioned factors, config-driven curves, ranking + ranking history, factor detail UI                                                                                                                                             |
@@ -41,7 +44,7 @@ fully checked candidate still costs up to ~2,000 credits, so a busy month can ex
 | `tsc` — root, Worker, data-plane Workers, web                                                                                  | pass                     |
 | ESLint (incl. ban on signing/broadcast calls)                                                                                  | pass                     |
 | Prettier                                                                                                                       | pass                     |
-| Vitest — 19 files, **156 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **156 passed**           |
+| Vitest — 20 files, **162 tests**: unit, integration (node:sqlite + local D1/workerd), failure injection, replay, security, API | **162 passed**           |
 | Playwright end-to-end (2 tests: full UI flow incl. reset procedure and mobile, unauthenticated refusal)                        | **2 passed**             |
 | `pnpm audit --prod`                                                                                                            | no known vulnerabilities |
 | `next build` (static export, 16 routes)                                                                                        | pass                     |

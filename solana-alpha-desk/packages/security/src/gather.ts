@@ -3,6 +3,7 @@ import { USDC_MINT, WSOL_MINT } from '@alpha-desk/config';
 import {
   EvidenceCollector,
   isNoRouteError,
+  ProviderError,
   quotePriceUsd,
   sellQuote,
   type DexScreener,
@@ -40,6 +41,10 @@ export interface GatherInput {
   maxPositionUsd: Decimal;
   cfg: StrategyConfig;
 }
+
+/** A spent daily credit budget leaves facts unavailable (UNVERIFIED), not erroneous. */
+const budgetSpent = (e: unknown) => e instanceof ProviderError && e.kind === 'BUDGET_EXCEEDED';
+const failure = (e: unknown): 'UNAVAILABLE' | 'ERROR' => (budgetSpent(e) ? 'UNAVAILABLE' : 'ERROR');
 
 const ok = <T>(value: T, evidenceIds: string[], observedAt: number): Fact<T> => ({
   status: 'OK',
@@ -440,7 +445,7 @@ export async function gatherSecurityEvidence(
         holderBasis.at,
       );
     } catch (e) {
-      holders = missing((e as Error).message, holderBasis.ids, 'ERROR');
+      holders = missing((e as Error).message, holderBasis.ids, failure(e));
     }
   }
 
@@ -467,7 +472,7 @@ export async function gatherSecurityEvidence(
         developer = ok(developerFrom(history, linked), ids, deps.clock.now());
       } else developer = ok(developerFrom(null, null), ids, deps.clock.now());
     } catch (e) {
-      developer = missing((e as Error).message, devIds, 'ERROR');
+      developer = missing((e as Error).message, devIds, failure(e));
     }
 
   // ── launch bundling (indexer required)
@@ -527,7 +532,7 @@ export async function gatherSecurityEvidence(
       );
     }
   } catch (e) {
-    bundle = missing((e as Error).message, [], 'ERROR');
+    bundle = missing((e as Error).message, [], failure(e));
   }
 
   // ── corroborating provider claims (never decisive)
@@ -725,7 +730,13 @@ export async function firstFunder(
     return { funder: null, traced: true };
   }
   if (!opts.indexer) return { funder: null, traced: false };
-  const page = await opts.indexer.transactions(wallet, { sortOrder: 'asc', limit: 25 });
+  let page: Awaited<ReturnType<Helius['transactions']>>;
+  try {
+    page = await opts.indexer.transactions(wallet, { sortOrder: 'asc', limit: 25 });
+  } catch (e) {
+    if (budgetSpent(e)) return { funder: null, traced: false };
+    throw e;
+  }
   ev.add(page, 'IDX_WALLET_FUNDING', 'PROVIDER_CLAIM');
   for (const tx of [...page.data].sort((a, b) => a.timestamp - b.timestamp)) {
     const n = tx.nativeTransfers.find(

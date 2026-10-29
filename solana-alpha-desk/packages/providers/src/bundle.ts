@@ -3,7 +3,7 @@ import { GeckoTerminal } from './geckoterminal.ts';
 import { Jupiter } from './jupiter.ts';
 import { RugCheck } from './rugcheck.ts';
 import { SolanaRpc } from './solana-rpc.ts';
-import { Helius } from './helius.ts';
+import { Helius, type CreditBudget } from './helius.ts';
 import type { CallMetric } from './http.ts';
 import type { Clock } from '@alpha-desk/shared';
 
@@ -32,7 +32,13 @@ export function rpcUrl(env: ProviderEnv): string {
 
 export function createProviders(
   env: ProviderEnv,
-  hooks: { onMetric?: (m: CallMetric) => void; budget?: () => boolean; clock?: Clock } = {},
+  hooks: {
+    onMetric?: (m: CallMetric) => void;
+    budget?: () => boolean;
+    clock?: Clock;
+    /** Daily credit budget for the indexer's billed calls. */
+    credits?: CreditBudget;
+  } = {},
 ): Providers {
   return {
     dex: new DexScreener(hooks),

@@ -6,7 +6,7 @@ import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_STRATEGY } from '@alpha-desk/config';
 import { migrateNodeDb, NodeSqliteDb } from '@alpha-desk/db/node';
-import { bootstrap, loadConfig, type Ctx } from '@alpha-desk/orchestrator';
+import { bootstrap, CreditLedger, loadConfig, type Ctx } from '@alpha-desk/orchestrator';
 import { createProviders, SolPrice } from '@alpha-desk/providers';
 import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import { FileEvidenceStore } from '../../monitor/src/file-store.ts';
@@ -31,7 +31,7 @@ await bootstrap(db, {
   initialMode: 'DISCOVERY_ONLY',
   timezone: process.env.TIMEZONE ?? 'UTC',
 });
-const providers = createProviders(process.env);
+const providers = createProviders(process.env, { credits: new CreditLedger(db, systemClock) });
 const evidence = new FileEvidenceStore(resolve(root, process.env.EVIDENCE_DIR ?? 'data/evidence'));
 const ctx: Ctx = {
   db,

@@ -209,7 +209,12 @@ export async function updateStrategy(
 
 export async function updateRuntimeSettings(
   ctx: Ctx,
-  s: { timezone?: string; reportHourLocal?: number; apiDailyCallCap?: number },
+  s: {
+    timezone?: string;
+    reportHourLocal?: number;
+    apiDailyCallCap?: number;
+    heliusDailyCreditCap?: number;
+  },
   actor: string,
 ): Promise<void> {
   const rt = await getRuntime(ctx.db);
@@ -219,11 +224,19 @@ export async function updateRuntimeSettings(
     timezone: s.timezone ?? rt.timezone,
     report_hour_local: s.reportHourLocal ?? rt.report_hour_local,
     api_daily_call_cap: s.apiDailyCallCap ?? rt.api_daily_call_cap,
+    helius_daily_credit_cap: s.heliusDailyCreditCap ?? rt.helius_daily_credit_cap,
   };
   await ctx.db.batch([
     {
-      sql: 'UPDATE runtime_state SET timezone = ?, report_hour_local = ?, api_daily_call_cap = ?, updated_at = ?, updated_by = ? WHERE id = 1',
-      params: [next.timezone, next.report_hour_local, next.api_daily_call_cap, now, actor],
+      sql: 'UPDATE runtime_state SET timezone = ?, report_hour_local = ?, api_daily_call_cap = ?, helius_daily_credit_cap = ?, updated_at = ?, updated_by = ? WHERE id = 1',
+      params: [
+        next.timezone,
+        next.report_hour_local,
+        next.api_daily_call_cap,
+        next.helius_daily_credit_cap,
+        now,
+        actor,
+      ],
     },
     {
       sql: `INSERT INTO configuration_changes (id, scope, previous_value, new_value, reason, actor, created_at) VALUES (?, 'RUNTIME', ?, ?, 'settings', ?, ?)`,
@@ -233,6 +246,7 @@ export async function updateRuntimeSettings(
           timezone: rt.timezone,
           report_hour_local: rt.report_hour_local,
           api_daily_call_cap: rt.api_daily_call_cap,
+          helius_daily_credit_cap: rt.helius_daily_credit_cap,
         }),
         JSON.stringify(next),
         actor,

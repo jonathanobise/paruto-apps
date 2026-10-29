@@ -86,6 +86,8 @@ export class World {
   heliusConfigured = true;
   /** Indexer (Helius Enhanced Transactions) calls made, to check credit-saving behaviour. */
   heliusCalls = 0;
+  /** Simulates a spent daily Helius credit budget: billed indexer calls are refused. */
+  heliusBudgetSpent = false;
   solUsd = 150;
 
   addToken(spec: TokenSpec): WorldToken {
@@ -513,6 +515,8 @@ export class World {
       },
       transactions: async (address: string, o: HistoryQuery = {}) => {
         w.heliusCalls++;
+        if (w.heliusBudgetSpent)
+          throw new ProviderError('helius', 'BUDGET_EXCEEDED', 'daily Helius credit budget spent');
         let txs = w.history(address); // newest first
         if (o.type) txs = txs.filter((t) => t.type === o.type);
         if (o.gteTime !== undefined) txs = txs.filter((t) => t.timestamp >= o.gteTime!);

@@ -6,6 +6,7 @@ export * from './queue.ts';
 export * from './repo.ts';
 export * from './bootstrap.ts';
 export * from './health.ts';
+export * from './credits.ts';
 export * from './scout-stage.ts';
 export * from './filter-stage.ts';
 export * from './analyst-stage.ts';

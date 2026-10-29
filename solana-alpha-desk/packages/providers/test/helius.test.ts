@@ -55,4 +55,25 @@ describe('Helius adapter', () => {
     expect(rpcUrl({ HELIUS_API_KEY: 'k', SOLANA_RPC_URL: 'https://x' })).toBe('https://x');
     expect(rpcUrl({})).toBe('https://api.mainnet-beta.solana.com');
   });
+  it('books credits before each billed call and makes no request once the daily budget is spent', async () => {
+    const calls: string[] = [];
+    const booked: number[] = [];
+    let left = 120;
+    const h = new Helius('k', {
+      fetchImpl: fakeFetch(calls, []),
+      sleep: async () => undefined,
+      credits: {
+        reserve: async (_p, credits) => {
+          if (credits > left) return false;
+          left -= credits;
+          booked.push(credits);
+          return true;
+        },
+      },
+    });
+    await h.transactions('Addr', {});
+    await expect(h.transactions('Addr', {})).rejects.toMatchObject({ kind: 'BUDGET_EXCEEDED' });
+    expect(calls).toHaveLength(1);
+    expect(booked).toEqual([100]);
+  });
 });

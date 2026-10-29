@@ -1,6 +1,7 @@
 import { D1Db, type D1Like } from '@alpha-desk/db';
 import { DEFAULT_STRATEGY } from '@alpha-desk/config';
 import {
+  CreditLedger,
   bootstrap,
   loadConfig,
   R2EvidenceStore,
@@ -27,7 +28,10 @@ export interface Env {
 
 export function workerCtx(env: Env, metrics?: ProviderMetrics): Ctx {
   const db = new D1Db(env.DB as unknown as D1Like);
-  const providers = createProviders(env, metrics ? { onMetric: metrics.record } : {});
+  const providers = createProviders(env, {
+    ...(metrics ? { onMetric: metrics.record } : {}),
+    credits: new CreditLedger(db, systemClock),
+  });
   return {
     db,
     providers,

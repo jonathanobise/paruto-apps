@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { DEFAULT_STRATEGY } from '@alpha-desk/config';
 import { BridgeDb, type SqlDb } from '@alpha-desk/db';
 import { migrateNodeDb, NodeSqliteDb } from '@alpha-desk/db/node';
-import { bootstrap, loadConfig, ProviderMetrics, type Ctx } from '@alpha-desk/orchestrator';
+import { bootstrap, CreditLedger, loadConfig, ProviderMetrics, type Ctx } from '@alpha-desk/orchestrator';
 import { createProviders, SolPrice } from '@alpha-desk/providers';
 import { createLogger, newId, systemClock } from '@alpha-desk/shared';
 import type { MonitorEnv } from './env.ts';
@@ -29,7 +29,10 @@ export async function buildContext(
   const log = createLogger({ service: 'monitor' }, env.LOG_LEVEL);
   const db = await openDb(env);
   const metrics = new ProviderMetrics();
-  const providers = createProviders(env, { onMetric: metrics.record });
+  const providers = createProviders(env, {
+    onMetric: metrics.record,
+    credits: new CreditLedger(db, systemClock),
+  });
   await bootstrap(db, {
     config: DEFAULT_STRATEGY,
     env,

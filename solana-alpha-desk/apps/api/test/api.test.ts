@@ -292,6 +292,21 @@ describe('dashboard endpoints return persisted data', () => {
     await health('helius', 20, 9);
     expect(await status()).toBe('DEGRADED');
   });
+  it("sets the daily Helius credit budget and reports today's usage", async () => {
+    const { call } = await setup();
+    const { cookie, csrf } = await signIn(call);
+    const put = (body: unknown) =>
+      call('/api/v1/settings/runtime', { method: 'PUT', cookie, csrf, body: JSON.stringify(body) });
+    expect((await put({ heliusDailyCreditCap: -1 })).status).toBe(400);
+    expect((await put({ heliusDailyCreditCap: 50_000 })).status).toBe(200);
+    const s = (
+      (await (await call('/api/v1/settings', { cookie })).json()) as {
+        data: { runtime: { helius_daily_credit_cap: number }; credits: { cap: number; credits: number } };
+      }
+    ).data;
+    expect(s.runtime.helius_daily_credit_cap).toBe(50_000);
+    expect(s.credits).toMatchObject({ cap: 50_000, credits: 0 });
+  });
   it('validates breaker resets with the documented phrase', async () => {
     const { call } = await setup();
     const { cookie, csrf } = await signIn(call);

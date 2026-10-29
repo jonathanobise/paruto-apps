@@ -12,6 +12,7 @@ import {
 } from '@alpha-desk/orchestrator';
 import { makeHarness } from '../fixtures/world.ts';
 import { openPositionFlow } from '../fixtures/flows.ts';
+import { exerciseCreditLedger } from '../fixtures/credits.ts';
 
 /**
  * Runs against a real D1 binding (workerd via Wrangler's platform proxy, local mode) to prove the
@@ -83,6 +84,9 @@ describe('Cloudflare D1 (local workerd)', () => {
     expect(
       Number((await db.first<{ n: number }>('SELECT COUNT(*) AS n FROM configuration_changes'))?.n),
     ).toBe(Number(before?.n) + 1);
+  });
+  it('reserves daily credits atomically with an upsert that refuses past the cap', async () => {
+    await exerciseCreditLedger(db);
   });
   it('enforces append-only triggers and the portfolio version lock', async () => {
     await expect(db.run('DELETE FROM ledger_entries')).rejects.toSatisfy(isConstraintError);

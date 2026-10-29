@@ -185,6 +185,7 @@ export function controlRoutes(api: Hono<HonoEnv>): void {
         timezone: z.string().min(1).max(64).optional(),
         reportHourLocal: z.number().int().min(0).max(23).optional(),
         apiDailyCallCap: z.number().int().min(1000).max(10_000_000).optional(),
+        heliusDailyCreditCap: z.number().int().min(0).max(100_000_000).optional(),
       }),
     );
     if (!b) return fail(c, 400, 'invalid settings');

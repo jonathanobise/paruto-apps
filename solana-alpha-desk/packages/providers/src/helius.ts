@@ -37,6 +37,14 @@ const EnhancedTx = z
   })
   .passthrough();
 
+/** A daily credit budget: `reserve` books the credits for one call, or refuses when the cap is spent. */
+export interface CreditBudget {
+  reserve(provider: string, credits: number): Promise<boolean>;
+}
+
+/** Helius credits per call (helius.dev/docs/billing/credits). */
+export const HELIUS_CREDITS = { enhancedTransactions: 100, das: 10 } as const;
+
 /**
  * Helius adapter — holder/trade intelligence and historical transaction indexer.
  * Status: BLOCKED_BY_CREDENTIALS until HELIUS_API_KEY is configured. Endpoints follow
@@ -45,10 +53,12 @@ const EnhancedTx = z
 export class Helius implements TransactionIndexer {
   readonly id = 'helius';
   private readonly http: HttpClient;
+  private readonly credits: CreditBudget | undefined;
   constructor(
     private readonly apiKey: string | undefined,
-    opts: Omit<HttpClientOptions, 'provider'> = {},
+    opts: Omit<HttpClientOptions, 'provider'> & { credits?: CreditBudget } = {},
   ) {
+    this.credits = opts.credits;
     // Free plan: 2 requests/s for Enhanced Transactions and DAS; Helius asks for ~1 s initial retry backoff.
     this.http = new HttpClient({
       provider: 'helius',
@@ -59,6 +69,12 @@ export class Helius implements TransactionIndexer {
 
   get configured(): boolean {
     return Boolean(this.apiKey);
+  }
+
+  /** Books the credits for one call against the daily budget; refuses the call once the budget is spent. */
+  private async charge(credits: number): Promise<void> {
+    if (this.credits && !(await this.credits.reserve('helius', credits)))
+      throw new ProviderError('helius', 'BUDGET_EXCEEDED', 'daily Helius credit budget spent');
   }
 
   private requireKey(): string {
@@ -88,6 +104,7 @@ export class Helius implements TransactionIndexer {
     if (opts.lteTime !== undefined) qs.set('lte-time', String(Math.ceil(opts.lteTime / 1000)));
     if (opts.type) qs.set('type', opts.type);
     const url = `https://api.helius.xyz/v0/addresses/${address}/transactions?${qs}`;
+    await this.charge(HELIUS_CREDITS.enhancedTransactions);
     let res: Observed<ParsedTx[]>;
     try {
       res = await this.fetchHistory(url);
@@ -151,6 +168,7 @@ export class Helius implements TransactionIndexer {
     let cursor: string | undefined;
     let last: Observed<unknown> | null = null;
     for (let page = 0; page < maxPages; page++) {
+      await this.charge(HELIUS_CREDITS.das);
       last = await this.http.request(
         'das/getTokenAccounts',
         `https://mainnet.helius-rpc.com/?api-key=${key}`,
