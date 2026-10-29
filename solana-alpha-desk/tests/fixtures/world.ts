@@ -528,7 +528,8 @@ export class World {
         return obs(
           {
             txs: txs.slice(start, end),
-            next: end < txs.length ? String(end) : null,
+            // Like Helius: a cursor keeps coming after the last transaction; only an empty page ends it.
+            next: String(end),
             unparsed: w.unparsedFor.has(address) ? 1 : 0,
           },
           w.clock.now(),

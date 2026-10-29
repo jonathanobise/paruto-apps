@@ -94,8 +94,8 @@ SQL bridge is disabled in production. The owner account exists. See `docs/deploy
   instruction names (`initializeMint`, a launchpad's `create`). Transactions Helius cannot parse are
   counted, and any in a launch window or developer history leave that read incomplete (`UNVERIFIED`).
 - Parsed Events has no published Free-plan rate limit; it is paced like DAS (2 requests/s).
-- Candidates whose launch-window or developer history needs more than 10 pages, or with more than 100
-  launch buyers, stay `UNVERIFIED` unless the result cannot change (fail closed).
+- Candidates whose launch window has more than 15 pages of transactions (busy launches fill a page of 100
+  in seconds), whose developer history needs more than 10 pages, or with more than 100 launch buyers, stay `UNVERIFIED` unless the result cannot change (fail closed).
 - Wallet funding is the first transfer of ≥ 0.01 SOL, or the fee payer when SOL arrives indirectly.
   Funders whose last 1,000 transactions span under a day are treated as service wallets (exchanges,
   bots) and link nobody — a bundler funding from such a busy wallet would not be linked.

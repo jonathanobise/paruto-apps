@@ -102,7 +102,8 @@ export async function processAnalyst(ctx: Ctx, candidateId: string): Promise<Sta
           else if (t.from === tx.feePayer)
             trades.push({ wallet: tx.feePayer, cluster: null, side: 'SELL', usd, at: tx.timestamp });
         }
-        if (!res.data.next) break;
+        // Helius keeps returning a cursor after the last transaction; an empty page is the end.
+        if (!res.data.next || (res.data.txs.length === 0 && res.data.unparsed === 0)) break;
         cursor = res.data.next;
       }
       const hc = await helius.holderCount(c.mint);

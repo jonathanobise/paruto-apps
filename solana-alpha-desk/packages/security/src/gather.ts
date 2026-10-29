@@ -501,37 +501,41 @@ export async function gatherSecurityEvidence(
         input.pairAddress,
         input.pairCreatedAt,
         input.pairCreatedAt + cfg.filter.launchWindowSeconds * 1000,
-        10,
+        LAUNCH_WINDOW_PAGES,
         ev,
         'IDX_LAUNCH_WINDOW',
       );
-      const reached = hist.complete;
-      const buys = reached
-        ? launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds)
-        : null;
-      const buyerFunders = new Map<string, string>();
-      const buyers = [...new Set((buys ?? []).map((b) => b.buyer))];
-      let allTraced = buyers.length <= MAX_TRACED_BUYERS;
-      for (const w of buyers.slice(0, MAX_TRACED_BUYERS)) {
-        const trace = await funderOf(w);
-        if (trace.funder) buyerFunders.set(w, trace.funder);
-        else if (!trace.traced) allTraced = false;
+      if (!hist.complete) {
+        bundle = missing(
+          `launch window not read completely (over ${LAUNCH_WINDOW_PAGES} pages, or transactions Helius could not parse)`,
+          ev.records.filter((r) => r.kind === 'IDX_LAUNCH_WINDOW').map((r) => r.id),
+        );
+      } else {
+        const buys = launchBuysFrom(hist.txs, mint, input.pairCreatedAt, cfg.filter.launchWindowSeconds);
+        const buyerFunders = new Map<string, string>();
+        const buyers = [...new Set(buys.map((b) => b.buyer))];
+        let allTraced = buyers.length <= MAX_TRACED_BUYERS;
+        for (const w of buyers.slice(0, MAX_TRACED_BUYERS)) {
+          const trace = await funderOf(w);
+          if (trace.funder) buyerFunders.set(w, trace.funder);
+          else if (!trace.traced) allTraced = false;
+        }
+        const supplyUi = fromBaseUnits(mintFacts.value.supply, mintFacts.value.decimals);
+        bundle = ok(
+          analyseBundle({
+            buys,
+            totalSupplyUi: supplyUi,
+            funders: buyerFunders,
+            fundersComplete: allTraced,
+            windowSeconds: cfg.filter.launchWindowSeconds,
+            maxBundledPct: cfg.filter.maxBundledLaunchPct,
+          }),
+          ev.records
+            .filter((r) => r.kind.startsWith('IDX_') || r.kind.startsWith('RPC_WALLET_'))
+            .map((r) => r.id),
+          deps.clock.now(),
+        );
       }
-      const supplyUi = fromBaseUnits(mintFacts.value.supply, mintFacts.value.decimals);
-      bundle = ok(
-        analyseBundle({
-          buys,
-          totalSupplyUi: supplyUi,
-          funders: buyerFunders,
-          fundersComplete: allTraced,
-          windowSeconds: cfg.filter.launchWindowSeconds,
-          maxBundledPct: cfg.filter.maxBundledLaunchPct,
-        }),
-        ev.records
-          .filter((r) => r.kind.startsWith('IDX_') || r.kind.startsWith('RPC_WALLET_'))
-          .map((r) => r.id),
-        deps.clock.now(),
-      );
     }
   } catch (e) {
     bundle = missing((e as Error).message, [], failure(e));
@@ -604,8 +608,10 @@ async function windowHistory(
 }
 
 /**
- * Pages through an address's history. Complete only when the last page was reached within `maxPages` and
- * every transaction on the way was parsed (an unparsed one could be the very buy or transfer that matters).
+ * Pages through an address's history. Complete only when the end was reached within `maxPages` and every
+ * transaction on the way was parsed (an unparsed one could be the very buy or transfer that matters). The
+ * end is a page without a cursor, or an empty page: Helius still returns a cursor after the last
+ * transaction of a time window, and short pages occur mid-history.
  */
 async function readHistory(
   helius: Helius,
@@ -623,11 +629,15 @@ async function readHistory(
     ev.add(page, kind, 'PROVIDER_CLAIM');
     txs.push(...page.data.txs);
     unparsed += page.data.unparsed;
-    if (!page.data.next) return { txs, complete: unparsed === 0 };
+    const empty = page.data.txs.length === 0 && page.data.unparsed === 0;
+    if (!page.data.next || empty) return { txs, complete: unparsed === 0 };
     cursor = page.data.next;
   }
   return { txs, complete: false };
 }
+
+/** History pages read for a launch window (100 transactions each; busy launches fill a page in seconds). */
+export const LAUNCH_WINDOW_PAGES = 15;
 
 /** Launch buyers whose funding is traced; with more, the bundling check cannot be completed. */
 export const MAX_TRACED_BUYERS = 100;
