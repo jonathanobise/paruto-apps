@@ -35,6 +35,33 @@ window.MEDIA_SITE = {
 
   projects: [
     {
+      // The working site is the live demo (it has English and Hausa, no French); this folder holds only its teaser and stills.
+      id: 'gani-da-ido', href: 'https://gani-da-ido-demo.paruto.workers.dev/', year: '2026', call: 'Developer ToR', programme: 'PAF-GSE Kaduna · Malala Fund',
+      accent: '#E3B23C', accent2: '#1F5C3F',
+      status: { en: 'Proposal', fr: 'Proposition' },
+      client: { en: 'e-CAPH', fr: 'e-CAPH' },
+      kicker: { en: 'Accountability platform · Web and mobile · English and Hausa', fr: 'Plateforme de redevabilité · Web et mobile · Anglais et haoussa' },
+      title: { en: 'Eyes on the *ground*', fr: 'Des yeux sur le *terrain*' },
+      summary: {
+        en: 'Gani da Ido follows public and development projects for girls’ education in Kaduna State, from the budget line to the classroom door: monthly reports, field visits, community feedback and commitments go through an approval workflow, and a public dashboard shows only approved information. The working prototype is live, in English and Hausa.',
+        fr: 'Gani da Ido suit les projets publics et de développement pour l’éducation des filles dans l’État de Kaduna, de la ligne budgétaire à la porte de la classe : rapports mensuels, visites de terrain, retours des communautés et engagements passent par un circuit de validation, et un tableau de bord public n’affiche que les informations approuvées. Le prototype fonctionne déjà, en anglais et en haoussa.',
+      },
+      stats: [
+        { n: 5, l: { en: 'user roles', fr: 'rôles d’utilisateur' } },
+        { n: 5, l: { en: 'record types', fr: 'types de fiches' } },
+        { n: 2, l: { en: 'languages', fr: 'langues' } },
+        { n: 184, l: { en: 'automated tests', fr: 'tests automatisés' } },
+      ],
+      teaser: 'gani-da-ido/teaser.mp4', poster: 'gani-da-ido/teaser.jpg',
+      gallery: [
+        { src: 'gani-da-ido/img/dashboard.jpg', href: 'https://gani-da-ido-demo.paruto.workers.dev/public', label: { en: 'Public dashboard · 3D map', fr: 'Tableau de bord public · carte 3D' } },
+        { src: 'gani-da-ido/img/project.jpg', href: 'https://gani-da-ido-demo.paruto.workers.dev/public/projects/GDI-HLT-001', label: { en: 'A project, reported and seen', fr: 'Un projet, déclaré et vérifié' } },
+        { src: 'gani-da-ido/img/hausa.jpg', href: 'https://gani-da-ido-demo.paruto.workers.dev/', label: { en: 'The whole site in Hausa', fr: 'Tout le site en haoussa' } },
+      ],
+      open: { en: 'Open the demo', fr: 'Ouvrir la démo' },
+      play: { en: 'Take the tour', fr: 'Suivre la visite' }, playHref: 'https://gani-da-ido-demo.paruto.workers.dev/demo',
+    },
+    {
       id: 'araa-sps', href: 'araa-sps/', year: '2026', call: 'AMI028-2026', programme: 'PACBAO-2 · SDC',
       accent: '#E9A14B', accent2: '#1F7A6E',
       status: { en: 'Proposal', fr: 'Proposition' },
