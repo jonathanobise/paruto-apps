@@ -70,7 +70,7 @@ Répondez A, B ou C 👇</div>
   <h2 id="fr-5">5. Mettre à jour ou ajouter une langue</h2>
   <ol>
     <li><b>Textes.</b> Tous les mots d’une vidéo sont dans <code>videos/&lt;module&gt;/script.js</code> (une clé par langue) ; ceux des capsules dans <code>audio/capsules.js</code>.</li>
-    <li><b>Voix.</b> Une réplique = un fichier : <code>videos/&lt;module&gt;/vo/&lt;langue&gt;/&lt;réplique&gt;.mp3</code>. Les voix finales (voix de synthèse haute fidélité là où elles existent pour la langue, enregistrements studio pour le bambara, le peul et toute langue où l’ARAA choisit des voix humaines) remplacent les voix de travail sous le même nom (voir le kit d’enregistrement).</li>
+    <li><b>Voix.</b> Une réplique = un fichier : <code>videos/&lt;module&gt;/vo/&lt;langue&gt;/&lt;réplique&gt;.mp3</code>. Les voix finales (voix de synthèse haute fidélité, ou enregistrements studio là où aucune voix de synthèse n’est assez bonne et dans toute langue où l’ARAA choisit des voix humaines) remplacent les voix de travail sous le même nom (voir le kit d’enregistrement).</li>
     <li><b>Rendus.</b> <code>node tools/render.mjs &lt;module&gt;</code> refait les MP4 16:9 et les SRT ; ajouter <code>--vertical</code> pour le 9:16. <code>python tools/capsules.py</code> refait les capsules ; <code>node tools/storyboard.mjs &lt;module&gt;</code> les storyboards ; <code>node tools/kit.mjs</code> la page du kit et l’archive des sources.</li>
     <li><b>Prérequis.</b> Node.js 20 ou plus, Chromium (Playwright), ffmpeg, et Python avec Piper pour les voix de travail.</li>
   </ol>
@@ -139,7 +139,7 @@ Reply A, B or C 👇</div>
   <h2 id="en-5">5. Updating or adding a language</h2>
   <ol>
     <li><b>Text.</b> Every word of a video is in <code>videos/&lt;module&gt;/script.js</code> (one key per language); the capsules’ words are in <code>audio/capsules.js</code>.</li>
-    <li><b>Voices.</b> One line = one file: <code>videos/&lt;module&gt;/vo/&lt;language&gt;/&lt;line&gt;.mp3</code>. The final voices (high-fidelity AI voices where they exist for the language, studio recordings for Bambara, Fulani and any language where ARAA chooses human voices) replace the scratch voices under the same names (see the recording kit).</li>
+    <li><b>Voices.</b> One line = one file: <code>videos/&lt;module&gt;/vo/&lt;language&gt;/&lt;line&gt;.mp3</code>. The final voices (high-fidelity AI voices, or studio recordings where no AI voice is good enough and in any language where ARAA chooses human voices) replace the scratch voices under the same names (see the recording kit).</li>
     <li><b>Renders.</b> <code>node tools/render.mjs &lt;module&gt;</code> rebuilds the 16:9 MP4s and SRTs; add <code>--vertical</code> for 9:16. <code>python tools/capsules.py</code> rebuilds the capsules; <code>node tools/storyboard.mjs &lt;module&gt;</code> the storyboards; <code>node tools/kit.mjs</code> the kit page and the sources archive.</li>
     <li><b>Requirements.</b> Node.js 20 or later, Chromium (Playwright), ffmpeg, and Python with Piper for the scratch voices.</li>
   </ol>
