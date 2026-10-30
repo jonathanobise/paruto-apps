@@ -42,12 +42,13 @@ if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 execFileSync('python3', ['-I', '-c', `
 import os, sys, zipfile
 root, out = sys.argv[1], sys.argv[2]
-skip_ext = ('.mp4', '.wav', '.flac', '.jpg', '.zip')
+skip_ext = ('.mp4', '.wav', '.flac', '.jpg', '.zip', '.pyc')
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
     for top in ['shared', 'videos', 'audio', 'tools', 'README.md']:
         p = os.path.join(root, top)
         if os.path.isfile(p): z.write(p, os.path.join('sps-kit', top)); continue
-        for d, _, fs in os.walk(p):
+        for d, ds, fs in os.walk(p):
+            ds[:] = [x for x in ds if x != '__pycache__']
             for f in fs:
                 if f.endswith(skip_ext) or f.startswith(('.', 'capsule-')): continue  # finished capsules are on the page
                 full = os.path.join(d, f); z.write(full, os.path.join('sps-kit', os.path.relpath(full, root)))
