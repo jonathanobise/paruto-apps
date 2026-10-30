@@ -23,7 +23,7 @@
       kicker: 'Réponse à l’AMI028-2026 de l’ARAA · Paruto Media',
       title: 'Kit de sensibilisation SPS : un échantillon de chaque livrable',
       lead: 'Pour ce dossier, Paruto Media a produit un exemple concret de chaque livrable demandé : des vidéos interactives sur les trois cadres (international, CEDEAO, UEMOA), leurs versions légères pour WhatsApp, des capsules audio pour la radio et le podcast, les storyboards, un guide de déploiement et les fichiers sources.',
-      note: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. Les voix sont des voix de synthèse provisoires : les versions finales sont enregistrées par des comédiens natifs au studio Paruto Music.',
+      note: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. Les voix sont des voix de synthèse provisoires : les versions finales sont enregistrées par des comédiens natifs au studio Paruto Music. Ces échantillons sont courts (environ 2 minutes par vidéo, 70 secondes par capsule) : les productions livrées dureront 7 à 8 minutes chacune, comme le demande l’ARAA.',
       tableHead: ['Livrable demandé', 'Ce que vous trouverez ici'],
       rows: [
         ['L1 · Rapport de démarrage et storyboards validés', 'Méthodologie, plan de travail sur 12 semaines, storyboards complets des trois vidéos avec la carte des embranchements', '#cadrage'],
@@ -75,7 +75,7 @@
       kicker: 'Response to ARAA call AMI028-2026 · Paruto Media',
       title: 'SPS awareness kit: a sample of every deliverable',
       lead: 'For this bid, Paruto Media produced a working example of every deliverable in the call: interactive videos on all three frameworks (international, ECOWAS, WAEMU), their light WhatsApp versions, audio capsules for radio and podcast, storyboards, a deployment guide and the source files.',
-      note: 'Demonstration content, to be validated by ARAA’s technical experts. The voices are temporary synthetic voices; final versions are recorded by native-speaker voice actors at the Paruto Music studio.',
+      note: 'Demonstration content, to be validated by ARAA’s technical experts. The voices are temporary synthetic voices; final versions are recorded by native-speaker voice actors at the Paruto Music studio. These samples are short (about 2 minutes per video, 70 seconds per capsule); the delivered pieces will run 7 to 8 minutes each, as ARAA asks.',
       tableHead: ['Deliverable in the call', 'What you’ll find here'],
       rows: [
         ['D1 · Inception report and validated storyboards', 'Method, 12-week workplan, full storyboards of the three videos with their branching maps', '#cadrage'],
