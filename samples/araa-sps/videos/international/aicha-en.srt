@@ -11,45 +11,189 @@ Aïcha runs a small abattoir. Buyers from a big coastal city want her meat.
 But they ask for a guarantee: is this meat safe?
 
 4
-00:00:18,900 --> 00:00:26,000
-For trade, the WTO has an agreement on sanitary and phytosanitary measures: the SPS Agreement.
+00:00:18,900 --> 00:00:26,200
+The city is in a neighbouring country, which sets its own health rules for the meat it lets in.
 
 5
-00:00:26,000 --> 00:00:36,000
-It relies on three references: the Codex Alimentarius for food, WOAH for animal health and the IPPC for plants.
+00:00:26,200 --> 00:00:33,600
+If every country invented its own rules, every border would ask for something different.
 
 6
-00:00:36,500 --> 00:00:40,800
-A cow was given an antibiotic yesterday. What does Aïcha do?
+00:00:33,600 --> 00:00:42,200
+That is why countries agreed on common principles, at the World Trade Organization.
 
 7
-00:00:41,000 --> 00:00:47,000
-Answer 2: respect the withdrawal period to avoid residues in the meat.
+00:00:42,900 --> 00:00:48,000
+The WTO SPS Agreement starts with a right:
 
 8
-00:00:47,500 --> 00:00:52,000
-Before slaughter, the veterinarian inspects the live animals.
+00:00:48,000 --> 00:00:56,200
+every country may protect the life and health of people, animals and plants.
 
 9
-00:00:52,000 --> 00:00:57,800
-After slaughter, he inspects each carcass and applies the inspection stamp.
+00:00:56,900 --> 00:01:04,000
+But this right has limits. A measure must rest on scientific principles and evidence.
 
 10
-00:00:57,800 --> 00:01:03,800
-Clean premises, clean water, work clothes: hygiene protects the consumer.
+00:01:04,000 --> 00:01:09,800
+It applies only as far as needed to protect health.
 
 11
-00:01:04,300 --> 00:01:09,000
-The meat is ready to leave for the city.
+00:01:09,800 --> 00:01:16,400
+It must not discriminate between countries where the same conditions prevail.
 
 12
-00:01:09,500 --> 00:01:14,500
-In a refrigerated truck, the cold chain is never broken.
+00:01:16,400 --> 00:01:22,300
+And it must never be a hidden barrier to trade.
 
 13
-00:01:14,500 --> 00:01:21,200
-Rules based on the same international standards make trade between countries easier.
+00:01:22,900 --> 00:01:30,400
+To choose a measure, a country first assesses the risk, using methods from the international organisations.
 
 14
-00:01:57,700 --> 00:02:06,400
+00:01:30,400 --> 00:01:38,200
+It weighs the scientific evidence, how animals are raised and processed, and which diseases are present.
+
+15
+00:01:38,200 --> 00:01:46,200
+Then it picks a measure that protects enough, without restricting trade more than required.
+
+16
+00:01:46,900 --> 00:01:54,000
+To bring rules closer, the Agreement asks countries to base their measures on international standards.
+
+17
+00:01:54,000 --> 00:02:04,000
+Three bodies write them: the Codex Alimentarius for food, WOAH for animal health and the IPPC for plants.
+
+18
+00:02:04,500 --> 00:02:12,600
+A measure that follows these standards is presumed necessary and consistent with the Agreement.
+
+19
+00:02:12,600 --> 00:02:21,800
+A country may protect more strictly than the standard, but it needs a scientific justification.
+
+20
+00:02:22,500 --> 00:02:26,800
+A cow was given an antibiotic yesterday. What does Aïcha do?
+
+21
+00:02:27,000 --> 00:02:33,000
+Answer 2: respect the withdrawal period to avoid residues in the meat.
+
+22
+00:02:33,500 --> 00:02:38,000
+Before slaughter, the veterinarian inspects the live animals.
+
+23
+00:02:38,000 --> 00:02:43,800
+After slaughter, he inspects each carcass and applies the inspection stamp.
+
+24
+00:02:43,800 --> 00:02:49,800
+Clean premises, clean water, work clothes: hygiene protects the consumer.
+
+25
+00:02:50,300 --> 00:02:56,800
+The buyers’ country does not check meat exactly the way Aïcha’s country does.
+
+26
+00:02:56,800 --> 00:03:04,400
+Under Article 4, the importer must accept different measures as equivalent,
+
+27
+00:03:04,400 --> 00:03:13,600
+if the exporting country objectively shows that they reach the importer’s level of protection.
+
+28
+00:03:14,300 --> 00:03:22,000
+The exporter supplies the scientific and technical data, and gives access for inspections and tests.
+
+29
+00:03:22,000 --> 00:03:29,800
+On request, the importer explains the risk its measure targets, and normally replies within six months.
+
+30
+00:03:29,800 --> 00:03:37,600
+Meanwhile, trade already under way goes on: a request is no reason to stop it.
+
+31
+00:03:38,300 --> 00:03:46,000
+One morning, foot-and-mouth disease is reported in a region far from Aïcha’s.
+
+32
+00:03:46,000 --> 00:03:55,600
+Must the whole country stop selling? Article 6 says measures must fit the health situation of each area.
+
+33
+00:03:56,300 --> 00:04:00,600
+What should Aïcha’s country do?
+
+34
+00:04:00,800 --> 00:04:06,800
+Answer 2: report the outbreak, control the zone and prove the other areas are free.
+
+35
+00:04:07,300 --> 00:04:14,000
+The outbreak is reported to WOAH and the zone is put under control.
+
+36
+00:04:14,000 --> 00:04:20,600
+With surveillance and checks, the country proves the other areas are free of the disease,
+
+37
+00:04:20,600 --> 00:04:26,600
+and buyers can keep accepting meat from those areas.
+
+38
+00:04:27,300 --> 00:04:34,600
+Checks have rules too. Inspections must be carried out without undue delay,
+
+39
+00:04:34,600 --> 00:04:41,000
+and imported products are treated no less favourably than local ones.
+
+40
+00:04:41,000 --> 00:04:48,800
+Rules must also be known: each country publishes its measures and notifies changes to the WTO,
+
+41
+00:04:48,800 --> 00:04:56,600
+and runs an enquiry point that answers questions about them.
+
+42
+00:04:57,300 --> 00:05:02,000
+The meat is ready to leave for the city.
+
+43
+00:05:02,500 --> 00:05:10,200
+How should the meat travel to the city?
+
+44
+00:05:10,500 --> 00:05:15,500
+In a refrigerated truck, the cold chain is never broken.
+
+45
+00:05:15,500 --> 00:05:22,200
+Rules based on the same international standards make trade between countries easier.
+
+46
+00:05:22,700 --> 00:05:31,800
+Another international text protects the youngest: the WHO International Code of Marketing of Breast-milk Substitutes.
+
+47
+00:05:31,800 --> 00:05:40,800
+It protects breastfeeding: these products should not be advertised to the public, and mothers should not get free samples.
+
+48
+00:05:40,800 --> 00:05:48,000
+And their labels should state that breastfeeding is best.
+
+49
+00:07:00,700 --> 00:07:10,000
+Four principles to remember: science, common standards, equivalence and disease-free zones.
+
+50
+00:07:10,700 --> 00:07:19,400
 Shared standards for safe meat and open markets.

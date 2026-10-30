@@ -23,16 +23,16 @@
       kicker: 'Réponse à l’AMI028-2026 de l’ARAA · Paruto Media',
       title: 'Kit de sensibilisation SPS : un échantillon de chaque livrable',
       lead: 'Pour ce dossier, Paruto Media a produit un exemple concret de chaque livrable demandé : des vidéos interactives sur les trois cadres (international, CEDEAO, UEMOA), leurs versions légères pour WhatsApp, des capsules audio pour la radio et le podcast, les storyboards, un guide de déploiement et les fichiers sources.',
-      note: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. Les voix sont des voix de synthèse provisoires : les versions finales sont enregistrées par des comédiens natifs au studio Paruto Music. Ces échantillons sont courts (environ 2 minutes par vidéo, 70 secondes par capsule) : les productions livrées dureront 7 à 8 minutes chacune, comme le demande l’ARAA.',
+      note: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. Les voix sont des voix de synthèse provisoires : les versions finales sont enregistrées par des comédiens natifs au studio Paruto Music. Le module international est en version complète, la durée que l’ARAA demande : la vidéo « Le marché d’Aïcha » dure 7 min 24 s et sa capsule radio environ 7 minutes et demie. Les vidéos CEDEAO et UEMOA (environ 2 minutes) et leurs capsules (environ 70 secondes) sont des échantillons courts du format.',
       tableHead: ['Livrable demandé', 'Ce que vous trouverez ici'],
       rows: [
         ['L1 · Rapport de démarrage et storyboards validés', 'Méthodologie, plan de travail sur 12 semaines, storyboards complets des trois vidéos avec la carte des embranchements', '#cadrage'],
         ['L2 · Première version des contenus', 'Les trois étapes de validation et le journal des commentaires', '#revue'],
-        ['L3 · Vidéos interactives : normes internationales (OMC, OMSA, FAO)', '« Le marché d’Aïcha », interactive, en français, anglais et portugais', '#videos'],
+        ['L3 · Vidéos interactives : normes internationales (OMC, OMSA, FAO)', '« Le marché d’Aïcha », version complète de 7 min 24 s, interactive, en français, anglais et portugais', '#videos'],
         ['L3 · Vidéos interactives : normes CEDEAO', '« Le voyage de Moussa », interactive, en français, anglais et portugais', '#videos'],
         ['L3 · Vidéos interactives : normes UEMOA', '« La boucherie de Koffi », interactive, en français, anglais et portugais', '#videos'],
         ['L3 · Versions légères pour WhatsApp', 'MP4 au format 16:9 et vertical 9:16, sous-titres incrustés et fichiers SRT', '#videos'],
-        ['L3 · Capsules audio radio / podcast (trois cadres)', 'Trois épisodes de « Santé animale, marchés ouverts », en MP3 et WAV, avec fiche de diffusion', '#audio'],
+        ['L3 · Capsules audio radio / podcast (trois cadres)', 'Trois épisodes de « Santé animale, marchés ouverts », en MP3 et WAV (FLAC pour l’épisode complet), avec fiche de diffusion', '#audio'],
         ['L3 · Huit langues (3 officielles + 5 locales)', 'Français, anglais, portugais produits ; kit d’enregistrement pour le haoussa, le bambara, le wolof, le yoruba et le peul', '#langues'],
         ['L3 · Fichiers sources et guide de déploiement', 'Sources éditables à télécharger et guide pour le web, WhatsApp et les radios communautaires', '#sources'],
       ],
@@ -57,7 +57,7 @@
       videosL: 'Trois modules, un par cadre. Chacun : une histoire animée, deux choix à embranchements avec leurs conséquences et un quiz. Les versions WhatsApp montrent les bonnes réponses.',
       play: 'Jouer la version interactive', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Sous-titres', sb: 'Storyboard',
       audioT: 'Capsules audio · Livrable 3',
-      audioL: 'Une émission, « Santé animale, marchés ouverts », un épisode par cadre : une animatrice et un vétérinaire, un jingle, trois messages clés. MP3 pour le podcast et WhatsApp, WAV normalisé (EBU R128, −23 LUFS) pour la radio.',
+      audioL: 'Une émission, « Santé animale, marchés ouverts », un épisode par cadre : une animatrice et un vétérinaire, un jingle, trois messages clés. MP3 pour le podcast et WhatsApp, WAV normalisé (EBU R128, −23 LUFS) pour la radio, en FLAC sans perte, plus léger, pour l’épisode complet.',
       ep: 'Épisode', transcript: 'Transcription', cueT: 'Fiche de diffusion', cueHead: ['Épisode', 'Langue', 'Durée', 'Début', 'Fin', 'Fichiers'],
       langsT: 'Huit langues · Livrable 3',
       langsL: 'Français, anglais et portugais sont produits ici. Les cinq langues locales sont traduites et enregistrées par des locuteurs natifs, à partir d’un glossaire SPS validé par les experts.',
@@ -75,16 +75,16 @@
       kicker: 'Response to ARAA call AMI028-2026 · Paruto Media',
       title: 'SPS awareness kit: a sample of every deliverable',
       lead: 'For this bid, Paruto Media produced a working example of every deliverable in the call: interactive videos on all three frameworks (international, ECOWAS, WAEMU), their light WhatsApp versions, audio capsules for radio and podcast, storyboards, a deployment guide and the source files.',
-      note: 'Demonstration content, to be validated by ARAA’s technical experts. The voices are temporary synthetic voices; final versions are recorded by native-speaker voice actors at the Paruto Music studio. These samples are short (about 2 minutes per video, 70 seconds per capsule); the delivered pieces will run 7 to 8 minutes each, as ARAA asks.',
+      note: 'Demonstration content, to be validated by ARAA’s technical experts. The voices are temporary synthetic voices; final versions are recorded by native-speaker voice actors at the Paruto Music studio. The international module is full length, as ARAA asks: the video “Aïcha’s Market” runs 7 min 24 s and its radio capsule about 7½ minutes. The ECOWAS and WAEMU videos (about 2 minutes) and their capsules (about 70 seconds) are short samples of the format.',
       tableHead: ['Deliverable in the call', 'What you’ll find here'],
       rows: [
         ['D1 · Inception report and validated storyboards', 'Method, 12-week workplan, full storyboards of the three videos with their branching maps', '#cadrage'],
         ['D2 · First draft of content', 'The three validation gates and the feedback log', '#revue'],
-        ['D3 · Interactive videos: international standards (WTO, WOAH, FAO)', '“Aïcha’s Market”, interactive, in French, English and Portuguese', '#videos'],
+        ['D3 · Interactive videos: international standards (WTO, WOAH, FAO)', '“Aïcha’s Market”, full length (7 min 24 s), interactive, in French, English and Portuguese', '#videos'],
         ['D3 · Interactive videos: ECOWAS standards', '“Moussa’s Journey”, interactive, in French, English and Portuguese', '#videos'],
         ['D3 · Interactive videos: WAEMU standards', '“Koffi’s Butcher Shop”, interactive, in French, English and Portuguese', '#videos'],
         ['D3 · Light versions for WhatsApp', 'MP4 in 16:9 and vertical 9:16, burned-in captions and SRT files', '#videos'],
-        ['D3 · Radio / podcast audio capsules (three frameworks)', 'Three episodes of “Healthy Animals, Open Markets”, MP3 and WAV, with a cue sheet', '#audio'],
+        ['D3 · Radio / podcast audio capsules (three frameworks)', 'Three episodes of “Healthy Animals, Open Markets”, MP3 and WAV (FLAC for the full-length episode), with a cue sheet', '#audio'],
         ['D3 · Eight languages (3 official + 5 local)', 'French, English, Portuguese produced; recording kit for Hausa, Bambara, Wolof, Yoruba and Fulani', '#langues'],
         ['D3 · Source files and deployment guide', 'Editable sources to download and a guide for web, WhatsApp and community radio', '#sources'],
       ],
@@ -109,7 +109,7 @@
       videosL: 'Three modules, one per framework. Each has an animated story, two branching choices with consequences, and a quiz. The WhatsApp versions show the right answers.',
       play: 'Play the interactive version', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Subtitles', sb: 'Storyboard',
       audioT: 'Audio capsules · Deliverable 3',
-      audioL: 'One programme, “Healthy Animals, Open Markets”, with an episode per framework: a host and a veterinarian, a jingle, three key messages. MP3 for podcast and WhatsApp, loudness-normalised WAV (EBU R128, −23 LUFS) for radio.',
+      audioL: 'One programme, “Healthy Animals, Open Markets”, with an episode per framework: a host and a veterinarian, a jingle, three key messages. MP3 for podcast and WhatsApp, loudness-normalised WAV (EBU R128, −23 LUFS) for radio, as lossless FLAC for the full-length episode, a smaller file.',
       ep: 'Episode', transcript: 'Transcript', cueT: 'Cue sheet', cueHead: ['Episode', 'Language', 'Length', 'In-cue', 'Out-cue', 'Files'],
       langsT: 'Eight languages · Deliverable 3',
       langsL: 'French, English and Portuguese are produced here. The five local languages are translated and recorded by native speakers, from an SPS glossary validated by the experts.',
@@ -186,7 +186,7 @@
       <h3>${serifLast(ep.title[lang].replace(/ \(.*\)$/, ''))}${/\(/.test(ep.title[lang]) ? ` <span class="dim">${esc(ep.title[lang].match(/\((.*)\)$/)[1])}</span>` : ''}</h3>
       <div class="seg alangs" style="--i:${langs.indexOf(cur)}">${langs.map((l) => `<button data-l="${l}" class="${l === cur ? 'on' : ''}">${l.toUpperCase()}</button>`).join('')}<span class="seg-thumb" aria-hidden="true"></span></div>
       <div class="aplayer"><button class="aplay" type="button" aria-label="Play">${PLAY}</button><div class="abar"><span></span></div><span class="atime mono">0:00 / ${dur(a[cur] && a[cur].duration)}</span><audio preload="none" src="${a[cur] ? `audio/${ep.id}/${a[cur].mp3.name}` : ''}"></audio></div>
-      <div class="dl-row">${langs.map((l) => `<a class="chip" href="audio/${ep.id}/${a[l].mp3.name}" download>MP3 ${l.toUpperCase()}<small>${size(a[l].mp3.bytes)}</small></a><a class="chip" href="audio/${ep.id}/${a[l].wav.name}" download>WAV ${l.toUpperCase()}<small>${size(a[l].wav.bytes)}</small></a>`).join('')}</div>
+      <div class="dl-row">${langs.map((l) => `<a class="chip" href="audio/${ep.id}/${a[l].mp3.name}" download>MP3 ${l.toUpperCase()}<small>${size(a[l].mp3.bytes)}</small></a><a class="chip" href="audio/${ep.id}/${a[l].wav.name}" download>${a[l].wav.name.split('.').pop().toUpperCase()} ${l.toUpperCase()}<small>${size(a[l].wav.bytes)}</small></a>`).join('')}</div>
       <details><summary>${esc(t.transcript)}</summary><div class="tx">${ep.lines.map((x) => `<p><b>${esc(CAPS.roles[x.who][cur])}</b> ${esc(x[cur])}</p>`).join('')}<p><i>${esc(CAPS.credit[cur])}</i></p></div></details>
     </article>`;
   }

@@ -71,15 +71,15 @@ window.SPS_MEDIA = {
     "fr": {
      "mp4": {
       "name": "aicha-fr.mp4",
-      "bytes": 3898416
+      "bytes": 11880121
      },
      "vertical": {
       "name": "aicha-fr-vertical.mp4",
-      "bytes": 3300289
+      "bytes": 10547964
      },
      "srt": {
       "name": "aicha-fr.srt",
-      "bytes": 1616
+      "bytes": 6240
      },
      "poster": {
       "name": "aicha-fr-poster.jpg",
@@ -89,15 +89,15 @@ window.SPS_MEDIA = {
     "en": {
      "mp4": {
       "name": "aicha-en.mp4",
-      "bytes": 3843146
+      "bytes": 11574570
      },
      "vertical": {
       "name": "aicha-en-vertical.mp4",
-      "bytes": 3155046
+      "bytes": 10101152
      },
      "srt": {
       "name": "aicha-en.srt",
-      "bytes": 1443
+      "bytes": 5608
      },
      "poster": {
       "name": "aicha-en-poster.jpg",
@@ -107,15 +107,15 @@ window.SPS_MEDIA = {
     "pt": {
      "mp4": {
       "name": "aicha-pt.mp4",
-      "bytes": 3729091
+      "bytes": 11225956
      },
      "vertical": {
       "name": "aicha-pt-vertical.mp4",
-      "bytes": 3136461
+      "bytes": 9893083
      },
      "srt": {
       "name": "aicha-pt.srt",
-      "bytes": 1524
+      "bytes": 5846
      },
      "poster": {
       "name": "aicha-pt-poster.jpg",
@@ -123,7 +123,7 @@ window.SPS_MEDIA = {
      }
     }
    },
-   "duration": 131.4,
+   "duration": 444.4,
    "storyThumb": {
     "en": "storyboards/international/img/meet-2.jpg",
     "fr": "storyboards/international/img/meet-2-fr.jpg"
@@ -234,35 +234,35 @@ window.SPS_MEDIA = {
    "en": {
     "mp3": {
      "name": "capsule-1-international-en.mp3",
-     "bytes": 1187908
+     "bytes": 7049367
     },
     "wav": {
-     "name": "capsule-1-international-en.wav",
-     "bytes": 6542678
+     "name": "capsule-1-international-en.flac",
+     "bytes": 13453781
     },
-    "duration": 74.2
+    "duration": 440.6
    },
    "fr": {
     "mp3": {
      "name": "capsule-1-international-fr.mp3",
-     "bytes": 1292815
+     "bytes": 7630330
     },
     "wav": {
-     "name": "capsule-1-international-fr.wav",
-     "bytes": 7121238
+     "name": "capsule-1-international-fr.flac",
+     "bytes": 12541768
     },
-    "duration": 80.8
+    "duration": 476.9
    },
    "pt": {
     "mp3": {
      "name": "capsule-1-international-pt.mp3",
-     "bytes": 1192923
+     "bytes": 7252913
     },
     "wav": {
-     "name": "capsule-1-international-pt.wav",
-     "bytes": 6570326
+     "name": "capsule-1-international-pt.flac",
+     "bytes": 12209308
     },
-    "duration": 74.5
+    "duration": 453.3
    }
   },
   "waemu": {
@@ -303,7 +303,7 @@ window.SPS_MEDIA = {
  },
  "zip": {
   "name": "paruto-media-sps-kit-sources.zip",
-  "bytes": 15658515
+  "bytes": 11174825
  },
  "built": "2026-10-30"
 };

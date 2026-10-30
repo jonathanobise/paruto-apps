@@ -3,16 +3,22 @@ so the pages stay identical apart from their words and files.   python3 tools/mo
 import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 THEME = open(os.path.join(ROOT, 'tools', 'theme-button.html')).read().strip()
+SHORT_FR = 'Échantillon court (environ 2 minutes) : deux choix à embranchements avec leurs conséquences, puis un quiz de trois questions avec score'
+SHORT_EN = 'Short sample (about 2 minutes): two branching choices with on-screen consequences, then a three-question quiz with a score'
 MODS = [
   dict(id='international', slug='aicha', n='01', title_en='Aïcha’s Market', title_fr='Le marché d’Aïcha',
        tag_en='International standards · WTO, WOAH, FAO/Codex', tag_fr='Normes internationales · OMC, OMSA, FAO/Codex',
-       desc='Sample interactive awareness video on international SPS standards (WTO SPS Agreement, Codex, WOAH, IPPC) for the meat trade, by Paruto Media.'),
+       desc='Full-length interactive awareness video on international SPS standards (WTO SPS Agreement, Codex, WOAH, IPPC, WHO Code) for the meat trade, by Paruto Media.',
+       shows_fr='Version complète de 7 min 24 s, comme l’ARAA le demande : trois choix à embranchements avec leurs conséquences, puis un quiz de six questions avec score',
+       shows_en='Full length, 7 min 24 s, as ARAA asks: three branching choices with on-screen consequences, then a six-question quiz with a score'),
   dict(id='ecowas', slug='moussa', n='02', title_en='Moussa’s Journey', title_fr='Le voyage de Moussa',
        tag_en='ECOWAS standards · C/REG.21/11/10', tag_fr='Normes CEDEAO · C/REG.21/11/10',
-       desc='Sample interactive awareness video on animal health (SPS) rules for the livestock trade in West Africa, by Paruto Media.'),
+       desc='Sample interactive awareness video on animal health (SPS) rules for the livestock trade in West Africa, by Paruto Media.',
+       shows_fr=SHORT_FR, shows_en=SHORT_EN),
   dict(id='waemu', slug='koffi', n='03', title_en='Koffi’s Butcher Shop', title_fr='La boucherie de Koffi',
        tag_en='WAEMU standards · Regulation 007/2007', tag_fr='Normes UEMOA · Règlement 007/2007',
-       desc='Sample interactive awareness video on food safety rules in the WAEMU area (Regulation 007/2007/CM/UEMOA), by Paruto Media.'),
+       desc='Sample interactive awareness video on food safety rules in the WAEMU area (Regulation 007/2007/CM/UEMOA), by Paruto Media.',
+       shows_fr=SHORT_FR, shows_en=SHORT_EN),
 ]
 T = '''<!doctype html>
 <html lang="fr">
@@ -119,12 +125,12 @@ T = '''<!doctype html>
         <p class="label"><span class="l-fr">Ce que montre l’échantillon</span><span class="l-en">What this sample shows</span></p>
         <ul class="l-fr">
           <li>Animation 2D sans texte à l’écran : seules la voix et les sous-titres changent d’une langue à l’autre</li>
-          <li>Deux choix à embranchements avec leurs conséquences, puis un quiz de trois questions avec score</li>
+          <li>{shows_fr}</li>
           <li>Fonctionne dans tout navigateur et sur téléphone, sans application</li>
         </ul>
         <ul class="l-en">
           <li>2D motion design built language-neutral: only the voice and captions change between versions</li>
-          <li>Two branching choices with on-screen consequences, then a three-question quiz with a score</li>
+          <li>{shows_en}</li>
           <li>Runs in any browser and on phones, with no app to install</li>
         </ul>
       </div>

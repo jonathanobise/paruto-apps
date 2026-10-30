@@ -11,45 +11,189 @@ Aïcha dirige un petit abattoir. Des acheteurs d’une grande ville côtière ve
 Mais ils demandent une garantie : cette viande est-elle saine ?
 
 4
-00:00:18,900 --> 00:00:26,000
-Pour le commerce, l’OMC a un accord sur les mesures sanitaires et phytosanitaires : l’Accord SPS.
+00:00:18,900 --> 00:00:26,200
+La ville se trouve dans un pays voisin, qui fixe ses propres règles sanitaires pour la viande qui entre.
 
 5
-00:00:26,000 --> 00:00:36,000
-Il s’appuie sur trois références : le Codex Alimentarius pour les aliments, l’OMSA pour la santé animale et la CIPV pour les végétaux.
+00:00:26,200 --> 00:00:33,600
+Si chaque pays inventait ses propres règles, chaque frontière exigerait autre chose.
 
 6
-00:00:36,500 --> 00:00:40,800
-Une vache a reçu un antibiotique hier. Que fait Aïcha ?
+00:00:33,600 --> 00:00:42,200
+C’est pourquoi les pays se sont accordés sur des principes communs, à l’Organisation mondiale du commerce.
 
 7
-00:00:41,000 --> 00:00:47,000
-Réponse 2 : on respecte le délai d’attente pour éviter des résidus dans la viande.
+00:00:42,900 --> 00:00:48,000
+L’Accord SPS de l’OMC commence par un droit :
 
 8
-00:00:47,500 --> 00:00:52,000
-Avant l’abattage, le vétérinaire inspecte les animaux vivants.
+00:00:48,000 --> 00:00:56,200
+chaque pays peut protéger la vie et la santé des personnes, des animaux et des végétaux.
 
 9
-00:00:52,000 --> 00:00:57,800
-Après l’abattage, il inspecte chaque carcasse et appose le cachet d’inspection.
+00:00:56,900 --> 00:01:04,000
+Mais ce droit a des limites. Une mesure doit reposer sur des principes et des preuves scientifiques.
 
 10
-00:00:57,800 --> 00:01:03,800
-Locaux propres, eau potable, tenues de travail : l’hygiène protège le consommateur.
+00:01:04,000 --> 00:01:09,800
+Elle ne s’applique que dans la mesure nécessaire pour protéger la santé.
 
 11
-00:01:04,300 --> 00:01:09,000
-La viande est prête à partir vers la ville.
+00:01:09,800 --> 00:01:16,400
+Elle ne doit pas faire de discrimination entre des pays où les mêmes conditions existent.
 
 12
-00:01:09,500 --> 00:01:14,500
-Dans un camion réfrigéré, la chaîne du froid n’est jamais rompue.
+00:01:16,400 --> 00:01:22,300
+Et elle ne doit jamais servir de barrière déguisée au commerce.
 
 13
-00:01:14,500 --> 00:01:21,200
-Des règles fondées sur les mêmes normes internationales facilitent le commerce entre pays.
+00:01:22,900 --> 00:01:30,400
+Pour choisir une mesure, un pays évalue d’abord le risque, avec les méthodes des organisations internationales.
 
 14
-00:01:57,700 --> 00:02:06,400
+00:01:30,400 --> 00:01:38,200
+Il tient compte des preuves scientifiques, des méthodes d’élevage et de transformation, et des maladies présentes.
+
+15
+00:01:38,200 --> 00:01:46,200
+Puis il choisit une mesure qui protège assez, sans restreindre le commerce plus que nécessaire.
+
+16
+00:01:46,900 --> 00:01:54,000
+Pour rapprocher les règles, l’Accord demande de fonder les mesures sur les normes internationales.
+
+17
+00:01:54,000 --> 00:02:04,000
+Trois organisations les élaborent : le Codex Alimentarius pour les aliments, l’OMSA pour la santé animale et la CIPV pour les végétaux.
+
+18
+00:02:04,500 --> 00:02:12,600
+Une mesure conforme à ces normes est présumée nécessaire et conforme à l’Accord.
+
+19
+00:02:12,600 --> 00:02:21,800
+Un pays peut protéger plus strictement que la norme, mais il lui faut une justification scientifique.
+
+20
+00:02:22,500 --> 00:02:26,800
+Une vache a reçu un antibiotique hier. Que fait Aïcha ?
+
+21
+00:02:27,000 --> 00:02:33,000
+Réponse 2 : on respecte le délai d’attente pour éviter des résidus dans la viande.
+
+22
+00:02:33,500 --> 00:02:38,000
+Avant l’abattage, le vétérinaire inspecte les animaux vivants.
+
+23
+00:02:38,000 --> 00:02:43,800
+Après l’abattage, il inspecte chaque carcasse et appose le cachet d’inspection.
+
+24
+00:02:43,800 --> 00:02:49,800
+Locaux propres, eau potable, tenues de travail : l’hygiène protège le consommateur.
+
+25
+00:02:50,300 --> 00:02:56,800
+Le pays des acheteurs ne contrôle pas la viande exactement comme celui d’Aïcha.
+
+26
+00:02:56,800 --> 00:03:04,400
+Selon l’article 4, l’importateur doit accepter des mesures différentes comme équivalentes,
+
+27
+00:03:04,400 --> 00:03:13,600
+si le pays exportateur démontre objectivement qu’elles atteignent le niveau de protection de l’importateur.
+
+28
+00:03:14,300 --> 00:03:22,000
+L’exportateur fournit les données scientifiques et techniques, et donne accès aux inspections et aux tests.
+
+29
+00:03:22,000 --> 00:03:29,800
+Sur demande, l’importateur explique le risque visé par sa mesure, et répond normalement dans les six mois.
+
+30
+00:03:29,800 --> 00:03:37,600
+Entre-temps, le commerce en cours continue : une demande n’est pas une raison de l’arrêter.
+
+31
+00:03:38,300 --> 00:03:46,000
+Un matin, la fièvre aphteuse est signalée dans une région éloignée de celle d’Aïcha.
+
+32
+00:03:46,000 --> 00:03:55,600
+Tout le pays doit-il arrêter de vendre ? L’article 6 demande d’adapter les mesures à la situation sanitaire de chaque zone.
+
+33
+00:03:56,300 --> 00:04:00,600
+Que doit faire le pays d’Aïcha ?
+
+34
+00:04:00,800 --> 00:04:06,800
+Réponse 2 : déclarer le foyer, contrôler la zone et prouver que les autres zones sont indemnes.
+
+35
+00:04:07,300 --> 00:04:14,000
+Le foyer est déclaré à l’OMSA et la zone est placée sous contrôle.
+
+36
+00:04:14,000 --> 00:04:20,600
+Grâce à la surveillance et aux contrôles, le pays prouve que les autres zones sont indemnes,
+
+37
+00:04:20,600 --> 00:04:26,600
+et les acheteurs peuvent continuer d’accepter la viande de ces zones.
+
+38
+00:04:27,300 --> 00:04:34,600
+Les contrôles aussi ont des règles. Les inspections se font sans retard injustifié,
+
+39
+00:04:34,600 --> 00:04:41,000
+et les produits importés ne sont pas traités moins bien que les produits locaux.
+
+40
+00:04:41,000 --> 00:04:48,800
+Les règles doivent aussi être connues : chaque pays publie ses mesures et notifie leurs changements à l’OMC,
+
+41
+00:04:48,800 --> 00:04:56,600
+et tient un point d’information qui répond aux questions sur ces mesures.
+
+42
+00:04:57,300 --> 00:05:02,000
+La viande est prête à partir vers la ville.
+
+43
+00:05:02,500 --> 00:05:10,200
+Comment transporter la viande jusqu’à la ville ?
+
+44
+00:05:10,500 --> 00:05:15,500
+Dans un camion réfrigéré, la chaîne du froid n’est jamais rompue.
+
+45
+00:05:15,500 --> 00:05:22,200
+Des règles fondées sur les mêmes normes internationales facilitent le commerce entre pays.
+
+46
+00:05:22,700 --> 00:05:31,800
+Un autre texte international protège les tout-petits : le Code international de commercialisation des substituts du lait maternel, de l’OMS.
+
+47
+00:05:31,800 --> 00:05:40,800
+Il protège l’allaitement : pas de publicité auprès du public pour ces produits, ni d’échantillons gratuits pour les mères.
+
+48
+00:05:40,800 --> 00:05:48,000
+Et leurs étiquettes doivent rappeler la supériorité de l’allaitement maternel.
+
+49
+00:07:00,700 --> 00:07:10,000
+Quatre principes à retenir : la science, des normes communes, l’équivalence et les zones indemnes.
+
+50
+00:07:10,700 --> 00:07:19,400
 Des normes communes pour une viande saine et des marchés ouverts.

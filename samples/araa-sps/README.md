@@ -10,7 +10,7 @@ tools, notes, raw recordings and internal prompts off the site.
 | `index.html`, `hub/` | The kit page: one section per deliverable, FR/EN. `hub/media.js` is generated. |
 | `videos/<module>/` | Interactive video per framework (`international`, `ecowas`, `waemu`): `script.js` (every word, FR/EN/PT), `timeline.js` (segments, branching, linear order), `scenes.js` (animation), `vo/` (voice clips), MP4s 16:9 and 9:16, SRTs, posters |
 | `shared/` | `kit.css`/`kit.js` (the page chrome in the Paruto apps style: glass nav, FR/EN segmented control, light/dark toggle, panels), the player, its styles and the illustration kit shared by the modules |
-| `audio/` | Radio/podcast capsules: `capsules.js` (scripts), one folder per episode with MP3 and WAV per language, `cues.js` |
+| `audio/` | Radio/podcast capsules: `capsules.js` (scripts), one folder per episode with MP3 and WAV per language (FLAC instead of WAV for an episode whose WAV would pass the site's 25 MiB file limit), `cues.js` |
 | `storyboards/<module>/` | Generated storyboards (frames, direction, narration, interactions, branching map) |
 | `guide/` | Deployment guide (web, WhatsApp, community radio, updating) |
 | `recording/` | Local-language recording kit: instructions, glossary, one CSV of lines per module |

@@ -72,6 +72,13 @@ const G = [
   ['CIPV (santé des végétaux)', 'IPPC (plant health)', 'CIPV (sanidade vegetal)'],
   ['CEDEAO', 'ECOWAS', 'CEDEAO'],
   ['UEMOA', 'WAEMU', 'UEMOA'],
+  ['évaluation du risque', 'risk assessment', 'avaliação do risco'],
+  ['niveau de protection', 'level of protection', 'nível de proteção'],
+  ['équivalence (des mesures)', 'equivalence (of measures)', 'equivalência (das medidas)'],
+  ['zone indemne', 'disease-free area', 'zona indemne'],
+  ['point d’information SPS', 'SPS enquiry point', 'ponto de informação SPS'],
+  ['limite maximale de résidus', 'maximum residue limit', 'limite máximo de resíduos'],
+  ['substituts du lait maternel', 'breast-milk substitutes', 'substitutos do leite materno'],
 ];
 fs.writeFileSync(path.join(out, 'glossary.csv'), '﻿' + [['fr', 'en', 'pt', ...LOCAL.map(([c]) => c), 'notes'].join(','), ...G.map((g) => [...g, '', '', '', '', '', ''].map(csvCell).join(','))].join('\n'));
 files.push('glossary.csv');

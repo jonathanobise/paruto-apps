@@ -31,25 +31,25 @@ for (const ep of fs.readdirSync(path.join(root, 'audio'))) {
   for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.mp3'))) {
     const lang = f.match(/-([a-z]{2})\.mp3$/)[1], base = f.slice(0, -4);
     media.audio[ep] = media.audio[ep] || {};
-    media.audio[ep][lang] = { mp3: file(dir, f), wav: file(dir, base + '.wav'), duration: Math.round(probe(path.join(dir, f)) * 10) / 10 };
+    media.audio[ep][lang] = { mp3: file(dir, f), wav: file(dir, base + '.wav') || file(dir, base + '.flac'), duration: Math.round(probe(path.join(dir, f)) * 10) / 10 };
   }
 }
 
-// editable sources: everything needed to change words, art, voices and re-render (not the big MP4/WAV outputs)
+// editable sources: everything needed to change words, art, voices and re-render (not the finished MP4, capsule and WAV/FLAC outputs)
 const zipName = 'paruto-media-sps-kit-sources.zip', zipPath = path.join(root, 'downloads', zipName);
 fs.mkdirSync(path.dirname(zipPath), { recursive: true });
 if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 execFileSync('python3', ['-I', '-c', `
 import os, sys, zipfile
 root, out = sys.argv[1], sys.argv[2]
-skip_ext = ('.mp4', '.wav', '.jpg', '.zip')
+skip_ext = ('.mp4', '.wav', '.flac', '.jpg', '.zip')
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
     for top in ['shared', 'videos', 'audio', 'tools', 'README.md']:
         p = os.path.join(root, top)
         if os.path.isfile(p): z.write(p, os.path.join('sps-kit', top)); continue
         for d, _, fs in os.walk(p):
             for f in fs:
-                if f.endswith(skip_ext) or f.startswith('.'): continue
+                if f.endswith(skip_ext) or f.startswith(('.', 'capsule-')): continue  # finished capsules are on the page
                 full = os.path.join(d, f); z.write(full, os.path.join('sps-kit', os.path.relpath(full, root)))
 `, root, zipPath]);
 media.zip = file(path.dirname(zipPath), zipName);

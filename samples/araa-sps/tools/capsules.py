@@ -6,7 +6,8 @@ For each episode and language: a short synthesised kalimba jingle, the host and 
 lines (Piper text-to-speech scratch voices, or studio recordings in
 audio/<episode>/rec/<lang>/NN-<role>.wav, which also add a local language), a sting before the closing line, the credit and
 an outro jingle. Writes audio/<episode>/capsule-<n>-<episode>-<lang>.mp3 (podcast, -16 LUFS,
-128 kb/s) and .wav (broadcast, mono 16-bit 44.1 kHz, EBU R128 -23 LUFS), plus audio/cues.js
+128 kb/s) and .wav (broadcast, mono 16-bit 44.1 kHz, EBU R128 -23 LUFS; .flac, the same audio
+losslessly compressed, when the WAV would pass 24 MiB), plus audio/cues.js
 (durations and in/out cues for the cue sheet).
 
 Voices (huggingface.co/rhasspy/piper-voices): fr_FR-siwis-medium (CC BY 4.0), fr_FR-mls-medium
@@ -125,8 +126,13 @@ def write(out, base):
         src = os.path.join(tmpd, 'mix.wav')
         with wave.open(src, 'wb') as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes(pcm.tobytes())
+        # the broadcast master is a WAV; a long episode's WAV would pass the 25 MiB a static file may weigh
+        # on the site, so it becomes a FLAC: the same lossless 44.1 kHz 16-bit audio at about a third of the size
+        bc = ('.flac', ['-ac', '1', '-sample_fmt', 's16', '-c:a', 'flac', '-compression_level', '8']) if len(out) * 2 > 24 * 2**20 else ('.wav', ['-ac', '1', '-c:a', 'pcm_s16le'])
+        for stale in ['.wav', '.flac']:
+            if stale != bc[0] and os.path.exists(base + stale): os.remove(base + stale)
         for target, ext, codec in [(-16, '.mp3', ['-ac', '2', '-c:a', 'libmp3lame', '-b:a', '128k', '-metadata', 'artist=Paruto Media']),
-                                   (-23, '.wav', ['-ac', '1', '-c:a', 'pcm_s16le'])]:
+                                   (-23, *bc)]:
             first = os.path.join(tmpd, 'pass1.wav')
             subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', src, '-af', f'loudnorm=I={target}:TP=-2:LRA=11', '-ar', str(SR), '-c:a', 'pcm_s16le', first], check=True)
             trim = target - loudness(first)

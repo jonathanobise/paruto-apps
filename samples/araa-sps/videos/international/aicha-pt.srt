@@ -11,45 +11,189 @@ Aïcha dirige um pequeno matadouro. Compradores de uma grande cidade costeira qu
 Mas pedem uma garantia: esta carne é segura?
 
 4
-00:00:18,900 --> 00:00:26,000
-Para o comércio, a OMC tem um acordo sobre medidas sanitárias e fitossanitárias: o Acordo SPS.
+00:00:18,900 --> 00:00:26,200
+A cidade fica num país vizinho, que fixa as suas próprias regras sanitárias para a carne que entra.
 
 5
-00:00:26,000 --> 00:00:36,000
-Apoia-se em três referências: o Codex Alimentarius para os alimentos, a OMSA para a saúde animal e a CIPV para os vegetais.
+00:00:26,200 --> 00:00:33,600
+Se cada país inventasse as suas próprias regras, cada fronteira exigiria outra coisa.
 
 6
-00:00:36,500 --> 00:00:40,800
-Uma vaca recebeu um antibiótico ontem. O que faz Aïcha?
+00:00:33,600 --> 00:00:42,200
+Por isso, os países acordaram princípios comuns, na Organização Mundial do Comércio.
 
 7
-00:00:41,000 --> 00:00:47,000
-Resposta 2: respeita-se o intervalo de segurança para evitar resíduos na carne.
+00:00:42,900 --> 00:00:48,000
+O Acordo SPS da OMC começa por um direito:
 
 8
-00:00:47,500 --> 00:00:52,000
-Antes do abate, o veterinário inspeciona os animais vivos.
+00:00:48,000 --> 00:00:56,200
+cada país pode proteger a vida e a saúde das pessoas, dos animais e das plantas.
 
 9
-00:00:52,000 --> 00:00:57,800
-Depois do abate, inspeciona cada carcaça e aplica o carimbo de inspeção.
+00:00:56,900 --> 00:01:04,000
+Mas este direito tem limites. Uma medida deve assentar em princípios e provas científicas.
 
 10
-00:00:57,800 --> 00:01:03,800
-Instalações limpas, água potável, roupa de trabalho: a higiene protege o consumidor.
+00:01:04,000 --> 00:01:09,800
+Só se aplica na medida necessária para proteger a saúde.
 
 11
-00:01:04,300 --> 00:01:09,000
-A carne está pronta para partir para a cidade.
+00:01:09,800 --> 00:01:16,400
+Não deve discriminar entre países onde existam as mesmas condições.
 
 12
-00:01:09,500 --> 00:01:14,500
-Num camião frigorífico, a cadeia de frio nunca é interrompida.
+00:01:16,400 --> 00:01:22,300
+E nunca deve servir de barreira disfarçada ao comércio.
 
 13
-00:01:14,500 --> 00:01:21,200
-Regras baseadas nas mesmas normas internacionais facilitam o comércio entre países.
+00:01:22,900 --> 00:01:30,400
+Para escolher uma medida, um país avalia primeiro o risco, com os métodos das organizações internacionais.
 
 14
-00:01:57,700 --> 00:02:06,400
+00:01:30,400 --> 00:01:38,200
+Tem em conta as provas científicas, os métodos de criação e de transformação, e as doenças presentes.
+
+15
+00:01:38,200 --> 00:01:46,200
+Depois escolhe uma medida que protege o suficiente, sem restringir o comércio mais do que o necessário.
+
+16
+00:01:46,900 --> 00:01:54,000
+Para aproximar as regras, o Acordo pede que as medidas se baseiem nas normas internacionais.
+
+17
+00:01:54,000 --> 00:02:04,000
+Três organizações elaboram-nas: o Codex Alimentarius para os alimentos, a OMSA para a saúde animal e a CIPV para as plantas.
+
+18
+00:02:04,500 --> 00:02:12,600
+Uma medida conforme a estas normas presume-se necessária e conforme ao Acordo.
+
+19
+00:02:12,600 --> 00:02:21,800
+Um país pode proteger de forma mais estrita do que a norma, mas precisa de uma justificação científica.
+
+20
+00:02:22,500 --> 00:02:26,800
+Uma vaca recebeu um antibiótico ontem. O que faz Aïcha?
+
+21
+00:02:27,000 --> 00:02:33,000
+Resposta 2: respeita-se o intervalo de segurança para evitar resíduos na carne.
+
+22
+00:02:33,500 --> 00:02:38,000
+Antes do abate, o veterinário inspeciona os animais vivos.
+
+23
+00:02:38,000 --> 00:02:43,800
+Depois do abate, inspeciona cada carcaça e aplica o carimbo de inspeção.
+
+24
+00:02:43,800 --> 00:02:49,800
+Instalações limpas, água potável, roupa de trabalho: a higiene protege o consumidor.
+
+25
+00:02:50,300 --> 00:02:56,800
+O país dos compradores não controla a carne exatamente como o de Aïcha.
+
+26
+00:02:56,800 --> 00:03:04,400
+Segundo o artigo 4.º, o importador deve aceitar medidas diferentes como equivalentes,
+
+27
+00:03:04,400 --> 00:03:13,600
+se o país exportador demonstrar objetivamente que atingem o nível de proteção do importador.
+
+28
+00:03:14,300 --> 00:03:22,000
+O exportador fornece os dados científicos e técnicos, e dá acesso a inspeções e testes.
+
+29
+00:03:22,000 --> 00:03:29,800
+A pedido, o importador explica o risco visado pela sua medida, e responde normalmente no prazo de seis meses.
+
+30
+00:03:29,800 --> 00:03:37,600
+Entretanto, o comércio em curso continua: um pedido não é razão para o interromper.
+
+31
+00:03:38,300 --> 00:03:46,000
+Numa manhã, é detetada febre aftosa numa região longe da de Aïcha.
+
+32
+00:03:46,000 --> 00:03:55,600
+Todo o país tem de parar de vender? O artigo 6.º pede que as medidas se adaptem à situação sanitária de cada zona.
+
+33
+00:03:56,300 --> 00:04:00,600
+O que deve fazer o país de Aïcha?
+
+34
+00:04:00,800 --> 00:04:06,800
+Resposta 2: declarar o foco, controlar a zona e provar que as outras zonas estão indemnes.
+
+35
+00:04:07,300 --> 00:04:14,000
+O foco é declarado à OMSA e a zona é colocada sob controlo.
+
+36
+00:04:14,000 --> 00:04:20,600
+Com vigilância e controlos, o país prova que as outras zonas estão livres da doença,
+
+37
+00:04:20,600 --> 00:04:26,600
+e os compradores podem continuar a aceitar a carne dessas zonas.
+
+38
+00:04:27,300 --> 00:04:34,600
+Os controlos também têm regras. As inspeções fazem-se sem atrasos injustificados,
+
+39
+00:04:34,600 --> 00:04:41,000
+e os produtos importados não são tratados pior do que os produtos locais.
+
+40
+00:04:41,000 --> 00:04:48,800
+As regras também devem ser conhecidas: cada país publica as suas medidas e notifica as alterações à OMC,
+
+41
+00:04:48,800 --> 00:04:56,600
+e mantém um ponto de informação que responde a perguntas sobre essas medidas.
+
+42
+00:04:57,300 --> 00:05:02,000
+A carne está pronta para partir para a cidade.
+
+43
+00:05:02,500 --> 00:05:10,200
+Como transportar a carne até à cidade?
+
+44
+00:05:10,500 --> 00:05:15,500
+Num camião frigorífico, a cadeia de frio nunca é interrompida.
+
+45
+00:05:15,500 --> 00:05:22,200
+Regras baseadas nas mesmas normas internacionais facilitam o comércio entre países.
+
+46
+00:05:22,700 --> 00:05:31,800
+Outro texto internacional protege os mais pequenos: o Código Internacional de Comercialização de Substitutos do Leite Materno, da OMS.
+
+47
+00:05:31,800 --> 00:05:40,800
+Protege o aleitamento: estes produtos não devem ser publicitados ao público, nem dadas amostras grátis às mães.
+
+48
+00:05:40,800 --> 00:05:48,000
+E os rótulos devem lembrar a superioridade do aleitamento materno.
+
+49
+00:07:00,700 --> 00:07:10,000
+Quatro princípios a reter: a ciência, normas comuns, a equivalência e as zonas indemnes.
+
+50
+00:07:10,700 --> 00:07:19,400
 Normas comuns para uma carne segura e mercados abertos.

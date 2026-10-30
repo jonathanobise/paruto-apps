@@ -19,18 +19,18 @@ window.SPS_CUES = {
  },
  "international": {
   "fr": {
-   "duration": 80.7,
-   "in": "Bienvenue dans « Santé animale",
+   "duration": 476.8,
+   "in": "Bienvenue dans « Santé animale, marchés",
    "out": "Une production Paruto Media."
   },
   "en": {
-   "duration": 74.2,
-   "in": "Welcome to Healthy Animals",
+   "duration": 440.5,
+   "in": "Welcome to Healthy Animals, Open Markets,",
    "out": "A Paruto Media production."
   },
   "pt": {
-   "duration": 74.5,
-   "in": "Bem-vindos a «Animais saudáveis",
+   "duration": 453.2,
+   "in": "Bem-vindos a «Animais saudáveis, mercados abertos»,",
    "out": "Uma produção Paruto Media."
   }
  },

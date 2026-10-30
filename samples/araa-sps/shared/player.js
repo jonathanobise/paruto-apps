@@ -230,7 +230,7 @@
     if (state.qi < SCRIPT.quiz.length - 1) { state.qi++; fillQuiz(state.qi); voPlay(`quiz-${state.qi}-q`); }
     else { quiz.classList.add('scored'); $('.score-num', quiz).textContent = `${state.score}/${SCRIPT.quiz.length}`; }
   });
-  $('.score-go', quiz).addEventListener('click', () => go('recap'));
+  $('.score-go', quiz).addEventListener('click', () => go(Object.values(TL.segments).find((s) => s.kind === 'quiz').next));
 
   // chrome
   function renderChapters() {
