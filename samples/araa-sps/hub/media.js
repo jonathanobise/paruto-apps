@@ -7,15 +7,15 @@ window.SPS_MEDIA = {
     "fr": {
      "mp4": {
       "name": "moussa-fr.mp4",
-      "bytes": 3962735
+      "bytes": 11728476
      },
      "vertical": {
       "name": "moussa-fr-vertical.mp4",
-      "bytes": 3233457
+      "bytes": 10750248
      },
      "srt": {
       "name": "moussa-fr.srt",
-      "bytes": 1528
+      "bytes": 6532
      },
      "poster": {
       "name": "moussa-fr-poster.jpg",
@@ -25,15 +25,15 @@ window.SPS_MEDIA = {
     "en": {
      "mp4": {
       "name": "moussa-en.mp4",
-      "bytes": 3815445
+      "bytes": 11160630
      },
      "vertical": {
       "name": "moussa-en-vertical.mp4",
-      "bytes": 3008719
+      "bytes": 9962470
      },
      "srt": {
       "name": "moussa-en.srt",
-      "bytes": 1384
+      "bytes": 5738
      },
      "poster": {
       "name": "moussa-en-poster.jpg",
@@ -43,15 +43,15 @@ window.SPS_MEDIA = {
     "pt": {
      "mp4": {
       "name": "moussa-pt.mp4",
-      "bytes": 3762643
+      "bytes": 11008962
      },
      "vertical": {
       "name": "moussa-pt-vertical.mp4",
-      "bytes": 3039552
+      "bytes": 9931897
      },
      "srt": {
       "name": "moussa-pt.srt",
-      "bytes": 1444
+      "bytes": 6142
      },
      "poster": {
       "name": "moussa-pt-poster.jpg",
@@ -59,7 +59,7 @@ window.SPS_MEDIA = {
      }
     }
    },
-   "duration": 112.6,
+   "duration": 422.6,
    "storyThumb": {
     "en": "storyboards/ecowas/img/meet-2.jpg",
     "fr": "storyboards/ecowas/img/meet-2-fr.jpg"
@@ -135,15 +135,15 @@ window.SPS_MEDIA = {
     "fr": {
      "mp4": {
       "name": "koffi-fr.mp4",
-      "bytes": 3903763
+      "bytes": 11564003
      },
      "vertical": {
       "name": "koffi-fr-vertical.mp4",
-      "bytes": 3259115
+      "bytes": 10252534
      },
      "srt": {
       "name": "koffi-fr.srt",
-      "bytes": 1672
+      "bytes": 6519
      },
      "poster": {
       "name": "koffi-fr-poster.jpg",
@@ -153,15 +153,15 @@ window.SPS_MEDIA = {
     "en": {
      "mp4": {
       "name": "koffi-en.mp4",
-      "bytes": 3875754
+      "bytes": 11024154
      },
      "vertical": {
       "name": "koffi-en-vertical.mp4",
-      "bytes": 3173942
+      "bytes": 9671085
      },
      "srt": {
       "name": "koffi-en.srt",
-      "bytes": 1505
+      "bytes": 5669
      },
      "poster": {
       "name": "koffi-en-poster.jpg",
@@ -171,15 +171,15 @@ window.SPS_MEDIA = {
     "pt": {
      "mp4": {
       "name": "koffi-pt.mp4",
-      "bytes": 3787592
+      "bytes": 10884231
      },
      "vertical": {
       "name": "koffi-pt-vertical.mp4",
-      "bytes": 3114345
+      "bytes": 9556883
      },
      "srt": {
       "name": "koffi-pt.srt",
-      "bytes": 1569
+      "bytes": 6127
      },
      "poster": {
       "name": "koffi-pt-poster.jpg",
@@ -187,7 +187,7 @@ window.SPS_MEDIA = {
      }
     }
    },
-   "duration": 125,
+   "duration": 424,
    "storyThumb": {
     "en": "storyboards/waemu/img/meet-2.jpg",
     "fr": "storyboards/waemu/img/meet-2-fr.jpg"
@@ -199,35 +199,35 @@ window.SPS_MEDIA = {
    "en": {
     "mp3": {
      "name": "capsule-2-ecowas-en.mp3",
-     "bytes": 1103062
+     "bytes": 6987509
     },
     "wav": {
-     "name": "capsule-2-ecowas-en.wav",
-     "bytes": 6073934
+     "name": "capsule-2-ecowas-en.flac",
+     "bytes": 13211323
     },
-    "duration": 68.9
+    "duration": 436.7
    },
    "fr": {
     "mp3": {
      "name": "capsule-2-ecowas-fr.mp3",
-     "bytes": 1144440
+     "bytes": 7459803
     },
     "wav": {
-     "name": "capsule-2-ecowas-fr.wav",
-     "bytes": 6302284
+     "name": "capsule-2-ecowas-fr.flac",
+     "bytes": 12138077
     },
-    "duration": 71.5
+    "duration": 466.2
    },
    "pt": {
     "mp3": {
      "name": "capsule-2-ecowas-pt.mp3",
-     "bytes": 1133155
+     "bytes": 7273811
     },
     "wav": {
-     "name": "capsule-2-ecowas-pt.wav",
-     "bytes": 6240844
+     "name": "capsule-2-ecowas-pt.flac",
+     "bytes": 12310191
     },
-    "duration": 70.8
+    "duration": 454.6
    }
   },
   "international": {
@@ -269,41 +269,41 @@ window.SPS_MEDIA = {
    "en": {
     "mp3": {
      "name": "capsule-3-waemu-en.mp3",
-     "bytes": 1085926
+     "bytes": 6921054
     },
     "wav": {
-     "name": "capsule-3-waemu-en.wav",
-     "bytes": 5979724
+     "name": "capsule-3-waemu-en.flac",
+     "bytes": 12801845
     },
-    "duration": 67.8
+    "duration": 432.5
    },
    "fr": {
     "mp3": {
      "name": "capsule-3-waemu-fr.mp3",
-     "bytes": 1089269
+     "bytes": 7350298
     },
     "wav": {
-     "name": "capsule-3-waemu-fr.wav",
-     "bytes": 5998156
+     "name": "capsule-3-waemu-fr.flac",
+     "bytes": 11873816
     },
-    "duration": 68
+    "duration": 459.4
    },
    "pt": {
     "mp3": {
      "name": "capsule-3-waemu-pt.mp3",
-     "bytes": 1030337
+     "bytes": 7219059
     },
     "wav": {
-     "name": "capsule-3-waemu-pt.wav",
-     "bytes": 5673548
+     "name": "capsule-3-waemu-pt.flac",
+     "bytes": 12122570
     },
-    "duration": 64.4
+    "duration": 451.2
    }
   }
  },
  "zip": {
   "name": "paruto-media-sps-kit-sources.zip",
-  "bytes": 11175500
+  "bytes": 20763470
  },
  "built": "2026-10-30"
 };

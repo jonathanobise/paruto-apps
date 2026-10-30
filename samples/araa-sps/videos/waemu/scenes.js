@@ -361,8 +361,8 @@
       const k = stall('ks2', 640, 610, 1, 'butcher');
       return `${cityBg()}${k.back}${koffi()}${k.front}${person('vet')}
         ${mode === 'duties'
-          ? `${[0, 1, 2].map((i) => chip('du du' + i, 360, 'duties.' + i, { fill: i ? '#FFF8EC' : C.green, color: i ? C.ink : '#FFF6E6' })).join('')}${notebook('nbk2')}`
-          : `${chip('inf', 330, 'informL', { fill: '#FFF8EC', tx: 20, icon: `<g transform="translate(-132 0) scale(.6)">${ic.envelope}</g>` })}${chip('prot', 330, 'protect', { fill: C.green, color: '#FFF6E6' })}
+          ? `${[0, 1, 2].map((i) => chip('du du' + i, 410, 'duties.' + i, { fill: i ? '#FFF8EC' : C.green, color: i ? C.ink : '#FFF6E6' })).join('')}${notebook('nbk2')}`
+          : `${chip('inf', 380, 'informL', { fill: '#FFF8EC', tx: 20, icon: `<g transform="translate(-158 0) scale(.6)">${ic.envelope}</g>` })}${chip('prot', 380, 'protect', { fill: C.green, color: '#FFF6E6' })}
              ${g1('auth', `${card(140, 110)}<g transform="scale(1.1)">${building}</g>`)}${g1('envI', ic.envelope)}
              ${[0, 1, 2].map((i) => chip('pw pw' + i, 280, 'powers.' + i, { fill: C.red, color: '#FFF6E6' })).join('')}${chip('loc', 470, 'local', { fill: '#FFF8EC', size: 22 })}`}`;
     },
@@ -448,10 +448,10 @@
       ${[0, 1, 2, 3].map((i) => g1('we we' + i, ic.envelope)).join('')}${g1('wdoc', ic.doc)}${g1('wship', shipW)}
       ${[0, 1, 2].map((i) => g1('wx wx' + i, ic.redX)).join('')}${[0, 1, 2].map((i) => check('wk wk' + i)).join('')}
       ${badge('bVet', 'vetAuth', ic.info)}${badge('bCom', 'commission', ic.globe)}${badge('bWoah', 'woah', cowBadge)}
-      ${chip('cForm', 280, 'form', { fill: '#FFF8EC', tx: 18, icon: `<g transform="translate(-112 0) scale(.6)">${ic.doc}</g>` })}${chip('cPer', 300, 'perimeter', { fill: C.red, color: '#FFF6E6' })}
+      ${chip('cForm', 320, 'form', { fill: '#FFF8EC', tx: 18, icon: `<g transform="translate(-132 0) scale(.6)">${ic.doc}</g>` })}${chip('cPer', 300, 'perimeter', { fill: C.red, color: '#FFF6E6' })}
       ${chip('cNet', 280, 'alertNet', { fill: C.teal, color: '#FFF6E6' })}${chip('cSafe', 330, 'safeguard', { fill: '#FFF8EC' })}${chip('cOver', 280, 'over', { fill: C.green, color: '#FFF6E6' })}
       ${chip('cRest', 380, 'restricted', { fill: C.red, color: '#FFF6E6' })}${chip('cVet', 330, 'certVet', { fill: '#FFF8EC' })}${chip('cSal', 330, 'salubrity', { fill: '#FFF8EC' })}${chip('cPart', 330, 'partial', { fill: C.red, color: '#FFF6E6' })}
-      ${chip('cFree', 300, 'freeLbl', { fill: C.green, color: '#FFF6E6' })}${chip('cSell', 400, 'sellAny', { fill: '#FFF8EC' })}${[0, 1, 2].map((i) => chip('cs cs' + i, 230, 'simple.' + i, { fill: '#EAF0F7', color: C.indigo })).join('')}`,
+      ${chip('cFree', 300, 'freeLbl', { fill: C.green, color: '#FFF6E6' })}${chip('cSell', 460, 'sellAny', { fill: '#FFF8EC' })}${[0, 1, 2].map((i) => chip('cs cs' + i, 230, 'simple.' + i, { fill: '#EAF0F7', color: C.indigo })).join('')}`,
     init(g) {
       const q = (s) => g.querySelector(s), qa = (s) => [...g.querySelectorAll(s)];
       ['la', 'lb', 'lc', 'hotA', 'hotC', 'ringW', 'wcow', 'wdoc', 'wship', 'bVet', 'bCom', 'bWoah', 'cForm', 'cPer', 'cNet', 'cSafe', 'cOver', 'cRest', 'cVet', 'cSal', 'cPart', 'cFree', 'cSell'].forEach((k) => (this[k] = q('.' + k)));

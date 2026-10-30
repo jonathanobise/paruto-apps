@@ -16,40 +16,180 @@ In WAEMU, Regulation No. 007/2007/CM/UEMOA sets common rules for the safety of p
 
 5
 00:00:28,600 --> 00:00:33,400
-Every actor in the chain is responsible for the safety of what they sell.
+Every food business in the chain answers for the safety of what it sells.
 
 6
-00:00:33,900 --> 00:00:39,800
-A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?
+00:00:33,900 --> 00:00:41,000
+The regulation rests on common principles: measures follow international standards.
 
 7
-00:00:41,600 --> 00:00:46,600
-Answer 2: only buy inspected meat, with the abattoir stamp.
+00:00:41,000 --> 00:00:47,400
+Risks are assessed on scientific data, and measures stay in proportion to them.
 
 8
-00:00:47,100 --> 00:00:51,400
-Koffi buys inspected meat at the abattoir, with its stamp.
+00:00:47,400 --> 00:00:54,000
+Faced with a risk of serious harm, a lack of full scientific certainty is no excuse to wait.
 
 9
-00:00:51,400 --> 00:00:57,200
-In his notebook he records every purchase: the date, the supplier, where the animals came from.
+00:00:54,000 --> 00:00:59,200
+And risks are explained to consumers and professionals.
 
 10
-00:00:57,200 --> 00:01:02,000
-That is traceability: knowing where a product comes from and where it goes.
+00:00:59,900 --> 00:01:07,000
+Who does what? Under the WAEMU Commission, a regional committee advises, backed by the Veterinary Committee.
 
 11
-00:01:02,600 --> 00:01:07,900
-One day, the veterinary services issue an alert about a batch of meat.
+00:01:07,000 --> 00:01:13,400
+Networks of experts, laboratories and alerts link the member states.
 
 12
-00:01:08,500 --> 00:01:14,300
-Thanks to the notebook, the batch is found and withdrawn. The rest of the market carries on.
+00:01:13,400 --> 00:01:19,800
+Each state has a veterinary administration and a national food safety body,
 
 13
-00:01:14,300 --> 00:01:20,700
-In WAEMU, member states cooperate and share alerts to protect consumers.
+00:01:19,800 --> 00:01:25,200
+and an advisory council where consumers also have a seat.
 
 14
-00:01:51,300 --> 00:02:00,000
+00:01:25,900 --> 00:01:31,800
+A trader offers Koffi cheaper meat with no inspection stamp. What does Koffi do?
+
+15
+00:01:33,600 --> 00:01:38,600
+Answer 2: only buy inspected meat, with the abattoir stamp.
+
+16
+00:01:39,100 --> 00:01:43,400
+Koffi buys inspected meat at the abattoir, with its stamp.
+
+17
+00:01:43,400 --> 00:01:49,200
+In his notebook he records every purchase: the date, the supplier, where the animals came from.
+
+18
+00:01:49,200 --> 00:01:54,000
+That is traceability: knowing where a product comes from and where it goes.
+
+19
+00:01:54,600 --> 00:02:01,900
+The rule is clear: food businesses answer for what they sell, and sell only safe products.
+
+20
+00:02:01,900 --> 00:02:09,900
+Each one checks its own operations at every stage: production, processing, storage and distribution.
+
+21
+00:02:09,900 --> 00:02:17,900
+And each must be able to show inspectors its own checks and the trade records for its food.
+
+22
+00:02:18,600 --> 00:02:23,900
+One day, the veterinary services issue an alert about a batch of meat.
+
+23
+00:02:24,500 --> 00:02:30,300
+Thanks to the notebook, the batch is found and withdrawn. The rest of the market carries on.
+
+24
+00:02:30,300 --> 00:02:36,700
+In WAEMU, member states cooperate and share alerts to protect consumers.
+
+25
+00:02:37,300 --> 00:02:46,400
+If a business thinks a food it has sold may harm health, it must inform the authorities and act to protect consumers.
+
+26
+00:02:46,400 --> 00:02:53,400
+In serious danger, the national food safety body can suspend sales, withdraw the food or have it destroyed.
+
+27
+00:02:53,400 --> 00:03:00,600
+In an emergency, local authorities can act for up to a month, informing that body within 24 hours.
+
+28
+00:03:01,300 --> 00:03:08,600
+In 2009, WAEMU listed the animal diseases that must be notified: more than one hundred and twenty.
+
+29
+00:03:08,600 --> 00:03:16,600
+Among them: foot-and-mouth disease, contagious bovine pleuropneumonia, peste des petits ruminants and anthrax.
+
+30
+00:03:16,600 --> 00:03:24,600
+One morning, a herder offers Koffi cattle that are drooling, with sores in their mouths.
+
+31
+00:03:25,300 --> 00:03:29,600
+What does Koffi do?
+
+32
+00:03:33,000 --> 00:03:37,800
+Answer 2: he refuses and alerts the veterinary services.
+
+33
+00:03:38,300 --> 00:03:45,600
+Any suspicion must be brought to the veterinary authority at once.
+
+34
+00:03:45,600 --> 00:03:53,600
+The state notifies the WAEMU Commission immediately, in writing, on WOAH’s form.
+
+35
+00:03:53,600 --> 00:04:01,600
+It declares the infection and applies measures within a defined area.
+
+36
+00:04:02,300 --> 00:04:09,600
+In a health crisis, states warn the Commission and each other at once through the alert network.
+
+37
+00:04:09,600 --> 00:04:15,600
+They take safeguard measures, and inform WOAH when animals are affected.
+
+38
+00:04:15,600 --> 00:04:19,600
+The measures end once the crisis is eradicated.
+
+39
+00:04:20,300 --> 00:04:27,600
+Animals sent to another member state travel with a veterinary certificate from an official veterinarian.
+
+40
+00:04:27,600 --> 00:04:35,400
+Meat and animal products entering the Union carry a health certificate: healthy animals, hygienic handling.
+
+41
+00:04:35,400 --> 00:04:43,600
+In an epizootic, a state can restrict animals from just the affected parts of another state.
+
+42
+00:04:44,300 --> 00:04:51,600
+Food and animal products that meet the rules move freely across the Union.
+
+43
+00:04:51,600 --> 00:04:59,000
+Any business can sell in another member state the products it sells lawfully in its own.
+
+44
+00:04:59,000 --> 00:05:07,600
+And rules must stay coherent, simple and transparent, with no needless barriers to trade.
+
+45
+00:05:08,300 --> 00:05:15,000
+And when Koffi’s shop is inspected, he is entitled to transparency, impartiality and proportionality.
+
+46
+00:05:15,000 --> 00:05:21,600
+States give the people concerned a say and tell them about risks and the measures taken.
+
+47
+00:05:21,600 --> 00:05:27,600
+Awareness campaigns, like this one, help everyone detect and prevent health risks.
+
+48
+00:06:40,300 --> 00:06:49,600
+Four rules: safe products, good records, informing the authorities and reporting disease.
+
+49
+00:06:50,300 --> 00:06:59,000
 A safe chain, from herd to plate.

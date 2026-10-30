@@ -16,40 +16,180 @@ Dans l’UEMOA, le Règlement n°007/2007/CM/UEMOA fixe des règles communes de 
 
 5
 00:00:28,600 --> 00:00:33,400
-Chaque acteur de la chaîne est responsable de la sécurité de ce qu’il vend.
+Chaque opérateur du secteur alimentaire répond de la qualité sanitaire de ce qu’il vend.
 
 6
-00:00:33,900 --> 00:00:39,800
-Un vendeur propose à Koffi de la viande moins chère, sans cachet d’inspection. Que fait Koffi ?
+00:00:33,900 --> 00:00:41,000
+Le règlement repose sur des principes communs : les mesures suivent les normes internationales.
 
 7
-00:00:41,600 --> 00:00:46,600
-Réponse 2 : on n’achète que de la viande inspectée, avec le cachet de l’abattoir.
+00:00:41,000 --> 00:00:47,400
+Les risques sont évalués sur des données scientifiques, et les mesures leur restent proportionnées.
 
 8
-00:00:47,100 --> 00:00:51,400
-Koffi achète à l’abattoir une viande inspectée, avec son cachet.
+00:00:47,400 --> 00:00:54,000
+Face à un risque de dommage grave, l’absence de certitude scientifique absolue n’est pas un prétexte pour attendre.
 
 9
-00:00:51,400 --> 00:00:57,200
-Dans son cahier, il note chaque achat : la date, le fournisseur, l’origine des animaux.
+00:00:54,000 --> 00:00:59,200
+Et les risques sont expliqués aux consommateurs et aux professionnels.
 
 10
-00:00:57,200 --> 00:01:02,000
-C’est la traçabilité : savoir d’où vient un produit et où il va.
+00:00:59,900 --> 00:01:07,000
+Qui fait quoi ? Auprès de la Commission de l’UEMOA, un comité régional conseille, appuyé par le Comité vétérinaire.
 
 11
-00:01:02,600 --> 00:01:07,900
-Un jour, les services vétérinaires lancent une alerte sur un lot de viande.
+00:01:07,000 --> 00:01:13,400
+Des réseaux d’experts, de laboratoires et d’alerte relient les États membres.
 
 12
-00:01:08,500 --> 00:01:14,300
-Grâce au cahier, le lot est retrouvé et retiré. Le reste du marché continue.
+00:01:13,400 --> 00:01:19,800
+Chaque État a une administration vétérinaire et un organisme national de sécurité sanitaire des aliments,
 
 13
-00:01:14,300 --> 00:01:20,700
-Dans l’UEMOA, les États membres coopèrent et partagent les alertes pour protéger les consommateurs.
+00:01:19,800 --> 00:01:25,200
+ainsi qu’un conseil consultatif où siègent aussi les consommateurs.
 
 14
-00:01:51,300 --> 00:02:00,000
+00:01:25,900 --> 00:01:31,800
+Un vendeur propose à Koffi de la viande moins chère, sans cachet d’inspection. Que fait Koffi ?
+
+15
+00:01:33,600 --> 00:01:38,600
+Réponse 2 : on n’achète que de la viande inspectée, avec le cachet de l’abattoir.
+
+16
+00:01:39,100 --> 00:01:43,400
+Koffi achète à l’abattoir une viande inspectée, avec son cachet.
+
+17
+00:01:43,400 --> 00:01:49,200
+Dans son cahier, il note chaque achat : la date, le fournisseur, l’origine des animaux.
+
+18
+00:01:49,200 --> 00:01:54,000
+C’est la traçabilité : savoir d’où vient un produit et où il va.
+
+19
+00:01:54,600 --> 00:02:01,900
+La règle est claire : les opérateurs du secteur alimentaire répondent de ce qu’ils vendent, et ne vendent que des produits sûrs.
+
+20
+00:02:01,900 --> 00:02:09,900
+Chacun contrôle ses propres opérations, à toutes les étapes : production, transformation, stockage et distribution.
+
+21
+00:02:09,900 --> 00:02:17,900
+Et chacun doit pouvoir montrer aux inspecteurs ses autocontrôles et les informations commerciales sur ses denrées.
+
+22
+00:02:18,600 --> 00:02:23,900
+Un jour, les services vétérinaires lancent une alerte sur un lot de viande.
+
+23
+00:02:24,500 --> 00:02:30,300
+Grâce au cahier, le lot est retrouvé et retiré. Le reste du marché continue.
+
+24
+00:02:30,300 --> 00:02:36,700
+Dans l’UEMOA, les États membres coopèrent et partagent les alertes pour protéger les consommateurs.
+
+25
+00:02:37,300 --> 00:02:46,400
+Si un opérateur pense qu’une denrée qu’il a vendue peut nuire à la santé, il doit informer les autorités et agir pour protéger les consommateurs.
+
+26
+00:02:46,400 --> 00:02:53,400
+En cas de danger grave, l’organisme national peut suspendre la vente, retirer la denrée ou la faire détruire.
+
+27
+00:02:53,400 --> 00:03:00,600
+En urgence, les autorités locales peuvent agir un mois au plus, en informant l’organisme national dans les 24 heures.
+
+28
+00:03:01,300 --> 00:03:08,600
+En 2009, l’UEMOA a dressé la liste des maladies animales à déclaration obligatoire : plus de cent vingt.
+
+29
+00:03:08,600 --> 00:03:16,600
+Parmi elles : fièvre aphteuse, péripneumonie contagieuse bovine, peste des petits ruminants, fièvre charbonneuse.
+
+30
+00:03:16,600 --> 00:03:24,600
+Un matin, un éleveur propose à Koffi des bovins qui bavent, avec des plaies dans la bouche.
+
+31
+00:03:25,300 --> 00:03:29,600
+Que fait Koffi ?
+
+32
+00:03:33,000 --> 00:03:37,800
+Réponse 2 : il refuse et alerte les services vétérinaires.
+
+33
+00:03:38,300 --> 00:03:45,600
+Toute suspicion doit être portée immédiatement à la connaissance de l’autorité vétérinaire.
+
+34
+00:03:45,600 --> 00:03:53,600
+L’État notifie aussitôt la Commission de l’UEMOA, par écrit, sur le formulaire de l’OMSA.
+
+35
+00:03:53,600 --> 00:04:01,600
+Il déclare l’infection et applique des mesures dans un périmètre déterminé.
+
+36
+00:04:02,300 --> 00:04:09,600
+En cas de crise sanitaire, les États préviennent aussitôt la Commission et les autres États par le réseau d’alerte.
+
+37
+00:04:09,600 --> 00:04:15,600
+Ils prennent des mesures de sauvegarde et informent l’OMSA quand il s’agit des animaux.
+
+38
+00:04:15,600 --> 00:04:19,600
+Les mesures prennent fin une fois la crise éradiquée.
+
+39
+00:04:20,300 --> 00:04:27,600
+Les animaux envoyés vers un autre État membre voyagent avec un certificat vétérinaire délivré par un vétérinaire officiel.
+
+40
+00:04:27,600 --> 00:04:35,400
+La viande et les produits d’origine animale qui entrent dans l’Union ont un certificat de salubrité : animaux sains, hygiène respectée.
+
+41
+00:04:35,400 --> 00:04:43,600
+En cas d’épizootie, un État peut restreindre les animaux venant des seules parties du territoire touchées.
+
+42
+00:04:44,300 --> 00:04:51,600
+Les aliments et produits animaux conformes circulent librement dans l’Union.
+
+43
+00:04:51,600 --> 00:04:59,000
+Tout opérateur peut vendre dans un autre État membre les produits légalement commercialisés dans le sien.
+
+44
+00:04:59,000 --> 00:05:07,600
+Et les règles doivent rester cohérentes, simples et transparentes, sans entraves inutiles au commerce.
+
+45
+00:05:08,300 --> 00:05:15,000
+Et quand la boutique de Koffi est contrôlée, il a droit à la transparence, à l’impartialité et à la proportionnalité.
+
+46
+00:05:15,000 --> 00:05:21,600
+Les États associent les acteurs aux décisions et les informent des risques et des mesures prises.
+
+47
+00:05:21,600 --> 00:05:27,600
+Les campagnes de sensibilisation, comme celle-ci, aident chacun à détecter et prévenir les risques sanitaires.
+
+48
+00:06:40,300 --> 00:06:49,600
+Quatre règles : des produits sûrs, des justificatifs, l’information des autorités et le signalement des maladies.
+
+49
+00:06:50,300 --> 00:06:59,000
 Une chaîne sûre, du troupeau à l’assiette.

@@ -245,7 +245,7 @@
       ${chip('freec', 300, 'freeLbl', { fill: C.green, color: '#FFF6E6' })}${chip('mutc', 340, 'mutual', { fill: '#FFF8EC' })}
       ${[0, 1, 2].map((i) => chip('rt rt' + i, 260, 'rights.' + i, { fill: '#EAF0F7', color: C.indigo })).join('')}
       ${chip('postsc', 280, 'posts', { fill: C.teal, color: '#FFF6E6' })}${chip('notc', 440, 'notifiable', { fill: C.red, color: '#FFF6E6', size: 21 })}
-      ${chip('quarc', 240, 'quarantine', { fill: '#F7EBDD' })}${chip('reasc', 260, 'reasons', { fill: '#FFF8EC' })}
+      ${chip('quarc', 240, 'quarantine', { fill: '#F7EBDD' })}${chip('reasc', 300, 'reasons', { fill: '#FFF8EC' })}
       ${chip('season0', 230, 'seasons.0', { fill: '#F9E3BF' })}${chip('season1', 260, 'seasons.1', { fill: '#DCEAF2' })}
       ${g1('transCard', `${card(330, 150)}<g transform="translate(-112 0)">${ic.doc}</g><text x="30" y="0" text-anchor="middle" font-size="22" font-weight="800" fill="${C.ink}" data-t="transCert" data-wrap="16" data-lh="26"></text>`)}
       ${chip('marketc', 200, 'market', { fill: '#FFF8EC' })}${chip('perc', 300, 'perimeter', { fill: C.red, color: '#FFF6E6' })}
