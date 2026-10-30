@@ -19,10 +19,16 @@
 
   const T = {
     fr: {
+      heroT: 'Kit de *sensibilisation* SPS',
+      deck: 'Un échantillon concret de chaque livrable de l’appel : vidéos interactives sur les trois cadres, versions WhatsApp, capsules radio, storyboards, sources et guide de déploiement. Ouvrez-le, jouez-le, téléchargez-le.',
+      ctaPlay: 'Jouer un module', ctaAll: 'Tous les livrables', stageChip: 'Trois modules · environ 7 min chacun',
+      stats: [['vidéos interactives', 'd’environ 7 min, en français, anglais et portugais'], ['versions WhatsApp', 'en 16:9 et en vertical 9:16, sous-titres incrustés'], ['capsules radio', 'de 7 à 8 min, MP3 et FLAC pour la radio'], ['langues', '3 produites, 5 prêtes à enregistrer']],
+      noteShort: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. La narration est pour l’instant une voix de travail :', noteLink: 'comment les voix sont produites',
+      delivL: 'L’appel, point par point',
+      facts: ['11 chapitres', '3 choix à embranchements', 'quiz de 6 questions'], dlT: 'Téléchargements', dlSub: 'WhatsApp 16:9 et 9:16, sous-titres',
+      cueMore: 'fichiers', voicesT: 'À propos des voix', produced: 'Voix et sous-titres produits', ready: 'Script prêt, à enregistrer par des locuteurs natifs',
       nav: ['Approche', 'Cadrage · L1', 'Revue · L2', 'Vidéos', 'Audio', 'Langues', 'Sources et guide'],
       kicker: 'Réponse à l’AMI028-2026 de l’ARAA · Paruto Media',
-      title: 'Kit de sensibilisation SPS : un échantillon de chaque livrable',
-      lead: 'Pour ce dossier, Paruto Media a produit un exemple concret de chaque livrable demandé : des vidéos interactives sur les trois cadres (international, CEDEAO, UEMOA), leurs versions légères pour WhatsApp, des capsules audio pour la radio et le podcast, les storyboards, un guide de déploiement et les fichiers sources.',
       note: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. La narration en français, anglais et portugais est ici une voix de travail. En production, la phase de revue utilise des voix de synthèse haute fidélité, au rendu naturel : un laboratoire de pointe pour le français, l’anglais et le portugais, et la meilleure option trouvée pour chaque langue locale, avec un enregistrement en studio là où aucune voix de synthèse n’est assez bonne. Elles sont dirigées au studio Paruto Music et vérifiées par un locuteur natif. Après les avoir écoutées, l’ARAA décide, langue par langue, à la validation des scripts finaux, si le kit final les garde ou s’il est enregistré avec des voix humaines. Les trois modules sont en version complète, la durée que l’ARAA demande : les vidéos durent de 7 min 03 s à 7 min 24 s, et les capsules radio environ 7 minutes chacune.',
       tableHead: ['Livrable demandé', 'Ce que vous trouverez ici'],
       rows: [
@@ -38,7 +44,7 @@
       ],
       approachT: 'Une seule animation, plusieurs voix',
       approachL: 'Chaque histoire est animée une fois, presque sans texte à l’écran. Une nouvelle langue ne demande que la voix et les sous-titres : les 48 contenus restent cohérents, dans les délais et dans le budget.',
-      pipe: ['Textes de référence', 'Accord SPS, Codex, OMSA, CIPV, C/REG.21/11/10, Règlement 007/2007', 'Scénarios et storyboards', 'Validés avec les experts de l’ARAA', 'Animation maître', 'Décors et personnages sans texte', 'Voix et sous-titres', '8 langues, glossaire SPS validé', 'Vidéo interactive web', 'MP4 WhatsApp 16:9 et 9:16', 'Capsules radio MP3 et WAV'],
+      pipe: ['Textes de référence', 'Accord SPS, Codex, OMSA, CIPV, C/REG.21/11/10, Règlement 007/2007', 'Scénarios et storyboards', 'Validés avec les experts de l’ARAA', 'Animation maître', 'Décors et personnages sans texte', 'Voix et sous-titres', '8 langues, glossaire SPS validé', 'Vidéo interactive web', 'MP4 WhatsApp 16:9 et 9:16', 'Capsules radio MP3 et FLAC'],
       points: ['Interactivité intégrée : choix à embranchements avec leurs conséquences, quiz avec score.', 'Fonctionne dans tout navigateur, sur ordinateur et téléphone, sans application à installer.', 'Tout est généré depuis un seul script par module : textes, sous-titres, voix et vidéos restent synchronisés.'],
       inceptionT: 'Cadrage et storyboards · Livrable 1',
       inceptionL: 'Le rapport de démarrage fixe la méthode, le calendrier et les storyboards. Voici notre plan de travail et les storyboards des trois vidéos, plan par plan.',
@@ -55,7 +61,7 @@
       log: [['1', 'L2 · Vidéo CEDEAO', '00:40', 'Employer partout « certificat vétérinaire », le terme du règlement.', 'Terme harmonisé dans les trois langues et dans le glossaire.', 'Traité'], ['2', 'L2 · Capsule UEMOA', '00:35', 'Rappeler que le contrôle relève des services officiels.', 'Réplique ajoutée au vétérinaire.', 'Traité'], ['3', 'L2 · Vidéo internationale', 'Quiz, Q3', 'Revoir la formulation de la bonne réponse sur l’Accord SPS.', 'Proposition envoyée à l’expert SPS.', 'En cours']],
       videosT: 'Vidéos interactives · Livrable 3',
       videosL: 'Trois modules, un par cadre. Chacun : une histoire animée d’environ 7 minutes, trois choix à embranchements avec leurs conséquences et un quiz de six questions. Les versions WhatsApp montrent les bonnes réponses.',
-      play: 'Jouer la version interactive', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Sous-titres', sb: 'Storyboard',
+      play: 'Jouer le module', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Sous-titres', sb: 'Storyboard',
       audioT: 'Capsules audio · Livrable 3',
       audioL: 'Une émission, « Santé animale, marchés ouverts », un épisode par cadre : une animatrice et un vétérinaire, un jingle, trois messages clés. MP3 pour le podcast et WhatsApp, version radio normalisée (EBU R128, −23 LUFS) en FLAC : le son d’un WAV, sans perte, dans un fichier plus léger.',
       ep: 'Épisode', transcript: 'Transcription', cueT: 'Fiche de diffusion', cueHead: ['Épisode', 'Langue', 'Durée', 'Début', 'Fin', 'Fichiers'],
@@ -71,10 +77,16 @@
       min: 'min',
     },
     en: {
+      heroT: 'SPS awareness *kit*',
+      deck: 'A working sample of every deliverable in the call: interactive videos on the three frameworks, WhatsApp editions, radio capsules, storyboards, sources and a deployment guide. Open it, play it, download it.',
+      ctaPlay: 'Play a module', ctaAll: 'Every deliverable', stageChip: 'Three modules · about 7 min each',
+      stats: [['interactive videos', 'about 7 minutes each, in French, English and Portuguese'], ['WhatsApp editions', 'in 16:9 and vertical 9:16, with burned-in captions'], ['radio capsules', '7 to 8 minutes, MP3 and FLAC for radio'], ['languages', '3 produced, 5 ready to record']],
+      noteShort: 'Demonstration content, to be validated by ARAA’s technical experts. The narration is a scratch voice for now:', noteLink: 'how the voices are produced',
+      delivL: 'The call, item by item',
+      facts: ['11 chapters', '3 branching choices', '6-question quiz'], dlT: 'Downloads', dlSub: 'WhatsApp 16:9 and 9:16, subtitles',
+      cueMore: 'files', voicesT: 'About the voices', produced: 'Voice and captions produced', ready: 'Script ready, to be recorded by native speakers',
       nav: ['Approach', 'Inception · D1', 'Review · D2', 'Videos', 'Audio', 'Languages', 'Sources & guide'],
       kicker: 'Response to ARAA call AMI028-2026 · Paruto Media',
-      title: 'SPS awareness kit: a sample of every deliverable',
-      lead: 'For this bid, Paruto Media produced a working example of every deliverable in the call: interactive videos on all three frameworks (international, ECOWAS, WAEMU), their light WhatsApp versions, audio capsules for radio and podcast, storyboards, a deployment guide and the source files.',
       note: 'Demonstration content, to be validated by ARAA’s technical experts. The French, English and Portuguese narration here is a scratch voice. In production, the review phase uses high-fidelity, natural-sounding AI voices: a frontier lab for French, English and Portuguese, and the best option found for each local language, with studio recording where no AI voice is good enough. They are directed at the Paruto Music studio and checked by a native speaker. Having heard them, ARAA decides language by language, at final script approval, whether the final kit keeps them or is recorded live with human voices. All three modules are full length, as ARAA asks: the videos run 7 min 03 s to 7 min 24 s, and the radio capsules about 7 minutes each.',
       tableHead: ['Deliverable in the call', 'What you’ll find here'],
       rows: [
@@ -90,7 +102,7 @@
       ],
       approachT: 'One master, many voices',
       approachL: 'Each story is animated once, with almost no text on screen. A new language only needs voice and captions, so all 48 assets stay consistent, on time and on budget.',
-      pipe: ['Reference texts', 'SPS Agreement, Codex, WOAH, IPPC, C/REG.21/11/10, Regulation 007/2007', 'Scripts and storyboards', 'Validated with ARAA’s experts', 'Master animation', 'Sets and characters without text', 'Voices and captions', '8 languages, validated SPS glossary', 'Interactive web video', 'WhatsApp MP4, 16:9 and 9:16', 'Radio capsules, MP3 and WAV'],
+      pipe: ['Reference texts', 'SPS Agreement, Codex, WOAH, IPPC, C/REG.21/11/10, Regulation 007/2007', 'Scripts and storyboards', 'Validated with ARAA’s experts', 'Master animation', 'Sets and characters without text', 'Voices and captions', '8 languages, validated SPS glossary', 'Interactive web video', 'WhatsApp MP4, 16:9 and 9:16', 'Radio capsules, MP3 and FLAC'],
       points: ['Built-in interactivity: branching choices with consequences, and a quiz with a score.', 'Runs in any browser, on computers and phones, with no app to install.', 'Everything is generated from one script per module, so text, captions, voices and videos stay in sync.'],
       inceptionT: 'Inception and storyboards · Deliverable 1',
       inceptionL: 'The inception report sets the method, schedule and storyboards. Here are our workplan and the shot-by-shot storyboards of all three videos.',
@@ -107,7 +119,7 @@
       log: [['1', 'D2 · ECOWAS video', '00:40', 'Use “veterinary certificate”, the regulation’s term, throughout.', 'Term aligned in all three languages and the glossary.', 'Done'], ['2', 'D2 · WAEMU capsule', '00:35', 'Say that checks are carried out by the official services.', 'Line added for the veterinarian.', 'Done'], ['3', 'D2 · International video', 'Quiz, Q3', 'Rework the wording of the correct answer on the SPS Agreement.', 'Proposal sent to the SPS expert.', 'In progress']],
       videosT: 'Interactive videos · Deliverable 3',
       videosL: 'Three modules, one per framework. Each has an animated story of about 7 minutes, three branching choices with consequences, and a six-question quiz. The WhatsApp versions show the right answers.',
-      play: 'Play the interactive version', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Subtitles', sb: 'Storyboard',
+      play: 'Play the module', wa: 'WhatsApp 16:9', wav: 'WhatsApp 9:16', srt: 'Subtitles', sb: 'Storyboard',
       audioT: 'Audio capsules · Deliverable 3',
       audioL: 'One programme, “Healthy Animals, Open Markets”, with an episode per framework: a host and a veterinarian, a jingle, three key messages. MP3 for podcast and WhatsApp, a loudness-normalised radio version (EBU R128, −23 LUFS) as FLAC: WAV audio, lossless, in a smaller file.',
       ep: 'Episode', transcript: 'Transcript', cueT: 'Cue sheet', cueHead: ['Episode', 'Language', 'Length', 'In-cue', 'Out-cue', 'Files'],
@@ -132,6 +144,8 @@
   const ARROW = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   // last word in italic serif, as on apps.paruto.com (punctuation stays upright)
   const serifLast = (t) => { const m = String(t).match(/^(.*\s)(\S+?)([.!?…:]*)$/); return m ? `${esc(m[1])}<em>${esc(m[2])}</em>${esc(m[3])}` : esc(t); };
+  // *word* picks the serif word explicitly
+  const serifMark = (t) => esc(t).replace(/\*([^*]+)\*/, '<em>$1</em>');
 
   function pipeline(t) {
     const p = t.pipe, box = (x, y, w, h, a, b, strong) => `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="${strong ? 'color-mix(in srgb, var(--a) 14%, transparent)' : 'var(--panel-2)'}" stroke="${strong ? 'var(--a)' : 'var(--line-2)'}" stroke-width="${strong ? 2 : 1.2}"/><text x="${x + 16}" y="${y + 30}" class="pt">${esc(a)}</text>${b ? `<text x="${x + 16}" y="${y + 54}" class="ps">${esc(b)}</text>` : ''}</g>`;
@@ -163,15 +177,16 @@
   function videoCard(m, t) {
     const v = M.videos[m.id] || { files: {} }, f = (l, k) => (v.files[l] || {})[k];
     const dl = (k, label) => `<div class="dl-row"><span class="label">${label}</span>${['fr', 'en', 'pt'].map((l) => f(l, k) ? `<a class="chip" href="videos/${m.id}/${f(l, k).name}" download>${l.toUpperCase()}<small>${size(f(l, k).bytes)}</small></a>` : '').join('')}</div>`;
-    const poster = f(lang, 'poster') || f('en', 'poster') || f('fr', 'poster');
     return `<article class="vcard panel reveal">
-      <a class="vthumb" href="videos/${m.id}/?lang=${lang}">${poster ? `<img src="videos/${m.id}/${poster.name}" alt="" loading="lazy">` : ''}<span class="vplay glass"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>${v.duration ? `<span class="vdur mono">${dur(v.duration)}</span>` : ''}</a>
+      <a class="vthumb" href="videos/${m.id}/?lang=${lang}"><img src="hub/img/${m.id}-${lang}.jpg" alt="" loading="lazy">
+        <span class="vlangs mono">FR · EN · PT</span><span class="vplay glass"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>${v.duration ? `<span class="vdur mono">${dur(v.duration)}</span>` : ''}</a>
       <div class="vbody">
         <p class="tag">${esc(m.tag[lang])}</p>
         <h3>${serifLast(m.title[lang])}</h3>
         <p class="vline">${esc(m.line[lang])}</p>
+        <ul class="facts">${t.facts.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         <div class="vcta"><a class="btn primary" href="videos/${m.id}/?lang=${lang}">${esc(t.play)} ${ARROW}</a><a class="btn ghost" href="storyboards/${m.id}/?lang=${lang}">${esc(t.sb)}</a></div>
-        <div class="dls">${dl('mp4', t.wa)}${dl('vertical', t.wav)}${dl('srt', t.srt)}</div>
+        <details class="more"><summary><b>${esc(t.dlT)}</b> <span>${esc(t.dlSub)}</span></summary><div class="dls">${dl('mp4', t.wa)}${dl('vertical', t.wav)}${dl('srt', t.srt)}</div></details>
       </div>
     </article>`;
   }
@@ -201,8 +216,13 @@
       const c = (CUES[ep.id] || {})[l] || {}, a = M.audio[ep.id][l];
       return `<tr><td>${ep.n}. ${esc(ep.title[lang])}</td><td>${l.toUpperCase()}</td><td>${dur(a.duration || c.duration)}</td><td>« ${esc(ep.lines[0][l].split(' ').slice(0, 6).join(' ').replace(/[,.:;]$/, ''))}… »</td><td>« ${esc(c.out || '')} »</td><td><a href="audio/${ep.id}/${a.wav.name}" download>WAV</a> · <a href="audio/${ep.id}/${a.mp3.name}" download>MP3</a></td></tr>`;
     })).join('');
+    const cueN = (cue.match(/<tr>/g) || []).length;
     const embedCode = `<iframe src="https://media.paruto.com/araa-sps/videos/ecowas/?embed&lang=${lang}" width="100%" style="aspect-ratio:16/10.6;border:0" allow="autoplay; fullscreen" title="${t === T.fr ? 'Le voyage de Moussa' : 'Moussa’s Journey'}"></iframe>`;
 
+    // the hero's numbers, all counted from the kit itself
+    const nWa = MODULES.reduce((n, m) => n + ['fr', 'en', 'pt'].reduce((k, l) => k + ['mp4', 'vertical'].filter((x) => ((M.videos[m.id] || { files: {} }).files[l] || {})[x]).length, 0), 0);
+    const nCaps = CAPS.episodes.reduce((n, ep) => n + Object.keys(M.audio[ep.id] || {}).length, 0);
+    const stats = [[MODULES.length, t.stats[0]], [nWa, t.stats[1]], [nCaps, t.stats[2]], [LANGS.length, t.stats[3]]];
     // section heads in the apps style: a mono label, a big title whose last word is set in serif italic
     const head = (n, full, fallback, lead) => {
       const [title, deliv] = full.split(' · ');
@@ -210,10 +230,25 @@
     };
     $('#main').innerHTML = `
       <section class="page-head hero">
-        <p class="eyebrow-pill"><span class="pulse" aria-hidden="true"></span>${esc(t.kicker)}</p>
-        <h1>${serifLast(t.title)}</h1>
-        <p class="lead">${esc(t.lead)}</p>
-        <p class="note">${esc(t.note)}</p>
+        <div class="hero-copy">
+          <p class="eyebrow-pill rise"><span class="pulse" aria-hidden="true"></span>${esc(t.kicker)}</p>
+          <h1 class="rise">${serifMark(t.heroT)}</h1>
+          <p class="lead rise">${esc(t.deck)}</p>
+          <div class="hero-cta rise"><a class="btn primary big" href="videos/international/?lang=${lang}">${esc(t.ctaPlay)} ${ARROW}</a><a class="btn ghost big" href="#livrables">${esc(t.ctaAll)}</a></div>
+        </div>
+        <div class="stage-wrap rise">
+          <div class="stage">
+            <a class="screen" href="#videos" aria-label="${esc(t.stageChip)}"><video id="teaser" muted loop playsinline preload="metadata" poster="${lang === 'fr' ? 'teaser-fr.jpg' : 'teaser.jpg'}" aria-hidden="true"></video><span class="screen-sheen" aria-hidden="true"></span></a>
+            <a class="now glass" href="#videos"><span class="k">${esc(t.stageChip)}</span><span class="go">${ARROW}</span></a>
+            <div class="floor" aria-hidden="true"></div>
+          </div>
+        </div>
+        <dl class="stats reveal">${stats.map(([n, [a, b]]) => `<div><dt><b data-count="${n}">${n}</b> ${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>
+        <p class="note-line reveal"><span class="dot" aria-hidden="true"></span>${esc(t.noteShort)} <a href="#voices">${esc(t.noteLink)}</a>.</p>
+      </section>
+
+      <section class="sec deliv" id="livrables">
+        <p class="label">${esc(t.delivL)}</p>
         <div class="deliv-list reveal">${t.rows.map(([a, b, h], i) => `<a class="deliv-row" href="${h}"><span class="dn mono">${String(i + 1).padStart(2, '0')}</span><b>${esc(a)}</b><span class="dd">${esc(b)}</span><span class="arrow" aria-hidden="true">${ARROW}</span></a>`).join('')}</div>
       </section>
 
@@ -237,20 +272,19 @@
 
       <section class="sec" id="audio">${head(5, t.audioT, t.nav[4], t.audioL)}
         <div class="agrid">${CAPS.episodes.map((ep) => audioCard(ep, t)).join('')}</div>
-        <p class="label sub">${esc(t.cueT)}</p>
-        <div class="table-wrap reveal"><table class="cue"><thead><tr>${t.cueHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${cue}</tbody></table></div>
+        <details class="more fold reveal"><summary><b>${esc(t.cueT)}</b> <span>${cueN} ${esc(t.cueMore)}</span></summary>
+        <div class="table-wrap"><table class="cue"><thead><tr>${t.cueHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${cue}</tbody></table></div></details>
       </section>
 
       <section class="sec" id="langues">${head(6, t.langsT, t.nav[5], t.langsL)}
-        <div class="table-wrap reveal"><table class="ltable"><thead><tr>${t.langHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>
-        ${LANGS.map((L, i) => i < 3 ? `<tr><td><b>${L.name}</b></td><td class="ok"><span class="dot"></span>${esc(t.done)}</td><td class="ok"><span class="dot"></span>${esc(t.done)}</td><td class="dim">—</td></tr>`
-          : `<tr><td><b>${L.name}</b></td><td>${esc(t.scriptReady)}</td><td>${esc(t.scriptReady)}</td><td class="wip"><span class="dot"></span>${esc(t.toRecord)} · <a href="recording/?lang=${lang}">${esc(t.kit)}</a></td></tr>`).join('')}
-        </tbody></table></div>
+        <div class="langs">${LANGS.map((L, i) => `<div class="lang panel reveal${i < 3 ? ' done' : ''}"><span class="code mono">${L.code.toUpperCase()}</span><b>${esc(L.name)}</b>
+          <span class="state"><span class="dot" aria-hidden="true"></span>${esc(i < 3 ? t.produced : t.ready)}</span>${i < 3 ? '' : `<a class="kitlink" href="recording/?lang=${lang}">${esc(t.kit)} ${ARROW}</a>`}</div>`).join('')}</div>
+        <div class="voices panel reveal" id="voices"><p class="label">${esc(t.voicesT)}</p><p>${esc(t.note)}</p></div>
         <ul class="points">${t.method.map((p) => `<li class="panel reveal">${esc(p)}</li>`).join('')}</ul>
       </section>
 
       <section class="sec" id="sources">${head(7, t.sourcesT, t.nav[6], t.sourcesL)}
-        <div class="srcs reveal">
+        <div class="srcs panel reveal">
           ${M.zip ? `<a class="btn primary" href="downloads/${M.zip.name}" download>${esc(t.zip)} <small>${size(M.zip.bytes)}</small></a>` : ''}
           <a class="btn ghost" href="guide/?lang=${lang}">${esc(t.guide)}</a>
           <a class="btn ghost" href="recording/?lang=${lang}">${esc(t.rec)}</a>
@@ -258,6 +292,15 @@
         <p class="label sub">${esc(t.embed)}</p>
         <div class="code panel reveal"><pre><code>${esc(embedCode)}</code></pre><button class="copy chip" data-copy="${esc(embedCode).replace(/"/g, '&quot;')}">${esc(t.copy)}</button></div>
       </section>`;
+    // the teaser plays muted while the stage is on screen; a still for reduced motion
+    const video = $('#teaser'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!still) {
+      video.src = lang === 'fr' ? 'teaser-fr.mp4' : 'teaser.mp4';
+      new IntersectionObserver(([e]) => (e.isIntersecting ? video.play().catch(() => {}) : video.pause()), { threshold: 0.2 }).observe(video);
+    }
+    // the hero's numbers count up once, when they come into view
+    const countUp = (el) => { const n = +el.dataset.count, t0 = performance.now(); const step = (now) => { const p = Math.min(1, (now - t0) / 1100); el.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+    if (!still) { const nums = document.querySelectorAll('[data-count]'); nums.forEach((el) => (el.textContent = '0')); const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); io.unobserve(e.target); } }), { threshold: 0.6 }); nums.forEach((el) => io.observe(el)); }
     $('#allProjects').textContent = lang === 'fr' ? '← Tous les projets' : '← All projects';
     if (window.KIT) KIT.reveal();
     $('#foot').textContent = t.foot;
