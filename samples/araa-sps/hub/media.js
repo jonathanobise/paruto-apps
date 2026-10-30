@@ -303,7 +303,7 @@ window.SPS_MEDIA = {
  },
  "zip": {
   "name": "paruto-media-sps-kit-sources.zip",
-  "bytes": 11175356
+  "bytes": 11175678
  },
  "built": "2026-10-30"
 };
