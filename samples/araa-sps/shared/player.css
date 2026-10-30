@@ -69,6 +69,20 @@ body.render .actions { display: none; }
 .start-card .eyebrow { font-size: clamp(11px, 1.2vw, 14px); }
 .start-card h2 { font-size: clamp(24px, 4.4vw, 52px); margin: 6px 0 4px; letter-spacing: -.02em; }
 .start-card p { font-size: clamp(13px, 1.7vw, 20px); margin: 0 0 clamp(12px, 2vw, 24px); color: #5d4734; }
+/* the language, chosen before playing: three plain-word buttons on the start card */
+.start-langs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 clamp(12px, 2vw, 22px); }
+.start-langs .lang-btn { height: clamp(34px, 3.4vw, 42px); padding: 0 clamp(12px, 1.6vw, 18px); border: 0; border-radius: 999px; font: inherit; font-size: clamp(13px, 1.5vw, 16px); font-weight: 600; color: #5d4734; background: rgba(93, 71, 52, .08); box-shadow: inset 0 0 0 1px rgba(93, 71, 52, .2); cursor: pointer; transition: background-color .2s, color .2s, scale .35s var(--spring); }
+.start-langs .lang-btn:hover { background: rgba(93, 71, 52, .14); }
+.start-langs .lang-btn:active { scale: .96; }
+.start-langs .lang-btn.on { color: #fff8ec; background: var(--ink); box-shadow: none; }
+/* and switchable while watching, beside the voice and captions buttons */
+.controls .ctl-langs { margin-left: auto; }
+@media (max-width: 600px) {
+  .start-card .eyebrow, .start-card p { display: none; } .start-card h2 { margin-top: 0; }
+  .start-langs { flex-wrap: nowrap; gap: 6px; margin-top: 10px; } .start-langs .lang-btn { height: 30px; padding: 0 10px; font-size: 12.5px; }
+  .controls .chapters { order: 9; flex: 1 1 100%; }
+}
+@media (max-width: 400px) { .controls { gap: 6px; } .ctl-langs button, .ctl-langs .seg-thumb { width: 32px; } .ctl-langs .seg-thumb { translate: calc(var(--i, 0) * 32px) 0; } }
 .start-card .pill.big { font-size: clamp(16px, 1.9vw, 22px); padding: clamp(10px, 1.3vw, 15px) clamp(20px, 2.6vw, 32px); }
 
 /* phones: cards and captions dock under the video at readable sizes */

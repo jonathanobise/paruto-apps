@@ -21,7 +21,7 @@
     fr: {
       heroT: 'Kit de *sensibilisation* SPS',
       deck: 'Un échantillon concret de chaque livrable de l’appel : vidéos interactives sur les trois cadres, versions WhatsApp, capsules radio, storyboards, sources et guide de déploiement. Ouvrez-le, jouez-le, téléchargez-le.',
-      ctaPlay: 'Jouer un module', ctaAll: 'Tous les livrables', stageChip: 'Trois modules · environ 7 min chacun',
+      openIn: 'Ouvrir en', ctaPlay: 'Jouer un module', ctaAll: 'Tous les livrables', stageChip: 'Trois modules · environ 7 min chacun',
       stats: [['vidéos interactives', 'd’environ 7 min, en français, anglais et portugais'], ['versions WhatsApp', 'en 16:9 et en vertical 9:16, sous-titres incrustés'], ['capsules radio', 'de 7 à 8 min, MP3 et FLAC pour la radio'], ['langues', '3 produites, 5 prêtes à enregistrer']],
       noteShort: 'Contenus de démonstration, à valider par les experts techniques de l’ARAA. La narration est pour l’instant une voix de travail :', noteLink: 'comment les voix sont produites',
       delivL: 'L’appel, point par point',
@@ -79,7 +79,7 @@
     en: {
       heroT: 'SPS awareness *kit*',
       deck: 'A working sample of every deliverable in the call: interactive videos on the three frameworks, WhatsApp editions, radio capsules, storyboards, sources and a deployment guide. Open it, play it, download it.',
-      ctaPlay: 'Play a module', ctaAll: 'Every deliverable', stageChip: 'Three modules · about 7 min each',
+      openIn: 'Open in', ctaPlay: 'Play a module', ctaAll: 'Every deliverable', stageChip: 'Three modules · about 7 min each',
       stats: [['interactive videos', 'about 7 minutes each, in French, English and Portuguese'], ['WhatsApp editions', 'in 16:9 and vertical 9:16, with burned-in captions'], ['radio capsules', '7 to 8 minutes, MP3 and FLAC for radio'], ['languages', '3 produced, 5 ready to record']],
       noteShort: 'Demonstration content, to be validated by ARAA’s technical experts. The narration is a scratch voice for now:', noteLink: 'how the voices are produced',
       delivL: 'The call, item by item',
@@ -178,8 +178,9 @@
     const v = M.videos[m.id] || { files: {} }, f = (l, k) => (v.files[l] || {})[k];
     const dl = (k, label) => `<div class="dl-row"><span class="label">${label}</span>${['fr', 'en', 'pt'].map((l) => f(l, k) ? `<a class="chip" href="videos/${m.id}/${f(l, k).name}" download>${l.toUpperCase()}<small>${size(f(l, k).bytes)}</small></a>` : '').join('')}</div>`;
     return `<article class="vcard panel reveal">
-      <a class="vthumb" href="videos/${m.id}/?lang=${lang}"><img src="hub/img/${m.id}-${lang}.jpg" alt="" loading="lazy">
-        <span class="vlangs mono">FR · EN · PT</span><span class="vplay glass"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>${v.duration ? `<span class="vdur mono">${dur(v.duration)}</span>` : ''}</a>
+      <div class="vmedia"><a class="vthumb" href="videos/${m.id}/?lang=${lang}"><img src="hub/img/${m.id}-${lang}.jpg" alt="" loading="lazy">
+        <span class="vplay glass"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>${v.duration ? `<span class="vdur mono">${dur(v.duration)}</span>` : ''}</a>
+        <nav class="vlangs" aria-label="${esc(t.openIn)}">${['fr', 'en', 'pt'].map((l) => `<a href="videos/${m.id}/?lang=${l}" class="${l === lang ? 'on' : ''}" title="${esc(t.openIn)} ${LANGS.find((x) => x.code === l).name}">${l.toUpperCase()}</a>`).join('')}</nav></div>
       <div class="vbody">
         <p class="tag">${esc(m.tag[lang])}</p>
         <h3>${serifLast(m.title[lang])}</h3>
