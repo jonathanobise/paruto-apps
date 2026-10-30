@@ -52,11 +52,16 @@ EOF
 (cd "$TMP/repo/samples" && npx -y "$WRANGLER" deploy $DRY --tag "$SHORT" --message "master $SHORT: ${SUBJECT:0:90}")
 if [ -n "$DRY" ]; then echo "Dry run: nothing uploaded."; exit 0; fi
 
-# the live stamp should name this commit within a few seconds
-for i in 1 2 3 4 5 6; do
-  LIVE=$(curl -fsS "$SITE/version.json?t=$(date +%s)" 2>/dev/null | sed -n 's/.*"commit": "\([0-9a-f]*\)".*/\1/p' || true)
-  if [ "$LIVE" = "$COMMIT" ]; then echo "Live: $SITE is at $SHORT ($SITE/version.json)."; exit 0; fi
+# Cloudflare can take up to a minute to serve a new version everywhere: wait up to 90 s for the
+# live stamp to name this commit. The upload has already succeeded, so don't run this again.
+echo "Uploaded. Waiting for $SITE to serve $SHORT…"
+LIVE=""
+for i in $(seq 1 18); do
+  LIVE=$(curl -fsS "$SITE/version.json?t=$(date +%s)" 2>/dev/null | sed -n 's/.*"short": "\([0-9a-f]*\)".*/\1/p' || true)
+  if [ "$LIVE" = "$SHORT" ]; then echo "Live: $SITE is at $SHORT ($SITE/version.json)."; exit 0; fi
+  if [ $((i % 4)) -eq 0 ]; then echo "  still waiting ($((i * 5)) s)…"; fi
   sleep 5
 done
-echo "Deployed, but $SITE/version.json still shows ${LIVE:-nothing} instead of $SHORT. Check again in a minute." >&2
+echo "The upload succeeded, but after 90 s $SITE/version.json still shows ${LIVE:-no stamp} rather than $SHORT." >&2
+echo "Don't redeploy: check again in a few minutes with  curl -s $SITE/version.json" >&2
 exit 1
