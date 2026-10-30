@@ -19,7 +19,15 @@ Served as static files by the Cloudflare Worker `paruto-media-samples` (`wrangle
    `open`/`play` labels and `playHref`. Every project joins the index at the top of the page: the newest one
    large with its teaser playing, the next two beside it, then rows of three (the others play their teaser
    on hover); the poster is the card's still, so pick a clean frame. Each also gets a section below.
-3. Preview with `python3 -m http.server` in `samples/`, then deploy from a clean checkout:
-   `cd samples && npx -y wrangler@4.141.0 deploy`.
+3. Preview with `python3 -m http.server` in `samples/`, merge into `master`, then deploy (see below).
+
+## Deploying
+
+Run `samples/deploy.sh` (`--dry-run` to check without uploading). It deploys GitHub's `master`, never
+this folder's working copy, so uncommitted files and other branches can't reach the site. It writes
+`version.json` at the site root (the commit, its date and the deploy time), tags the Cloudflare
+version with the short commit, and checks the live stamp afterwards. What's live:
+`curl -s https://media.paruto.com/version.json`. To roll back, redeploy an earlier version from the
+Cloudflare dashboard (Workers, `paruto-media-samples`, Deployments) or revert on `master` and deploy.
 
 Never put invented clients, figures or testimonials on the page.

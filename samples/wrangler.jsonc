@@ -1,8 +1,8 @@
 {
   "$schema": "https://unpkg.com/wrangler@4.141.0/config-schema.json",
   // media.paruto.com: Paruto Media's work samples, served by Cloudflare as static files (no Worker code).
-  // Everything in this folder is published except what .assetsignore lists. Deploy from a clean
-  // checkout of committed code: `cd samples && npx wrangler deploy`.
+  // Everything in this folder is published except what .assetsignore lists. Deploy with
+  // samples/deploy.sh, which publishes GitHub's master and stamps it into /version.json.
   // (The samples are not published on apps.paruto.com: the root .assetsignore leaves this folder out.)
   "name": "paruto-media-samples",
   "compatibility_date": "2026-09-25",
