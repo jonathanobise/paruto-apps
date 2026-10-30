@@ -52,7 +52,7 @@ files.push('recording-capsules.csv');
 
 // glossary: the SPS terms every translator must agree on first
 const G = [
-  ['certificat zoosanitaire international', 'international animal health certificate', 'certificado zoossanitário internacional'],
+  ['certificat vétérinaire', 'veterinary certificate', 'certificado veterinário'],
   ['vétérinaire officiel', 'official veterinarian', 'veterinário oficial'],
   ['services vétérinaires', 'veterinary services', 'serviços veterinários'],
   ['délai d’attente (médicament)', 'withdrawal period (drug)', 'intervalo de segurança (medicamento)'],

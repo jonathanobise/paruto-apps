@@ -19,37 +19,185 @@ Les animaux voyagent d’un pays à l’autre… et les maladies voyagent avec e
 Une seule bête malade peut contaminer d’autres troupeaux tout au long de la route.
 
 6
-00:00:25,800 --> 00:00:29,900
-Avant de partir, que doit faire Moussa ?
+00:00:25,800 --> 00:00:32,900
+Chaque jour, des animaux et des produits animaux traversent les frontières de l’Afrique de l’Ouest.
 
 7
-00:00:30,300 --> 00:00:34,600
-Réponse 2 : le contrôle sanitaire commence avant le départ.
+00:00:32,900 --> 00:00:40,100
+En 2010, la CEDEAO a adopté un règlement qui harmonise les règles sanitaires des végétaux, des animaux et des aliments.
 
 8
-00:00:35,100 --> 00:00:40,400
-Moussa appelle le vétérinaire officiel, qui examine et vaccine chaque animal.
+00:00:40,100 --> 00:00:47,100
+Il s’applique de la production à la distribution, car la santé humaine dépend de la santé animale.
 
 9
-00:00:40,400 --> 00:00:46,200
-Les animaux sont sains : le vétérinaire délivre un certificat zoosanitaire international.
+00:00:47,800 --> 00:00:54,700
+Le règlement fixe des principes communs. D’abord, les mesures se fondent sur les normes internationales.
 
 10
-00:00:46,200 --> 00:00:50,100
-Ce certificat accompagne le troupeau pendant tout le voyage.
+00:00:54,700 --> 00:01:01,100
+Les risques sont évalués sur des données scientifiques, et les mesures restent proportionnées au risque.
 
 11
-00:00:50,700 --> 00:00:56,400
-À la frontière, un agent des services vétérinaires contrôle les documents et les animaux.
+00:01:01,100 --> 00:01:07,500
+L’absence de certitude scientifique absolue n’est pas un prétexte pour retarder l’action.
 
 12
-00:00:56,600 --> 00:01:02,200
-Le certificat est valable et les animaux sont en bonne santé : la barrière se lève.
+00:01:07,500 --> 00:01:13,100
+Mais une mesure provisoire ne doit pas restreindre le commerce plus que nécessaire.
 
 13
-00:01:02,200 --> 00:01:08,200
-Les règles harmonisées de la CEDEAO donnent un cadre commun aux contrôles sanitaires dans toute la région.
+00:01:13,800 --> 00:01:21,100
+Les animaux et produits conformes aux normes communautaires circulent librement dans l’espace CEDEAO.
 
 14
-00:01:38,900 --> 00:01:47,600
+00:01:21,100 --> 00:01:27,900
+Chaque pays accepte ceux qui sont conformes aux normes d’un autre État membre.
+
+15
+00:01:27,900 --> 00:01:35,100
+Et toute personne contrôlée a droit à la transparence, à l’impartialité et à la proportionnalité.
+
+16
+00:01:35,800 --> 00:01:42,900
+Qui fait quoi ? Chaque pays a une administration vétérinaire, qui désigne l’autorité chargée des certificats vétérinaires.
+
+17
+00:01:42,900 --> 00:01:50,100
+Les vétérinaires officiels assurent les contrôles sanitaires et la certification des animaux.
+
+18
+00:01:50,100 --> 00:01:56,700
+Des vétérinaires privés peuvent recevoir un mandat sanitaire : prophylaxie, surveillance, inspection.
+
+19
+00:01:56,700 --> 00:02:03,100
+Au niveau régional, un comité et des réseaux d’experts, de laboratoires et d’alerte relient les pays.
+
+20
+00:02:03,800 --> 00:02:07,900
+Avant de partir, que doit faire Moussa ?
+
+21
+00:02:08,300 --> 00:02:12,600
+Réponse 2 : le contrôle sanitaire commence avant le départ.
+
+22
+00:02:13,100 --> 00:02:18,400
+Moussa appelle le vétérinaire officiel, qui examine et vaccine chaque animal.
+
+23
+00:02:18,400 --> 00:02:24,200
+Les animaux sont sains : le vétérinaire officiel délivre le certificat vétérinaire.
+
+24
+00:02:24,200 --> 00:02:29,100
+Il accompagne le troupeau et se présente aux postes de contrôle.
+
+25
+00:02:29,700 --> 00:02:35,400
+À la frontière, un agent des services vétérinaires contrôle les documents et les animaux.
+
+26
+00:02:35,600 --> 00:02:41,200
+Le certificat est valable et les animaux sont en bonne santé : la barrière se lève.
+
+27
+00:02:41,200 --> 00:02:47,200
+Les règles harmonisées de la CEDEAO donnent un cadre commun aux contrôles sanitaires dans toute la région.
+
+28
+00:02:47,900 --> 00:02:54,400
+Chaque pays fixe la liste des postes frontaliers par lesquels les animaux peuvent entrer.
+
+29
+00:02:54,400 --> 00:03:01,000
+Si des animaux sont atteints d’une maladie à déclaration obligatoire, il peut refuser leur entrée ou les mettre en quarantaine.
+
+30
+00:03:01,000 --> 00:03:07,200
+Ces mesures sont communiquées immédiatement, avec leurs motifs.
+
+31
+00:03:07,900 --> 00:03:15,000
+La transhumance déplace les troupeaux au fil des saisons. C’est un mode d’élevage utile, mais aussi une source de problèmes sanitaires.
+
+32
+00:03:15,000 --> 00:03:22,200
+Les États membres facilitent la circulation des troupeaux transhumants d’un pays à l’autre,
+
+33
+00:03:22,200 --> 00:03:29,200
+avec le certificat international de transhumance de la CEDEAO.
+
+34
+00:03:29,900 --> 00:03:36,800
+Au marché, Moussa remarque des animaux d’un autre troupeau qui toussent et respirent mal.
+
+35
+00:03:36,800 --> 00:03:47,200
+Ce pourrait être une maladie à déclaration obligatoire : toute suspicion doit être signalée immédiatement à l’autorité vétérinaire.
+
+36
+00:03:47,900 --> 00:03:52,200
+Que doit faire Moussa ?
+
+37
+00:03:52,400 --> 00:03:58,400
+Réponse 2 : alerter tout de suite les services vétérinaires.
+
+38
+00:03:58,900 --> 00:04:06,000
+Les autorités déclarent la maladie et appliquent des mesures dans un périmètre déterminé.
+
+39
+00:04:06,000 --> 00:04:13,000
+Le pays informe la Commission de la CEDEAO et les autres États par le réseau d’alerte, ainsi que l’OMSA.
+
+40
+00:04:13,000 --> 00:04:19,400
+Les restrictions peuvent ne viser que la partie du pays où la maladie est apparue,
+
+41
+00:04:19,400 --> 00:04:24,200
+et elles prennent fin une fois la maladie éradiquée.
+
+42
+00:04:24,900 --> 00:04:32,000
+Les produits d’origine animale voyagent aussi : viande, lait, cuirs et peaux.
+
+43
+00:04:32,000 --> 00:04:39,000
+Envoyés vers un autre État membre, ils sont aussi accompagnés d’un certificat vétérinaire délivré par un vétérinaire officiel.
+
+44
+00:04:39,000 --> 00:04:46,200
+À l’exportation, cuirs, peaux et cornes demandent un certificat d’origine et un certificat de désinfection.
+
+45
+00:04:46,900 --> 00:04:54,200
+Quiconque produit, transporte ou vend des animaux ou des aliments est un opérateur économique.
+
+46
+00:04:54,200 --> 00:05:01,800
+Les opérateurs du secteur alimentaire répondent de la qualité sanitaire de ce qu’ils vendent, et mettent sur le marché des produits sûrs.
+
+47
+00:05:01,800 --> 00:05:10,200
+Si un produit peut nuire à la santé, ils informent les autorités et agissent pour protéger les consommateurs.
+
+48
+00:05:10,900 --> 00:05:18,200
+Les pays associent aussi les acteurs aux décisions et les informent des risques sanitaires.
+
+49
+00:05:18,200 --> 00:05:26,200
+Les campagnes de sensibilisation, comme cette vidéo, aident chacun à détecter, prévenir et gérer les risques sanitaires.
+
+50
+00:06:38,900 --> 00:06:48,200
+Quatre règles à retenir : science, libre circulation, certificat vétérinaire et alerte immédiate.
+
+51
+00:06:48,900 --> 00:06:57,600
 Trois réflexes pour un commerce de bétail sûr et ouvert.

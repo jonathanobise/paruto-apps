@@ -19,37 +19,185 @@ Os animais viajam de país para país… e as doenças viajam com eles.
 Um só animal doente pode contaminar outros rebanhos ao longo do caminho.
 
 6
-00:00:25,800 --> 00:00:29,900
-Antes de partir, o que deve fazer Moussa?
+00:00:25,800 --> 00:00:32,900
+Todos os dias, animais e produtos animais atravessam as fronteiras da África Ocidental.
 
 7
-00:00:30,300 --> 00:00:34,600
-Resposta 2: o controlo sanitário começa antes da partida.
+00:00:32,900 --> 00:00:40,100
+Em 2010, a CEDEAO adotou um regulamento que harmoniza as regras sanitárias dos vegetais, dos animais e dos alimentos.
 
 8
-00:00:35,100 --> 00:00:40,400
-Moussa chama o veterinário oficial, que examina e vacina cada animal.
+00:00:40,100 --> 00:00:47,100
+Aplica-se da produção à distribuição, porque a saúde humana depende da saúde animal.
 
 9
-00:00:40,400 --> 00:00:46,200
-Os animais estão saudáveis: o veterinário emite um certificado zoossanitário internacional.
+00:00:47,800 --> 00:00:54,700
+O regulamento fixa princípios comuns. Primeiro, as medidas baseiam-se nas normas internacionais.
 
 10
-00:00:46,200 --> 00:00:50,100
-Este certificado acompanha o rebanho durante toda a viagem.
+00:00:54,700 --> 00:01:01,100
+Os riscos são avaliados com base em dados científicos, e as medidas mantêm-se proporcionais ao risco.
 
 11
-00:00:50,700 --> 00:00:56,400
-Na fronteira, um agente dos serviços veterinários controla os documentos e os animais.
+00:01:01,100 --> 00:01:07,500
+A falta de certeza científica absoluta não é pretexto para adiar a ação.
 
 12
-00:00:56,600 --> 00:01:02,200
-O certificado é válido e os animais estão saudáveis: a cancela levanta-se.
+00:01:07,500 --> 00:01:13,100
+Mas uma medida provisória não deve restringir o comércio mais do que o necessário.
 
 13
-00:01:02,200 --> 00:01:08,200
-As regras harmonizadas da CEDEAO dão aos controlos sanitários um quadro comum em toda a região.
+00:01:13,800 --> 00:01:21,100
+Os animais e produtos conformes às normas comunitárias circulam livremente no espaço da CEDEAO.
 
 14
-00:01:38,900 --> 00:01:47,600
+00:01:21,100 --> 00:01:27,900
+Cada país aceita os que estão conformes às normas de outro Estado-membro.
+
+15
+00:01:27,900 --> 00:01:35,100
+E quem é controlado tem direito à transparência, à imparcialidade e à proporcionalidade.
+
+16
+00:01:35,800 --> 00:01:42,900
+Quem faz o quê? Cada país tem uma administração veterinária, que designa a autoridade responsável pelos certificados veterinários.
+
+17
+00:01:42,900 --> 00:01:50,100
+Os veterinários oficiais asseguram os controlos sanitários e a certificação dos animais.
+
+18
+00:01:50,100 --> 00:01:56,700
+Veterinários privados podem receber um mandato sanitário: profilaxia, vigilância, inspeção.
+
+19
+00:01:56,700 --> 00:02:03,100
+A nível regional, um comité e redes de peritos, laboratórios e alerta ligam os países.
+
+20
+00:02:03,800 --> 00:02:07,900
+Antes de partir, o que deve fazer Moussa?
+
+21
+00:02:08,300 --> 00:02:12,600
+Resposta 2: o controlo sanitário começa antes da partida.
+
+22
+00:02:13,100 --> 00:02:18,400
+Moussa chama o veterinário oficial, que examina e vacina cada animal.
+
+23
+00:02:18,400 --> 00:02:24,200
+Os animais estão saudáveis: o veterinário oficial emite o certificado veterinário.
+
+24
+00:02:24,200 --> 00:02:29,100
+Acompanha o rebanho e é apresentado nos postos veterinários do percurso.
+
+25
+00:02:29,700 --> 00:02:35,400
+Na fronteira, um agente dos serviços veterinários controla os documentos e os animais.
+
+26
+00:02:35,600 --> 00:02:41,200
+O certificado é válido e os animais estão saudáveis: a cancela levanta-se.
+
+27
+00:02:41,200 --> 00:02:47,200
+As regras harmonizadas da CEDEAO dão aos controlos sanitários um quadro comum em toda a região.
+
+28
+00:02:47,900 --> 00:02:54,400
+Cada país fixa a lista dos postos fronteiriços por onde os animais podem entrar.
+
+29
+00:02:54,400 --> 00:03:01,000
+Se os animais tiverem uma doença de declaração obrigatória, pode recusar a entrada ou pô-los em quarentena.
+
+30
+00:03:01,000 --> 00:03:07,200
+Essas medidas são comunicadas de imediato, com os motivos.
+
+31
+00:03:07,900 --> 00:03:15,000
+A transumância desloca os rebanhos ao ritmo das estações. É um modo de criação útil, mas também uma fonte de problemas sanitários.
+
+32
+00:03:15,000 --> 00:03:22,200
+Os Estados-membros facilitam a circulação dos rebanhos transumantes de um país para outro,
+
+33
+00:03:22,200 --> 00:03:29,200
+com o certificado internacional de transumância da CEDEAO.
+
+34
+00:03:29,900 --> 00:03:36,800
+No mercado, Moussa repara em animais de outro rebanho que tossem e respiram mal.
+
+35
+00:03:36,800 --> 00:03:47,200
+Pode ser uma doença de declaração obrigatória: qualquer suspeita deve ser comunicada de imediato à autoridade veterinária.
+
+36
+00:03:47,900 --> 00:03:52,200
+O que deve fazer Moussa?
+
+37
+00:03:52,400 --> 00:03:58,400
+Resposta 2: alertar de imediato os serviços veterinários.
+
+38
+00:03:58,900 --> 00:04:06,000
+As autoridades declaram a doença e aplicam medidas num perímetro determinado.
+
+39
+00:04:06,000 --> 00:04:13,000
+O país informa a Comissão da CEDEAO e os outros Estados através da rede de alerta, e também a OMSA.
+
+40
+00:04:13,000 --> 00:04:19,400
+As restrições podem visar apenas a parte do país onde a doença apareceu,
+
+41
+00:04:19,400 --> 00:04:24,200
+e terminam assim que a doença é erradicada.
+
+42
+00:04:24,900 --> 00:04:32,000
+Os produtos de origem animal também viajam: carne, leite, couros e peles.
+
+43
+00:04:32,000 --> 00:04:39,000
+Enviados para outro Estado-membro, também seguem com um certificado veterinário emitido por um veterinário oficial.
+
+44
+00:04:39,000 --> 00:04:46,200
+Na exportação, couros, peles e chifres exigem um certificado de origem e um certificado de desinfeção.
+
+45
+00:04:46,900 --> 00:04:54,200
+Quem produz, transporta ou vende animais ou alimentos é um operador económico.
+
+46
+00:04:54,200 --> 00:05:01,800
+Os operadores do setor alimentar respondem pela qualidade sanitária do que vendem, e colocam no mercado produtos seguros.
+
+47
+00:05:01,800 --> 00:05:10,200
+Se um produto puder prejudicar a saúde, informam as autoridades e agem para proteger os consumidores.
+
+48
+00:05:10,900 --> 00:05:18,200
+Os países também associam os intervenientes às decisões e informam-nos sobre os riscos sanitários.
+
+49
+00:05:18,200 --> 00:05:26,200
+As campanhas de sensibilização, como este vídeo, ajudam todos a detetar, prevenir e gerir os riscos sanitários.
+
+50
+00:06:38,900 --> 00:06:48,200
+Quatro regras a reter: ciência, livre circulação, certificado veterinário e alerta imediato.
+
+51
+00:06:48,900 --> 00:06:57,600
 Três reflexos para um comércio de gado seguro e aberto.

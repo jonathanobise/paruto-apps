@@ -19,37 +19,185 @@ Animals travel from country to country… and diseases travel with them.
 One sick animal can infect other herds all along the route.
 
 6
-00:00:25,800 --> 00:00:29,900
-Before leaving, what should Moussa do?
+00:00:25,800 --> 00:00:32,900
+Every day, animals and animal products cross the borders of West Africa.
 
 7
-00:00:30,300 --> 00:00:34,600
-Answer 2: the health check starts before the journey.
+00:00:32,900 --> 00:00:40,100
+In 2010, ECOWAS adopted a regulation that harmonises the health rules for plants, animals and food.
 
 8
-00:00:35,100 --> 00:00:40,400
-Moussa calls the official veterinarian, who examines and vaccinates each animal.
+00:00:40,100 --> 00:00:47,100
+It applies from production to distribution, because human health depends on animal health.
 
 9
-00:00:40,400 --> 00:00:46,200
-The animals are healthy: the veterinarian issues an international animal health certificate.
+00:00:47,800 --> 00:00:54,700
+The regulation sets common principles. First, measures are based on international standards.
 
 10
-00:00:46,200 --> 00:00:50,100
-The certificate travels with the herd for the whole journey.
+00:00:54,700 --> 00:01:01,100
+Risks are assessed on scientific data, and measures stay proportionate to the risk.
 
 11
-00:00:50,700 --> 00:00:56,400
-At the border, a veterinary officer checks the documents and the animals.
+00:01:01,100 --> 00:01:07,500
+A lack of full scientific certainty is no excuse to delay action.
 
 12
-00:00:56,600 --> 00:01:02,200
-The certificate is valid and the animals are healthy: the barrier lifts.
+00:01:07,500 --> 00:01:13,100
+But a provisional measure must not restrict trade more than necessary.
 
 13
-00:01:02,200 --> 00:01:08,200
-ECOWAS harmonised rules give health checks a common framework across the region.
+00:01:13,800 --> 00:01:21,100
+Animals and products that meet community standards move freely across the ECOWAS area.
 
 14
-00:01:38,900 --> 00:01:47,600
+00:01:21,100 --> 00:01:27,900
+Each country accepts those that meet the standards of another member state.
+
+15
+00:01:27,900 --> 00:01:35,100
+And anyone inspected is entitled to transparency, impartiality and proportionality.
+
+16
+00:01:35,800 --> 00:01:42,900
+Who does what? Each country has a veterinary administration, which names the authority that issues veterinary certificates.
+
+17
+00:01:42,900 --> 00:01:50,100
+Official veterinarians carry out the health checks and certify the animals.
+
+18
+00:01:50,100 --> 00:01:56,700
+Private vets can receive a sanitary mandate: disease prevention, surveillance, inspection.
+
+19
+00:01:56,700 --> 00:02:03,100
+Across the region, a committee and networks of experts, laboratories and alerts link the countries.
+
+20
+00:02:03,800 --> 00:02:07,900
+Before leaving, what should Moussa do?
+
+21
+00:02:08,300 --> 00:02:12,600
+Answer 2: the health check starts before the journey.
+
+22
+00:02:13,100 --> 00:02:18,400
+Moussa calls the official veterinarian, who examines and vaccinates each animal.
+
+23
+00:02:18,400 --> 00:02:24,200
+The animals are healthy: the official veterinarian issues the veterinary certificate.
+
+24
+00:02:24,200 --> 00:02:29,100
+It goes with the herd and is shown at the veterinary posts on the route.
+
+25
+00:02:29,700 --> 00:02:35,400
+At the border, a veterinary officer checks the documents and the animals.
+
+26
+00:02:35,600 --> 00:02:41,200
+The certificate is valid and the animals are healthy: the barrier lifts.
+
+27
+00:02:41,200 --> 00:02:47,200
+ECOWAS harmonised rules give health checks a common framework across the region.
+
+28
+00:02:47,900 --> 00:02:54,400
+Each country lists the border posts where animals may enter.
+
+29
+00:02:54,400 --> 00:03:01,000
+If animals carry a notifiable disease, it can refuse them entry or put them in quarantine.
+
+30
+00:03:01,000 --> 00:03:07,200
+Such measures are reported straight away, with the reasons.
+
+31
+00:03:07,900 --> 00:03:15,000
+Transhumance moves herds with the seasons. It is a useful way of raising livestock, but also a source of health problems.
+
+32
+00:03:15,000 --> 00:03:22,200
+Member states make it easier for transhumant herds to move from country to country,
+
+33
+00:03:22,200 --> 00:03:29,200
+with the ECOWAS international transhumance certificate.
+
+34
+00:03:29,900 --> 00:03:36,800
+At the market, Moussa notices animals from another herd coughing and short of breath.
+
+35
+00:03:36,800 --> 00:03:47,200
+It could be a notifiable disease: any suspicion must be reported to the veterinary authority at once.
+
+36
+00:03:47,900 --> 00:03:52,200
+What should Moussa do?
+
+37
+00:03:52,400 --> 00:03:58,400
+Answer 2: alert the veterinary services straight away.
+
+38
+00:03:58,900 --> 00:04:06,000
+The authorities declare the disease and apply measures within a defined area.
+
+39
+00:04:06,000 --> 00:04:13,000
+The country informs the ECOWAS Commission and the other states through the alert network, and WOAH too.
+
+40
+00:04:13,000 --> 00:04:19,400
+Restrictions can target only the part of the country where the disease appeared,
+
+41
+00:04:19,400 --> 00:04:24,200
+and they end once the disease is eradicated.
+
+42
+00:04:24,900 --> 00:04:32,000
+Products of animal origin travel too: meat, milk, hides and skins.
+
+43
+00:04:32,000 --> 00:04:39,000
+Sent to another member state, they too travel with a veterinary certificate from an official veterinarian.
+
+44
+00:04:39,000 --> 00:04:46,200
+For export, hides, skins and horns need a certificate of origin and a disinfection certificate.
+
+45
+00:04:46,900 --> 00:04:54,200
+Anyone who produces, transports or sells animals or food is an economic operator.
+
+46
+00:04:54,200 --> 00:05:01,800
+Food operators answer for the safety of what they sell, and place only safe products on the market.
+
+47
+00:05:01,800 --> 00:05:10,200
+If a product may harm health, they inform the authorities and act to protect consumers.
+
+48
+00:05:10,900 --> 00:05:18,200
+Countries also give stakeholders a say in decisions and keep them informed about health risks.
+
+49
+00:05:18,200 --> 00:05:26,200
+Awareness campaigns, like this video, help everyone detect, prevent and manage health risks.
+
+50
+00:06:38,900 --> 00:06:48,200
+Four rules to remember: science, free movement, the veterinary certificate and an immediate alert.
+
+51
+00:06:48,900 --> 00:06:57,600
 Three habits for a safe and open livestock trade.
