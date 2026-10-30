@@ -191,6 +191,47 @@
 
   const virus = (cls) => `<g class="${cls}" opacity="0">${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<path d="M0 0 L0 -26" stroke="${C.red}" stroke-width="4" stroke-linecap="round" transform="rotate(${a})"/><circle cy="-27" r="4.5" fill="${C.red}" transform="rotate(${a})"/>`).join('')}<circle r="17" fill="${C.red}"/><circle cx="-5" cy="-4" r="4" fill="#F59A8D"/><circle cx="6" cy="5" r="3" fill="#F59A8D"/></g>`;
 
+  // ---------- explainer pieces: pop-ins, the cream board, invented flags, cards and icons ----------
+  // (first drawn for the full-length international module; used by every module)
+  const pop = (el, t, t0, x, y, s0 = 0.6) => { const p = prog(t, t0, t0 + 0.45, ease.back); op(el, prog(t, t0, t0 + 0.2)); tf(el, x, y, lerp(s0, 1, p)); };
+  const popOut = (el, t, t0, t1, x, y, s0 = 0.6) => { pop(el, t, t0, x, y, s0); op(el, prog(t, t0, t0 + 0.2) * (1 - prog(t, t1, t1 + 0.4))); };
+  // Explainer scenes sit on the cream board of the standards scene; the two countries are told
+  // apart by invented flags (teal and gold for Aïcha's, indigo and sand for the buyers').
+  const board = () => `<rect width="1280" height="720" fill="#FBF1DF"/><rect width="1280" height="720" fill="url(#p-dots)"/>`;
+  const flagA = (s = 1) => `<g transform="scale(${s})"><rect x="-3" y="-90" width="6" height="92" rx="2" fill="#7A6A55"/><rect x="3" y="-88" width="62" height="20" fill="${C.teal}"/><rect x="3" y="-68" width="62" height="20" fill="#F2C14E"/><circle cx="34" cy="-68" r="7" fill="${C.terracotta}"/></g>`;
+  const flagB = (s = 1) => `<g transform="scale(${s})"><rect x="-3" y="-90" width="6" height="92" rx="2" fill="#7A6A55"/><path d="M3 -88 H65 L3 -48Z" fill="${C.indigo}"/><path d="M65 -88 V-48 H3Z" fill="#E2B36C"/><circle cx="18" cy="-76" r="5" fill="#FFF6E6"/></g>`;
+  const card = (w, h, fill = '#FFF8EC') => `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="22" fill="${fill}" filter="url(#f-shadow)"/>`;
+  const label = (key, y, wrap = 16, size = 22, color = C.ink) => `<text x="0" y="${y}" text-anchor="middle" font-size="${size}" font-weight="750" fill="${color}" data-t="${key}" data-wrap="${wrap}" data-lh="${Math.round(size * 1.2)}"></text>`;
+  const ic = {
+    microscope: `<g><rect x="-36" y="28" width="72" height="11" rx="5" fill="#4B5D73"/><path d="M14 28 Q 40 4 22 -26" stroke="#4B5D73" stroke-width="10" fill="none" stroke-linecap="round"/><rect x="-26" y="6" width="44" height="8" rx="3" fill="#4B5D73"/><g transform="rotate(-28 -6 -18)"><rect x="-15" y="-52" width="20" height="50" rx="5" fill="#7F95AE"/><rect x="-18" y="-58" width="26" height="9" rx="3" fill="#4B5D73"/><rect x="-11" y="-4" width="12" height="12" rx="2" fill="#4B5D73"/></g></g>`,
+    gauge: `<g><circle r="40" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="3"/><path d="M-28 12 A 30 30 0 0 1 -14 -24" stroke="${C.green}" stroke-width="9" fill="none"/><path d="M-12 -25 A 30 30 0 0 1 12 -25" stroke="#F2C14E" stroke-width="9" fill="none"/><path d="M14 -24 A 30 30 0 0 1 28 12" stroke="${C.red}" stroke-width="9" fill="none"/><path d="M0 8 L-10 -16" stroke="${C.ink}" stroke-width="5" stroke-linecap="round"/><circle cy="8" r="6" fill="${C.ink}"/></g>`,
+    fair: `<g><path d="M0 -40 V34 M-28 34 H28" stroke="#7A6A55" stroke-width="6" stroke-linecap="round"/><path d="M-46 -24 H46" stroke="#7A6A55" stroke-width="6" stroke-linecap="round"/><g transform="translate(-40 6)">${flagA(0.42)}</g><g transform="translate(24 6)">${flagB(0.42)}</g><path d="M-58 14 Q -40 28 -22 14Z M22 14 Q 40 28 58 14Z" fill="#C9A36B"/></g>`,
+    noBarrier: `<g><rect x="34" y="-30" width="14" height="62" rx="3" fill="#5E5545"/><g transform="translate(40 -18)"><rect x="-96" y="-8" width="96" height="16" rx="8" fill="url(#p-stripes)" stroke="#9E3A2C" stroke-width="2"/></g><g transform="translate(-16 -14)"><circle r="22" fill="${C.red}"/><path d="M-9 -9 L9 9 M9 -9 L-9 9" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g></g>`,
+    person: `<g><circle cy="-16" r="15" fill="#8A5536"/><path d="M-28 26 Q -28 0 0 0 Q 28 0 28 26Z" fill="${C.terracotta}"/></g>`,
+    globe: `<g><circle r="24" fill="#E7F1FB" stroke="${C.indigo}" stroke-width="4"/><ellipse rx="10" ry="24" fill="none" stroke="${C.indigo}" stroke-width="3"/><path d="M-24 0 H24 M-20 -12 H20 M-20 12 H20" stroke="${C.indigo}" stroke-width="3"/></g>`,
+    envelope: `<g><rect x="-24" y="-16" width="48" height="32" rx="4" fill="#FFFDF6" stroke="${C.ink}" stroke-width="3"/><path d="M-24 -14 L0 4 L24 -14" stroke="${C.ink}" stroke-width="3" fill="none" stroke-linejoin="round"/></g>`,
+    doc: `<g><rect x="-22" y="-28" width="44" height="56" rx="4" fill="#FFFDF6" stroke="#D8C6A2" stroke-width="2"/><path d="M-13 -14 H13 M-13 -4 H13 M-13 6 H6" stroke="#CDBB9A" stroke-width="3.5" stroke-linecap="round"/><path d="M-13 16 l5 5 l9 -9" stroke="${C.teal}" stroke-width="3" fill="none"/></g>`,
+    temple: `<g><polygon points="-38,-12 0,-38 38,-12" fill="${C.teal}"/><rect x="-40" y="-14" width="80" height="9" rx="2" fill="#17665C"/>${[-24, 0, 24].map((x) => `<rect x="${x - 6}" y="-3" width="12" height="30" fill="#FFF8EC" stroke="#17665C" stroke-width="2.5"/>`).join('')}<rect x="-42" y="27" width="84" height="9" rx="2" fill="#17665C"/></g>`,
+    shield: (s = 1) => `<g transform="scale(${s})"><path d="M0 -112 L 92 -78 V -6 Q 92 80 0 120 Q -92 80 -92 -6 V -78Z" fill="${C.teal}"/><path d="M0 -92 L 74 -64 V -6 Q 74 66 0 100 Q -74 66 -74 -6 V -64Z" fill="#2A8E80"/><path d="M-32 2 L-8 26 L36 -22" stroke="#FFF6E6" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+    eq: `<g><circle r="40" fill="${C.green}" filter="url(#f-shadow)"/><path d="M-18 -9 H18 M-18 9 H18" stroke="#fff" stroke-width="7" stroke-linecap="round"/></g>`,
+    neq: `<g><circle r="40" fill="#FFF8EC" filter="url(#f-shadow)"/><path d="M-18 -9 H18 M-18 9 H18" stroke="${C.terracotta}" stroke-width="7" stroke-linecap="round"/><path d="M10 -24 L-10 24" stroke="${C.terracotta}" stroke-width="7" stroke-linecap="round"/></g>`,
+    ask: `<g><path d="M-34 -30 H34 Q 44 -30 44 -20 V12 Q 44 22 34 22 H-4 L-18 38 L-16 22 H-34 Q -44 22 -44 12 V-20 Q -44 -30 -34 -30Z" fill="#FFF8EC" filter="url(#f-shadow)"/><text y="6" text-anchor="middle" font-size="40" font-weight="800" fill="${C.terracotta}">?</text></g>`,
+    calendar: `<g><rect x="-30" y="-28" width="60" height="58" rx="8" fill="#FFFDF6" stroke="${C.ink}" stroke-width="3"/><rect x="-30" y="-28" width="60" height="16" rx="6" fill="${C.terracotta}"/><path d="M-16 -36 V-22 M16 -36 V-22" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/><text y="22" text-anchor="middle" font-size="28" font-weight="800" fill="${C.ink}">6</text></g>`,
+    stopwatch: `<g><circle r="42" fill="#FFF8EC" stroke="${C.ink}" stroke-width="5" filter="url(#f-shadow)"/><rect x="-8" y="-60" width="16" height="13" rx="3" fill="${C.ink}"/><path d="M30 -34 l9 -9" stroke="${C.ink}" stroke-width="5" stroke-linecap="round"/><path d="M0 -30 A 30 30 0 0 1 26 -15" stroke="${C.green}" stroke-width="7" fill="none"/><g class="hand"><path d="M0 0 V-28" stroke="${C.terracotta}" stroke-width="5" stroke-linecap="round"/></g><circle r="5" fill="${C.ink}"/></g>`,
+    info: `<g><circle r="30" fill="${C.teal}" filter="url(#f-shadow)"/><circle cy="-14" r="5" fill="#FFF6E6"/><rect x="-5" y="-4" width="10" height="24" rx="3" fill="#FFF6E6"/></g>`,
+    tin: `<g><rect x="-50" y="-70" width="100" height="134" rx="10" fill="#F4F6F4" stroke="#C9D2D0" stroke-width="3"/><rect x="-55" y="-84" width="110" height="22" rx="7" fill="#BFD7E6"/><rect x="-50" y="-36" width="100" height="62" fill="#FFFFFF" stroke="#E2E7E5" stroke-width="2"/><g transform="translate(-14 -6)"><circle r="8" fill="#B07850"/><path d="M-14 22 Q -14 6 0 6 Q 14 6 14 22Z" fill="#D9A33A"/></g><g transform="translate(16 2)"><circle cy="-4" r="5" fill="#C98E62"/><path d="M-8 12 Q -8 2 0 2 Q 8 2 8 12Z" fill="#FFF6E6" stroke="#E7D2AE" stroke-width="1.5"/></g></g>`,
+    heart: `<path d="M0 14 C -26 -4 -16 -30 0 -16 C 16 -30 26 -4 0 14Z" fill="${C.red}"/>`,
+    megaphone: `<g><path d="M-30 -12 L 14 -30 V 30 L -30 12Z" fill="${C.terracotta}"/><rect x="-44" y="-12" width="16" height="24" rx="4" fill="${C.ink}"/><path d="M24 -18 q 12 18 0 36 M34 -28 q 20 28 0 56" stroke="${C.ink}" stroke-width="4" fill="none" stroke-linecap="round"/></g>`,
+    gift: `<g><rect x="-42" y="-30" width="84" height="62" rx="6" fill="${C.terracotta}"/><rect x="-7" y="-30" width="14" height="62" fill="#F2C14E"/><rect x="-46" y="-44" width="92" height="17" rx="4" fill="#D9663F"/><path d="M0 -44 q -24 -22 -28 -4 M0 -44 q 24 -22 28 -4" stroke="#F2C14E" stroke-width="6" fill="none"/></g>`,
+    redX: `<g><circle r="30" fill="${C.red}" filter="url(#f-shadow)"/><path d="M-11 -11 L11 11 M11 -11 L-11 11" stroke="#fff" stroke-width="6" stroke-linecap="round"/></g>`,
+  };
+  const g1 = (cls, inner, o = 0) => `<g class="${cls}" opacity="${o}">${inner}</g>`;
+  const fly = (el, t, t0, t1, [x0, y0], [x1, y1], arc = 60, s = 1) => {
+    const m = prog(t, t0, t1, ease.inOut);
+    tf(el, lerp(x0, x1, m), lerp(y0, y1, m) - Math.sin(m * Math.PI) * arc, s);
+    op(el, prog(t, t0, t0 + 0.15) * (1 - prog(t, t1, t1 + 0.25)));
+  };
+
   // ---------- shared scenes ----------
   const titleScene = () => ({
     build: () => `${landscape({ sky: 'g-dawn', hill: '#D99A5C', ground: '#C98448', ground2: '#B87239' })}
@@ -251,5 +292,6 @@
     update(t) { op(this.eb, prog(t, 0.2, 0.9)); op(this.logo, prog(t, 0.5, 1.4)); op(this.el, prog(t, 1.2, 2.0)); },
   });
 
-  window.SPS_ART = { C, clamp, ease, prog, lerp, tf, op, defs, acacia, grass, landscape, cow, prepCow, poseCow, person, prepPerson, posePerson, chip, check, cross, syringe, certificate, receipt, borderPost, barrierArm, virus, ICONS, titleScene, quizScene, recapScene, endScene };
+  window.SPS_ART = { C, clamp, ease, prog, lerp, tf, op, defs, acacia, grass, landscape, cow, prepCow, poseCow, person, prepPerson, posePerson, chip, check, cross, syringe, certificate, receipt, borderPost, barrierArm, virus, ICONS, titleScene, quizScene, recapScene, endScene,
+    pop, popOut, board, flagA, flagB, card, label, ic, g1, fly };
 })();
