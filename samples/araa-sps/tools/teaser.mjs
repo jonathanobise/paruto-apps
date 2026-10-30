@@ -23,6 +23,8 @@ const SHOTS = [
   ['ecowas', 'borderCross', 2.2, 3.6],
   ['international', 'transportGo', 1.0, 3.4],
 ];
+// the still: [shot, seconds into it] (the ECOWAS veterinary certificate, stamped and signed)
+const POSTER = [4, 2.6];
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'teaser-'));
 const browser = await chromium.launch();
 const pages = {};
@@ -60,6 +62,8 @@ for (let i = 1; i < clips.length; i++) {
 graph += `[v]fade=t=in:st=0:d=0.5,fade=t=out:st=${(t - 0.6).toFixed(2)}:d=0.6[out]`;
 const mp4 = path.join(root, `teaser${suffix}.mp4`);
 execFileSync('ffmpeg', [...args, '-filter_complex', graph, '-map', '[out]', '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart', '-an', mp4]);
-execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(clips[0].len + clips[1].len + 1), '-i', mp4, '-frames:v', '1', '-q:v', '3', path.join(root, `teaser${suffix}.jpg`)]);
+// the still (the projects page's card and poster): POSTER seconds into one shot, clear of its fades
+const shotStart = (k) => clips.slice(0, k).reduce((a, c) => a + c.len - FADE, 0);
+execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', (shotStart(POSTER[0]) + POSTER[1]).toFixed(2), '-i', mp4, '-frames:v', '1', '-q:v', '3', path.join(root, `teaser${suffix}.jpg`)]);
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`teaser${suffix}.mp4 ${t.toFixed(1)}s, ${(fs.statSync(mp4).size / 1e6).toFixed(1)} MB`);

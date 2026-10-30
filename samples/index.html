@@ -47,24 +47,20 @@
   </header>
 
   <main id="top">
-    <!-- Hero: the latest proposal plays on a lit stage -->
+    <!-- Hero: a short headline, then every proposal at a glance (the newest one large, its teaser playing) -->
     <section class="hero" aria-labelledby="headline">
       <div class="hero-light" aria-hidden="true"></div>
-      <div class="hero-copy wrap">
-        <p class="eyebrow mono rise"><span class="pulse" aria-hidden="true"></span><span data-t="eyebrow"></span></p>
-        <h1 id="headline" class="rise" data-t="headline"></h1>
-        <p class="sub rise" data-t="sub"></p>
-      </div>
-      <div class="stage-wrap wrap rise">
-        <div class="stage" id="stage">
-          <a class="screen" id="screen" href="#projects">
-            <video id="teaser" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-            <span class="screen-sheen" aria-hidden="true"></span>
-          </a>
-          <a class="now glass" id="now" href="#"></a>
-          <div class="floor" aria-hidden="true"></div>
+      <div class="hero-head wrap">
+        <div class="hero-title">
+          <p class="eyebrow mono rise"><span class="pulse" aria-hidden="true"></span><span data-t="eyebrow"></span></p>
+          <h1 id="headline" class="rise" data-t="headline"></h1>
+        </div>
+        <div class="hero-side rise">
+          <p class="sub" data-t="sub"></p>
+          <p class="count mono" id="count"></p>
         </div>
       </div>
+      <div class="index wrap rise" id="index" role="list" aria-label="Projects"></div>
     </section>
 
     <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>

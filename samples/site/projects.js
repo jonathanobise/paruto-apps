@@ -1,7 +1,8 @@
 // Everything on the media.paruto.com front page, in English and French. Add a proposal by
-// adding an object to `projects` (newest first); its folder sits next to this one, e.g.
-// samples/araa-sps/. The last word of each headline is set in italic serif; in a project
-// title, *word* picks the italic word instead.
+// adding an object to `projects` (newest first): it joins the index at the top of the page (the
+// newest one large, with its teaser playing) and gets its own section below. Its folder sits
+// next to this one, e.g. samples/araa-sps/. The last word of each headline is set in italic
+// serif; in a project title, *word* picks the italic word instead.
 window.MEDIA_SITE = {
   site: {
     eyebrow: { en: 'Paruto Media · Proposals and sample work', fr: 'Paruto Media · Propositions et réalisations' },
@@ -12,9 +13,11 @@ window.MEDIA_SITE = {
     },
     nav: { en: ['Projects', 'Capabilities', 'Approach'], fr: ['Projets', 'Savoir-faire', 'Méthode'] },
     contact: { en: 'Contact', fr: 'Contact' },
-    nowShowing: { en: 'Now showing', fr: 'À l’affiche' },
+    count: { en: ['proposal', 'proposals'], fr: ['proposition', 'propositions'] },
+    indexLabel: { en: 'Projects at a glance', fr: 'Les projets en un coup d’œil' },
+    newest: { en: 'Newest', fr: 'Nouveau' },
     projectsLabel: { en: 'Projects', fr: 'Projets' },
-    projectsTitle: { en: 'Selected proposals.', fr: 'Propositions choisies.' },
+    projectsTitle: { en: 'Each proposal, in detail.', fr: 'Chaque proposition, en détail.' },
     projectsLead: { en: 'Each proposal is a working site: open it, play it, download it.', fr: 'Chaque proposition est un site qui fonctionne : ouvrez-le, jouez-le, téléchargez-le.' },
     next: {
       title: { en: 'The next proposal', fr: 'La prochaine proposition' },

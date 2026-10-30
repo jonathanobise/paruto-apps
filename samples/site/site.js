@@ -1,6 +1,7 @@
-// media.paruto.com: renders site/projects.js (MEDIA_SITE) in English or French, plays the latest
-// proposal's teaser on the hero stage, and adds the motion: nav compaction, reveals, count-ups,
-// a gentle stage tilt and the panel spotlight.
+// media.paruto.com: renders site/projects.js (MEDIA_SITE) in English or French: the index of every
+// proposal at the top (the newest one large, its teaser playing; the others play on hover), then
+// a section per proposal. Adds the motion: nav compaction, reveals, count-ups, the panel spotlight,
+// and the hero light, which takes the accent of the project under the pointer.
 (function () {
   const D = window.MEDIA_SITE, S = D.site;
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -24,6 +25,7 @@
     board: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="8" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="13" width="8" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14 15h6M14 18h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
   };
   const latest = D.projects[0];
+  const pickL = (v) => (typeof v === 'string' ? v : L(v));
 
   function render() {
     document.documentElement.lang = lang;
@@ -34,10 +36,23 @@
     $('.seg').dataset.on = lang === 'fr' ? '1' : '0';
     $('#ctaBtn').href = S.ctaHref;
 
-    // hero "now showing" chip
-    $('#now').href = latest.href;
-    $('#now').innerHTML = `<span class="k">${esc(L(S.nowShowing))} · ${String(1).padStart(2, '0')}</span><span class="t">${esc(L(latest.title).replace(/\*/g, ''))}</span><span class="go">${arrow}</span>`;
-    $('#screen').href = latest.href;
+    // the index: every proposal at a glance, newest first and largest
+    const n = D.projects.length;
+    $('#count').textContent = `${String(n).padStart(2, '0')} ${L(S.count)[n === 1 ? 0 : 1]} · ${[...new Set(D.projects.map((p) => p.year))].join(', ')}`;
+    $('#index').setAttribute('aria-label', L(S.indexLabel));
+    $('#index').dataset.n = Math.min(n, 4);
+    $('#index').innerHTML = D.projects.map((p, i) => `
+      <a class="tile panel" role="listitem" href="${esc(p.href)}?lang=${lang}" style="--a:${p.accent};--b:${p.accent2}" data-i="${i}">
+        <span class="tile-media"><img src="${esc(pickL(p.poster))}" alt="" ${i ? 'loading="lazy"' : ''}><video muted loop playsinline preload="none" aria-hidden="true" data-src="${esc(pickL(p.teaser))}"></video>
+          <span class="tile-no mono">${String(i + 1).padStart(2, '0')}${i === 0 ? ` · ${esc(L(S.newest))}` : ''}</span></span>
+        <span class="tile-body">
+          <span class="tile-kicker mono">${esc(L(p.kicker))}</span>
+          <span class="tile-title">${serifLast(L(p.title))}</span>
+          <span class="tile-meta"><span class="status"><span class="pulse" aria-hidden="true"></span>${esc(L(p.status))}</span><span>${esc(L(p.client).split(',')[0])} · ${esc(p.call)} · ${esc(p.year)}</span></span>
+          <span class="tile-go" aria-hidden="true">${arrow}</span>
+        </span>
+      </a>`).join('');
+    tiles();
 
     const words = D.capabilities.map((c) => L(c.t)).concat(['WhatsApp', lang === 'fr' ? 'Storyboards' : 'Storyboards', lang === 'fr' ? 'Radios communautaires' : 'Community radio']);
     $('#ticker').innerHTML = [...words, ...words].map((w) => `<span>${esc(w)}</span>`).join('');
@@ -86,28 +101,29 @@
     requestAnimationFrame(step);
   }
 
-  // hero teaser, in the page's language: plays muted while on screen; a still for reduced motion
-  const video = $('#teaser'); let onScreen = false;
-  document.documentElement.style.setProperty('--a', latest.accent);
-  document.documentElement.style.setProperty('--b', latest.accent2);
-  const pickL = (v) => (typeof v === 'string' ? v : L(v));
-  function setTeaser() {
-    const src = pickL(latest.teaser), poster = pickL(latest.poster);
-    if (video.dataset.src === src) return;
-    video.dataset.src = src; video.poster = poster;
-    if (!reduce) { video.src = src; if (onScreen) video.play().catch(() => {}); }
-  }
-  if (!reduce) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; onScreen ? video.play().catch(() => {}) : video.pause(); }, { threshold: 0.2 }).observe(video);
-
-  // the stage tilts a little toward the pointer
-  const stage = $('#stage');
-  if (!reduce && matchMedia('(hover: hover)').matches) {
-    stage.addEventListener('pointermove', (e) => {
-      const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      stage.style.transform = `rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`;
+  // teasers in the index, muted: the newest plays while on screen, the others while hovered or
+  // focused; stills only for reduced motion. The hero light follows the project under the pointer.
+  const root = document.documentElement, hover = matchMedia('(hover: hover)').matches;
+  const light = (p) => { root.style.setProperty('--a', p.accent); root.style.setProperty('--b', p.accent2); };
+  light(latest);
+  let seen;
+  function tiles() {
+    if (seen) seen.disconnect();
+    const play = (v) => { if (reduce) return; if (!v.src) v.src = v.dataset.src; v.play().then(() => v.classList.add('on')).catch(() => {}); };
+    const stop = (v) => { v.pause(); v.classList.remove('on'); };
+    $$('.tile').forEach((t) => {
+      const v = $('video', t), p = D.projects[+t.dataset.i];
+      if (t.dataset.i === '0') {
+        seen = new IntersectionObserver(([e]) => (e.isIntersecting ? play(v) : stop(v)), { threshold: 0.25 });
+        seen.observe(t);
+      } else if (hover) {
+        t.addEventListener('pointerenter', () => play(v)); t.addEventListener('pointerleave', () => stop(v));
+        t.addEventListener('focus', () => play(v)); t.addEventListener('blur', () => stop(v));
+      }
+      t.addEventListener('pointerenter', () => light(p)); t.addEventListener('focus', () => light(p));
     });
-    stage.addEventListener('pointerleave', () => (stage.style.transform = ''));
   }
+  $('#index').addEventListener('pointerleave', () => light(latest));
 
   // spotlight on panels
   document.addEventListener('pointermove', (e) => {
@@ -120,11 +136,11 @@
   addEventListener('scroll', () => { const y = scrollY; nav.classList.toggle('compact', y > 120 && y > lastY); lastY = y; }, { passive: true });
 
   // theme: dark default, light opt-in, remembered
-  const root = document.documentElement, tbtn = $('#themeToggle');
+  const tbtn = $('#themeToggle');
   const syncTheme = () => { const light = root.dataset.theme === 'light'; tbtn.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode'); $('meta[name="theme-color"]').content = light ? '#f5f5f7' : '#060608'; };
   tbtn.addEventListener('click', () => { const light = root.dataset.theme !== 'light'; if (light) root.dataset.theme = 'light'; else delete root.dataset.theme; store.set('theme', light ? 'light' : 'dark'); syncTheme(); });
   syncTheme();
 
-  $$('.seg button').forEach((b) => b.addEventListener('click', () => { if (b.dataset.lang === lang) return; lang = b.dataset.lang; store.set('kit-lang', lang); render(); setTeaser(); $$('.reveal').forEach((el) => el.classList.add('in')); $$('[data-count]').forEach((el) => (el.textContent = el.dataset.count)); }));
-  render(); setTeaser();
+  $$('.seg button').forEach((b) => b.addEventListener('click', () => { if (b.dataset.lang === lang) return; lang = b.dataset.lang; store.set('kit-lang', lang); render(); $$('.reveal').forEach((el) => el.classList.add('in')); $$('[data-count]').forEach((el) => (el.textContent = el.dataset.count)); }));
+  render();
 })();
