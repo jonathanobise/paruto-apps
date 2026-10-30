@@ -1,2 +1,3 @@
 .cloudflare/
 .wrangler/
+__pycache__/
