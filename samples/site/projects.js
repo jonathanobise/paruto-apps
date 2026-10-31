@@ -39,6 +39,7 @@ window.MEDIA_SITE = {
   projects: [
     {
       // The working site is the live demo (it has English and Hausa, no French); this folder holds only its teaser and stills.
+      // The teaser is the launch announcement (portrait, 31 Oct 2026) set on a 16:9 frame, silent: the card plays it muted.
       id: 'gani-da-ido', href: 'https://ganidaido.paruto.com/', year: '2026', call: 'Developer ToR', programme: 'PAF-GSE Kaduna · Malala Fund',
       accent: '#E3B23C', accent2: '#1F5C3F',
       status: { en: 'Proposal', fr: 'Proposition' },
@@ -55,7 +56,7 @@ window.MEDIA_SITE = {
         { n: 2, l: { en: 'languages', fr: 'langues' } },
         { n: 191, l: { en: 'automated tests', fr: 'tests automatisés' } },
       ],
-      teaser: 'gani-da-ido/teaser.mp4?v=0.27.3', poster: 'gani-da-ido/teaser.jpg?v=0.27.3',
+      teaser: 'gani-da-ido/teaser.mp4?v=launch', poster: 'gani-da-ido/teaser.jpg?v=launch',
       gallery: [
         { src: 'gani-da-ido/img/dashboard.jpg', href: 'https://ganidaido.paruto.com/public', label: { en: 'Public dashboard · 3D map', fr: 'Tableau de bord public · carte 3D' } },
         { src: 'gani-da-ido/img/project.jpg', href: 'https://ganidaido.paruto.com/public/projects/GDI-HLT-001', label: { en: 'A project, reported and seen', fr: 'Un projet, déclaré et vérifié' } },
