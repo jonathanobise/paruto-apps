@@ -54,7 +54,7 @@ if [ -n "$DRY" ]; then echo "Dry run: nothing uploaded."; exit 0; fi
 
 # Cloudflare can take up to a minute to serve a new version everywhere: wait up to 90 s for the
 # live stamp to name this commit. The upload has already succeeded, so don't run this again.
-echo "Uploaded. Waiting for $SITE to serve $SHORT…"
+echo "Uploaded. Waiting for $SITE to serve ${SHORT}…"
 LIVE=""
 for i in $(seq 1 18); do
   LIVE=$(curl -fsS "$SITE/version.json?t=$(date +%s)" 2>/dev/null | sed -n 's/.*"short": "\([0-9a-f]*\)".*/\1/p' || true)
