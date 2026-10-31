@@ -35,6 +35,15 @@ listed in `tools/voice.py` and `tools/capsules.py`.
     node tools/kit.mjs                                    # hub/media.js and the sources zip (run last)
     node tools/snap.mjs <module> <outdir> fr 12 choice2@3 # stills, to check frames
 
+## The submitted copy
+
+`submitted/` (https://media.paruto.com/araa-sps/submitted/) is the kit as submitted to ARAA, the
+address every portfolio link in the offer uses. Never edit it by hand. Until the deadline
+(6 November 2026, 23:59 GMT), refresh it after changing the kit: commit, then
+`node tools/freeze.mjs`, which copies the committed kit, points its links and embed codes at the
+copy, and stamps `submitted/FROZEN.json` with the source commit. After the deadline it never
+changes (the script refuses), while the live kit at `/araa-sps/` can keep evolving.
+
 ## Voices
 
 The narration is a synthetic scratch voice (Piper TTS): French "siwis" and "mls" (CC BY 4.0),

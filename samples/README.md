@@ -9,6 +9,7 @@ Served as static files by the Cloudflare Worker `paruto-media-samples` (`wrangle
 | --- | --- |
 | `index.html`, `site/` | The front page. **All its words and projects live in `site/projects.js`** (EN/FR); `site.css` holds the design tokens (same language as apps.paruto.com: dark default, light opt-in, Liquid Glass only on floating controls); `site.js` renders it. |
 | `araa-sps/` | Project 01: the SPS awareness kit for ARAA's call AMI028-2026 (see `araa-sps/README.md`) |
+| `araa-sps/submitted/` | That kit frozen as submitted to ARAA; made by `araa-sps/tools/freeze.mjs`, never edited by hand |
 
 ## Adding a proposal
 
