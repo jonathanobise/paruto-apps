@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/fraunces";
+
+/*
+ * WealthOS design tokens. Calm, precise, premium: deep forest green, warm off-white,
+ * charcoal, restrained emerald. Light is the default; dark follows the OS unless the user
+ * chose a theme (html[data-theme]). Chart series colours were validated for contrast and
+ * colour-vision deficiency with the dataviz palette validator (docs/DECISIONS.md, ADR-009).
+ */
+:root {
+  color-scheme: light;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --surface-2: #f1eee6;
+  --surface-sunken: #ebe7dc;
+  --border: #e2ddd0;
+  --border-strong: #cdc6b5;
+  --text: #1b1f1c;
+  --text-2: #4b524d;
+  --text-3: #6a716b;
+  --brand: #12392b;
+  --brand-ink: #f6f3ec;
+  --accent: #0f7b57;
+  --accent-soft: #e3f1ea;
+  --focus: #0f7b57;
+  --positive: #11663f;
+  --negative: #b42318;
+  --warning: #8a5300;
+  --warning-soft: #fbf0d9;
+  --info-soft: #e6eef0;
+  --danger-soft: #fbe7e4;
+  --demo: #6b3fa0;
+  --demo-soft: #f1eaf9;
+  --series-1: #0f7b57;
+  --series-2: #b45309;
+  --grid: #e7e2d6;
+  --shadow: 0 1px 2px rgb(27 31 28 / 0.04), 0 4px 16px rgb(27 31 28 / 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0c1310;
+    --surface: #131c18;
+    --surface-2: #18231e;
+    --surface-sunken: #0f1714;
+    --border: #24312b;
+    --border-strong: #34443c;
+    --text: #edf1ec;
+    --text-2: #b8c2bb;
+    --text-3: #8f9a92;
+    --brand: #cfe8da;
+    --brand-ink: #0c1310;
+    --accent: #3fb886;
+    --accent-soft: #173327;
+    --focus: #5fd0a0;
+    --positive: #52c48f;
+    --negative: #ff8a7a;
+    --warning: #f0b45a;
+    --warning-soft: #2d2412;
+    --info-soft: #172529;
+    --danger-soft: #34191a;
+    --demo: #c4a6f0;
+    --demo-soft: #261d33;
+    --series-1: #35a57a;
+    --series-2: #c2611a;
+    --grid: #1f2a25;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c1310;
+  --surface: #131c18;
+  --surface-2: #18231e;
+  --surface-sunken: #0f1714;
+  --border: #24312b;
+  --border-strong: #34443c;
+  --text: #edf1ec;
+  --text-2: #b8c2bb;
+  --text-3: #8f9a92;
+  --brand: #cfe8da;
+  --brand-ink: #0c1310;
+  --accent: #3fb886;
+  --accent-soft: #173327;
+  --focus: #5fd0a0;
+  --positive: #52c48f;
+  --negative: #ff8a7a;
+  --warning: #f0b45a;
+  --warning-soft: #2d2412;
+  --info-soft: #172529;
+  --danger-soft: #34191a;
+  --demo: #c4a6f0;
+  --demo-soft: #261d33;
+  --series-1: #35a57a;
+  --series-2: #c2611a;
+  --grid: #1f2a25;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--surface-sunken);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-info-soft: var(--info-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-demo: var(--demo);
+  --color-demo-soft: var(--demo-soft);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --radius-card: 14px;
+}
+
+html {
+  background: var(--bg);
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+}
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+::selection {
+  background: var(--accent-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: 16px;
+  top: 16px;
+  z-index: 100;
+  background: var(--surface);
+  padding: 8px 12px;
+  border-radius: 8px;
+}

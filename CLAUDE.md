@@ -66,6 +66,9 @@ Live at **https://apps.paruto.com**, served by **Cloudflare**: the Worker `parut
   `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`
   or pushes containing images fail with HTTP 400.
 
+## WealthOS (`wealthos/`)
+A separate product: a Next.js + Postgres fintech app (non-custodial wealth tracking, Nigeria first). It is **not** part of the showcase site and is excluded from the apps.paruto.com publish by `.assetsignore`. Work on it from `wealthos/` and follow `wealthos/CLAUDE.md`; it has its own README, docs and tests.
+
 ## Style rules
 - Don't hand-edit HTML for content; keep content in `apps.json`.
 - Never fabricate app stats, reviews, download counts or testimonials.

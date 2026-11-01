@@ -1,0 +1,30 @@
+"use client";
+import { useActionState } from "react";
+import Link from "next/link";
+import { signInAction } from "../actions";
+import { Field, Input } from "@/components/ui/form";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { FormMessage, fieldError } from "@/components/ui/form-message";
+
+export function SignInForm() {
+  const [state, action] = useActionState(signInAction, null);
+  return (
+    <form action={action} className="flex flex-col gap-4" noValidate>
+      <FormMessage state={state} />
+      <Field label="Email" htmlFor="email" error={fieldError(state, "email")}>
+        <Input id="email" name="email" type="email" autoComplete="email" required />
+      </Field>
+      <Field label="Password" htmlFor="password" error={fieldError(state, "password")}>
+        <Input id="password" name="password" type="password" autoComplete="current-password" required />
+      </Field>
+      <div className="flex justify-end text-sm">
+        <Link href="/reset-password" className="text-accent hover:underline">
+          Forgot password?
+        </Link>
+      </div>
+      <SubmitButton size="lg" pendingText="Signing in…">
+        Sign in
+      </SubmitButton>
+    </form>
+  );
+}

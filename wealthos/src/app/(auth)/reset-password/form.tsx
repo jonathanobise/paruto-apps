@@ -1,0 +1,37 @@
+"use client";
+import { useActionState } from "react";
+import { requestResetAction, resetPasswordAction } from "../actions";
+import { Field, Input } from "@/components/ui/form";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { FormMessage, fieldError } from "@/components/ui/form-message";
+
+export function RequestResetForm() {
+  const [state, action] = useActionState(requestResetAction, null);
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <FormMessage state={state} />
+      <Field label="Email" htmlFor="email" error={fieldError(state, "email")}>
+        <Input id="email" name="email" type="email" autoComplete="email" required />
+      </Field>
+      <SubmitButton size="lg" pendingText="Sending…">
+        Send reset link
+      </SubmitButton>
+    </form>
+  );
+}
+
+export function NewPasswordForm({ token }: { token: string }) {
+  const [state, action] = useActionState(resetPasswordAction, null);
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <FormMessage state={state} />
+      <input type="hidden" name="token" value={token} />
+      <Field label="New password" htmlFor="password" hint="At least 12 characters." error={fieldError(state, "password")}>
+        <Input id="password" name="password" type="password" autoComplete="new-password" minLength={12} required />
+      </Field>
+      <SubmitButton size="lg" pendingText="Saving…">
+        Set new password
+      </SubmitButton>
+    </form>
+  );
+}

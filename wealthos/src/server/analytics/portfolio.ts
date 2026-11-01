@@ -58,6 +58,8 @@ export interface HoldingView {
   name: string;
   symbol: string | null;
   assetClass: string;
+  assetClassKey: string;
+  country: string;
   currency: string;
   quantity: string;
   price: string | null;
@@ -316,6 +318,8 @@ export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: s
           name: info.name,
           symbol: info.symbol ?? null,
           assetClass: ASSET_CLASS_LABELS[info.assetClass],
+          assetClassKey: info.assetClass,
+          country: info.country,
           currency: h.currency,
           quantity: h.quantity.toFixed(),
           price: h.price?.toFixed(6) ?? null,

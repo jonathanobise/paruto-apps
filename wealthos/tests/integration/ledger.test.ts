@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import { closeDb, withTenant } from "@/server/db/client";
 import { ledgerEntries } from "@/server/db/schema";
 import { addValuation, createAccount } from "@/server/accounts/service";

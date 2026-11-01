@@ -5,6 +5,12 @@ import { organizations } from "./tenancy";
 import { users } from "./identity";
 import { institutions, instruments } from "./market";
 
+export interface ModelTarget {
+  label: string;
+  weight: string;
+  match: { assetClasses: string[]; currencies?: string[]; countries?: string[] };
+}
+
 export const accountType = pgEnum("account_type", [
   "bank",
   "brokerage",
@@ -126,8 +132,11 @@ export const modelPortfolios = pgTable("model_portfolios", {
   orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
-  /** { [assetClassOrBucket]: { label, weight } } with weights as decimal strings summing to 1. */
-  targets: jsonb("targets").$type<Record<string, { label: string; weight: string }>>().notNull(),
+  /**
+   * { [bucket]: { label, weight, match } }: weights are decimal strings summing to 1; `match` assigns
+   * holdings to the bucket by asset class and optionally currency / country.
+   */
+  targets: jsonb("targets").$type<Record<string, ModelTarget>>().notNull(),
   isHypothetical: boolean("is_hypothetical").notNull().default(true),
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: createdAt(),
