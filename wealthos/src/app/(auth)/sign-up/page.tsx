@@ -6,7 +6,7 @@ export const metadata = { title: "Create account · WealthOS" };
 export default function SignUpPage() {
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Create your account</h1>
+      <h1 className="font-display text-[36px] leading-[1.05]">Create your <em>account</em></h1>
       <p className="mt-2 text-sm text-text-2">
         Already have one?{" "}
         <Link href="/sign-in" className="font-medium text-accent hover:underline">

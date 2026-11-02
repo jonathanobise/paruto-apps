@@ -18,6 +18,9 @@ Read `docs/ARCHITECTURE.md` and `docs/FINANCIAL_ENGINE.md` before changing domai
 - Don't trust X-Forwarded-For directly: use `requestMeta()` (src/lib/client-ip.ts).
 - Analytics results are cached (`src/server/analytics/cache.ts`). When you change any calculation that affects dashboard/account/holding results, bump `ANALYTICS_VERSION` so stale cached results are not served. New inputs to the analytics must be added to `inputsFingerprint`.
 
+## Design
+Paruto design standard (docs/DECISIONS.md ADR-027): dark by default for everyone, light opt-in via the header toggle — never reintroduce prefers-color-scheme switching. Tokens live in `src/app/globals.css`; change look-and-feel there. Liquid Glass (`.glass`) only on floating controls, never content panels. Page titles use `PageHeader` (last word in Instrument Serif italic). Buttons are capsules with `spring` motion; inner radii `var(--radius-inner)` inside `var(--radius-card)` panels. Status colours carry text too (contrast ≥ 4.5:1) — always with a label or sign, never colour alone. Run the dataviz palette validator before changing chart colours. The user didn't like a light, apple.com-marketing look.
+
 ## Commands
 `npm run check` (typecheck, lint, unit, integration) · `npm run test:e2e` · `npm run test:perf` (large-ledger timings) · `npm run db:generate` then hand-review SQL · `npm run db:migrate` · `npm run db:seed-demo -- --with-user` · `npm run worker` (alerts + billing lifecycle) · `scripts/grant-admin.ts`, `scripts/record-compliance-decision.ts` (operator scripts, owner role). Ops: docs/RUNBOOK.md.
 

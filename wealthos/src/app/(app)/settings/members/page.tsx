@@ -49,7 +49,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
                       <form action={roleAction} className="flex items-center gap-1">
                         <input type="hidden" name="userId" value={m.userId} />
                         <label htmlFor={`role-${m.userId}`} className="sr-only">Role for {m.displayName}</label>
-                        <select id={`role-${m.userId}`} name="role" defaultValue={m.role} className="h-8 rounded-lg border border-border bg-surface px-2 text-[13px]">{Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+                        <select id={`role-${m.userId}`} name="role" defaultValue={m.role} className="h-8 rounded-[var(--radius-inner)] border border-border bg-surface px-2 text-[13px]">{Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
                         <Button type="submit" variant="ghost" size="sm">Save</Button>
                       </form>
                     ) : <Badge>{ROLE_LABELS[m.role]}</Badge>}

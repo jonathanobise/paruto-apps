@@ -69,7 +69,7 @@ export default async function InstrumentPage({ params }: { params: Promise<{ id:
             <h3 className="mt-6 text-[13px] font-semibold">Trailing price returns (in {x.currency})</h3>
             <dl className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-6">
               {x.trailing.map((t) => (
-                <div key={t.key} className="rounded-lg bg-surface-2 px-3 py-2">
+                <div key={t.key} className="rounded-[var(--radius-inner)] bg-surface-2 px-3 py-2">
                   <dt className="text-[12px] text-text-3">{t.key}</dt>
                   <dd className="text-[14px] font-medium">{t.cumulative === null ? <span className="text-text-3">—</span> : <Delta value={t.cumulative} percent />}</dd>
                   {t.annualized ? <dd className="num text-[11px] text-text-3">{formatPercent(t.annualized, { signed: true, decimals: 2 })} a yr</dd> : null}

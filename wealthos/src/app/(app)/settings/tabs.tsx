@@ -10,9 +10,9 @@ export function SettingsTabs({ current }: { current: "general" | "security" | "p
     { key: "privacy", href: "/settings/privacy", label: "Privacy & data" },
   ];
   return (
-    <nav aria-label="Settings sections" className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
+    <nav aria-label="Settings sections" className="glass mb-7 flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1">
       {tabs.map((t) => (
-        <Link key={t.key} href={t.href} aria-current={t.key === current ? "page" : undefined} className={cn("-mb-px shrink-0 border-b-2 px-3 py-2 text-sm font-medium", t.key === current ? "border-accent text-text" : "border-transparent text-text-3 hover:text-text")}>
+        <Link key={t.key} href={t.href} aria-current={t.key === current ? "page" : undefined} className={cn("spring shrink-0 rounded-full px-4 py-1.5 text-sm font-medium", t.key === current ? "bg-brand text-brand-ink" : "text-text-2 hover:text-text")}>
           {t.label}
         </Link>
       ))}

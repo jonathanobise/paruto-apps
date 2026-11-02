@@ -28,10 +28,10 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       <PageHeader title="Reports" description={`Statements for “${app.org.name}”, built from the same calculations as your dashboard, with sources, dates and methodology notes.`} />
       <form className="mb-6 flex flex-wrap items-end gap-3" method="get">
         <label className="flex flex-col gap-1 text-[13px] text-text-2">Period
-          <select name="period" defaultValue={period} className="h-9 rounded-lg border border-border bg-surface px-2 text-sm text-text">{REPORT_PERIODS.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}</select>
+          <select name="period" defaultValue={period} className="h-9 rounded-[var(--radius-inner)] border border-border bg-surface px-2 text-sm text-text">{REPORT_PERIODS.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}</select>
         </label>
         <label className="flex flex-col gap-1 text-[13px] text-text-2">Currency
-          <select name="currency" defaultValue={currency} className="num h-9 rounded-lg border border-border bg-surface px-2 text-sm text-text">{DISPLAY_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}</select>
+          <select name="currency" defaultValue={currency} className="num h-9 rounded-[var(--radius-inner)] border border-border bg-surface px-2 text-sm text-text">{DISPLAY_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         </label>
         <Button type="submit" variant="secondary" size="sm">Apply</Button>
       </form>

@@ -39,13 +39,13 @@ export async function ConnectionsCard({ ctx, jurisdiction, account, canWrite }: 
           <AdminForm action={connectAction} submit="Give consent and connect">
             <input type="hidden" name="accountId" value={account.id} />
             <label className="flex flex-col gap-1">Provider
-              <select name="provider" className="h-9 rounded-lg border border-border bg-surface px-2">{providers.map((p) => <option key={p.key} value={p.key}>{p.name}</option>)}</select>
+              <select name="provider" className="h-9 rounded-[var(--radius-inner)] border border-border bg-surface px-2">{providers.map((p) => <option key={p.key} value={p.key}>{p.name}</option>)}</select>
             </label>
             <fieldset className="flex flex-col gap-1"><legend className="mb-1">What WealthOS may read</legend>
               {Object.entries(SCOPE_LABELS).map(([k, v]) => <label key={k} className="flex items-center gap-2"><input type="checkbox" name="scopes" value={k} defaultChecked /> {v}</label>)}
             </fieldset>
             <label className="flex flex-col gap-1">For how long
-              <select name="days" defaultValue="90" className="h-9 max-w-40 rounded-lg border border-border bg-surface px-2"><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option></select>
+              <select name="days" defaultValue="90" className="h-9 max-w-40 rounded-[var(--radius-inner)] border border-border bg-surface px-2"><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option></select>
             </label>
             <ul className="list-disc space-y-1 pl-5 text-text-2">
               <li>Access is read-only: WealthOS can&apos;t move money or see your bank password.</li>

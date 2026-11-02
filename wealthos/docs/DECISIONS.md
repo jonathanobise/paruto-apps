@@ -16,7 +16,7 @@
 
 **ADR-008 Versions (Nov 2026).** Next 16.4.3, React 19.3.1, Drizzle 0.45.4, Zod 4.6.7, Tailwind 4.3.3, Recharts 3.10.1, Vitest 5.0.5, Playwright 1.63 (matches the environment's browser). TypeScript 6.0.3 instead of 7.0 (native compiler) because Next's type tooling relies on the JS compiler API. All pinned exactly.
 
-**ADR-009 Design system.** Tokens in `globals.css` (light default, OS dark, explicit toggle); Inter + Fraunces self-hosted via Fontsource (no third-party font requests). Chart series colours validated for contrast and colour-vision deficiency (light `#0F7B57`/`#B45309`, dark `#35A57A`/`#C2611A`, all checks pass). Gains/losses always carry a +/− sign, never colour alone. shadcn-style components written in-repo on Radix.
+**ADR-009 Design system.** *Superseded by ADR-027.* Originally a light, forest-green theme with Inter and Fraunces.
 
 **ADR-010 Valuation conventions.** End-of-day flow convention for TWR; FIFO default; discount instruments accrete straight-line; missing price → at cost (flagged); missing FX → excluded (flagged). See FINANCIAL_ENGINE.md.
 
@@ -51,6 +51,8 @@
 **ADR-025 PWA without data caching.** The service worker caches only a static offline page; financial pages and API responses are never stored on the device. Native apps are deferred until a token-based API and store accounts are justified.
 
 **ADR-026 Jurisdictions as data, features gated per jurisdiction.** Expansion is a compliance decision per feature per country, not a code switch; planned countries are catalogued but unavailable by construction.
+
+**ADR-027 Paruto design standard.** WealthOS follows the Paruto design language: dark editorial base for every visitor regardless of OS setting (light is opt-in from the header toggle, saved as a preference; no prefers-color-scheme switching), refined with Apple's HIG — SF Pro via the system stack (self-hosted Geist fallback) with Instrument Serif italic as the accent (last word of page titles), Liquid Glass (`.glass`) only on floating controls (top bar, navigation, segmented controls, chips, secondary buttons, menus, chart tooltips), never on content panels; Apple system colours for gains/losses/status stepped to ≥ 4.5:1 text contrast on every surface; capsule buttons with spring motion; concentric radii (24px panels, 12px inner); layered app-icon mark. Chart series (green, blue, orange) pass all six dataviz-validator checks in both modes; series 1 and 2 are the pair drawn together. Fonts are self-hosted (CSP allows no third-party requests). Printed pages are always light.
 
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.

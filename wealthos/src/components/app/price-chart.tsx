@@ -22,7 +22,7 @@ export function PriceChart({ data, currency, label }: { data: Array<{ date: stri
                 if (!active || !payload?.length) return null;
                 const row = payload[0]!.payload as { date: string; price: number };
                 return (
-                  <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] shadow-lg">
+                  <div className="glass rounded-[14px] px-3 py-2 text-[13px]">
                     <p className="font-medium">{formatDate(row.date)}</p>
                     <p className="num text-text-2">{formatMoney(String(row.price), currency, { decimals: 4 })}</p>
                   </div>
@@ -35,7 +35,7 @@ export function PriceChart({ data, currency, label }: { data: Array<{ date: stri
       </div>
       <details className="mt-2 text-[13px]">
         <summary className="cursor-pointer text-text-3 hover:text-text">Show as table (weekly)</summary>
-        <div className="mt-2 max-h-56 overflow-auto rounded-lg border border-border">
+        <div className="mt-2 max-h-56 overflow-auto rounded-[var(--radius-inner)] border border-border">
           <table className="w-full">
             <tbody>
               {[...data].reverse().map((r) => (

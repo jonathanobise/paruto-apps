@@ -45,7 +45,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
               <ul className="flex flex-col gap-1">
                 {conversations.map((x) => (
                   <li key={x.id}>
-                    <Link href={`/assistant?c=${x.id}`} className={cn("block truncate rounded-lg px-3 py-2 text-sm", x.id === current?.conversation.id ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")} aria-current={x.id === current?.conversation.id ? "page" : undefined}>
+                    <Link href={`/assistant?c=${x.id}`} className={cn("block truncate rounded-[var(--radius-inner)] px-3 py-2 text-sm", x.id === current?.conversation.id ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")} aria-current={x.id === current?.conversation.id ? "page" : undefined}>
                       {x.title}
                     </Link>
                   </li>

@@ -16,7 +16,7 @@ export default async function VerifyEmailPage() {
       <div className="mb-6 flex size-12 items-center justify-center rounded-full bg-accent-soft text-accent">
         <MailCheck aria-hidden />
       </div>
-      <h1 className="font-display text-3xl font-semibold">Confirm your email</h1>
+      <h1 className="font-display text-[36px] leading-[1.05]">Confirm your email</h1>
       <p className="mt-3 text-sm leading-relaxed text-text-2">
         We sent a link to <strong className="text-text">{session.user.email}</strong>. Open it to finish setting up your account. The link expires in 24 hours.
       </p>

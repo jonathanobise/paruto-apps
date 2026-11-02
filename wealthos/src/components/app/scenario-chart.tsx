@@ -34,7 +34,7 @@ export function ScenarioChart({ series, currency, target, mode = "nominal" }: { 
                 const { active, payload, label } = p as TooltipContentProps<number, string>;
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] shadow-lg">
+                  <div className="glass rounded-[14px] px-3 py-2 text-[13px]">
                     <p className="font-medium">{Number(label) === 0 ? "Now" : `After ${Number(label).toFixed(Number.isInteger(Number(label)) ? 0 : 1)} years`}</p>
                     {payload.map((x, i) => <p key={i} className="flex justify-between gap-4 text-text-2"><span>{String(x.dataKey)}</span><span className="num text-text">{formatMoney(String(x.value), currency, { decimals: 0 })}</span></p>)}
                   </div>

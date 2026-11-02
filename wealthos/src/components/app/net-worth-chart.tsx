@@ -12,7 +12,7 @@ function TooltipBox({ active, payload, label, currency }: TooltipContentProps<nu
   if (!active || !payload?.length) return null;
   const row = payload[0]!.payload as HistoryPoint;
   return (
-    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-[13px] shadow-lg">
+    <div className="glass rounded-[14px] px-3 py-2 text-[13px]">
       <p className="font-medium text-text">{formatDate(String(label))}</p>
       <p className="mt-1 flex items-center gap-2 text-text-2">
         <span className="inline-block size-2 rounded-full bg-[var(--series-1)]" aria-hidden /> Net worth
@@ -61,7 +61,7 @@ export function NetWorthChart({ data, currency }: { data: HistoryPoint[]; curren
       </div>
       <details className="mt-3 text-[13px]">
         <summary className="cursor-pointer text-text-3 hover:text-text">Show as table</summary>
-        <div className="mt-2 max-h-64 overflow-auto rounded-lg border border-border">
+        <div className="mt-2 max-h-64 overflow-auto rounded-[var(--radius-inner)] border border-border">
           <table className="w-full text-left">
             <thead className="sticky top-0 bg-surface-2 text-text-3">
               <tr>

@@ -68,7 +68,7 @@ export default async function ImportPreviewPage({ params, searchParams }: { para
           ["Possible duplicates", s.duplicates, "warning"],
           [batch.status === "committed" || batch.status === "rolled_back" ? "Imported" : "With warnings", batch.status === "committed" || batch.status === "rolled_back" ? s.imported : s.warnings, "neutral"],
         ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-xl border border-border bg-surface px-4 py-3">
+          <div key={String(label)} className="rounded-[18px] border border-border bg-surface px-4 py-3">
             <dt className="text-[12px] text-text-3">{label}</dt>
             <dd className="num text-xl font-semibold">{value ?? 0}</dd>
           </div>
@@ -113,9 +113,9 @@ export default async function ImportPreviewPage({ params, searchParams }: { para
         <Card className="overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4">
             <h2 className="text-[15px] font-semibold">Rows</h2>
-            <nav aria-label="Filter rows" className="inline-flex rounded-lg border border-border bg-surface-2 p-0.5">
+            <nav aria-label="Filter rows" className="inline-flex rounded-[var(--radius-inner)] border border-border bg-surface-2 p-0.5">
               {FILTERS.map((f) => (
-                <Link key={f} href={`?show=${f}`} scroll={false} aria-current={f === show ? "true" : undefined} className={cn("rounded-md px-2.5 py-1 text-[12px] font-medium capitalize", f === show ? "bg-surface text-text shadow-sm" : "text-text-3 hover:text-text")}>
+                <Link key={f} href={`?show=${f}`} scroll={false} aria-current={f === show ? "true" : undefined} className={cn("rounded-[8px] px-2.5 py-1 text-[12px] font-medium capitalize", f === show ? "bg-surface text-text shadow-sm" : "text-text-3 hover:text-text")}>
                   {f === "error" ? "Errors" : f === "duplicate" ? "Duplicates" : f}
                 </Link>
               ))}

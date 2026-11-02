@@ -6,7 +6,7 @@ export const metadata = { title: "Reset password · WealthOS" };
 export default function ResetPage() {
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Reset your password</h1>
+      <h1 className="font-display text-[36px] leading-[1.05]">Reset your <em>password</em></h1>
       <p className="mt-2 text-sm text-text-2">We&apos;ll email you a link to choose a new one.</p>
       <div className="mt-8">
         <RequestResetForm />

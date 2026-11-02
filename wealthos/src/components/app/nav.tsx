@@ -26,6 +26,9 @@ const live = [
 // Modules on the roadmap. Shown so the product shape is clear, but not clickable until built.
 const upcoming: Array<{ label: string; icon: typeof FileText; milestone: string }> = [];
 
+/** Capsule nav items; the active one is lifted (Paruto standard). */
+const item = (active: boolean) => cn("flex items-center gap-3 rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200", active ? "bg-text/10 text-text shadow-[inset_0_1px_0_var(--hi)]" : "text-text-2 hover:bg-text/5 hover:text-text");
+
 export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; isAdmin?: boolean }) {
   const pathname = usePathname();
   return (
@@ -39,7 +42,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
                 href={href}
                 onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
-                className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors", active ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2 hover:text-text")}
+                className={item(active)}
               >
                 <Icon className={cn("size-4", active ? "text-accent" : "text-text-3")} aria-hidden />
                 {label}
@@ -55,7 +58,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
             <li key={label} className="flex items-center gap-3 px-3 py-1.5 text-sm text-text-3">
               <Icon className="size-4" aria-hidden />
               <span className="flex-1">{label}<span className="sr-only"> (not available yet)</span></span>
-              <span className="rounded bg-surface-2 px-1.5 text-[10px] font-semibold">{milestone}</span>
+              <span className="rounded-full bg-surface-2 px-2 text-[10px] font-semibold">{milestone}</span>
             </li>
           ))}
         </ul>
@@ -63,18 +66,18 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
       <ul className="flex flex-col gap-0.5">
         {isAdmin ? (
           <li>
-            <Link href="/admin" onClick={onNavigate} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium", pathname.startsWith("/admin") ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")}>
+            <Link href="/admin" onClick={onNavigate} className={item(pathname.startsWith("/admin"))}>
               <Shield className="size-4 text-text-3" aria-hidden /> Admin
             </Link>
           </li>
         ) : null}
         <li>
-          <Link href="/settings" onClick={onNavigate} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium", pathname.startsWith("/settings") ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")}>
+          <Link href="/settings" onClick={onNavigate} className={item(pathname.startsWith("/settings"))}>
             <Settings className="size-4 text-text-3" aria-hidden /> Settings
           </Link>
         </li>
         <li>
-          <Link href="/support" onClick={onNavigate} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium", pathname.startsWith("/support") ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")}>
+          <Link href="/support" onClick={onNavigate} className={item(pathname.startsWith("/support"))}>
             <LifeBuoy className="size-4 text-text-3" aria-hidden /> Help
           </Link>
         </li>
@@ -86,10 +89,12 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
 export function MobileNav({ isAdmin = false, footer }: { isAdmin?: boolean; footer?: React.ReactNode }) {
   return (
     <details className="group lg:hidden">
-      <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-lg border border-border text-text-2" aria-label="Open menu">
+      <summary className="spring flex size-9 cursor-pointer list-none items-center justify-center rounded-full text-text-2 hover:bg-text/10" aria-label="Open menu">
         <Menu className="size-4" aria-hidden />
       </summary>
-      <div className="fixed inset-x-0 top-14 z-40 max-h-[calc(100dvh-56px)] overflow-y-auto border-b border-border bg-surface p-4 shadow-lg">
+      {/* Anchored under the glass bar (a backdrop-filter parent is the containing block, so not fixed);
+          near-opaque so the menu stays readable over content. */}
+      <div className="absolute inset-x-0 top-[calc(100%+8px)] z-40 max-h-[calc(100dvh-96px)] overflow-y-auto rounded-[28px] border border-[var(--glass-rim)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] p-3 shadow-[var(--glass-shadow)] backdrop-blur-xl">
         <Nav isAdmin={isAdmin} />
         {footer ? <div className="mt-4 border-t border-border pt-3 sm:hidden">{footer}</div> : null}
       </div>

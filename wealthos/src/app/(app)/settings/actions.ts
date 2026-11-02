@@ -29,8 +29,7 @@ export async function preferencesAction(_: FormState, form: FormData): Promise<F
     });
     const jar = await cookies();
     jar.delete(CURRENCY_COOKIE);
-    if (theme === "light" || theme === "dark") jar.set(THEME_COOKIE, theme, { path: "/", sameSite: "lax", maxAge: 31536000 });
-    else jar.delete(THEME_COOKIE);
+    jar.set(THEME_COOKIE, theme === "light" ? "light" : "dark", { path: "/", sameSite: "lax", maxAge: 31536000 });
   } catch (err) {
     return toActionError(err);
   }

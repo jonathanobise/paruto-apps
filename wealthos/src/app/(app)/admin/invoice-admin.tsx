@@ -8,7 +8,7 @@ export interface InvoiceRow { id: string; number: string; status: string; total:
 /** An invoice with the reconciliation actions an administrator can take on it. */
 export function InvoiceAdmin({ invoice: i, readOnly = false }: { invoice: InvoiceRow; readOnly?: boolean }) {
   return (
-    <div className="rounded-lg border border-border p-3 text-[13px]">
+    <div className="rounded-[var(--radius-inner)] border border-border p-3 text-[13px]">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p><span className="num font-medium">{i.number}</span> · {i.description}</p>
         <p className="flex items-center gap-2"><span className="num font-semibold">{i.totalLabel}</span><Badge tone={i.status === "paid" ? "accent" : i.status === "open" ? "warning" : "neutral"}>{i.status}</Badge></p>

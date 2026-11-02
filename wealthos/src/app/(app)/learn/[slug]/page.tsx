@@ -39,7 +39,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               return <ul key={i} className="list-disc space-y-1.5 pl-5">{b.items.map((x, j) => <li key={j}>{x}</li>)}</ul>;
             case "formula":
               return (
-                <figure key={i} className="rounded-lg bg-surface-2 px-4 py-3">
+                <figure key={i} className="rounded-[var(--radius-inner)] bg-surface-2 px-4 py-3">
                   <code className="num text-[14px]">{b.text}</code>
                   {b.caption ? <figcaption className="mt-1 text-[12px] text-text-3">{b.caption}</figcaption> : null}
                 </figure>

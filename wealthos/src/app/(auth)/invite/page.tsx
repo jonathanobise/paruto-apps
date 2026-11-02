@@ -11,11 +11,11 @@ export default async function InvitePage({ searchParams }: { searchParams: Promi
   const token = (await searchParams).token ?? "";
   const [invite, session] = await Promise.all([previewInvitation(token), getSession()]);
   const here = `/invite?token=${encodeURIComponent(token)}`;
-  if (!invite) return (<div><h1 className="font-display text-3xl font-semibold">Invitation</h1><Alert tone="warning" className="mt-6">This invitation link isn&apos;t valid. Ask the person who invited you to send a new one.</Alert></div>);
+  if (!invite) return (<div><h1 className="font-display text-[36px] leading-[1.05]">Invitation</h1><Alert tone="warning" className="mt-6">This invitation link isn&apos;t valid. Ask the person who invited you to send a new one.</Alert></div>);
   const signedIn = session && (!session.user.mfaEnabled || session.mfaSatisfied);
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Join “{invite.org_name}”</h1>
+      <h1 className="font-display text-[36px] leading-[1.05]">Join “{invite.org_name}”</h1>
       <p className="mt-2 text-sm text-text-2">You&apos;ve been invited as {ROLE_LABELS[invite.role].toLowerCase()}. {ROLE_HELP[invite.role]}</p>
       <div className="mt-8 flex flex-col gap-4">
         {invite.state !== "open" ? <Alert tone="warning">This invitation has {invite.state === "accepted" ? "already been used" : invite.state === "expired" ? "expired" : "been withdrawn"}. Ask for a new one if you still need access.</Alert> : !signedIn ? (

@@ -29,7 +29,7 @@ export function UploadForm({ accounts, mappings, defaultAccount }: { accounts: A
         </Select>
       </Field>
       <Field label="CSV file" htmlFor="file" hint="UTF-8 CSV, up to 2 MB and 5,000 rows. Export Excel sheets as “CSV UTF-8”." error={fieldError(state, "file")}>
-        <Input id="file" name="file" type="file" accept=".csv,text/csv" required className="h-auto py-2 file:mr-3 file:rounded-md file:border-0 file:bg-surface-2 file:px-3 file:py-1 file:text-sm" />
+        <Input id="file" name="file" type="file" accept=".csv,text/csv" required className="h-auto py-2 file:mr-3 file:rounded-[8px] file:border-0 file:bg-surface-2 file:px-3 file:py-1 file:text-sm" />
       </Field>
       <div className="sm:col-span-2">
         <SubmitButton pendingText="Checking the file…">Upload and preview</SubmitButton>

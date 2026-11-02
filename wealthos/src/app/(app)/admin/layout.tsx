@@ -20,9 +20,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const app = await requireStaffPage();
   return (
     <>
-      <nav aria-label="Admin" className="mb-6 flex flex-wrap gap-1 border-b border-border">
-        {TABS.filter(([, , roles]) => roles.includes(app.staffRole)).map(([href, label]) => <Link key={href} href={href} className="-mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium text-text-2 hover:text-text">{label}</Link>)}
-        <span className="ml-auto self-center text-[12px] text-text-3">Signed in as {app.staffRole === "admin" ? "administrator" : app.staffRole === "support" ? "support agent" : "compliance reviewer"}</span>
+      <nav aria-label="Admin" className="glass mb-7 flex flex-wrap items-center gap-1 rounded-[22px] p-1">
+        {TABS.filter(([, , roles]) => roles.includes(app.staffRole)).map(([href, label]) => <Link key={href} href={href} className="spring rounded-full px-3.5 py-1.5 text-sm font-medium text-text-2 hover:bg-surface-2 hover:text-text">{label}</Link>)}
+        <span className="ml-auto self-center px-3 text-[12px] text-text-3">Signed in as {app.staffRole === "admin" ? "administrator" : app.staffRole === "support" ? "support agent" : "compliance reviewer"}</span>
       </nav>
       {children}
     </>

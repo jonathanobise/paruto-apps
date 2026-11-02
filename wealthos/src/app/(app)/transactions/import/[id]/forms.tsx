@@ -32,7 +32,7 @@ export function MappingForm({ batchId, headers, fields, columns, dateFormat, unk
         </Field>
       </div>
       {unknownTypes.length || Object.keys(typeAliases).length ? (
-        <fieldset className="rounded-xl border border-border p-4">
+        <fieldset className="rounded-[18px] border border-border p-4">
           <legend className="px-1 text-[13px] font-medium text-text-2">What do this institution&apos;s type words mean?</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             {[...new Set([...Object.keys(typeAliases), ...unknownTypes])].map((t) => (

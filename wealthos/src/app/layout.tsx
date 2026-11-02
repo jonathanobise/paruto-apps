@@ -14,15 +14,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f3ec" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c1310" },
-  ],
+  // Dark is the default for every visitor (Paruto standard); light is opt-in.
+  themeColor: "#060608",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = (await cookies()).get(THEME_COOKIE)?.value;
-  const dataTheme = theme === "light" || theme === "dark" ? theme : undefined;
+  const dataTheme = theme === "light" ? "light" : "dark";
   return (
     <html lang="en" data-theme={dataTheme} suppressHydrationWarning>
       <body className="min-h-dvh">
@@ -30,6 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         {children}
+        <div className="grain" aria-hidden />
         <ServiceWorker />
       </body>
     </html>

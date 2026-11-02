@@ -6,6 +6,9 @@ import { CURRENCY_COOKIE, THEME_COOKIE, getSession } from "@/server/auth/context
 import { setActiveOrg } from "@/server/identity/sessions";
 import { listOrganizations } from "@/server/identity/tenancy";
 import { isDisplayCurrency } from "@/engine";
+import { eq } from "drizzle-orm";
+import { db } from "@/server/db/client";
+import { userPreferences } from "@/server/db/schema";
 
 export async function switchOrgAction(form: FormData): Promise<void> {
   const session = await getSession();
@@ -23,10 +26,11 @@ export async function setCurrencyAction(form: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
+/** Header sun/moon toggle: dark is the default; light is opt-in (cookie + saved preference). */
 export async function setThemeAction(form: FormData): Promise<void> {
-  const theme = String(form.get("theme") ?? "system");
-  const jar = await cookies();
-  if (theme === "light" || theme === "dark") jar.set(THEME_COOKIE, theme, { path: "/", sameSite: "lax", maxAge: 31536000 });
-  else jar.delete(THEME_COOKIE);
+  const theme = String(form.get("theme")) === "light" ? "light" : "dark";
+  (await cookies()).set(THEME_COOKIE, theme, { path: "/", sameSite: "lax", maxAge: 31536000 });
+  const session = await getSession();
+  if (session) await db().update(userPreferences).set({ theme, updatedAt: new Date() }).where(eq(userPreferences.userId, session.userId));
   revalidatePath("/", "layout");
 }

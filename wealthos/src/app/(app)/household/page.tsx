@@ -41,7 +41,7 @@ export default async function HouseholdPage() {
         <CardHeader><div><CardTitle>Who owns each account</CardTitle><CardDescription>Shares are of this space&apos;s part of the account (after its ownership percentage). Leave everyone at 0 for jointly held or not yet decided.</CardDescription></div></CardHeader>
         <CardContent className="flex flex-col gap-4">
           {h.accounts.map((a) => (
-            <div key={a.accountId} className="rounded-lg border border-border p-3">
+            <div key={a.accountId} className="rounded-[var(--radius-inner)] border border-border p-3">
               <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
                 <p className="font-medium">{a.name} {a.kind === "liability" ? <Badge>Liability</Badge> : null}</p>
                 <p className="num text-[13px] text-text-2">{a.value === null ? "Not valued" : formatMoney(a.value, ccy)}</p>
@@ -54,7 +54,7 @@ export default async function HouseholdPage() {
                       <label key={p.userId} className="flex items-center gap-2 text-[13px]">
                         <input type="hidden" name="userId" value={p.userId} />
                         <span className="min-w-20">{p.name}</span>
-                        <input name="percent" inputMode="decimal" defaultValue={a.owners.find((o) => o.userId === p.userId)?.percent ?? ""} placeholder="0" aria-label={`${p.name}'s share of ${a.name} (%)`} className="num h-8 w-20 rounded-lg border border-border bg-surface px-2 text-right" />
+                        <input name="percent" inputMode="decimal" defaultValue={a.owners.find((o) => o.userId === p.userId)?.percent ?? ""} placeholder="0" aria-label={`${p.name}'s share of ${a.name} (%)`} className="num h-8 w-20 rounded-[var(--radius-inner)] border border-border bg-surface px-2 text-right" />
                         <span className="text-text-3">%</span>
                       </label>
                     ))}

@@ -67,7 +67,7 @@ export default async function GoalPage({ params }: { params: Promise<{ id: strin
           <CardContent>
             <ul className="flex flex-col gap-4 text-[13px]">
               {v.scenarios.map((s) => (
-                <li key={s.label} className="rounded-xl border border-border p-3">
+                <li key={s.label} className="rounded-[18px] border border-border p-3">
                   <p className="flex items-center gap-2 font-medium">
                     {s.meetsTarget ? <CircleCheck className="size-4 text-positive" aria-hidden /> : <CircleDashed className="size-4 text-warning" aria-hidden />}
                     {s.label} · {formatPercent(s.annualReturn, { decimals: 1 })} a year {s.meetsTarget ? <span className="sr-only">(reaches the target)</span> : <span className="sr-only">(falls short)</span>}
@@ -86,7 +86,7 @@ export default async function GoalPage({ params }: { params: Promise<{ id: strin
           <CardHeader><div><CardTitle>If you save in naira</CardTitle><CardDescription>Your goal is in {ccy}. At today&apos;s rate ({v.currencySensitivity.fxRate} NGN per {ccy}) the target at the date is about {formatMoney(v.currencySensitivity.ngnToday, "NGN", { decimals: 0 })}.</CardDescription></div></CardHeader>
           <CardContent>
             <ul className="grid gap-3 text-[13px] sm:grid-cols-3">
-              {v.currencySensitivity.rows.map((r) => <li key={r.label} className="rounded-lg bg-surface-2 p-3"><p className="text-text-3">{r.label}</p><p className="num text-base font-semibold">{formatMoney(r.ngn, "NGN", { decimals: 0 })}</p></li>)}
+              {v.currencySensitivity.rows.map((r) => <li key={r.label} className="rounded-[var(--radius-inner)] bg-surface-2 p-3"><p className="text-text-3">{r.label}</p><p className="num text-base font-semibold">{formatMoney(r.ngn, "NGN", { decimals: 0 })}</p></li>)}
             </ul>
           </CardContent>
         </Card>

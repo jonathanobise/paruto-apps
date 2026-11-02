@@ -67,7 +67,7 @@ export default async function InvoicePage({ params, searchParams }: { params: Pr
         </table>
         {inv.status === "open" ? (
           settings.bankTransfer ? (
-            <div className="mt-8 rounded-lg bg-surface-2 p-4 text-[13px]">
+            <div className="mt-8 rounded-[var(--radius-inner)] bg-surface-2 p-4 text-[13px]">
               <p className="font-medium">Pay by bank transfer</p>
               <p className="mt-1">{settings.bankTransfer.bankName} · {settings.bankTransfer.accountName} · <span className="num">{settings.bankTransfer.accountNumber}</span></p>
               <p className="mt-1 text-text-2">Use <span className="num font-medium text-text">{inv.number}</span> as the payment reference. {settings.bankTransfer.instructions}</p>
