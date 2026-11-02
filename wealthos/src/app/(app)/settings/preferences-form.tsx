@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { preferencesAction } from "./actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -6,9 +7,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
 export function PreferencesForm(p: { displayName: string; baseCurrency: string; timezone: string; locale: string; theme: string; notifyInApp: boolean; notifyEmail: boolean }) {
-  const [state, action] = useActionState(preferencesAction, null);
+  const [state, action, actionPending] = useActionState(preferencesAction, null);
   return (
-    <form action={action} className="grid gap-5 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2"><FormMessage state={state} /></div>
       <Field label="Display name" htmlFor="displayName" error={fieldError(state, "displayName")}><Input id="displayName" name="displayName" defaultValue={p.displayName} /></Field>
       <Field label="Default display currency" htmlFor="baseCurrency"><Select id="baseCurrency" name="baseCurrency" defaultValue={p.baseCurrency}>{["NGN", "USD", "GBP", "EUR"].map((c) => <option key={c}>{c}</option>)}</Select></Field>
@@ -21,6 +22,6 @@ export function PreferencesForm(p: { displayName: string; baseCurrency: string; 
         <label className="flex items-center gap-2"><input type="checkbox" name="notifyEmail" defaultChecked={p.notifyEmail} className="accent-[var(--accent)]" /> Email alerts (when available)</label>
       </fieldset>
       <div className="sm:col-span-2"><SubmitButton pendingText="Saving…">Save preferences</SubmitButton></div>
-    </form>
+    </ActionForm>
   );
 }

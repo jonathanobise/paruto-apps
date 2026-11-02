@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import Link from "next/link";
 import { signInAction } from "../actions";
@@ -7,9 +8,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
 export function SignInForm() {
-  const [state, action] = useActionState(signInAction, null);
+  const [state, action, actionPending] = useActionState(signInAction, null);
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <ActionForm action={action} pending={actionPending} className="flex flex-col gap-4" noValidate>
       <FormMessage state={state} />
       <Field label="Email" htmlFor="email" error={fieldError(state, "email")}>
         <Input id="email" name="email" type="email" autoComplete="email" required />
@@ -25,6 +26,6 @@ export function SignInForm() {
       <SubmitButton size="lg" pendingText="Signing in…">
         Sign in
       </SubmitButton>
-    </form>
+    </ActionForm>
   );
 }

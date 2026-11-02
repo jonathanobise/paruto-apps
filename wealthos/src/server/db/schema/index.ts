@@ -5,3 +5,4 @@ export * from "./portfolio";
 export * from "./compliance";
 export * from "./analytics";
 export * from "./research";
+export * from "./planning";

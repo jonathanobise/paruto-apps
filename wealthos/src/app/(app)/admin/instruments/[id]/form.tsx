@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { saveInstrumentAction } from "../../actions";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
@@ -8,12 +9,12 @@ import { FormMessage, fieldError } from "@/components/ui/form-message";
 type V = Record<string, string | number | boolean | null | undefined>;
 
 export function InstrumentForm({ id, v, facts, classes }: { id: string | null; v: V; facts: Record<string, unknown>; classes: Array<[string, string]> }) {
-  const [state, action] = useActionState(saveInstrumentAction, null);
+  const [state, action, actionPending] = useActionState(saveInstrumentAction, null);
   const t = (k: string) => (v[k] === null || v[k] === undefined ? "" : String(v[k]));
   const f = (k: string) => (facts[k] === undefined ? "" : String(facts[k]));
   const err = (k: string) => fieldError(state, k);
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <ActionForm action={action} pending={actionPending} className="flex flex-col gap-6">
       <FormMessage state={state} />
       {id ? <input type="hidden" name="id" value={id} /> : null}
       <fieldset className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -59,6 +60,6 @@ export function InstrumentForm({ id, v, facts, classes }: { id: string | null; v
         </label>
       </fieldset>
       <div><SubmitButton pendingText="Saving…">Save instrument</SubmitButton></div>
-    </form>
+    </ActionForm>
   );
 }

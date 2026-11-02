@@ -15,3 +15,4 @@ export * from "./projection";
 export * from "./fixed-income";
 export * from "./holding-performance";
 export * from "./price-returns";
+export * from "./stress";

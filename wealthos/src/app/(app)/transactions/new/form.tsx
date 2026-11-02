@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState, useMemo, useState } from "react";
 import { postEventAction } from "../actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -53,7 +54,7 @@ const NEEDS: Record<string, string[]> = {
 const CURRENCIES = ["NGN", "USD", "GBP", "EUR"];
 
 export function TransactionForm({ accounts, instruments, today, defaultAccount }: { accounts: Account[]; instruments: Instrument[]; today: string; defaultAccount?: string }) {
-  const [state, action] = useActionState(postEventAction, null);
+  const [state, action, actionPending] = useActionState(postEventAction, null);
   const [type, setType] = useState("deposit");
   const [instrumentId, setInstrumentId] = useState("");
   const [accountId, setAccountId] = useState(defaultAccount ?? accounts[0]?.id ?? "");
@@ -98,7 +99,7 @@ export function TransactionForm({ accounts, instruments, today, defaultAccount }
   );
 
   return (
-    <form action={action} className="grid gap-5 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <FormMessage state={state} />
       </div>
@@ -172,6 +173,6 @@ export function TransactionForm({ accounts, instruments, today, defaultAccount }
         <SubmitButton pendingText="Validating and saving…">Save transaction</SubmitButton>
         <p className="mt-2 text-xs text-text-3">Entries are permanent. To correct one, reverse it — the original stays in your history.</p>
       </div>
-    </form>
+    </ActionForm>
   );
 }

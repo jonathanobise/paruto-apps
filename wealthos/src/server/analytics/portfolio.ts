@@ -76,6 +76,8 @@ export interface HoldingView {
   weight: string | null;
   synthetic: boolean;
   maturityDate: string | null;
+  /** The user's ownership share of the account (1 = 100%). Net worth counts value × share. */
+  ownershipShare: string;
 }
 
 export interface DashboardData {
@@ -119,7 +121,7 @@ export interface DashboardData {
   allocation: { assetClass: Slice[]; geography: Slice[]; currency: Slice[] };
   concentration: { largestName: string | null; largestWeight: string | null; top5Weight: string; effectiveHoldings: string | null } | null;
   holdings: HoldingView[];
-  cash: Array<{ accountId: string; accountName: string; currency: string; amount: string; amountBase: string | null }>;
+  cash: Array<{ accountId: string; accountName: string; currency: string; amount: string; amountBase: string | null; ownershipShare: string }>;
   manual: Array<Omit<ManualItem, "amount" | "amountBase" | "ownershipPercent"> & { amount: string; amountBase: string | null; ownershipPercent: string }>;
   recent: Array<{ id: string; date: string; type: string; label: string; description: string | null; accountName: string; reversed: boolean; isReversal: boolean }>;
   maturities: Array<{ instrumentId: string; name: string; accountName: string; maturityDate: string; daysToGo: number; faceValue: string | null; currency: string }>;
@@ -342,6 +344,7 @@ export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: s
           weight: h.marketValueBase && !holdingsTotal.isZero() ? h.marketValueBase.div(holdingsTotal).toFixed(6) : null,
           synthetic: h.synthetic,
           maturityDate: info.maturityDate ?? null,
+          ownershipShare: ownershipShare(accounts, h.accountId).toFixed(),
         };
       })
       .sort((a, b) => Number(b.marketValueBase ?? 0) - Number(a.marketValueBase ?? 0));
@@ -421,7 +424,7 @@ export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: s
       allocation: { assetClass: toSlices(byClass), geography: toSlices(byGeo), currency: toSlices(byCurrency) },
       concentration: conc ? { largestName: conc.largest?.label ?? null, largestWeight: conc.largest?.weight.toFixed(6) ?? null, top5Weight: conc.topNWeight.toFixed(6), effectiveHoldings: conc.effectiveHoldings?.toFixed(2) ?? null } : null,
       holdings,
-      cash: valuation.cash.map((c) => ({ accountId: c.accountId, accountName: accountName(c.accountId), currency: c.currency, amount: c.amount.toFixed(2), amountBase: c.amountBase?.toFixed(2) ?? null })),
+      cash: valuation.cash.map((c) => ({ accountId: c.accountId, accountName: accountName(c.accountId), currency: c.currency, amount: c.amount.toFixed(2), amountBase: c.amountBase?.toFixed(2) ?? null, ownershipShare: ownershipShare(accounts, c.accountId).toFixed() })),
       manual: manual.items.map((m) => ({ ...m, amount: m.amount.toFixed(2), amountBase: m.amountBase?.toFixed(2) ?? null, ownershipPercent: m.ownershipPercent.toFixed() })),
       recent,
       maturities,

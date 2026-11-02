@@ -62,6 +62,12 @@ A flow is external when value crosses the boundary of the analysis scope (set of
 - Projections: start balance, per-period contributions (beginning/end), contribution growth, compounding 1/4/12, fees, inflation-deflated real values, explicit "taxes not modelled" and "not guaranteed" disclosures; `projectScenarios` refuses a single scenario. `requiredContribution` solves the level contribution (round-trip tested). Purchasing power, CPI deflation, fee drag, documented stress shocks.
 - Fixed income: discount price, discount → true yield → effective annual yield, nominal → effective, simple interest (ACT/365|364|360|ACT), coupon schedules, fixed-deposit cash flows net of WHT. **Rate methodologies** are typed; `assertComparable` refuses to compare e.g. a T-bill discount rate with a fund's published yield.
 
+## Goals, simulator and stress tests
+- `project` accepts `horizonPeriods` (e.g. 30 months to a target date); the path records each year end and the final, possibly fractional, year. Contribution growth applies at year boundaries. `requiredContribution` solves the level monthly amount for the same horizon (round-trip tested).
+- Goals: starting value = today's value of the linked accounts (or net worth) in the goal's currency; a target "in today's money" is inflated to the target date at the goal's own inflation assumption. Every goal stores ≥2 scenarios; results are shown per scenario, never as one figure. Negative starting values start from zero, with a disclosure.
+- Currency sensitivity (goals in USD/GBP/EUR): naira cost at today's rate and if the naira weakens 10/30/50% by the target date.
+- Stress tests (`stress.ts`): six written-down hypothetical scenarios. Asset rules (first match) then an exact currency revaluation: with NGN base, foreign items × 1/(1 − p); from another base, NGN items × (1 − p). Liabilities are revalued for currency only. Shock sizes are illustrative and stated in the UI.
+
 ## Test fixtures (independent references)
 - Spreadsheet XIRR documentation example → 0.3733625335.
 - TWR/XIRR scenario (100 → +55 contribution → 181.5) hand-computed: TWR 21%, gain 26.5, XIRR 20.9621% (Python bisection).

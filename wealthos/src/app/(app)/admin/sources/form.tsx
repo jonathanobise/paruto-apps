@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { createSourceAction } from "../actions";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
@@ -6,9 +7,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
 export function SourceForm() {
-  const [state, action] = useActionState(createSourceAction, null);
+  const [state, action, actionPending] = useActionState(createSourceAction, null);
   return (
-    <form action={action} className="grid gap-4 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><FormMessage state={state} /></div>
       <Field label="Key" htmlFor="key" hint="e.g. cbn-auctions" error={fieldError(state, "key")}><Input id="key" name="key" required /></Field>
       <Field label="Name" htmlFor="name" error={fieldError(state, "name")}><Input id="name" name="name" required /></Field>
@@ -17,6 +18,6 @@ export function SourceForm() {
       <Field label="URL" htmlFor="url" className="sm:col-span-2" error={fieldError(state, "url")}><Input id="url" name="url" type="url" placeholder="https://" /></Field>
       <Field label="Licence / terms of use" htmlFor="licenseNote" className="sm:col-span-2" hint="What permits WealthOS to store and display this data, and any attribution required." error={fieldError(state, "licenseNote")}><Textarea id="licenseNote" name="licenseNote" required /></Field>
       <div className="sm:col-span-2"><SubmitButton pendingText="Saving…">Add source</SubmitButton></div>
-    </form>
+    </ActionForm>
   );
 }

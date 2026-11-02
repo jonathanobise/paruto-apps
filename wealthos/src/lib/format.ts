@@ -16,7 +16,12 @@ export function formatMoney(value: string | null | undefined, currency: string, 
     notation: opts.compact ? "compact" : "standard",
     signDisplay: opts.signed ? "exceptZero" : "auto",
   });
-  return fmt.format(value as unknown as number).replace("NGN", "₦");
+  return minus(fmt.format(value as unknown as number).replace("NGN", "₦"));
+}
+
+/** Typographic minus sign (U+2212) for negative figures. */
+function minus(s: string): string {
+  return s.replace(/^-/, "\u2212");
 }
 
 export function formatNumber(value: string | null | undefined, maxDecimals = 4): string {
@@ -26,7 +31,7 @@ export function formatNumber(value: string | null | undefined, maxDecimals = 4):
 
 export function formatPercent(value: string | number | null | undefined, opts: { signed?: boolean; decimals?: number } = {}): string {
   if (value === null || value === undefined) return "—";
-  return new Intl.NumberFormat("en-NG", { style: "percent", minimumFractionDigits: opts.decimals ?? 1, maximumFractionDigits: opts.decimals ?? 1, signDisplay: opts.signed ? "exceptZero" : "auto" }).format(Number(value));
+  return new Intl.NumberFormat("en-NG", { style: "percent", minimumFractionDigits: opts.decimals ?? 1, maximumFractionDigits: opts.decimals ?? 1, signDisplay: opts.signed ? "exceptZero" : "auto" }).format(Number(value)).replace(/^-/, "\u2212");
 }
 
 export function formatDate(iso: string | null | undefined, style: "medium" | "short" = "medium"): string {

@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { closeAccountAction, updateAccountAction } from "../actions";
 import { Field, Input, Textarea } from "@/components/ui/form";
@@ -19,9 +20,9 @@ export interface AccountDetails {
 }
 
 export function EditAccountForm({ a }: { a: AccountDetails }) {
-  const [state, action] = useActionState(updateAccountAction, null);
+  const [state, action, actionPending] = useActionState(updateAccountAction, null);
   return (
-    <form action={action} className="grid gap-4 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><FormMessage state={state} /></div>
       <input type="hidden" name="accountId" value={a.id} />
       <Field label="Name" htmlFor="name" error={fieldError(state, "name")}><Input id="name" name="name" defaultValue={a.name} required maxLength={80} /></Field>
@@ -37,22 +38,22 @@ export function EditAccountForm({ a }: { a: AccountDetails }) {
       ) : null}
       <p className="text-xs text-text-3 sm:col-span-2">Type ({a.typeLabel}) and currency ({a.currency}) can&apos;t change once created, because your history depends on them.</p>
       <div className="sm:col-span-2"><SubmitButton variant="secondary" pendingText="Saving…">Save details</SubmitButton></div>
-    </form>
+    </ActionForm>
   );
 }
 
 export function CloseAccountForm({ id, today, isLedger }: { id: string; today: string; isLedger: boolean }) {
-  const [state, action] = useActionState(closeAccountAction, null);
+  const [state, action, actionPending] = useActionState(closeAccountAction, null);
   return (
     <details>
       <summary className="cursor-pointer text-sm font-medium text-text-2 hover:text-negative">Close this account…</summary>
-      <form action={action} className="mt-3 flex flex-col gap-3">
+      <ActionForm action={action} pending={actionPending} className="mt-3 flex flex-col gap-3">
         <FormMessage state={state} />
         <input type="hidden" name="accountId" value={id} />
         <p className="text-sm text-text-2">{isLedger ? "The account must be empty (move or withdraw any cash and holdings first). Its transactions stay in your history and reports." : "From the closing date it no longer counts towards your net worth (record any sale proceeds as a deposit). Its valuation history is kept."}</p>
         <Field label="Closed on" htmlFor="closedOn" error={fieldError(state, "closedOn")}><Input id="closedOn" name="closedOn" type="date" defaultValue={today} max={today} required className="max-w-48" /></Field>
         <SubmitButton variant="danger" pendingText="Closing…">Close account</SubmitButton>
-      </form>
+      </ActionForm>
     </details>
   );
 }

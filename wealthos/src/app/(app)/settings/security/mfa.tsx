@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { beginMfaAction, confirmMfaAction, disableMfaAction } from "../actions";
 import { Field, Input } from "@/components/ui/form";
@@ -7,8 +8,8 @@ import { FormMessage } from "@/components/ui/form-message";
 import { Alert } from "@/components/ui/alert";
 
 export function EnableMfa() {
-  const [begin, beginAction] = useActionState(beginMfaAction, null);
-  const [confirm, confirmAction] = useActionState(confirmMfaAction, null);
+  const [begin, beginAction, beginActionPending] = useActionState(beginMfaAction, null);
+  const [confirm, confirmAction, confirmActionPending] = useActionState(confirmMfaAction, null);
   if (confirm?.ok && "recoveryCodes" in confirm.data) {
     return (
       <div className="flex flex-col gap-3">
@@ -25,27 +26,27 @@ export function EnableMfa() {
         <p className="text-sm text-text-2">Add WealthOS to an authenticator app (Google Authenticator, 1Password, Authy…). Scan with your phone or enter the key manually:</p>
         <div className="size-44 rounded-lg border border-border bg-white p-2 [&_svg]:size-full" role="img" aria-label="QR code for your authenticator app" dangerouslySetInnerHTML={{ __html: begin.data.qrSvg }} />
         <code className="num block break-all rounded-lg bg-surface-2 px-3 py-2 text-sm tracking-wider" data-testid="totp-secret">{begin.data.secret}</code>
-        <form action={confirmAction} className="flex flex-col gap-3">
+        <ActionForm action={confirmAction} pending={confirmActionPending} className="flex flex-col gap-3">
           <FormMessage state={confirm} />
           <Field label="6-digit code from the app" htmlFor="code"><Input id="code" name="code" inputMode="numeric" autoComplete="one-time-code" className="num max-w-40 tracking-widest" required /></Field>
           <SubmitButton pendingText="Checking…">Turn on</SubmitButton>
-        </form>
+        </ActionForm>
       </div>
     );
   }
   return (
-    <form action={beginAction} className="flex flex-col gap-3">
+    <ActionForm action={beginAction} pending={beginActionPending} className="flex flex-col gap-3">
       <FormMessage state={begin} />
       <p className="text-sm text-text-2">Protect your account with a code from your phone in addition to your password.</p>
       <SubmitButton variant="accent" pendingText="Preparing…">Set up two-step verification</SubmitButton>
-    </form>
+    </ActionForm>
   );
 }
 
 export function DisableMfa() {
-  const [state, action] = useActionState(disableMfaAction, null);
+  const [state, action, actionPending] = useActionState(disableMfaAction, null);
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <ActionForm action={action} pending={actionPending} className="flex flex-col gap-3">
       <FormMessage state={state} />
       <p className="text-sm text-text-2">Two-step verification is <strong className="text-positive">on</strong>.</p>
       <details>
@@ -55,6 +56,6 @@ export function DisableMfa() {
           <SubmitButton variant="danger" pendingText="Turning off…">Turn off two-step verification</SubmitButton>
         </div>
       </details>
-    </form>
+    </ActionForm>
   );
 }

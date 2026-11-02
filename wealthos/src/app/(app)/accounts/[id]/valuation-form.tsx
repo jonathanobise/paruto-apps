@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { addValuationAction } from "../actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -6,9 +7,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
 export function ValuationForm({ accountId, today, liability }: { accountId: string; today: string; liability: boolean }) {
-  const [state, action] = useActionState(addValuationAction, null);
+  const [state, action, actionPending] = useActionState(addValuationAction, null);
   return (
-    <form action={action} className="grid gap-4 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><FormMessage state={state} /></div>
       <input type="hidden" name="accountId" value={accountId} />
       <Field label={liability ? "Outstanding balance" : "Value"} htmlFor="amount" error={fieldError(state, "amount")}>
@@ -28,6 +29,6 @@ export function ValuationForm({ accountId, today, liability }: { accountId: stri
         <Input id="note" name="note" maxLength={300} />
       </Field>
       <div className="sm:col-span-2"><SubmitButton pendingText="Saving…">Save valuation</SubmitButton></div>
-    </form>
+    </ActionForm>
   );
 }

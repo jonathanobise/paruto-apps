@@ -5,7 +5,7 @@ import type { TenantContext, Tx } from "@/server/db/client";
 import { sha256 } from "@/server/identity/crypto";
 
 /** Bump whenever a calculation in src/engine or src/server/analytics changes its results. */
-export const ANALYTICS_VERSION = "2026-11-02.1";
+export const ANALYTICS_VERSION = "2026-11-02.2";
 
 /**
  * Fingerprint of every input the analytics read for the organisation in context: ledger and

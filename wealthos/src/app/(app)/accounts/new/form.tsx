@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState, useState } from "react";
 import { createAccountAction } from "../actions";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
@@ -8,11 +9,11 @@ import { FormMessage, fieldError } from "@/components/ui/form-message";
 type TypeOption = { value: string; label: string; class: string };
 
 export function NewAccountForm({ types, today }: { types: TypeOption[]; today: string }) {
-  const [state, action] = useActionState(createAccountAction, null);
+  const [state, action, actionPending] = useActionState(createAccountAction, null);
   const [type, setType] = useState("bank");
   const cls = types.find((t) => t.value === type)?.class ?? "ledger";
   return (
-    <form action={action} className="grid gap-5 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <FormMessage state={state} />
       </div>
@@ -62,6 +63,6 @@ export function NewAccountForm({ types, today }: { types: TypeOption[]; today: s
       <div className="sm:col-span-2">
         <SubmitButton pendingText="Saving…">Add account</SubmitButton>
       </div>
-    </form>
+    </ActionForm>
   );
 }

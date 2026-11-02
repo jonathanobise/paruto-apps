@@ -34,6 +34,7 @@
   --demo-soft: #f1eaf9;
   --series-1: #0f7b57;
   --series-2: #b45309;
+  --series-3: #3b5bdb;
   --grid: #e7e2d6;
   --shadow: 0 1px 2px rgb(27 31 28 / 0.04), 0 4px 16px rgb(27 31 28 / 0.04);
 }
@@ -65,6 +66,7 @@
     --demo-soft: #261d33;
     --series-1: #35a57a;
     --series-2: #c2611a;
+    --series-3: #5b7cf0;
     --grid: #1f2a25;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
   }
@@ -96,6 +98,7 @@
   --demo-soft: #261d33;
   --series-1: #35a57a;
   --series-2: #c2611a;
+  --series-3: #5b7cf0;
   --grid: #1f2a25;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
 }

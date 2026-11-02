@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeftRight, Bell, Bot, ChartPie, CreditCard, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { Activity, ArrowLeftRight, Calculator, Bell, Bot, ChartPie, CreditCard, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const live = [
@@ -11,13 +11,15 @@ const live = [
   { href: "/holdings", label: "Holdings", icon: Layers },
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
   { href: "/model", label: "Target mix", icon: ChartPie },
+  { href: "/goals", label: "Goals", icon: Target },
+  { href: "/simulator", label: "Simulator", icon: Calculator },
+  { href: "/stress", label: "Stress tests", icon: Activity },
   { href: "/explore", label: "Explorer", icon: Search },
   { href: "/watchlists", label: "Watchlists", icon: Star },
 ];
 
 // Modules on the roadmap. Shown so the product shape is clear, but not clickable until built.
 const upcoming = [
-  { label: "Goals & scenarios", icon: Target, milestone: "M3" },
   { label: "Research assistant", icon: Bot, milestone: "M3" },
   { label: "Alerts", icon: Bell, milestone: "M3" },
   { label: "Reports", icon: FileText, milestone: "M4" },

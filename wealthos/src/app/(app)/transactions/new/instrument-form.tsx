@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { createInstrumentAction } from "../actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -19,9 +20,9 @@ const CLASSES: Array<[string, string]> = [
 ];
 
 export function InstrumentForm() {
-  const [state, action] = useActionState(createInstrumentAction, null);
+  const [state, action, actionPending] = useActionState(createInstrumentAction, null);
   return (
-    <form action={action} className="grid gap-4">
+    <ActionForm action={action} pending={actionPending} className="grid gap-4">
       <FormMessage state={state} />
       <Field label="Name" htmlFor="i-name" error={fieldError(state, "name")}>
         <Input id="i-name" name="name" placeholder="e.g. FGN T-bill 364d, 12 Mar 2027" required />
@@ -52,6 +53,6 @@ export function InstrumentForm() {
         </Field>
       </div>
       <SubmitButton variant="secondary" pendingText="Adding…">Add instrument</SubmitButton>
-    </form>
+    </ActionForm>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { commitAction, remapAction, rollbackAction } from "../actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -8,9 +9,9 @@ import { FormMessage, fieldError } from "@/components/ui/form-message";
 type FieldDef = { key: string; label: string };
 
 export function MappingForm({ batchId, headers, fields, columns, dateFormat, unknownTypes, typeAliases, types }: { batchId: string; headers: string[]; fields: FieldDef[]; columns: Record<string, string>; dateFormat: string; unknownTypes: string[]; typeAliases: Record<string, string>; types: Array<{ value: string; label: string }> }) {
-  const [state, action] = useActionState(remapAction, null);
+  const [state, action, actionPending] = useActionState(remapAction, null);
   return (
-    <form action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} pending={actionPending} className="flex flex-col gap-5">
       <FormMessage state={state} />
       <input type="hidden" name="batchId" value={batchId} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -51,14 +52,14 @@ export function MappingForm({ batchId, headers, fields, columns, dateFormat, unk
         </Field>
         <SubmitButton variant="secondary" pendingText="Re-checking…">Update preview</SubmitButton>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 
 export function CommitForm({ batchId, ready, duplicates }: { batchId: string; ready: number; duplicates: number }) {
-  const [state, action] = useActionState(commitAction, null);
+  const [state, action, actionPending] = useActionState(commitAction, null);
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <ActionForm action={action} pending={actionPending} className="flex flex-col gap-3">
       <FormMessage state={state} />
       <input type="hidden" name="batchId" value={batchId} />
       {duplicates > 0 ? (
@@ -71,16 +72,16 @@ export function CommitForm({ batchId, ready, duplicates }: { batchId: string; re
         Import {ready} transaction{ready === 1 ? "" : "s"}
       </SubmitButton>
       <p className="text-xs text-text-3">All rows are recorded together, or none are. Rows with errors are left out.</p>
-    </form>
+    </ActionForm>
   );
 }
 
 export function RollbackForm({ batchId, count }: { batchId: string; count: number }) {
-  const [state, action] = useActionState(rollbackAction, null);
+  const [state, action, actionPending] = useActionState(rollbackAction, null);
   return (
     <details>
       <summary className="cursor-pointer text-sm font-medium text-negative">Roll back this import…</summary>
-      <form action={action} className="mt-3 flex flex-col gap-3">
+      <ActionForm action={action} pending={actionPending} className="mt-3 flex flex-col gap-3">
         <FormMessage state={state} />
         <input type="hidden" name="batchId" value={batchId} />
         <p className="text-sm text-text-2">Reverses all {count} imported transactions at once. The originals stay in your history, marked as reversed. Not possible if later transactions depend on them.</p>
@@ -88,7 +89,7 @@ export function RollbackForm({ batchId, count }: { batchId: string; count: numbe
           <Input id="reason" name="reason" placeholder="e.g. imported into the wrong account" required minLength={3} />
         </Field>
         <SubmitButton variant="danger" pendingText="Rolling back…">Roll back import</SubmitButton>
-      </form>
+      </ActionForm>
     </details>
   );
 }

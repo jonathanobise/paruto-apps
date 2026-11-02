@@ -1,7 +1,10 @@
 import { ChartPie } from "lucide-react";
 import { requireApp } from "@/server/auth/context";
 import { buildDashboard } from "@/server/analytics/portfolio";
-import { listModels, driftAgainstModel } from "@/server/models/service";
+import { listModels, driftAgainstModel, BUCKET_PRESETS } from "@/server/models/service";
+import { NewModelForm } from "./new-model-form";
+import { deleteModelAction } from "../goals/actions";
+import { Button } from "@/components/ui/button";
 import { featureDecision } from "@/server/compliance/gate";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { PageHeader } from "@/components/app/page-header";
@@ -31,7 +34,7 @@ export default async function ModelPage() {
       <PageHeader title="Target mix" description="Compare your investments with an allocation you defined yourself. WealthOS describes the drift; it does not tell you what to buy or sell." />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-6" title="Pre-release feature">{gate.reason}</Alert> : null}
       {models.length === 0 ? (
-        <EmptyState icon={<ChartPie />} title="No target mix yet">Creating your own target mix arrives with Goals &amp; Scenarios (Milestone 3). The demo portfolio includes an example.</EmptyState>
+        <EmptyState icon={<ChartPie />} title="No target mix yet">Describe the allocation you are aiming for below, and WealthOS will show how far your holdings are from it.</EmptyState>
       ) : (
         models.map((m) => {
           const drift = driftAgainstModel(m.targets, dash, false);
@@ -42,6 +45,7 @@ export default async function ModelPage() {
                   <CardTitle className="flex items-center gap-2">{m.name} {m.isHypothetical ? <Badge tone="demo">Hypothetical</Badge> : null}</CardTitle>
                   {m.description ? <CardDescription>{m.description}</CardDescription> : null}
                 </div>
+                {app.canWrite ? <form action={deleteModelAction}><input type="hidden" name="id" value={m.id} /><Button variant="ghost" size="sm">Delete</Button></form> : null}
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -86,6 +90,12 @@ export default async function ModelPage() {
           );
         })
       )}
+      {app.canWrite ? (
+        <Card className="mt-6">
+          <CardHeader><div><CardTitle>New target mix</CardTitle><CardDescription>Your own hypothetical allocation. WealthOS only describes how far you are from it; it never tells you what to buy or sell.</CardDescription></div></CardHeader>
+          <CardContent><NewModelForm buckets={Object.entries(BUCKET_PRESETS).map(([key, b]) => ({ key, label: b.label }))} /></CardContent>
+        </Card>
+      ) : null}
     </>
   );
 }

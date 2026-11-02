@@ -1,4 +1,5 @@
 "use client";
+import { ActionForm } from "@/components/ui/action-form";
 import { useActionState } from "react";
 import { uploadAction } from "./actions";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -6,9 +7,9 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
 export function UploadForm({ accounts, mappings, defaultAccount }: { accounts: Array<{ id: string; name: string; currency: string }>; mappings: Array<{ id: string; name: string }>; defaultAccount?: string }) {
-  const [state, action] = useActionState(uploadAction, null);
+  const [state, action, actionPending] = useActionState(uploadAction, null);
   return (
-    <form action={action} className="grid gap-5 sm:grid-cols-2">
+    <ActionForm action={action} pending={actionPending} className="grid gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2"><FormMessage state={state} /></div>
       <Field label="Import into account" htmlFor="accountId" hint="Every row is recorded against this account." error={fieldError(state, "accountId")}>
         <Select id="accountId" name="accountId" defaultValue={defaultAccount ?? accounts[0]?.id} required>
@@ -34,6 +35,6 @@ export function UploadForm({ accounts, mappings, defaultAccount }: { accounts: A
         <SubmitButton pendingText="Checking the file…">Upload and preview</SubmitButton>
         <p className="mt-2 text-xs text-text-3">Nothing is added to your transactions until you review the preview and confirm.</p>
       </div>
-    </form>
+    </ActionForm>
   );
 }
