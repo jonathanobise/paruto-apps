@@ -1,6 +1,6 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
-import { accountValuations, consentRecords, financialAccounts, importBatches, importMappings, instruments, ledgerEntries, ledgerEvents, memberships, modelPortfolios, organizations, securityEvents, userPreferences, users } from "@/server/db/schema";
+import { accountValuations, aiConversations, aiMessages, aiSourceReferences, alerts, consentRecords, financialAccounts, goals, importBatches, importMappings, instruments, ledgerEntries, ledgerEvents, memberships, modelPortfolios, notifications, organizations, savedComparisons, securityEvents, userPreferences, users, watchlistItems, watchlists } from "@/server/db/schema";
 import { db, withTenant, withUser } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
 import { recordSecurityEvent, type RequestMeta } from "@/server/audit/audit";
@@ -12,7 +12,8 @@ export const EXPORT_FORMAT_VERSION = "wealthos-export/1";
 /**
  * Portable export of everything WealthOS holds about the user (NDPA 2023 data portability):
  * profile, preferences, consents, security log, and every organisation they belong to with its
- * accounts, ledger, entries, valuations, private instruments and model portfolios.
+ * accounts, ledger, entries, valuations, private instruments and model portfolios, plus their own
+ * alerts, notifications and research-assistant conversations.
  */
 export async function exportUserData(userId: string, meta: RequestMeta) {
   await rateLimit(`export:${userId}`, 5, 3600);
@@ -34,6 +35,16 @@ export async function exportUserData(userId: string, meta: RequestMeta) {
       // Raw file text is never exported (it is deleted after commit/discard anyway).
       imports: (await tx.select().from(importBatches)).map(({ rawText: _r, ...rest }) => rest),
       importMappings: await tx.select().from(importMappings),
+      goals: await tx.select().from(goals),
+      watchlists: await tx.select().from(watchlists),
+      watchlistItems: await tx.select().from(watchlistItems),
+      savedComparisons: await tx.select().from(savedComparisons),
+      // Personal rows (RLS returns only this user's).
+      alerts: await tx.select().from(alerts),
+      notifications: await tx.select().from(notifications),
+      assistantConversations: await tx.select().from(aiConversations),
+      assistantMessages: await tx.select().from(aiMessages).orderBy(aiMessages.createdAt),
+      assistantSources: await tx.select().from(aiSourceReferences),
     }));
     orgData.push({ organization: org, ...data });
   }

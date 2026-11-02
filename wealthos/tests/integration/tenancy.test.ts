@@ -59,6 +59,16 @@ describe("service-layer isolation", () => {
 });
 
 describe("database-level isolation (runtime role)", () => {
+  it("every table with an org_id column has row-level security enabled", async () => {
+    const r = await db().execute<{ relname: string; rls: boolean }>(sql`
+      select c.relname, c.relrowsecurity as rls from pg_class c
+      join pg_namespace n on n.oid = c.relnamespace
+      join pg_attribute a on a.attrelid = c.oid and a.attname = 'org_id' and not a.attisdropped
+      where c.relkind = 'r' and n.nspname = current_schema()`);
+    expect(r.rows.length).toBeGreaterThan(15);
+    expect(r.rows.filter((x) => !x.rls).map((x) => x.relname)).toEqual([]);
+  });
+
   it("returns no tenant rows without a context", async () => {
     expect(await db().select().from(financialAccounts)).toHaveLength(0);
     expect(await db().select().from(ledgerEvents)).toHaveLength(0);

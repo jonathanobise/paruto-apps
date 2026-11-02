@@ -7,3 +7,4 @@ export * from "./analytics";
 export * from "./research";
 export * from "./planning";
 export * from "./notifications";
+export * from "./ai";

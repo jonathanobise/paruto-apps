@@ -40,6 +40,9 @@ Also: `valuation_snapshots` (analytics cache), `data_versions` (market-data vers
 | Tenancy | organizations, memberships | RLS: members read their own; writes only via `app_create_organization()` |
 | Portfolio (tenant) | financial_accounts, ledger_events, ledger_entries, account_valuations, model_portfolios, import_batches, import_mappings | RLS by verified membership; viewers read-only |
 | Reference | instruments, instrument_identifiers, market_prices, fx_rates, market_data_sources, institutions | Global rows (org_id NULL) readable by all; tenants may add private instruments/prices; global writes via owner/admin only |
+| Research & planning (tenant, shared) | watchlists, watchlist_items, saved_comparisons, goals | RLS by membership; viewers read-only |
+| Personal (tenant, per user) | alerts, notifications, ai_conversations, ai_messages, ai_source_references | RLS on org **and** user: private even inside a shared organisation; erased with the user |
+| System | jobs | Not user-readable; worker only |
 | Analytics cache | valuation_snapshots | RLS; derived data only, never authoritative; safe to truncate |
 | Compliance | regulatory_feature_approvals (append-only), feature_flags, audit_events (append-only) | |
 
@@ -61,4 +64,4 @@ Also: `valuation_snapshots` (analytics cache), `data_versions` (market-data vers
 Generated SQL is reviewed before commit. Destructive changes need a two-step plan (expand → backfill → contract) and a backup. Never edit a migration that has run in a shared environment; add a new one. (`0000` was amended once, before any shared deployment, to create the `citext` extension.)
 
 ## Not yet built (validated against the domain first, per the directive)
-corporate_actions (catalogue-level), fund_yields, treasury_auctions (modelled as `published_rates` with methodology discount/true yield and tenor), projection_scenarios (scenarios live on each goal; the simulator is stateless), holdings tables (positions are derived from the ledger), goals, projection_scenarios, watchlists, alerts, notifications, ai_conversations, ai_source_references, subscriptions, payments, entitlements. Holdings are currently derived on read from the ledger, which is the source of truth; snapshots will be a cache, never authoritative.
+corporate_actions (catalogue-level), fund_yields, treasury_auctions (modelled as `published_rates` with methodology discount/true yield and tenor), projection_scenarios (scenarios live on each goal; the simulator is stateless), holdings tables (positions are derived from the ledger), subscriptions, payments, entitlements. Holdings are currently derived on read from the ledger, which is the source of truth; snapshots will be a cache, never authoritative.

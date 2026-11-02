@@ -17,11 +17,11 @@ const live = [
   { href: "/explore", label: "Explorer", icon: Search },
   { href: "/watchlists", label: "Watchlists", icon: Star },
   { href: "/alerts", label: "Alerts", icon: Bell },
+  { href: "/assistant", label: "Research assistant", icon: Bot },
 ];
 
 // Modules on the roadmap. Shown so the product shape is clear, but not clickable until built.
 const upcoming = [
-  { label: "Research assistant", icon: Bot, milestone: "M3" },
   { label: "Reports", icon: FileText, milestone: "M4" },
   { label: "Billing", icon: CreditCard, milestone: "M4" },
 ];
