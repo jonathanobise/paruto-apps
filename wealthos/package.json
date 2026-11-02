@@ -21,7 +21,8 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "test:perf": "vitest run --project perf"
+    "test:perf": "vitest run --project perf",
+    "worker": "tsx --conditions=react-server scripts/worker.ts"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "5.3.0",

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
+import { unreadCount } from "@/server/alerts/service";
 import { requireApp } from "@/server/auth/context";
 import { Logo } from "@/components/app/logo";
 import { MobileNav, Nav } from "@/components/app/nav";
@@ -11,6 +12,7 @@ import { SUPPORTED_CURRENCIES } from "@/engine";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const app = await requireApp();
+  const unread = await unreadCount(app.ctx);
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 overflow-y-auto border-r border-border bg-surface px-3 py-5 lg:flex">
@@ -54,6 +56,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 ))}
               </AutoSubmitSelect>
             </form>
+            <Link href="/notifications" className="relative flex size-9 items-center justify-center rounded-lg text-text-3 hover:bg-surface-2 hover:text-text" aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}>
+              <Bell className="size-4" aria-hidden />
+              {unread ? <span className="num absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-accent px-1 text-center text-[10px] font-semibold leading-4 text-white">{unread > 99 ? "99+" : unread}</span> : null}
+            </Link>
             <span className="hidden text-sm text-text-2 md:inline">{app.session.user.displayName}</span>
             <form action={signOutAction}>
               <button className="flex size-9 items-center justify-center rounded-lg text-text-3 hover:bg-surface-2 hover:text-text" aria-label="Sign out" title="Sign out">

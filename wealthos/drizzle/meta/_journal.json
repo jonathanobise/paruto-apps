@@ -85,6 +85,20 @@
       "when": 1793591794111,
       "tag": "0011_goals_security",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793592558675,
+      "tag": "0012_alerts_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793592559574,
+      "tag": "0013_alerts_jobs_security",
+      "breakpoints": true
     }
   ]
 }

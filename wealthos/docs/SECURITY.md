@@ -14,6 +14,7 @@ Guided by OWASP ASVS 4 (Level 2 target). Status per control:
 | Transport/headers | nosniff, frame DENY, strict referrer, permissions policy, COOP; `poweredByHeader` off | HSTS at the edge; CSP |
 | Secrets | `.env.local` (git-ignored); env validated at boot; no secrets in repo | Managed secret store; key rotation for APP_ENCRYPTION_KEY (versioned ciphertexts) |
 | Privacy | Consent records (append-only, versioned), JSON export of all user data, erasure via SECURITY DEFINER function (deletes solely-owned orgs, anonymises the user, keeps opaque ids in logs), no bank/broker credentials stored, masked numbers ≤ 4 chars | DPIA; retention schedule; DSAR workflow tooling |
+| Alerts | Alerts and notifications are private to their owner even within a shared organisation (RLS on user and org); the scheduler sees only (org, user) pairs via a SECURITY DEFINER function; the job queue is a system table with no user-facing reads | — |
 | Audit | `audit_events` (tenant actions), `security_events` (auth) — both append-only | Admin audit viewer, alerting |
 | Supply chain | Exact-pinned dependencies; `npm audit --omit=dev` clean at commit time | Dependabot/Renovate, SBOM, CI scanning |
 | Files | CSV imports only: 2 MiB / 5,000 rows / 50 columns / 500-char cells, strict UTF-8, binary (NUL) rejection, rate-limited, nothing executed; raw text deleted after commit/discard; formula neutralisation on export (docs/IMPORTS.md) | Malware scanning if other file types are ever accepted |

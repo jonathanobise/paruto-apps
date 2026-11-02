@@ -8,7 +8,7 @@
 - **Roles:** run `scripts/sql/bootstrap-roles.sql` equivalent; migrations with the owner role in CI/CD; app with the runtime role (NOBYPASSRLS). Never give the app owner credentials.
 - **Secrets:** `DATABASE_URL`, `DATABASE_OWNER_URL` (CI only), `APP_ENCRYPTION_KEY` (32 bytes), `APP_ORIGIN`, `SCRYPT_LOG_N=17`, email provider credentials (adapter to be written; `EMAIL_TRANSPORT=outbox` is development-only and logs a warning in production).
 - **Edge:** HTTPS only, HSTS, WAF/rate limiting in front of auth routes.
-- **Jobs:** durable queue (e.g. pg-boss on Postgres) for alerts, price imports and email (M3).
+- **Worker:** run `npm run worker` as a separate long-running process (or `npm run worker -- --once` from a scheduler every few minutes). It needs the same `DATABASE_URL` as the app. Jobs live in Postgres; no extra infrastructure.
 - **Object storage:** R2-compatible bucket for reports/imports (M4).
 - **Observability:** OpenTelemetry traces, error monitoring, uptime check on `/api/health`.
 

@@ -6,3 +6,4 @@ export * from "./compliance";
 export * from "./analytics";
 export * from "./research";
 export * from "./planning";
+export * from "./notifications";

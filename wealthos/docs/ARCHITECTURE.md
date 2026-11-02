@@ -33,6 +33,11 @@ Planned modules (contracts reserved, not built): `instruments` catalogue admin, 
 ## Analytics cache
 `src/server/analytics/cache.ts` wraps the dashboard, account-performance and holdings-performance computations. Inside the same tenant transaction it computes an input fingerprint (a few aggregate queries), returns the stored result if it matches, otherwise computes, stores and returns. Results are JSON (decimal strings), identical to an uncached computation (tested). Bump `ANALYTICS_VERSION` whenever calculation logic changes. Measured on 2,400 events over 5 years: dashboard 390–460 ms uncached → 4 ms cached; holdings performance 850 ms → 7 ms (`npm run test:perf`).
 
+## Background jobs and alerts
+A durable queue in Postgres (`jobs`, `src/server/jobs/queue.ts`): `enqueue` with optional dedupe key; workers `claim` with `FOR UPDATE SKIP LOCKED`; failures retry with exponential backoff (30 s doubling, capped at 1 h) up to `max_attempts`, then the job is kept as `dead` with its last error; `recoverStale` re-queues jobs from crashed workers. Handlers must be idempotent. The worker (`npm run worker`, `scripts/worker.ts`) schedules alert evaluations hourly per user (dedupe keys per hour) and processes jobs; it is safe to run several copies.
+
+Alerts (`src/server/alerts`) are evaluated in the owner's tenant context. Notifications carry a unique `(org, dedupe_key)` derived from the event (e.g. alert + price date, alert + instrument + maturity date, alert + milestone), so re-running never notifies twice. Stale prices and FX never trigger level alerts. Wording is factual with no calls to action (unit-tested). Delivery is in-app; email/push will use the same notifications as the source of truth.
+
 ## Errors
 Services throw `AppError(code, safeMessage)`; actions map to `ActionResult` (`toActionError`) and log unexpected errors server-side without leaking internals. Pages have `error.tsx` and `loading.tsx` states; empty states exist on every list.
 
