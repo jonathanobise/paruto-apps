@@ -22,8 +22,19 @@ Carried forward: import of transfers/FX conversions; faster cold holdings perfor
 
 Carried forward: connect an AI provider after counsel and vendor approval, then run the live eval; admin review queue for flagged conversations; email delivery of notifications (needs an email provider); live market-data feeds (licensing); faster cold holdings performance.
 
-## Milestone 4 — Commercial beta
-Plans/entitlements (Free ₦0, Plus ₦4,500/mo, Pro ₦12,500/mo — hypotheses, configurable), payment provider (after terms review), admin console, audit viewer, reports (PDF/CSV), import workflows, CSP/HSTS, observability, security review, performance testing, deployment.
+## Milestone 4 — Commercial beta ✅ (except deployment, which awaits approval)
+- **Multi-user onboarding:** household/business spaces, email invitations bound to the invited address, roles (owner/admin/member/viewer) with Postgres-enforced rules, leave/remove; sign-in keeps the invitation link.
+- **Entitlements and plans:** configurable plan catalogue (Free ₦0, Wealth Plus ₦4,500/mo, Wealth Pro ₦12,500/mo, Adviser placeholder — hypotheses), limits enforced in services, downgrades never delete data (docs/BILLING.md).
+- **Subscription billing (provider-neutral):** trials, plan requests, prorated upgrades, scheduled downgrades and cancellation, renewal invoices, past-due grace and expiry (hourly job), numbered tax-aware immutable invoices and receipts, bank-transfer reconciliation by admins, signed-webhook framework with idempotency and reconciliation of mismatches, revenue analytics. No payment provider connected (terms not confirmed).
+- **Admin console:** users, organisations, billing, plans and billing settings, support queue, AI usage (metadata only), jobs (retry dead letters), audit and security logs, feature gates, source freshness, education list. Every view of personal details audited.
+- **Reports:** PDF wealth statement and CSV statement/holdings, built from the same services as the screens; PDF on Plus/Pro.
+- **Import workflows:** currency conversions and transfers between own accounts (cash and securities) from CSV; transfers recognised across both accounts' statements.
+- **Production security review** (docs/SECURITY_REVIEW.md): 11 findings fixed (IP spoofing, invoice and trial tampering, last-owner check, CSP, TOTP replay…).
+- **Observability:** structured logs, request ids, server error hook, readiness endpoint.
+- **Performance:** single-replay holdings performance (cold 850 → 645 ms on 2,400 events/5 years; cached 4 ms).
+- **Deployment readiness:** Dockerfile, CI workflow (inactive until enabled), runbook. **Not deployed.**
+
+Carried forward: payment provider integration (after terms), email provider, AI provider connection and live eval, support/compliance staff roles, independent penetration test, infrastructure choice and deployment.
 
 ## Milestone 5 — Expansion
 Authorised institution connections, adviser partnerships (only after authorisation), mobile apps, households, other African markets.

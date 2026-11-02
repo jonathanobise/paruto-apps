@@ -35,12 +35,14 @@ Instruments are the founder's research candidates (Coronation MMF, Stanbic IBTC 
 | CSV import (upload, preview, column/type mapping, duplicates, commit, rollback) | Built |
 | Net worth (history, assets, liabilities) | Built |
 | Target mix (drift vs user-defined hypothetical mix; gated, pending review) | Built (view only) |
-| Settings: preferences, security (MFA, sessions, password, activity), privacy (export, consents, deletion) | Built |
-| Onboarding | Minimal (empty states + demo) |
+| Settings: preferences, security (MFA, sessions, password, activity), members (shared spaces, invitations, roles), plan & billing (usage, trial, plans, invoices/receipts), privacy (export, consents, deletion) | Built |
+| Onboarding | Empty states + demo; shared-space invitations with accept page |
 | Explorer, instrument pages (price/NAV history, rates by methodology, sources), comparisons, watchlists (gated, pending review) | Built |
 | Goals with scenarios, simulator, stress tests | Built |
 | Alerts and in-app notifications (background worker) | Built |
 | Research assistant (consent, sources, advice boundary; gated, pending review) | Built, not connected to a provider |
 | Learn (7 general education articles) | Built |
-| Admin: sources, verified catalogue, market-data imports | Built (platform admins with 2FA) |
-| Reports, billing, admin console | Milestone 4 |
+| Admin console: overview and source freshness, users, organisations, billing (revenue, reconciliation, plans, settings), support, AI usage, jobs, audit log, feature gates, sources, catalogue, market-data imports | Built (platform admins with 2FA) |
+| Reports (PDF wealth statement, CSV statement and holdings) | Built (PDF on Plus/Pro) |
+| Help (support requests and replies) | Built |
+| Plans and billing | Built, provider-neutral; paid plans pending review (docs/BILLING.md) |

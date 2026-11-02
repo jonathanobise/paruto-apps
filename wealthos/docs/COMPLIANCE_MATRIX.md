@@ -18,6 +18,9 @@ Source of truth in code: `src/server/compliance/features.ts`. A feature is avail
 | EDUCATION | education | — | not_advice | not_required | none | NG | — (content rules: general only, no current rates, illustrative examples verified by the engine, output policy applied in tests) |
 | AI_RESEARCH_ASSISTANT | information | ai:use, research:read | ai_limits, not_advice | pending_review | all_access | NG | Lawful basis/transfer for AI vendors; refusal boundaries; liability for errors. Built (docs/AI_SAFETY.md): three-layer advice boundary, separate `ai_data_processing` consent, redaction, per-turn audit; not connected to any provider |
 | ALERTS_USER_DEFINED | tooling | portfolio:read | data_freshness | not_required | writes | NG | Alerts must avoid buy/sell calls to action |
+| SHARED_SPACES | tooling | portfolio:read | non_custodial | not_required | writes | NG | Consent when one member records another person's finances in a shared space? |
+| REPORTS | tooling | portfolio:read | past_performance, data_freshness, not_advice | not_required | all_access | NG | Presentation rules for performance in downloadable statements |
+| SUBSCRIPTION_BILLING | commercial | portfolio:read | — | pending_review | writes | NG | Terms of sale, refunds and cancellation (FCCPA 2018); VAT registration and inclusive/exclusive pricing; invoice contents; invoice retention after erasure (tax law vs NDPA). See docs/BILLING.md |
 | PERSONALISED_RECOMMENDATIONS | regulated_advice | adviser:clients | — | rejected (hard-disabled) | all_access | — | Licensing path if ever pursued |
 | AUTO_REBALANCING | regulated_advice | adviser:clients | — | rejected (hard-disabled) | all_access | — | — |
 | DISCRETIONARY_MANAGEMENT | regulated_advice | adviser:clients | — | rejected (hard-disabled) | all_access | — | — |

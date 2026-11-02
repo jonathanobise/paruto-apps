@@ -34,12 +34,23 @@
 
 **ADR-017 Education as code.** Articles are typed data reviewed like code, with every worked-example figure recomputed by the engine in a unit test and the output policy applied to the text. No CMS until non-engineers need to publish.
 
+**ADR-018 Provider-neutral billing first.** The directive requires confirming a payment provider's terms before integrating. Billing is built around our own subscription state machine and immutable invoices, with administrator bank-transfer reconciliation and a provider-adapter interface for signed notifications. Connecting a provider adds an adapter and a checkout step; nothing else changes.
+
+**ADR-019 PDF reports with pdfkit and embedded Inter.** Server-side PDF generation without a headless browser (lighter to deploy). The standard PDF fonts can't render ₦ or Yoruba/Igbo diacritics, so Inter (SIL OFL) is embedded; files are vendored with their licence.
+
+**ADR-020 Nonce CSP via the Next 16 proxy.** Every page is dynamically rendered (the root layout reads cookies), so Next applies a per-request nonce to its scripts; `strict-dynamic` lets them load chunks. Inline style attributes stay allowed (charts); scripts are strict.
+
+**ADR-021 Trusted proxy hops for client IP.** Rate limits and security logs need the real client address; `X-Forwarded-For` is trusted only for entries appended by proxies we run. Production must declare its proxy topology.
+
+**ADR-022 Batch holding performance.** All holdings are computed in one ledger replay, valuing each holding only on the dates the single-holding calculation would, so results are identical (tested) and cold time drops.
+
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
 - No live market data; licensing costs unknown.
 - No production email provider; verification emails only reach the dev outbox.
 - Cold (uncached) analytics replay the full ledger; acceptable up to a few thousand events (see TESTING.md perf), revisit with incremental snapshots if users import much larger histories.
 - Admin/support access path not yet designed in RLS terms.
-- TOTP step replay within 30 s not prevented.
 - The AI assistant has never run against a real model; its live eval (`npm run ai:eval -- --yes`) is unrun. The request classifier is pattern-based and will miss some phrasings (the prompt and output check are the other layers).
-- No admin view yet for conversations flagged `needs_review`.
+- Admin AI view shows flagged turns' metadata only; reviewing content would need the user's permission (not built).
+- No payment or email provider connected; paid plans can't go live until terms, VAT and a provider are decided (docs/BILLING.md).
+- No independent penetration test yet (docs/SECURITY_REVIEW.md).
