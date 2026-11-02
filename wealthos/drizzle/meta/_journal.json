@@ -120,6 +120,34 @@
       "when": 1793593470200,
       "tag": "0016_erase_personal_rows",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793595596839,
+      "tag": "0017_billing_invitations",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793595671737,
+      "tag": "0018_billing_invitations_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793595987183,
+      "tag": "0019_platform_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793595988269,
+      "tag": "0020_billing_system_access",
+      "breakpoints": true
     }
   ]
 }

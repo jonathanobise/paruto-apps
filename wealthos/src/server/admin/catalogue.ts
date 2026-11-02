@@ -2,7 +2,9 @@ import "server-only";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { fxRates, instrumentIdentifiers, instruments, marketDataImports, marketDataSources, marketPrices, publishedRates } from "@/server/db/schema";
-import { withUser, type Tx } from "@/server/db/client";
+import type { Tx } from "@/server/db/client";
+import { asAdmin, type AdminContext } from "./context";
+export type { AdminContext };
 import { AppError } from "@/server/platform/errors";
 import { parseOrThrow } from "@/server/identity/service";
 import { recordAudit } from "@/server/audit/audit";
@@ -14,18 +16,6 @@ import { factsSchema } from "@/server/research/facts";
  * Administrator-controlled catalogue and market data. Every function runs as the admin user in
  * context; Postgres re-checks the platform role (app_is_platform_admin()) on every write.
  */
-export interface AdminContext {
-  userId: string;
-}
-
-async function asAdmin<T>(admin: AdminContext, fn: (tx: Tx) => Promise<T>): Promise<T> {
-  return withUser(admin.userId, async (tx) => {
-    const r = await tx.execute<{ ok: boolean }>(sql`select app_is_platform_admin() as ok`);
-    if (!r.rows[0]?.ok) throw new AppError("FORBIDDEN", "Administrator access with two-step verification is required.");
-    return fn(tx);
-  });
-}
-
 // --- Sources ---------------------------------------------------------------------------------
 export const sourceSchema = z.object({
   key: z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9-]{1,40}$/, "Lower-case letters, digits and dashes"),

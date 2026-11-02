@@ -6,7 +6,7 @@ import { createAccount } from "@/server/accounts/service";
 import { postEvent } from "@/server/ledger/service";
 import { buildDashboard, listTransactions } from "@/server/analytics/portfolio";
 import { commitImport, discardImport, getImport, listImports, listMappings, previewImport, remapImport, rollbackImport, saveMapping } from "@/server/imports/service";
-import { expectDbRejection, makeUser, meta, ownerPool } from "./helpers";
+import { expectDbRejection, grantPlan, makeUser, meta, ownerPool } from "./helpers";
 import { eraseAccount, exportUserData } from "@/server/privacy/service";
 
 const enc = (s: string) => new TextEncoder().encode(s);
@@ -27,6 +27,7 @@ beforeAll(async () => {
   await pool.query("insert into instruments (name, symbol, asset_class, country, region, currency, pricing_model, stale_after_days, verification_state) values ('Import Test Plc', 'IMPX', 'equity', 'NG', 'Africa', 'NGN', 'market', 5, 'synthetic') on conflict do nothing");
   await pool.end();
   user = await makeUser("Importer");
+  await grantPlan(user.orgId, "pro");
   broker = (await createAccount(user.ctx, { name: "Broker", type: "brokerage", currency: "NGN" })).id;
   bank = (await createAccount(user.ctx, { name: "Bank", type: "bank", currency: "NGN" })).id;
 });

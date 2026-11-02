@@ -49,3 +49,14 @@ export async function expectDbRejection(p: Promise<unknown>, pattern: RegExp): P
   }
   if (!messages.some((m) => pattern.test(m))) throw new Error(`Expected rejection matching ${pattern}, got: ${messages.join(" | ")}`);
 }
+
+/** Give an organisation a complimentary plan (seeded as the table owner, as an operator would). */
+export async function grantPlan(orgId: string, plan: "plus" | "pro"): Promise<void> {
+  const pool = ownerPool();
+  await pool.query(
+    `insert into subscriptions (org_id, plan_code, status, price, currency, interval, current_period_start, current_period_end, complimentary, note)
+     select $1, code, 'active', 0, currency, interval, now(), now() + interval '1 year', true, 'test' from plans where code = $2`,
+    [orgId, plan],
+  );
+  await pool.end();
+}

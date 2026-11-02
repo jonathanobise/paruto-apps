@@ -14,8 +14,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const app = await requireApp();
   const unread = await unreadCount(app.ctx);
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-6 overflow-y-auto border-r border-border bg-surface px-3 py-5 lg:flex">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr] print:block">
+      <aside className="sticky top-0 hidden print:hidden h-dvh flex-col gap-6 overflow-y-auto border-r border-border bg-surface px-3 py-5 lg:flex">
         <Link href="/dashboard" className="px-3">
           <Logo />
         </Link>
@@ -23,7 +23,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <p className="mt-auto px-3 text-[11px] leading-relaxed text-text-3">{DISCLOSURES.non_custodial}</p>
       </aside>
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg/90 px-4 backdrop-blur sm:px-6">
+        <header className="print:hidden sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg/90 px-4 backdrop-blur sm:px-6">
           <MobileNav isAdmin={app.session.user.platformRole === "admin"} />
           <Link href="/dashboard" className="lg:hidden">
             <Logo />

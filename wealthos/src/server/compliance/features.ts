@@ -19,7 +19,9 @@ export type RegulatoryClassification =
   /** Would be (or may be) regulated investment advice or management. */
   | "regulated_advice"
   /** Execution, brokerage, custody or fund handling. */
-  | "regulated_execution";
+  | "regulated_execution"
+  /** Selling WealthOS itself (subscriptions, invoices): consumer, tax and terms-of-sale rules. */
+  | "commercial";
 
 export type ApprovalStatus = "not_required" | "pending_review" | "approved" | "rejected" | "suspended";
 
@@ -67,6 +69,9 @@ export const FEATURES: FeatureDefinition[] = [
   { key: "EDUCATION", name: "General financial education", module: "content", classification: "education", requiredPermissions: [], disclosures: ["not_advice"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "none", jurisdictions: NG, milestone: 3 },
   { key: "AI_RESEARCH_ASSISTANT", name: "AI research assistant (non-advisory, tool-grounded)", module: "ai-research", classification: "information", requiredPermissions: ["ai:use", "research:read"], disclosures: ["ai_limits", "not_advice"], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 3, counselQuestions: ["Lawful basis and cross-border transfer requirements (NDPA 2023, GAID 2025) for sending user portfolio data to an AI vendor.", "Refusal boundaries for personalised questions."] },
   { key: "ALERTS_USER_DEFINED", name: "User-defined alerts (prices, maturities, thresholds)", module: "notifications", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["data_freshness"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 3 },
+  { key: "SHARED_SPACES", name: "Household and business spaces with invited members and roles", module: "tenancy", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["non_custodial"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 4 },
+  { key: "REPORTS", name: "Wealth statement and transaction reports (PDF/CSV)", module: "reports", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["past_performance", "data_freshness", "not_advice"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 4 },
+  { key: "SUBSCRIPTION_BILLING", name: "Paid plans, trials, invoices and receipts", module: "billing", classification: "commercial", requiredPermissions: ["portfolio:read"], disclosures: [], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 4, counselQuestions: ["Terms of sale, refunds and cancellation rights under the FCCPA 2018.", "VAT registration and whether plan prices are quoted inclusive or exclusive of VAT; invoice requirements.", "Retention period for invoices after account erasure (tax law vs NDPA)."] },
   // ---- Prohibited in Version 1 (hard-disabled) ----
   { key: "PERSONALISED_RECOMMENDATIONS", name: "Personalised buy/sell recommendations", module: "advice", classification: "regulated_advice", requiredPermissions: ["adviser:clients"], disclosures: ["not_advice"], defaultApproval: "rejected", hardDisabled: true, auditLogging: "all_access", jurisdictions: [], milestone: 5 },
   { key: "AUTO_REBALANCING", name: "Automatic portfolio rebalancing", module: "advice", classification: "regulated_advice", requiredPermissions: ["adviser:clients"], disclosures: [], defaultApproval: "rejected", hardDisabled: true, auditLogging: "all_access", jurisdictions: [], milestone: 5 },

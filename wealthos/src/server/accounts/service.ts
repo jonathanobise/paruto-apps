@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { accountValuations, financialAccounts, institutions } from "@/server/db/schema";
@@ -50,6 +51,7 @@ export async function createAccount(ctx: TenantContext, input: unknown) {
   const typeInfo = ACCOUNT_TYPES[data.type];
   if (typeInfo.class !== "ledger" && !data.openingValue) throw new AppError("VALIDATION", "Enter the current value.", { fieldErrors: { openingValue: ["Enter the current value (an estimate is fine)"] } });
   return withTenant(ctx, async (tx) => {
+    await enforceLimit(tx, ctx, "accounts");
     const [inst] = data.institutionName ? await tx.select({ id: institutions.id }).from(institutions).where(eq(institutions.name, data.institutionName)).limit(1) : [];
     const [row] = await tx
       .insert(financialAccounts)
@@ -179,6 +181,7 @@ export async function reopenAccount(ctx: TenantContext, accountId: string) {
     const [account] = await tx.select().from(financialAccounts).where(eq(financialAccounts.id, accountId)).limit(1);
     if (!account) throw new AppError("NOT_FOUND", "Account not found.");
     if (account.status !== "closed") throw new AppError("CONFLICT", "This account is open.");
+    await enforceLimit(tx, ctx, "accounts");
     await tx.update(financialAccounts).set({ status: "open", closedOn: null, updatedAt: new Date() }).where(eq(financialAccounts.id, accountId));
     await recordAudit(tx, { orgId: ctx.orgId, actorUserId: ctx.userId, action: "account.reopened", targetType: "financial_account", targetId: accountId, metadata: { previousClosedOn: account.closedOn } });
   });

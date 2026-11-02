@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import { and, desc, eq, inArray, isNotNull, lt } from "drizzle-orm";
 import { z } from "zod";
 import { financialAccounts, importBatches, importMappings, instrumentIdentifiers, instruments, ledgerEvents } from "@/server/db/schema";
@@ -108,6 +109,7 @@ export async function previewImport(ctx: TenantContext, req: PreviewRequest): Pr
   const fileName = req.fileName.replace(/[^\w.\- ()]/g, "_").slice(0, 120) || "import.csv";
   const sha = sha256Hex(req.bytes);
   return withTenant(ctx, async (tx) => {
+    await enforceLimit(tx, ctx, "csvImportsPerMonth");
     await expireStalePreviews(tx);
     const account = await loadAccount(tx, req.accountId);
     let mapping: ImportMapping = suggestMapping(parsed.headers, req.dateFormat ?? "DD/MM/YYYY");

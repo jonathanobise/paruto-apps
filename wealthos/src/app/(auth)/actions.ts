@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { safeNext } from "@/lib/safe-next";
 import { clearSessionCookie, getSession, requestMeta, setSessionCookie } from "@/server/auth/context";
 import { completeMfaChallenge, requestPasswordReset, resendVerification, resetPassword, signIn, signUp } from "@/server/identity/service";
 import { revokeSession } from "@/server/identity/sessions";
@@ -25,11 +26,11 @@ export async function signUpAction(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function signInAction(_: FormState, form: FormData): Promise<FormState> {
-  let next = "/dashboard";
+  let next = safeNext(form.get("next"));
   try {
     const r = await signIn({ email: form.get("email"), password: form.get("password") }, await requestMeta());
     await setSessionCookie(r.session.token, r.session.expiresAt);
-    if (r.status === "mfa_required") next = "/sign-in/mfa";
+    if (r.status === "mfa_required") next = next === "/dashboard" ? "/sign-in/mfa" : `/sign-in/mfa?next=${encodeURIComponent(next)}`;
   } catch (err) {
     return toActionError(err);
   }
@@ -44,7 +45,7 @@ export async function mfaChallengeAction(_: FormState, form: FormData): Promise<
   } catch (err) {
     return toActionError(err);
   }
-  redirect("/dashboard");
+  redirect(safeNext(form.get("next")));
 }
 
 export async function resendVerificationAction(): Promise<FormState> {

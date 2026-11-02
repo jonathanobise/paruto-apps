@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { instruments, savedComparisons, watchlistItems, watchlists } from "@/server/db/schema";
@@ -27,6 +28,7 @@ export async function watchInstrument(ctx: TenantContext, instrumentId: string, 
     const [inst] = await tx.select({ id: instruments.id }).from(instruments).where(eq(instruments.id, instrumentId)).limit(1);
     if (!inst) throw new AppError("NOT_FOUND", "Instrument not found.");
     let [list] = await tx.select().from(watchlists).where(eq(watchlists.name, name)).limit(1);
+    if (!list) await enforceLimit(tx, ctx, "watchlists");
     if (!list) [list] = await tx.insert(watchlists).values({ orgId: ctx.orgId, name, createdBy: ctx.userId }).returning();
     await tx.insert(watchlistItems).values({ orgId: ctx.orgId, watchlistId: list!.id, instrumentId, note: note?.slice(0, 300) ?? null }).onConflictDoNothing();
     return list!.id;

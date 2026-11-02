@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { alerts, instruments, notifications } from "@/server/db/schema";
@@ -41,6 +42,7 @@ export async function createAlert(ctx: TenantContext, input: unknown): Promise<s
   const a = parseOrThrow(alertInputSchema, input);
   const { kind, repeat, ...params } = a;
   return withTenant(ctx, async (tx) => {
+    await enforceLimit(tx, ctx, "alerts");
     if ("instrumentId" in params) {
       const [i] = await tx.select({ id: instruments.id }).from(instruments).where(eq(instruments.id, params.instrumentId)).limit(1);
       if (!i) throw new AppError("NOT_FOUND", "Instrument not found.");

@@ -7,11 +7,12 @@ import { Field, Input } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
 
-export function SignInForm() {
+export function SignInForm({ next = "/dashboard" }: { next?: string }) {
   const [state, action, actionPending] = useActionState(signInAction, null);
   return (
     <ActionForm action={action} pending={actionPending} className="flex flex-col gap-4" noValidate>
       <FormMessage state={state} />
+      <input type="hidden" name="next" value={next} />
       <Field label="Email" htmlFor="email" error={fieldError(state, "email")}>
         <Input id="email" name="email" type="email" autoComplete="email" required />
       </Field>

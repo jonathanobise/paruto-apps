@@ -7,7 +7,7 @@ export interface OutgoingEmail {
   to: string;
   subject: string;
   text: string;
-  purpose: "email_verification" | "password_reset" | "security_notice" | "account_deletion";
+  purpose: "email_verification" | "password_reset" | "security_notice" | "account_deletion" | "invitation" | "billing";
 }
 
 /**

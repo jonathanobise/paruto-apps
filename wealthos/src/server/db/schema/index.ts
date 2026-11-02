@@ -8,3 +8,5 @@ export * from "./research";
 export * from "./planning";
 export * from "./notifications";
 export * from "./ai";
+export * from "./billing";
+export * from "./platform";

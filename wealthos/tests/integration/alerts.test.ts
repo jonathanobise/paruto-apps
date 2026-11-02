@@ -8,7 +8,7 @@ import { createAccount } from "@/server/accounts/service";
 import { postEvent } from "@/server/ledger/service";
 import { saveGoal } from "@/server/planning/goals";
 import { addMonths } from "@/engine";
-import { expectDbRejection, makeUser, ownerPool } from "./helpers";
+import { expectDbRejection, grantPlan, makeUser, ownerPool } from "./helpers";
 
 const today = new Date().toISOString().slice(0, 10);
 let user: Awaited<ReturnType<typeof makeUser>>;
@@ -26,6 +26,7 @@ beforeAll(async () => {
   await pool.query("insert into fx_rates (base, quote, rate, observed_on, source_id, methodology, verification_state) values ('USD','NGN',1600,$1,$2,'official','verified')", [today, src]);
   await pool.end();
   user = await makeUser("Alerter");
+  await grantPlan(user.orgId, "pro");
   acc = (await createAccount(user.ctx, { name: "Broker", type: "brokerage", currency: "NGN" })).id;
   await postEvent(user.ctx, { type: "deposit", accountId: acc, currency: "NGN", amount: "1000000", occurredOn: addMonths(today, -1) });
   await postEvent(user.ctx, { type: "buy", accountId: acc, instrumentId, quantity: "10000", price: "70", fees: "0", currency: "NGN", occurredOn: addMonths(today, -1) });

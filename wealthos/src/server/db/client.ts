@@ -49,3 +49,15 @@ export async function withUser<T>(userId: string, fn: (tx: Tx) => Promise<T>): P
     return fn(tx);
   });
 }
+
+/**
+ * Transaction in the billing-system context (no user): used only by the billing lifecycle job and
+ * by payment notifications whose signature has been verified. RLS policies on billing tables
+ * accept this context via app_billing_system(); nothing else does.
+ */
+export async function withBillingSystem<T>(fn: (tx: Tx) => Promise<T>): Promise<T> {
+  return db().transaction(async (tx) => {
+    await tx.execute(sql`select set_config('app.system', 'billing', true), set_config('app.user_id', '', true), set_config('app.org_id', '', true)`);
+    return fn(tx);
+  });
+}

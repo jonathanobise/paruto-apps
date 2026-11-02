@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { financialAccounts, goals } from "@/server/db/schema";
@@ -61,6 +62,7 @@ const toRow = (g: z.infer<typeof goalInputSchema>) => ({
 export async function saveGoal(ctx: TenantContext, id: string | null, input: unknown): Promise<string> {
   const g = parseOrThrow(goalInputSchema, input);
   return withTenant(ctx, async (tx) => {
+    if (!id) await enforceLimit(tx, ctx, "goals");
     if (g.scope === "accounts") {
       const accs = await tx.select({ id: financialAccounts.id }).from(financialAccounts);
       if (g.accountIds.some((a) => !accs.some((x) => x.id === a))) throw new AppError("NOT_FOUND", "Account not found.");

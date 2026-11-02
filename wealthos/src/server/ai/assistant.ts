@@ -1,4 +1,5 @@
 import "server-only";
+import { enforceLimit } from "@/server/billing/entitlements";
 import type Anthropic from "@anthropic-ai/sdk";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { aiConversations, aiMessages, aiSourceReferences, consentRecords, organizations } from "@/server/db/schema";
@@ -77,6 +78,7 @@ export async function askAssistant(ctx: TenantContext, input: { conversationId?:
   const { history, conversationId: existingId, isDemo } = await withTenant(ctx, async (tx) => {
     const usage = await tx.execute<{ n: string }>(sql`select app_ai_tokens_this_month(${ctx.orgId}) as n`);
     if (Number(usage.rows[0]?.n ?? 0) >= AI_LIMITS.orgTokensPerMonth) throw new AppError("RATE_LIMITED", "This workspace has used its assistant allowance for the month. It resets on the 1st.");
+    await enforceLimit(tx, ctx, "aiQuestionsPerMonth");
     const [org] = await tx.select({ isDemo: organizations.isDemo }).from(organizations).where(eq(organizations.id, ctx.orgId));
     const convId = input.conversationId ?? null;
     let past: Array<{ role: string; content: string }> = [];

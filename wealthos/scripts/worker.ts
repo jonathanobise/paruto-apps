@@ -1,5 +1,6 @@
 /**
- * Background worker: schedules alert evaluations and processes the durable job queue.
+ * Background worker: schedules alert evaluations and the billing lifecycle, and processes the
+ * durable job queue.
  *
  *   npm run worker            # run continuously
  *   npm run worker -- --once  # one scheduling + processing pass (cron-friendly)
@@ -12,7 +13,9 @@ import { hostname } from "node:os";
 config({ path: process.env.ENV_FILE ?? ".env.local", quiet: true });
 
 const { runOnce, recoverStale } = await import("../src/server/jobs/queue");
-const { jobHandlers, scheduleAlertEvaluations } = await import("../src/server/alerts/service");
+const { jobHandlers: alertHandlers, scheduleAlertEvaluations } = await import("../src/server/alerts/service");
+const { billingJobHandlers, scheduleBillingLifecycle } = await import("../src/server/billing/service");
+const jobHandlers = { ...alertHandlers, ...billingJobHandlers };
 const { closeDb } = await import("../src/server/db/client");
 
 const workerId = `${hostname()}:${process.pid}`;
@@ -26,7 +29,7 @@ do {
   try {
     if (Date.now() - lastSchedule > 5 * 60_000) {
       const recovered = await recoverStale();
-      const scheduled = await scheduleAlertEvaluations();
+      const scheduled = (await scheduleAlertEvaluations()) + ((await scheduleBillingLifecycle()) ? 1 : 0);
       lastSchedule = Date.now();
       if (recovered || scheduled) console.log(`[worker] recovered ${recovered}, scheduled ${scheduled}`);
     }

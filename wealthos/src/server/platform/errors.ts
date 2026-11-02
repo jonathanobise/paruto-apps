@@ -7,7 +7,8 @@ export type AppErrorCode =
   | "CONFLICT"
   | "RATE_LIMITED"
   | "FEATURE_UNAVAILABLE"
-  | "LEDGER_REJECTED";
+  | "LEDGER_REJECTED"
+  | "PLAN_LIMIT";
 
 export class AppError extends Error {
   constructor(
