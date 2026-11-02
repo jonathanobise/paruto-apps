@@ -105,16 +105,18 @@ export interface PreviewRequest {
   bytes: Uint8Array;
   mappingId?: string;
   dateFormat?: (typeof DATE_FORMATS)[number];
+  /** "connection": rows from an institution connection sync (not counted as a CSV upload). */
+  source?: "file" | "connection";
 }
 
 export async function previewImport(ctx: TenantContext, req: PreviewRequest): Promise<string> {
-  await rateLimit(`import-preview:${ctx.userId}`, 30, 3600);
+  if (req.source !== "connection") await rateLimit(`import-preview:${ctx.userId}`, 30, 3600);
   const text = wrapCsv(() => decodeCsv(req.bytes));
   const parsed = wrapCsv(() => parseCsv(text));
   const fileName = req.fileName.replace(/[^\w.\- ()]/g, "_").slice(0, 120) || "import.csv";
   const sha = sha256Hex(req.bytes);
   return withTenant(ctx, async (tx) => {
-    await enforceLimit(tx, ctx, "csvImportsPerMonth");
+    if (req.source !== "connection") await enforceLimit(tx, ctx, "csvImportsPerMonth");
     await expireStalePreviews(tx);
     const account = await loadAccount(tx, req.accountId);
     let mapping: ImportMapping = suggestMapping(parsed.headers, req.dateFormat ?? "DD/MM/YYYY");

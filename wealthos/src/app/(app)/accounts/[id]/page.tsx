@@ -17,6 +17,7 @@ import { PeriodTabs } from "@/components/app/period-tabs";
 import { formatDate, formatMoney, formatNumber, formatPercent } from "@/lib/format";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { ValuationForm } from "./valuation-form";
+import { ConnectionsCard } from "./connections-card";
 import { CloseAccountForm, EditAccountForm } from "./settings-forms";
 import { reopenAccountAction } from "../actions";
 
@@ -192,6 +193,7 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
           </CardContent>
         </Card>
       </div>
+      <ConnectionsCard ctx={app.ctx} jurisdiction={app.org.jurisdiction} account={{ id: account.id, type: account.type, status: account.status }} canWrite={app.canWrite} />
       <Card className="mt-6">
         <CardHeader><CardTitle>Recent transactions</CardTitle><Link href="/transactions" className="text-[13px] font-medium text-accent hover:underline">All transactions</Link></CardHeader>
         <CardContent>

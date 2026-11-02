@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, count, eq, gte, inArray, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, count, eq, gte, inArray, isNull, ne, notLike, sql } from "drizzle-orm";
 import { alerts, financialAccounts, goals, importBatches, orgInvitations, organizations, plans, subscriptions, watchlists, type Entitlements } from "@/server/db/schema";
 import { withTenant, type TenantContext, type Tx } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
@@ -76,7 +76,8 @@ export async function usage(tx: Tx, ctx: TenantContext, key: LimitKey): Promise<
     case "watchlists":
       return n(tx.select({ n: count() }).from(watchlists));
     case "csvImportsPerMonth":
-      return n(tx.select({ n: count() }).from(importBatches).where(and(gte(importBatches.createdAt, monthStart), ne(importBatches.status, "discarded"))));
+      // Institution-connection syncs aren't uploads; they're named "connection-…".
+      return n(tx.select({ n: count() }).from(importBatches).where(and(gte(importBatches.createdAt, monthStart), ne(importBatches.status, "discarded"), notLike(importBatches.fileName, "connection-%"))));
     case "members": {
       const m = await tx.execute<{ n: string }>(sql`select count(*) as n from app_org_members()`);
       const pending = await n(tx.select({ n: count() }).from(orgInvitations).where(and(isNull(orgInvitations.acceptedAt), isNull(orgInvitations.revokedAt), gte(orgInvitations.expiresAt, new Date()))));
