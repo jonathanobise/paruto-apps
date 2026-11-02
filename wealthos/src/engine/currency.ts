@@ -20,6 +20,11 @@ const POLICIES: Record<string, CurrencyPolicy> = {
   GBP: { code: "GBP", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "£" },
   EUR: { code: "EUR", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "€" },
   JPY: { code: "JPY", minorUnits: 0, rounding: RoundingMode.HALF_EVEN, symbol: "¥" },
+  GHS: { code: "GHS", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "GH₵" },
+  KES: { code: "KES", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "KSh" },
+  ZAR: { code: "ZAR", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "R" },
+  XOF: { code: "XOF", minorUnits: 0, rounding: RoundingMode.HALF_EVEN, symbol: "CFA" },
+  EGP: { code: "EGP", minorUnits: 2, rounding: RoundingMode.HALF_EVEN, symbol: "E£" },
 };
 
 export function isCurrencyCode(code: string): boolean {

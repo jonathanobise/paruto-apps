@@ -45,7 +45,7 @@ async function mapDbErrors<T>(p: Promise<T>): Promise<T> {
   }
 }
 
-const spaceSchema = z.object({ name: z.string().trim().min(2, "Give the space a name").max(80), kind: z.enum(["household", "business"]) });
+const spaceSchema = z.object({ name: z.string().trim().min(2, "Give the space a name").max(80), kind: z.enum(["household", "business"]), jurisdiction: z.string().default("NG") });
 
 export async function createSharedSpace(userId: string, input: unknown): Promise<string> {
   const s = parseOrThrow(spaceSchema, input);
@@ -53,6 +53,8 @@ export async function createSharedSpace(userId: string, input: unknown): Promise
   return withUser(userId, async (tx) => {
     const r = await tx.execute<{ id: string }>(sql`select app_create_organization(${userId}::uuid, ${s.name}, ${s.kind}::org_kind, false) as id`);
     const orgId = r.rows[0]!.id;
+    // Only offered jurisdictions (Nigeria today); the organisation row defaults to NG.
+    if (s.jurisdiction !== "NG") throw new AppError("VALIDATION", "WealthOS is only available in Nigeria for now.", { fieldErrors: { jurisdiction: ["Not offered yet"] } });
     await tx.execute(sql`select set_config('app.org_id', ${orgId}, true)`);
     await recordAudit(tx, { orgId, actorUserId: userId, action: "org.created", targetType: "organization", targetId: orgId, metadata: { kind: s.kind } });
     return orgId;

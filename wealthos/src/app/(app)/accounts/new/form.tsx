@@ -1,4 +1,5 @@
 "use client";
+import { RECORD_CURRENCIES } from "@/lib/jurisdictions";
 import { ActionForm } from "@/components/ui/action-form";
 import { useActionState, useState } from "react";
 import { createAccountAction } from "../actions";
@@ -38,7 +39,7 @@ export function NewAccountForm({ types, today }: { types: TypeOption[]; today: s
       </Field>
       <Field label="Main currency" htmlFor="currency" error={fieldError(state, "currency")}>
         <Select id="currency" name="currency" defaultValue="NGN">
-          {["NGN", "USD", "GBP", "EUR"].map((c) => <option key={c}>{c}</option>)}
+          {RECORD_CURRENCIES.map((c) => <option key={c}>{c}</option>)}
         </Select>
       </Field>
       {cls !== "ledger" ? (
