@@ -1,12 +1,14 @@
 import "server-only";
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { accountValuations, financialAccounts, institutions } from "@/server/db/schema";
 import { withTenant, type TenantContext } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
 import { parseOrThrow } from "@/server/identity/service";
 import { recordAudit } from "@/server/audit/audit";
-import { isISODate } from "@/engine";
+import { PortfolioBook, effectiveEvents, eventAccountIds, isISODate } from "@/engine";
+import { instrumentIdsOf, loadEvents, loadInstrumentMap, lockLedger } from "@/server/ledger/service";
+import { toEngineEvent } from "@/server/ledger/codec";
 
 export const ACCOUNT_TYPES = {
   bank: { label: "Bank account", class: "ledger", investment: false },
@@ -111,13 +113,73 @@ export async function listValuations(ctx: TenantContext, accountId: string) {
   return withTenant(ctx, (tx) => tx.select().from(accountValuations).where(eq(accountValuations.accountId, accountId)).orderBy(desc(accountValuations.valuedOn), desc(accountValuations.createdAt)));
 }
 
-export async function closeAccount(ctx: TenantContext, accountId: string, closedOn: string, hasOpenBalance: boolean) {
-  if (!isISODate(closedOn)) throw new AppError("VALIDATION", "Use a valid closing date.");
+export const updateAccountSchema = z.object({
+  name: z.string().trim().min(1, "Give the account a name").max(80),
+  institutionName: z.string().trim().max(120).optional().transform((v) => v || null),
+  isInvestment: z.boolean(),
+  ownershipPercent: decimalString.refine((v) => Number(v) > 0 && Number(v) <= 100, "Between 0 and 100"),
+  maskedNumber: z.string().trim().max(4, "Only the last 4 characters").optional().transform((v) => v || null),
+  notes: z.string().trim().max(500).optional().transform((v) => v || null),
+});
+
+/**
+ * Edit descriptive fields. Type and currency are fixed once created because the ledger and
+ * valuations depend on them; create a new account instead.
+ */
+export async function updateAccount(ctx: TenantContext, accountId: string, input: unknown) {
+  const data = parseOrThrow(updateAccountSchema, input);
   return withTenant(ctx, async (tx) => {
-    const [account] = await tx.select().from(financialAccounts).where(and(eq(financialAccounts.id, accountId), eq(financialAccounts.status, "open"))).limit(1);
-    if (!account) throw new AppError("NOT_FOUND", "Open account not found.");
-    if (account.accountClass === "ledger" && hasOpenBalance) throw new AppError("CONFLICT", "Move or withdraw the remaining cash and holdings before closing this account.");
+    const [before] = await tx.select().from(financialAccounts).where(eq(financialAccounts.id, accountId)).limit(1);
+    if (!before) throw new AppError("NOT_FOUND", "Account not found.");
+    const [inst] = data.institutionName ? await tx.select({ id: institutions.id }).from(institutions).where(eq(institutions.name, data.institutionName)).limit(1) : [];
+    await tx
+      .update(financialAccounts)
+      .set({ name: data.name, institutionName: data.institutionName, institutionId: inst?.id ?? null, isInvestment: before.accountClass === "ledger" ? data.isInvestment : false, ownershipPercent: data.ownershipPercent, maskedNumber: data.maskedNumber, notes: data.notes, updatedAt: new Date() })
+      .where(eq(financialAccounts.id, accountId));
+    const changed = (["name", "institutionName", "isInvestment", "ownershipPercent", "maskedNumber", "notes"] as const).filter((k) => String(before[k] ?? "") !== String(data[k] ?? ""));
+    await recordAudit(tx, { orgId: ctx.orgId, actorUserId: ctx.userId, action: "account.updated", targetType: "financial_account", targetId: accountId, metadata: { changed } });
+  });
+}
+
+/**
+ * Close an account as of a date. Ledger accounts must be empty (no cash or holdings) and have no
+ * transactions after the closing date. Closed accounts keep their history; manual assets and
+ * liabilities stop counting towards net worth from the closing date.
+ */
+export async function closeAccount(ctx: TenantContext, accountId: string, closedOn: string) {
+  if (!isISODate(closedOn)) throw new AppError("VALIDATION", "Use a valid closing date.", { fieldErrors: { closedOn: ["Use a valid date"] } });
+  if (closedOn > new Date().toISOString().slice(0, 10)) throw new AppError("VALIDATION", "The closing date can't be in the future.", { fieldErrors: { closedOn: ["Can't be in the future"] } });
+  return withTenant(ctx, async (tx) => {
+    await lockLedger(tx, ctx.orgId);
+    const [account] = await tx.select().from(financialAccounts).where(eq(financialAccounts.id, accountId)).limit(1);
+    if (!account) throw new AppError("NOT_FOUND", "Account not found.");
+    if (account.status === "closed") throw new AppError("CONFLICT", "This account is already closed.");
+    if (account.accountClass === "ledger") {
+      const events = (await loadEvents(tx)).map(toEngineEvent);
+      const live = effectiveEvents(events);
+      if (live.some((e) => e.date > closedOn && eventAccountIds(e).includes(accountId))) throw new AppError("CONFLICT", "There are transactions after this date. Choose a later closing date.");
+      const book = PortfolioBook.replay(events, { baseCurrency: "NGN", instruments: await loadInstrumentMap(tx, instrumentIdsOf(events)) });
+      const cash = book.cashBalances().filter((c) => c.accountId === accountId);
+      const positions = book.positions().filter((p) => p.accountId === accountId && !p.quantity.isZero());
+      if (cash.length || positions.length) {
+        const parts = [...cash.map((c) => `${c.amount.toFixed(2)} ${c.currency} cash`), ...positions.map((p) => `${p.quantity.toFixed()} units of a holding`)];
+        throw new AppError("CONFLICT", `Move or withdraw what's left before closing (${parts.join(", ")}).`);
+      }
+    } else {
+      const [first] = await tx.select({ d: accountValuations.valuedOn }).from(accountValuations).where(eq(accountValuations.accountId, accountId)).orderBy(accountValuations.valuedOn).limit(1);
+      if (first && closedOn < first.d) throw new AppError("VALIDATION", "The closing date is before the first valuation.");
+    }
     await tx.update(financialAccounts).set({ status: "closed", closedOn, updatedAt: new Date() }).where(eq(financialAccounts.id, accountId));
     await recordAudit(tx, { orgId: ctx.orgId, actorUserId: ctx.userId, action: "account.closed", targetType: "financial_account", targetId: accountId, metadata: { closedOn } });
+  });
+}
+
+export async function reopenAccount(ctx: TenantContext, accountId: string) {
+  return withTenant(ctx, async (tx) => {
+    const [account] = await tx.select().from(financialAccounts).where(eq(financialAccounts.id, accountId)).limit(1);
+    if (!account) throw new AppError("NOT_FOUND", "Account not found.");
+    if (account.status !== "closed") throw new AppError("CONFLICT", "This account is open.");
+    await tx.update(financialAccounts).set({ status: "open", closedOn: null, updatedAt: new Date() }).where(eq(financialAccounts.id, accountId));
+    await recordAudit(tx, { orgId: ctx.orgId, actorUserId: ctx.userId, action: "account.reopened", targetType: "financial_account", targetId: accountId, metadata: { previousClosedOn: account.closedOn } });
   });
 }

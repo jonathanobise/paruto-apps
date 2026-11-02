@@ -71,7 +71,8 @@ export function xirr(cashflows: DatedAmount[], guess = 0.1): number | null {
 }
 
 function round10(x: number): number {
-  return Math.round(x * 1e10) / 1e10;
+  const r = Math.round(x * 1e10) / 1e10;
+  return r === 0 ? 0 : r; // never report −0
 }
 
 export interface ValuationPoint {

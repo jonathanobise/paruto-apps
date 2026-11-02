@@ -29,6 +29,27 @@
       "when": 1793582665799,
       "tag": "0003_csv_imports_security",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793590062975,
+      "tag": "0004_valuation_snapshots",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793590063767,
+      "tag": "0005_valuation_snapshots_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793590103016,
+      "tag": "0006_analytics_cache_versions",
+      "breakpoints": true
     }
   ]
 }

@@ -166,9 +166,17 @@ export function analyzePerformance(input: PerformanceInput): PerformanceResult {
   const netContributions = main.contributions.minus(main.withdrawals);
   const investmentGain = last.value.minus(first.value).minus(netContributions);
 
-  // Constant-FX counterfactual for currency attribution.
+  // Constant-FX counterfactual for currency attribution. When nothing in the ledger is in a
+  // currency other than the base currency, freezing FX changes nothing: the FX effect is exactly
+  // zero and the second pass is skipped.
+  const foreign = input.events.some((e) => {
+    const ccys = [("currency" in e ? e.currency : undefined), ("fromCurrency" in e ? e.fromCurrency : undefined), ("toCurrency" in e ? e.toCurrency : undefined)];
+    const inst = "instrumentId" in e && e.instrumentId ? input.instruments.get(e.instrumentId)?.currency : undefined;
+    return [...ccys, inst].some((c) => c !== undefined && c !== input.baseCurrency);
+  });
   let investmentGainConstantFx: Decimal | null = null;
-  try {
+  if (!foreign) investmentGainConstantFx = main.complete ? investmentGain : null;
+  else try {
     const cf = buildSeries(input, new FixedDateFx(input.fx, input.start), dates, []);
     if (cf.complete) {
       const f0 = cf.points[0]!;

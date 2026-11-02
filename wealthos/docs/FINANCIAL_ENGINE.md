@@ -48,6 +48,13 @@ A flow is external when value crosses the boundary of the analysis scope (set of
 - **Bridge**: `end − start = net contributions + investment gain`; gain shows income (gross), fees, withholding tax, realised gains and **FX effect** = gain − gain recomputed with all FX frozen at start-date rates (an explicit counterfactual, not a substitution).
 - Any missing FX/price in the period → `complete = false`, TWR/XIRR withheld (shown as "—" with an explanation).
 
+## Account and holding performance
+- **Account**: `analyzePerformance` with a one-account scope. Transfers to/from your other accounts are that account's contributions/withdrawals (not returns), so bank → broker funding never looks like profit at either end.
+- **Holding** (`holding-performance.ts`): one instrument in one account, treated as a mini-portfolio. Money in: purchases incl. fees, holding-specific fees/taxes, opening positions and securities transferred in (at market value). Money out: net sale proceeds, maturity/redemption proceeds, net income paid out, securities transferred out. Reinvested income nets to zero but counts as income. Splits/bonus issues are not flows. Same end-of-day TWR convention; XIRR on the same flows.
+- Every holding result is reported twice: **local** (instrument currency — the investment's own performance, ex-FX) and **base** (display currency — including currency moves). Base is withheld (null) if any FX rate in the period is missing.
+- Single-currency shortcut: when nothing in the ledger is in a non-base currency, the FX effect is exactly zero and the constant-FX counterfactual pass is skipped.
+- XIRR never reports −0.
+
 ## Risk, allocation, planning
 - Volatility: sample stdev × √periods/yr. Max drawdown on a growth index (never on raw value, which deposits distort). Sharpe returns its assumptions (risk-free rate, label, periodicity) with the number.
 - Allocation by asset class, geography, currency; concentration via HHI, effective number of holdings, top-N, user threshold breaches.
@@ -61,7 +68,8 @@ A flow is external when value crosses the boundary of the analysis scope (set of
 - FIFO/average-cost sale (fees capitalised) hand-computed: gains 532 / 494.
 - T-bill: 18% discount, 364 days → price 82.0493150685, true yield 0.2193802591, EAY 0.2194418565 (Python `decimal`).
 - Volatility/Sharpe from Python `statistics`.
+- Holding: buy 100 @ 10, dividend 50 − 5 WHT, sell 50 @ 13, 50 left @ 14 → TWR 45.25% (1245/1000 × 1300/1200 × 700/650), gain 395, XIRR 58.56605% (Python); USD ETF $100 → $110 with USD/NGN 1500 → 1650 → local +10%, NGN +21%.
 - Annuity FV 331 / 364.1; inflation deflation; FX attribution (constant USD price, USD/NGN 1500 → 1650 ⇒ gain is 100% FX).
 
 ## Known limitations (planned)
-Accrued interest on coupon bonds; day-count/settlement conventions per market; corporate actions from a catalogue feed (currently entered per organisation); tax lots for specific-identification; multi-currency cash in performance attribution by currency pair; performance per account/holding.
+Accrued interest on coupon bonds; day-count/settlement conventions per market; corporate actions from a catalogue feed (currently entered per organisation); tax lots for specific-identification; multi-currency cash in performance attribution by currency pair; holding performance replays the ledger once per holding (≈0.85 s for 10 holdings × 2,400 events, uncached).

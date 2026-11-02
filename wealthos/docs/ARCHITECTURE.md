@@ -30,6 +30,9 @@ Planned modules (contracts reserved, not built): `instruments` catalogue admin, 
 - **Ledger writes** are serialised per organisation with `pg_advisory_xact_lock`, so two concurrent sales cannot both pass validation.
 - **External integrations** (email, market data, AI, payments) are adapters; only development transports exist. Nothing pretends to be connected.
 
+## Analytics cache
+`src/server/analytics/cache.ts` wraps the dashboard, account-performance and holdings-performance computations. Inside the same tenant transaction it computes an input fingerprint (a few aggregate queries), returns the stored result if it matches, otherwise computes, stores and returns. Results are JSON (decimal strings), identical to an uncached computation (tested). Bump `ANALYTICS_VERSION` whenever calculation logic changes. Measured on 2,400 events over 5 years: dashboard 390–460 ms uncached → 4 ms cached; holdings performance 850 ms → 7 ms (`npm run test:perf`).
+
 ## Errors
 Services throw `AppError(code, safeMessage)`; actions map to `ActionResult` (`toActionError`) and log unexpected errors server-side without leaking internals. Pages have `error.tsx` and `loading.tsx` states; empty states exist on every list.
 

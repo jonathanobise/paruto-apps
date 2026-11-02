@@ -24,10 +24,14 @@
 
 **ADR-012 Feature gating.** Code registry is the source of truth for classification; compliance decisions are append-only rows; regulated features hard-disabled; `pending_review` blocked in production.
 
+**ADR-013 Analytics cache, not materialised holdings.** Positions stay derived from the ledger (single source of truth). Expensive views are cached as whole JSON results keyed by an exact input fingerprint rather than maintaining incremental holdings tables, which would need their own reconciliation. Invalidation is by construction (any input change → new key), verified by tests for each input type.
+
+**ADR-014 Holding performance convention.** A holding is measured as its own mini-portfolio with purchases as money in and net sale/maturity proceeds and net income as money out; returns are shown in the instrument currency (ex-FX) and in the display currency. Withholding tax reduces income returned; fees are part of cost.
+
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
 - No live market data; licensing costs unknown.
 - No production email provider; verification emails only reach the dev outbox.
-- Dashboard recomputes from the full ledger on each request — fine at personal scale; add snapshots/caching before large imports.
+- Cold (uncached) analytics replay the full ledger; acceptable up to a few thousand events (see TESTING.md perf), revisit with incremental snapshots if users import much larger histories.
 - Admin/support access path not yet designed in RLS terms.
 - TOTP step replay within 30 s not prevented.

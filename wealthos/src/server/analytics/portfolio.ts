@@ -1,7 +1,7 @@
 import "server-only";
 import { asc, desc, eq } from "drizzle-orm";
 import { accountValuations, financialAccounts, ledgerEvents, organizations } from "@/server/db/schema";
-import { withTenant, type TenantContext } from "@/server/db/client";
+import { withTenant, type TenantContext, type Tx } from "@/server/db/client";
 import {
   ASSET_CLASS_LABELS,
   Decimal,
@@ -30,7 +30,9 @@ import {
 import { loadEvents, loadInstrumentMap, instrumentIdsOf } from "@/server/ledger/service";
 import { toEngineEvent, EVENT_LABELS } from "@/server/ledger/codec";
 import { loadFxTable, loadPriceTable } from "@/server/market-data/service";
+import { withSnapshot } from "./cache";
 
+export { periodStart };
 export const PERIODS = { "1M": 30, "3M": 91, "6M": 182, YTD: -1, "1Y": 365, "3Y": 1095, ALL: 0 } as const;
 export type PeriodKey = keyof typeof PERIODS;
 
@@ -204,22 +206,28 @@ function netWorthOf(valuation: Valuation, accounts: AccountRow[], manual: Manual
   return { assets: ledger.plus(manualAssets), liabilities, ledger, manualAssets };
 }
 
-export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: string; period: PeriodKey; asOf?: ISODate }): Promise<DashboardData> {
+/** Everything the analytics need, loaded once inside a tenant transaction. */
+export async function loadPortfolioInputs(tx: Tx, ctx: TenantContext, asOf: ISODate, earliest?: ISODate) {
+  const [org] = await tx.select().from(organizations).where(eq(organizations.id, ctx.orgId)).limit(1);
+  const accounts = await tx.select().from(financialAccounts).orderBy(asc(financialAccounts.createdAt));
+  const valuations = await tx.select().from(accountValuations).orderBy(desc(accountValuations.valuedOn));
+  const eventRows = await loadEvents(tx);
+  const events: LedgerEvent[] = eventRows.map(toEngineEvent);
+  const effective = sortEvents(effectiveEvents(events));
+  const firstDate = [...effective.map((e) => e.date), ...valuations.map((v) => v.valuedOn)].sort()[0] ?? null;
+  const instrumentMap = await loadInstrumentMap(tx, instrumentIdsOf(events));
+  const from = [firstDate ?? asOf, earliest ?? asOf].sort()[0]!;
+  const { table: prices, latest } = await loadPriceTable(tx, [...instrumentMap.keys()], from, asOf);
+  const fx = await loadFxTable(tx, from, asOf);
+  return { org, accounts, valuations, eventRows, events, effective, firstDate, instrumentMap, prices, latest, fx };
+}
+
+export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: string; period: PeriodKey; asOf?: ISODate; bypassCache?: boolean }): Promise<DashboardData> {
   const asOf = opts.asOf ?? new Date().toISOString().slice(0, 10);
   const base = opts.baseCurrency;
-  return withTenant(ctx, async (tx) => {
-    const [org] = await tx.select().from(organizations).where(eq(organizations.id, ctx.orgId)).limit(1);
-    const accounts = await tx.select().from(financialAccounts).orderBy(asc(financialAccounts.createdAt));
-    const valuations = await tx.select().from(accountValuations).orderBy(desc(accountValuations.valuedOn));
-    const eventRows = await loadEvents(tx);
-    const events: LedgerEvent[] = eventRows.map(toEngineEvent);
-    const effective = sortEvents(effectiveEvents(events));
-    const firstDate = [...effective.map((e) => e.date), ...valuations.map((v) => v.valuedOn)].sort()[0] ?? null;
-    const instrumentMap = await loadInstrumentMap(tx, instrumentIdsOf(events));
+  return withTenant(ctx, (tx) => withSnapshot(tx, ctx, "dashboard", `${base}|${opts.period}|${asOf}`, async () => {
+    const { org, accounts, valuations, eventRows, events, effective, firstDate, instrumentMap, prices, latest, fx } = await loadPortfolioInputs(tx, ctx, asOf);
     const start = periodStart(opts.period, asOf, firstDate);
-    const historyStart = firstDate && firstDate < start ? firstDate : start;
-    const { table: prices, latest } = await loadPriceTable(tx, [...instrumentMap.keys()], historyStart, asOf);
-    const fx = await loadFxTable(tx, historyStart, asOf);
     const accountName = (id: string) => accounts.find((a) => a.id === id)?.name ?? "Unknown account";
 
     const ledgerIds = new Set(accounts.filter((a) => a.accountClass === "ledger").map((a) => a.id));
@@ -420,7 +428,7 @@ export async function buildDashboard(ctx: TenantContext, opts: { baseCurrency: s
       issues,
       freshness: { latestPriceDate: priceDates[priceDates.length - 1] ?? null, oldestPriceDate: priceDates[0] ?? null, syntheticData },
     };
-  });
+  }, { bypass: Boolean(opts.bypassCache) }));
 }
 
 export async function listTransactions(ctx: TenantContext) {

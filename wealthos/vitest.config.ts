@@ -22,6 +22,10 @@ export default defineConfig({
           hookTimeout: 60_000,
         },
       },
+      {
+        resolve: { alias },
+        test: { name: "perf", include: ["tests/perf/**/*.perf.test.ts"], environment: "node", globalSetup: ["tests/integration/global-setup.ts"], setupFiles: ["tests/integration/env.ts"], fileParallelism: false, testTimeout: 600_000, hookTimeout: 120_000 },
+      },
     ],
   },
 });
