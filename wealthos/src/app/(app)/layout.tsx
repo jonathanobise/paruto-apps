@@ -24,16 +24,25 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
       <div className="min-w-0">
         <header className="print:hidden sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg/90 px-4 backdrop-blur sm:px-6">
-          <MobileNav isAdmin={app.session.user.platformRole !== "user"} />
-          <Link href="/dashboard" className="lg:hidden">
-            <Logo />
+          <MobileNav
+            isAdmin={app.session.user.platformRole !== "user"}
+            footer={
+              <form action={signOutAction}>
+                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-2 hover:bg-surface-2">
+                  <LogOut className="size-4 text-text-3" aria-hidden /> Sign out
+                </button>
+              </form>
+            }
+          />
+          <Link href="/dashboard" className="lg:hidden" aria-label="WealthOS home">
+            <Logo compact />
           </Link>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
             <form action={switchOrgAction}>
               <label htmlFor="org-switch" className="sr-only">
                 Portfolio
               </label>
-              <AutoSubmitSelect id="org-switch" name="orgId" defaultValue={app.org.id} className="h-9 max-w-28 rounded-lg border border-border bg-surface px-2 text-sm sm:max-w-52">
+              <AutoSubmitSelect id="org-switch" name="orgId" defaultValue={app.org.id} className="h-9 w-24 min-w-0 rounded-lg border border-border bg-surface px-2 text-sm sm:w-auto sm:max-w-52">
                 {app.orgs.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.isDemo ? `DEMO · ${o.name}` : o.name}
@@ -61,7 +70,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               {unread ? <span className="num absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-accent px-1 text-center text-[10px] font-semibold leading-4 text-white">{unread > 99 ? "99+" : unread}</span> : null}
             </Link>
             <span className="hidden text-sm text-text-2 md:inline">{app.session.user.displayName}</span>
-            <form action={signOutAction}>
+            <form action={signOutAction} className="hidden sm:block">
               <button className="flex size-9 items-center justify-center rounded-lg text-text-3 hover:bg-surface-2 hover:text-text" aria-label="Sign out" title="Sign out">
                 <LogOut className="size-4" aria-hidden />
               </button>

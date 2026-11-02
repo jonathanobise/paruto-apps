@@ -13,7 +13,8 @@ Read `docs/ARCHITECTURE.md` and `docs/FINANCIAL_ENGINE.md` before changing domai
 - Server modules import `server-only`; scripts run with `tsx --conditions=react-server`.
 - Plan limits: new creatable things (accounts, goals, alerts, watchlists, members, imports, assistant questions, PDF reports) must call `enforceLimit`/`enforceFeature` (src/server/billing/entitlements.ts) inside the insert's transaction. Downgrades never delete data.
 - Money owed is issued only by the billing system (`withBillingSystem`) after the app checks the caller's role; never let customers write invoice amounts, and never apply a payment that doesn't match the invoice exactly. No payment provider may be connected until its terms are confirmed (docs/BILLING.md).
-- Admin features run in `asAdmin` (Postgres re-checks role + 2FA), audit every view of a person's or organisation's details, and never read financial records or assistant conversation content.
+- Staff features run in `asStaff(roles)` / `asAdmin` (Postgres re-checks role + 2FA), audit every view of a person's or organisation's details, and never read financial records or assistant conversation content.
+- Bank-connection data only ever enters the ledger through a user-reviewed import preview. Only Nigeria is offered: never add a jurisdiction to a feature without a recorded compliance decision. Never cache financial data in the service worker.
 - Don't trust X-Forwarded-For directly: use `requestMeta()` (src/lib/client-ip.ts).
 - Analytics results are cached (`src/server/analytics/cache.ts`). When you change any calculation that affects dashboard/account/holding results, bump `ANALYTICS_VERSION` so stale cached results are not served. New inputs to the analytics must be added to `inputsFingerprint`.
 

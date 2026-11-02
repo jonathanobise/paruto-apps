@@ -26,6 +26,7 @@ const STATUS: Record<string, { label: string; tone: "accent" | "warning" | "neut
   expired: { label: "Ended", tone: "neutral" },
 };
 const ORDER: LimitKey[] = ["accounts", "goals", "alerts", "watchlists", "members", "csvImportsPerMonth", "aiQuestionsPerMonth"];
+const sentence = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const iso = (x: Date | null | undefined) => (x ? x.toISOString().slice(0, 10) : null);
 
 export default async function BillingPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -92,7 +93,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
                 const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
                 return (
                   <li key={k}>
-                    <div className="flex justify-between gap-2"><span className="capitalize">{LIMIT_LABELS[k].plural}{LIMIT_LABELS[k].period ? ` ${LIMIT_LABELS[k].period}` : ""}</span><span className="num text-text-2">{used} / {limit ?? "unlimited"}</span></div>
+                    <div className="flex justify-between gap-2"><span>{sentence(`${LIMIT_LABELS[k].plural}${LIMIT_LABELS[k].period ? ` ${LIMIT_LABELS[k].period}` : ""}`)}</span><span className="num text-text-2">{used} / {limit ?? "unlimited"}</span></div>
                     {limit ? <div className="mt-1 h-1.5 rounded-full bg-surface-2" aria-hidden><div className={cn("h-1.5 rounded-full", pct >= 100 ? "bg-warning" : "bg-accent")} style={{ width: `${pct}%` }} /></div> : null}
                   </li>
                 );

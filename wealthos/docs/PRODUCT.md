@@ -45,4 +45,8 @@ Instruments are the founder's research candidates (Coronation MMF, Stanbic IBTC 
 | Admin console: overview and source freshness, users, organisations, billing (revenue, reconciliation, plans, settings), support, AI usage, jobs, audit log, feature gates, sources, catalogue, market-data imports | Built (platform admins with 2FA) |
 | Reports (PDF wealth statement, CSV statement and holdings) | Built (PDF on Plus/Pro) |
 | Help (support requests and replies) | Built |
+| Household (net worth by person, who owns each account) | Built |
+| Bank connection on bank/cash accounts (consent, sync to review, disconnect) | Built; no provider connected (sandbox in development) |
+| Staff console for support agents and compliance reviewers | Built |
+| Installable app with offline page | Built (web); native apps not built |
 | Plans and billing | Built, provider-neutral; paid plans pending review (docs/BILLING.md) |

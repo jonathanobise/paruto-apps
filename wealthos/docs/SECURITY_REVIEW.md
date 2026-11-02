@@ -37,3 +37,11 @@ Date: 2 Nov 2026. Scope: the whole application with focus on Milestone 4 surface
 7. Session cookies rely on HTTPS in production (`__Host-` prefix); verify at the edge.
 8. Logging/monitoring vendor not chosen; logs are structured JSON on stdout.
 9. Backups/DR, key escrow and the restore drill exist only on paper (RUNBOOK.md) until infrastructure is chosen.
+
+## Milestone 5 addendum (2 Nov 2026)
+| # | Severity | Finding | Fix | Test |
+|---|---|---|---|---|
+| 12 | High | `regulatory_feature_approvals` had no row-level security: any runtime code path (or injected SQL) could insert an approval and switch on a pending feature in production | RLS: readable by all (gating), insertable only by compliance reviewers/admins with 2FA, under their own user id, with a reference | `staff-roles.test.ts` (raw SQL as a customer and in another reviewer's name) |
+| 13 | Medium | Every page overflowed on phones (header controls ~500 px), so browsers zoomed pages out; Playwright couldn't even tap buttons | Compact header (logo mark, narrower switcher, sign-out in the menu); E2E checks every main page against the screen width | `e2e/m5.spec.ts` |
+
+New surfaces reviewed: bank connections (scopes, consent expiry, encrypted credentials deleted on revocation, guard against re-pointing/extension/reactivation, review-before-ledger, sandbox refused in production), household ownership (members only, shares ≤ 100%, cleared on leaving), staff roles (Postgres-checked per request), service worker (caches only a static offline page — verified in the browser test).

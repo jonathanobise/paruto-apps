@@ -18,7 +18,7 @@
 - Client IP: set `TRUSTED_PROXY_HOPS` (number of proxies in front of the app) or `TRUSTED_IP_HEADER` (e.g. `cf-connecting-ip`); production refuses to start otherwise.
 - Health: `/api/health` (liveness), `/api/health?deep=1` (readiness: migration, worker heartbeat, dead jobs).
 - Logs: structured JSON on stdout with request ids (`x-request-id`); server errors via `src/instrumentation.ts`.
-- Payment notifications: `/api/billing/webhook/{provider}` (no provider registered). Never set `BILLING_TEST_WEBHOOK_SECRET` or `AI_PROVIDER=test` in production (both refused).
+- Payment notifications: `/api/billing/webhook/{provider}` (no provider registered). Never set `BILLING_TEST_WEBHOOK_SECRET`, `AI_PROVIDER=test` or `CONNECTIONS_SANDBOX=1` in production (all refused).
 - Runbook: docs/RUNBOOK.md. Security review: docs/SECURITY_REVIEW.md.
 
 ## Release checklist

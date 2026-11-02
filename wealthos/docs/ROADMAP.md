@@ -36,5 +36,12 @@ Carried forward: connect an AI provider after counsel and vendor approval, then 
 
 Carried forward: payment provider integration (after terms), email provider, AI provider connection and live eval, support/compliance staff roles, independent penetration test, infrastructure choice and deployment.
 
-## Milestone 5 — Expansion
-Authorised institution connections, adviser partnerships (only after authorisation), mobile apps, households, other African markets.
+## Milestone 5 — Expansion (engineering foundations ✅; launches gated)
+- **Household planning:** ownership of each account split between members, net worth by person reconciling to the space total.
+- **Authorised institution connections (framework):** consented, read-only, expiring connections with encrypted provider credentials; daily syncs become import previews the user reviews; sandbox test double only. **No provider connected.**
+- **Staff roles:** support agents and compliance reviewers with Postgres-enforced, narrower access; in-app compliance decisions; compliance approvals locked down by row-level security.
+- **African expansion (framework):** jurisdiction catalogue, record-keeping currencies (GHS, KES, ZAR, XOF, EGP), per-jurisdiction gating; **only Nigeria offered**.
+- **Mobile:** installable web app with an offline page and no on-device caching of financial data; all screens verified at phone width (fixed a header overflow that zoomed every page out on phones). **Native apps not built** (store accounts, token API).
+- **Adviser partnerships and regulated advice:** not built; hard-disabled; operating-model requirements in docs/EXPANSION.md.
+
+Needs owner/counsel/vendor decisions: data-provider choice and CBN open-banking status, per-country legal review, native app plan, adviser operating model and authorisation.

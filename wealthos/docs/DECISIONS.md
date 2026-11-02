@@ -44,6 +44,14 @@
 
 **ADR-022 Batch holding performance.** All holdings are computed in one ledger replay, valuing each holding only on the dates the single-holding calculation would, so results are identical (tested) and cold time drops.
 
+**ADR-023 Connections feed the import pipeline.** Bank data enters the same preview → review → commit flow as CSV files (provider transaction ids as references), so validation, duplicate detection, audit and rollback are shared and nothing reaches the ledger without the user.
+
+**ADR-024 Staff roles in Postgres.** Support and compliance roles are checked by `app_staff_role()` in every policy and function they use, not only in pages, matching how tenancy is enforced.
+
+**ADR-025 PWA without data caching.** The service worker caches only a static offline page; financial pages and API responses are never stored on the device. Native apps are deferred until a token-based API and store accounts are justified.
+
+**ADR-026 Jurisdictions as data, features gated per jurisdiction.** Expansion is a compliance decision per feature per country, not a code switch; planned countries are catalogued but unavailable by construction.
+
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
 - No live market data; licensing costs unknown.

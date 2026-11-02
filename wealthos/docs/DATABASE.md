@@ -45,9 +45,11 @@ Also: `valuation_snapshots` (analytics cache), `data_versions` (market-data vers
 | System | jobs | Not user-readable; worker only |
 | Billing | plans, subscriptions, invoices, payment_events, platform_settings | Plans/settings readable by all, written by admins. Subscriptions/invoices readable by members; customers may start one trial and change cancellation/downgrade flags (guard trigger); invoices issued only by the billing system (`app.system = billing`) or admins, immutable once issued, kept after erasure without org link. payment_events: system/admin only |
 | Tenancy (sharing) | org_invitations | Owners/admins of the organisation; acceptance via `app_accept_invitation()` (email-bound, single use) |
+| Household | account_owners | Members' shares of an account in a shared space; RLS by membership, viewers read-only; Postgres checks owners are members and shares ≤ 100%; cleared when a member leaves |
+| Connections | institution_connections | Read-only bank links; RLS by membership; consenting user recorded; guard stops re-pointing, extending consent or reactivating a revoked link; credentials encrypted and nulled on revocation |
 | Support | support_cases, support_messages | Requester and admins only; messages append-only; erased with the user |
 | Analytics cache | valuation_snapshots | RLS; derived data only, never authoritative; safe to truncate |
-| Compliance | regulatory_feature_approvals (append-only), feature_flags, audit_events (append-only) | |
+| Compliance | regulatory_feature_approvals (append-only; insert only by compliance reviewers/admins as themselves), feature_flags, audit_events (append-only) | Readable by all for gating |
 
 ## Invariants
 1. **Tenant isolation:** every tenant row has `org_id`; policies require `org_id = app_current_org()`, which returns the org in context *only if the user in context is a member*. Forged org ids see nothing. (tests/integration/tenancy.test.ts)

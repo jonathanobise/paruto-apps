@@ -2,7 +2,7 @@
 
 Non-custodial financial intelligence and wealth-management SaaS — Nigeria first. Track every account, holding and liability; measure performance correctly; see currency exposure and data freshness; plan with honest scenarios.
 
-> **Status: Milestones 0–4 complete** (foundation, core wealth engine, research & planning, commercial beta) except deployment, which awaits approval. No payment, email, AI or market-data provider is connected. Not deployed. Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed. Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 WealthOS Version 1 never holds money, never places trades and never gives personalised investment advice. Regulated features are hard-disabled in code ([docs/COMPLIANCE_MATRIX.md](docs/COMPLIANCE_MATRIX.md)).
 
@@ -53,7 +53,8 @@ See [docs/TESTING.md](docs/TESTING.md).
 ```
 src/engine/        Pure, deterministic financial engine (no I/O). Decimal money, FX, lots, returns…
 src/server/        Domain modules: identity (incl. members), accounts, ledger, imports, market-data, analytics, models,
-                   research, admin, planning, jobs, alerts, ai, billing, reports, support, compliance, privacy, audit, demo
+                   research, admin, planning, jobs, alerts, ai, billing, reports, support, household, connections,
+                   compliance, privacy, audit, demo
 src/server/db/     Drizzle schema; tenant context (withTenant) that sets Postgres RLS variables
 src/app/           Next.js routes: (auth) sign-in/up, (app) signed-in screens, api/ exports + health
 src/components/    UI primitives (ui/) and app components (app/)

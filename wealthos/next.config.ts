@@ -19,7 +19,11 @@ const config: NextConfig = {
   // CSV imports accept files up to 2 MiB (validated again server-side); allow multipart overhead.
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The service worker must always be re-checked so fixes reach installed apps promptly.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+    ];
   },
 };
 

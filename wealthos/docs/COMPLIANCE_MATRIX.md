@@ -18,6 +18,8 @@ Source of truth in code: `src/server/compliance/features.ts`. A feature is avail
 | EDUCATION | education | — | not_advice | not_required | none | NG | — (content rules: general only, no current rates, illustrative examples verified by the engine, output policy applied in tests) |
 | AI_RESEARCH_ASSISTANT | information | ai:use, research:read | ai_limits, not_advice | pending_review | all_access | NG | Lawful basis/transfer for AI vendors; refusal boundaries; liability for errors. Built (docs/AI_SAFETY.md): three-layer advice boundary, separate `ai_data_processing` consent, redaction, per-turn audit; not connected to any provider |
 | ALERTS_USER_DEFINED | tooling | portfolio:read | data_freshness | not_required | writes | NG | Alerts must avoid buy/sell calls to action |
+| HOUSEHOLD_PLANNING | tooling | portfolio:read | estimates | not_required | writes | NG | — (a planning view of who owns what; not a record of legal title) |
+| INSTITUTION_CONNECTIONS | tooling | portfolio:read/write | data_freshness, non_custodial | pending_review | all_access | NG | CBN open-banking framework: does WealthOS need to register as a participant to receive data via a licensed provider? Consent wording/duration/renewal; NDPA lawful basis; provider due diligence and DPA. No provider connected |
 | SHARED_SPACES | tooling | portfolio:read | non_custodial | not_required | writes | NG | Consent when one member records another person's finances in a shared space? |
 | REPORTS | tooling | portfolio:read | past_performance, data_freshness, not_advice | not_required | all_access | NG | Presentation rules for performance in downloadable statements |
 | SUBSCRIPTION_BILLING | commercial | portfolio:read | — | pending_review | writes | NG | Terms of sale, refunds and cancellation (FCCPA 2018); VAT registration and inclusive/exclusive pricing; invoice contents; invoice retention after erasure (tax law vs NDPA). See docs/BILLING.md |
@@ -32,3 +34,9 @@ Source of truth in code: `src/server/compliance/features.ts`. A feature is avail
 
 ## Before public launch
 Counsel review of this matrix, Terms and Privacy Notice (currently marked DRAFT in the app); DPIA; NDPC registration if applicable; decide data residency; record each approval in `regulatory_feature_approvals` with reviewer and reference.
+
+## Jurisdictions
+Only Nigeria is offered (`src/lib/jurisdictions.ts`). Ghana, Kenya and South Africa are catalogued as planned with their regulators and data-protection laws for counsel to verify; no feature lists them, so nothing is available there in any environment even if a decision were recorded (tested). Launch steps per country: docs/EXPANSION.md.
+
+## Recording decisions
+Compliance reviewers (platform role `compliance`, 2FA) record decisions in Admin → Feature gates, under their own name with a reference; operators can also use `scripts/record-compliance-decision.ts`. Decisions are append-only; only compliance reviewers and administrators can write them (row-level security). Hard-disabled features can't be approved either way.

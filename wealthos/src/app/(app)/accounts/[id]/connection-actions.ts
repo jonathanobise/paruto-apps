@@ -14,6 +14,7 @@ export async function connectAction(_: State, f: FormData): Promise<State> {
   try {
     const app = await requireAppForAction();
     await requireFeature("INSTITUTION_CONNECTIONS", app.org.jurisdiction);
+    if (f.get("consent") !== "on") return { ok: false, code: "VALIDATION", message: "Tick the box to give consent before connecting." };
     // A real provider returns a one-time link code from its consent screen; the sandbox accepts a generated one.
     const linkCode = String(f.get("linkCode") || `sbx-${crypto.randomUUID().slice(0, 8)}`);
     await connectAccount(app.ctx, accountId, { provider: f.get("provider"), linkCode, scopes: f.getAll("scopes").map(String), days: f.get("days"), consent: f.get("consent") === "on" }, await requestMeta());

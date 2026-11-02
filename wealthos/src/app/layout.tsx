@@ -1,12 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
+import { ServiceWorker } from "@/components/app/service-worker";
 import { THEME_COOKIE } from "@/server/auth/context";
 
 export const metadata: Metadata = {
   title: "WealthOS — financial intelligence for your wealth",
   description: "Track every account, holding and liability; measure performance properly; research and plan with evidence. Non-custodial. Built for Nigeria first.",
   robots: { index: false, follow: false },
+  applicationName: "WealthOS",
+  icons: { icon: [{ url: "/icons/icon.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192" }], apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "WealthOS", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -26,6 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         {children}
+        <ServiceWorker />
       </body>
     </html>
   );

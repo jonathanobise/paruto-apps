@@ -11,5 +11,5 @@ export default defineConfig({
   reporter: [["list"]],
   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: { command: `npm run build && APP_ENV=staging AI_PROVIDER=test npx next start --port ${port}`, url: `http://localhost:${port}/api/health`, reuseExistingServer: true, timeout: 240_000 },
+  webServer: { command: `npm run build && APP_ENV=staging AI_PROVIDER=test CONNECTIONS_SANDBOX=1 npx next start --port ${port}`, url: `http://localhost:${port}/api/health`, reuseExistingServer: true, timeout: 240_000 },
 });

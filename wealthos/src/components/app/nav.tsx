@@ -83,7 +83,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
   );
 }
 
-export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
+export function MobileNav({ isAdmin = false, footer }: { isAdmin?: boolean; footer?: React.ReactNode }) {
   return (
     <details className="group lg:hidden">
       <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-lg border border-border text-text-2" aria-label="Open menu">
@@ -91,6 +91,7 @@ export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
       </summary>
       <div className="fixed inset-x-0 top-14 z-40 max-h-[calc(100dvh-56px)] overflow-y-auto border-b border-border bg-surface p-4 shadow-lg">
         <Nav isAdmin={isAdmin} />
+        {footer ? <div className="mt-4 border-t border-border pt-3 sm:hidden">{footer}</div> : null}
       </div>
     </details>
   );
