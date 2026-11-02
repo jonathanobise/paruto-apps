@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uuid, uniqueIndex, inet } from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uuid, uniqueIndex, inet } from "drizzle-orm/pg-core";
 import { citext, createdAt, id, updatedAt } from "./_shared";
 
 export const platformRole = pgEnum("platform_role", ["user", "support", "compliance", "admin"]);
@@ -13,6 +13,8 @@ export const users = pgTable("users", {
   /** AES-256-GCM encrypted TOTP secret (base64 iv|tag|ciphertext). */
   mfaTotpSecretEnc: text("mfa_totp_secret_enc"),
   mfaEnabledAt: timestamp("mfa_enabled_at", { withTimezone: true }),
+  /** Last TOTP time step accepted: a code can't be used twice (replay protection). */
+  mfaLastUsedStep: bigint("mfa_last_used_step", { mode: "number" }),
   /** SHA-256 hashes of unused recovery codes. */
   mfaRecoveryCodeHashes: jsonb("mfa_recovery_code_hashes").$type<string[]>(),
   failedLoginCount: integer("failed_login_count").notNull().default(0),

@@ -63,7 +63,12 @@ async function instrumentResolver(tx: Tx): Promise<(key: { symbol?: string; isin
 /** Parse, map, validate against the current ledger and flag duplicates. Nothing is written to the ledger. */
 async function buildRows(tx: Tx, parsed: ParsedCsv, mapping: ImportMapping, account: { id: string; currency: string }): Promise<PreparedRow[]> {
   const resolveInstrument = await instrumentResolver(tx);
-  const rows = wrapCsv(() => prepareRows(parsed, mapping, { accountId: account.id, accountCurrency: account.currency, today: new Date().toISOString().slice(0, 10), resolveInstrument }));
+  const others = (await tx.select({ id: financialAccounts.id, name: financialAccounts.name, currency: financialAccounts.currency, status: financialAccounts.status }).from(financialAccounts)).filter((a) => a.id !== account.id);
+  const resolveAccount = (name: string) => {
+    const hits = others.filter((a) => a.name.trim().toLowerCase() === name.trim().toLowerCase());
+    return hits.length === 1 ? { id: hits[0]!.id, currency: hits[0]!.currency, name: hits[0]!.name } : null;
+  };
+  const rows = wrapCsv(() => prepareRows(parsed, mapping, { accountId: account.id, accountCurrency: account.currency, today: new Date().toISOString().slice(0, 10), resolveInstrument, resolveAccount }));
   const existingRows = await loadEvents(tx);
   const reversed = new Set(existingRows.filter((r) => r.reversesEventId).map((r) => r.reversesEventId!));
   const live = existingRows.filter((r) => r.type !== "reversal" && !reversed.has(r.id));

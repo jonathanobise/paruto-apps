@@ -21,6 +21,8 @@ async function latestToken(email: string): Promise<string> {
 
 test("a new user records investments and sees a correct dashboard", async ({ page }) => {
   const email = `e2e.${Date.now()}@example.test`;
+  // Each browser sign-up comes from its own address (dev trusts no proxy), so the per-IP limit isn't shared.
+  await page.context().setExtraHTTPHeaders({ "x-forwarded-for": `10.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` });
   await page.goto("/sign-up");
   await page.fill("#displayName", "Ngozi Test");
   await page.fill("#email", email);

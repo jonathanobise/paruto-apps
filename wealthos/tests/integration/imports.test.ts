@@ -223,3 +223,35 @@ async function impxId(ctx: { userId: string; orgId: string }): Promise<string> {
   const r = await withTenant(ctx, (tx) => tx.execute<{ id: string }>(sql`select id from instruments where symbol = 'IMPX'`));
   return r.rows[0]!.id;
 }
+
+describe("transfers and conversions from statements", () => {
+  it("a transfer appears in both accounts' statements but is recorded once; conversions keep both legs", async () => {
+    const u = await makeUser("Transfer Importer");
+    await grantPlan(u.orgId, "pro");
+    const naira = (await createAccount(u.ctx, { name: "Naira current", type: "bank", currency: "NGN" })).id;
+    const savings = (await createAccount(u.ctx, { name: "Naira savings", type: "bank", currency: "NGN" })).id;
+    await postEvent(u.ctx, { type: "deposit", accountId: naira, currency: "NGN", amount: "1000000", occurredOn: "2026-09-01" });
+
+    const fromCurrent = "date,type,amount,currency,other account,reference\n01/10/2026,Transfer out,250000,NGN,Naira savings,CUR-001\n";
+    const b1 = await previewImport(u.ctx, { accountId: naira, fileName: "current.csv", bytes: enc(fromCurrent) });
+    expect(await commitImport(u.ctx, b1, { includeDuplicates: false })).toEqual({ imported: 1 });
+
+    const fromSavings = "date,type,amount,currency,other account,reference\n01/10/2026,Transfer in,250000,NGN,Naira current,SAV-777\n02/10/2026,Interest,1200,NGN,,SAV-778\n";
+    const b2 = await previewImport(u.ctx, { accountId: savings, fileName: "savings.csv", bytes: enc(fromSavings) });
+    const preview = await getImport(u.ctx, b2);
+    expect(preview.rows.map((r) => r.status)).toEqual(["duplicate", "ready"]);
+    expect(await commitImport(u.ctx, b2, { includeDuplicates: false })).toEqual({ imported: 1 });
+
+    const dash = await buildDashboard(u.ctx, { baseCurrency: "NGN", period: "ALL", bypassCache: true });
+    const cash = Object.fromEntries(dash.cash.map((c) => [c.accountName, c.amount]));
+    expect(Number(cash["Naira current"])).toBe(750000);
+    expect(Number(cash["Naira savings"])).toBe(251200);
+    expect(Number(dash.totals.cash)).toBe(1001200); // moving money between own accounts changes nothing in total
+
+    const fx = "date,type,amount,currency,amount received,to currency,fees,reference\n03/10/2026,FX purchase,150000,NGN,100,USD,500,FX-1\n";
+    const b3 = await previewImport(u.ctx, { accountId: naira, fileName: "fx.csv", bytes: enc(fx) });
+    expect(await commitImport(u.ctx, b3, { includeDuplicates: false })).toEqual({ imported: 1 });
+    const tx = await listTransactions(u.ctx);
+    expect(tx.find((t) => t.type === "fx_conversion")).toMatchObject({ currency: "NGN", amount: "150000" });
+  });
+});

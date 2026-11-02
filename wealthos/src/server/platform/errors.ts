@@ -1,3 +1,5 @@
+import { log } from "./log";
+
 /** Typed application errors. Messages are safe to show to the user; details stay in logs. */
 export type AppErrorCode =
   | "UNAUTHENTICATED"
@@ -28,6 +30,6 @@ export function toActionError(err: unknown): { ok: false; code: AppErrorCode; me
     const fieldErrors = err.details?.fieldErrors as Record<string, string[]> | undefined;
     return { ok: false, code: err.code, message: err.message, ...(fieldErrors ? { fieldErrors } : {}) };
   }
-  console.error("[wealthos] unexpected error", err);
+  log("error", "action.unexpected_error", { error: err instanceof Error ? err : new Error(String(err)) });
   return { ok: false, code: "VALIDATION", message: "Something went wrong. Nothing was saved. Please try again." };
 }

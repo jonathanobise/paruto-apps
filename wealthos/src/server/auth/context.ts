@@ -1,4 +1,6 @@
 import "server-only";
+import { clientIp } from "@/lib/client-ip";
+import { env } from "@/server/platform/env";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -25,7 +27,8 @@ export async function clearSessionCookie(): Promise<void> {
 
 export async function requestMeta(): Promise<RequestMeta> {
   const h = await headers();
-  return { ip: h.get("x-forwarded-for") ?? h.get("x-real-ip") ?? null, userAgent: h.get("user-agent") };
+  const e = env();
+  return { ip: clientIp((n) => h.get(n), { trustedHeader: e.TRUSTED_IP_HEADER ?? null, trustedHops: e.TRUSTED_PROXY_HOPS }), userAgent: h.get("user-agent") };
 }
 
 /** Current session (memoised per request). */

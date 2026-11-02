@@ -108,8 +108,15 @@ describe("two-step verification (TOTP)", () => {
     const pending = (await resolveSession(s1.session.token))!;
     expect(pending.mfaSatisfied).toBe(false);
     await expect(completeMfaChallenge(pending.id, userId, "123456", meta)).rejects.toMatchObject({ code: "UNAUTHENTICATED" });
-    await completeMfaChallenge(pending.id, userId, totp(secret), meta);
+    // The enrolment code can't be reused; the next 30-second code (within the drift window) works once.
+    await expect(completeMfaChallenge(pending.id, userId, totp(secret), meta)).rejects.toMatchObject({ code: "UNAUTHENTICATED", message: /already been used/ });
+    const next = totp(secret, Date.now() + 30_000);
+    await completeMfaChallenge(pending.id, userId, next, meta);
     expect((await resolveSession(s1.session.token))!.mfaSatisfied).toBe(true);
+    const sReplay = await signIn({ email, password: "correct horse battery staple" }, meta);
+    const pReplay = (await resolveSession(sReplay.session.token))!;
+    await expect(completeMfaChallenge(pReplay.id, userId, next, meta)).rejects.toMatchObject({ message: /already been used/ });
+    expect((await resolveSession(sReplay.session.token))!.mfaSatisfied).toBe(false);
 
     const s2 = await signIn({ email, password: "correct horse battery staple" }, meta);
     const p2 = (await resolveSession(s2.session.token))!;

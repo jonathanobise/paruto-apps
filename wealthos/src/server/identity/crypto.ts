@@ -123,13 +123,17 @@ export function totp(secretBase32: string, atMs = Date.now(), step = 30, digits 
   return hotp(base32Decode(secretBase32), Math.floor(atMs / 1000 / step), digits);
 }
 
-/** Accepts the current code and one step either side for clock drift. */
-export function verifyTotp(secretBase32: string, code: string, atMs = Date.now()): boolean {
-  if (!/^\d{6}$/.test(code)) return false;
+/** The 30-second time step a code belongs to (current or one either side for clock drift), or null. */
+export function totpStep(secretBase32: string, code: string, atMs = Date.now()): number | null {
+  if (!/^\d{6}$/.test(code)) return null;
   const secret = base32Decode(secretBase32);
   const counter = Math.floor(atMs / 1000 / 30);
-  for (const delta of [-1, 0, 1]) if (safeEqual(hotp(secret, counter + delta), code)) return true;
-  return false;
+  for (const delta of [-1, 0, 1]) if (safeEqual(hotp(secret, counter + delta), code)) return counter + delta;
+  return null;
+}
+
+export function verifyTotp(secretBase32: string, code: string, atMs = Date.now()): boolean {
+  return totpStep(secretBase32, code, atMs) !== null;
 }
 
 export function otpauthUri(secret: string, account: string, issuer = "WealthOS"): string {

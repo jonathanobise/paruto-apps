@@ -1,6 +1,6 @@
 import "server-only";
 import { withTenant, type TenantContext } from "@/server/db/client";
-import { analyzePerformance, holdingPerformance, type HoldingReturn, type ISODate } from "@/engine";
+import { analyzePerformance, holdingsPerformanceBatch, type HoldingReturn, type ISODate } from "@/engine";
 import { loadPortfolioInputs, periodStart, type PeriodKey } from "./portfolio";
 import { withSnapshot } from "./cache";
 
@@ -62,9 +62,11 @@ export async function holdingsPerformance(ctx: TenantContext, opts: { baseCurren
       for (const accountId of accs) pairs.set(`${accountId}|${e.instrumentId}`, { accountId, instrumentId: e.instrumentId });
     }
     const out: HoldingPerformanceView[] = [];
-    for (const [key, pair] of pairs) {
-      if (opts.accountId && pair.accountId !== opts.accountId) continue;
-      const r = holdingPerformance({ events: inp.events, instruments: inp.instrumentMap, prices: inp.prices, fx: inp.fx, baseCurrency: opts.baseCurrency, accountId: pair.accountId, instrumentId: pair.instrumentId, start, end: asOf });
+    const wanted = [...pairs.entries()].filter(([, p]) => !opts.accountId || p.accountId === opts.accountId);
+    // One ledger replay for every holding (identical results to one replay per holding).
+    const results = holdingsPerformanceBatch({ events: inp.events, instruments: inp.instrumentMap, prices: inp.prices, fx: inp.fx, baseCurrency: opts.baseCurrency, start, end: asOf, pairs: wanted.map(([, p]) => p) });
+    for (const [i, [key, pair]] of wanted.entries()) {
+      const r = results[i]!;
       // Skip positions with no activity or value in the period.
       if (r.local.startValue.isZero() && r.local.endValue.isZero() && r.local.invested.isZero() && r.local.returned.isZero()) continue;
       const info = inp.instrumentMap.get(pair.instrumentId)!;

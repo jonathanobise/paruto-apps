@@ -27,6 +27,8 @@ function totp(secret: string): string {
 
 async function signUpVerified(page: Page, name: string): Promise<string> {
   const email = `${name.toLowerCase()}.${Date.now()}@example.test`;
+  // Each browser sign-up comes from its own address (dev trusts no proxy), so the per-IP limit isn't shared.
+  await page.context().setExtraHTTPHeaders({ "x-forwarded-for": `10.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` });
   await page.goto("/sign-up");
   await page.fill("#displayName", name);
   await page.fill("#email", email);
@@ -57,6 +59,15 @@ test("admin publishes verified data; a user researches, watches and compares", a
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_OWNER_URL });
   await pool.query("update users set platform_role = 'admin' where email = $1", [adminEmail]);
   await pool.end();
+
+  // Admin console pages render for an administrator with 2FA.
+  for (const [path, heading] of [["/admin", "Administration"], ["/admin/users", "Users"], ["/admin/orgs", "Organisations"], ["/admin/billing", "Billing"], ["/admin/support", "Support"], ["/admin/ai", "AI usage"], ["/admin/jobs", "Background jobs"], ["/admin/audit", "Audit log"], ["/admin/gates", "Regulatory feature gates"]] as const) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+  }
+  await page.goto(`/admin/users?q=${encodeURIComponent(adminEmail)}`);
+  await page.locator("main").getByRole("link", { name: "Admin", exact: true }).click();
+  await expect(page.getByText("this view was recorded in the audit log")).toBeVisible();
 
   await page.goto("/admin/sources");
   await page.fill("#key", `e2e-src-${suffix}`);

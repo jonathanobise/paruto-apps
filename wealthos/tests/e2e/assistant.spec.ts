@@ -10,6 +10,8 @@ config({ path: ".env.local", quiet: true });
 
 test("read a Learn article, ask the assistant, see the lookups it ran, manage consent and delete the conversation", async ({ page }) => {
   const email = `assistant.${Date.now()}@example.test`;
+  // Each browser sign-up comes from its own address (dev trusts no proxy), so the per-IP limit isn't shared.
+  await page.context().setExtraHTTPHeaders({ "x-forwarded-for": `10.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` });
   await page.goto("/sign-up");
   await page.fill("#displayName", "Ada Assistant");
   await page.fill("#email", email);

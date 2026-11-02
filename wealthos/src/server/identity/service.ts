@@ -1,12 +1,12 @@
 import "server-only";
-import { and, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
 import { consentRecords, userPreferences, users, verificationTokens } from "@/server/db/schema";
 import { db, withUser } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
 import { rateLimit } from "@/server/platform/rate-limit";
 import { recordSecurityEvent, type RequestMeta } from "@/server/audit/audit";
 import { appUrl, sendEmail } from "./email";
-import { decryptSecret, encryptSecret, generateRecoveryCodes, generateTotpSecret, hashPassword, needsRehash, otpauthUri, randomToken, sha256, verifyPassword, verifyTotp } from "./crypto";
+import { decryptSecret, encryptSecret, generateRecoveryCodes, generateTotpSecret, hashPassword, needsRehash, otpauthUri, randomToken, sha256, totpStep, verifyPassword } from "./crypto";
 import { createSession, markSessionMfa, revokeAllSessions } from "./sessions";
 import { CONSENT_VERSIONS, passwordSchema, signInSchema, signUpSchema } from "./validation";
 import { z } from "zod";
@@ -146,9 +146,16 @@ export async function completeMfaChallenge(sessionId: string, userId: string, co
   if (!user?.mfaTotpSecretEnc || !user.mfaEnabledAt) throw new AppError("VALIDATION", "Two-step verification is not enabled.");
   const normalized = code.trim().toUpperCase();
   if (/^\d{6}$/.test(normalized)) {
-    if (!verifyTotp(decryptSecret(user.mfaTotpSecretEnc), normalized)) {
+    const step = totpStep(decryptSecret(user.mfaTotpSecretEnc), normalized);
+    if (step === null) {
       await recordSecurityEvent(userId, "mfa.challenge_failed", meta);
       throw new AppError("UNAUTHENTICATED", "That code is not valid. Check your authenticator app and try again.");
+    }
+    // Each code works once: atomically move the last-used step forward.
+    const claimed = await db().update(users).set({ mfaLastUsedStep: step }).where(and(eq(users.id, userId), or(isNull(users.mfaLastUsedStep), lt(users.mfaLastUsedStep, step)))).returning({ id: users.id });
+    if (!claimed.length) {
+      await recordSecurityEvent(userId, "mfa.code_replayed", meta);
+      throw new AppError("UNAUTHENTICATED", "That code has already been used. Wait for the next code in your authenticator app.");
     }
   } else {
     const hashes = user.mfaRecoveryCodeHashes ?? [];
@@ -177,9 +184,10 @@ export async function confirmMfaEnrollment(userId: string, sessionId: string, co
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user?.mfaTotpSecretEnc) throw new AppError("VALIDATION", "Start the set-up again.");
   if (user.mfaEnabledAt) throw new AppError("CONFLICT", "Two-step verification is already enabled.");
-  if (!verifyTotp(decryptSecret(user.mfaTotpSecretEnc), code.trim())) throw new AppError("VALIDATION", "That code is not valid. Check the time on your phone and try again.");
+  const step = totpStep(decryptSecret(user.mfaTotpSecretEnc), code.trim());
+  if (step === null) throw new AppError("VALIDATION", "That code is not valid. Check the time on your phone and try again.");
   const recoveryCodes = generateRecoveryCodes();
-  await db().update(users).set({ mfaEnabledAt: new Date(), mfaRecoveryCodeHashes: recoveryCodes.map(sha256) }).where(eq(users.id, userId));
+  await db().update(users).set({ mfaEnabledAt: new Date(), mfaRecoveryCodeHashes: recoveryCodes.map(sha256), mfaLastUsedStep: step }).where(eq(users.id, userId));
   await markSessionMfa(sessionId);
   await revokeAllSessions(userId, sessionId);
   await recordSecurityEvent(userId, "mfa.enabled", meta);
@@ -190,7 +198,7 @@ export async function confirmMfaEnrollment(userId: string, sessionId: string, co
 export async function disableMfa(userId: string, password: string, meta: RequestMeta): Promise<void> {
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user || !(await verifyPassword(password, user.passwordHash))) throw new AppError("UNAUTHENTICATED", "Password is incorrect.");
-  await db().update(users).set({ mfaEnabledAt: null, mfaTotpSecretEnc: null, mfaRecoveryCodeHashes: null }).where(eq(users.id, userId));
+  await db().update(users).set({ mfaEnabledAt: null, mfaTotpSecretEnc: null, mfaRecoveryCodeHashes: null, mfaLastUsedStep: null }).where(eq(users.id, userId));
   await recordSecurityEvent(userId, "mfa.disabled", meta);
   await sendEmail({ to: user.email, subject: "Two-step verification was turned off", text: "Two-step verification was turned off for your WealthOS account. If this wasn't you, reset your password immediately.", purpose: "security_notice" });
 }

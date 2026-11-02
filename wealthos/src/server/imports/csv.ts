@@ -176,10 +176,13 @@ export const IMPORT_FIELDS = {
   externalRef: "Reference / ID",
   debit: "Debit (money out)",
   credit: "Credit (money in)",
+  toAmount: "Amount received (currency conversions)",
+  toCurrency: "Currency received (currency conversions)",
+  counterAccount: "Other account (transfers between your accounts)",
 } as const;
 export type ImportField = keyof typeof IMPORT_FIELDS;
 
-export const IMPORTABLE_TYPES = ["deposit", "withdrawal", "buy", "sell", "dividend", "interest", "coupon", "fee", "tax", "reinvestment", "maturity", "redemption", "opening_position", "stock_dividend"] as const;
+export const IMPORTABLE_TYPES = ["deposit", "withdrawal", "buy", "sell", "dividend", "interest", "coupon", "fee", "tax", "reinvestment", "maturity", "redemption", "opening_position", "stock_dividend", "fx_conversion", "transfer_out", "transfer_in"] as const;
 export type ImportableType = (typeof IMPORTABLE_TYPES)[number];
 
 export interface ImportMapping {
@@ -203,7 +206,10 @@ const BUILTIN_TYPE_ALIASES: Record<string, ImportableType> = {
   reinvestment: "reinvestment", reinvest: "reinvestment", drip: "reinvestment", "dividend reinvestment": "reinvestment",
   maturity: "maturity", matured: "maturity",
   redemption: "redemption", redeem: "redemption", liquidation: "redemption",
-  "opening position": "opening_position", "opening balance": "opening_position", opening_position: "opening_position", transfer_in: "opening_position",
+  "opening position": "opening_position", "opening balance": "opening_position", opening_position: "opening_position",
+  "transfer in": "transfer_in", transfer_in: "transfer_in", "transfer received": "transfer_in", "inward transfer": "transfer_in",
+  "transfer out": "transfer_out", transfer_out: "transfer_out", "transfer sent": "transfer_out", "outward transfer": "transfer_out",
+  "fx conversion": "fx_conversion", fx_conversion: "fx_conversion", "currency conversion": "fx_conversion", fx: "fx_conversion", exchange: "fx_conversion", "fx purchase": "fx_conversion", "fx sale": "fx_conversion",
   bonus: "stock_dividend", "bonus issue": "stock_dividend", "stock dividend": "stock_dividend", stock_dividend: "stock_dividend", scrip: "stock_dividend",
 };
 
@@ -226,6 +232,9 @@ const HEADER_ALIASES: Record<ImportField, string[]> = {
   externalRef: ["reference", "ref", "transaction id", "txn id", "id", "reference number", "ref no", "contract note", "contract no"],
   debit: ["debit", "withdrawals", "money out", "dr", "debit amount", "paid out"],
   credit: ["credit", "deposits", "lodgements", "money in", "cr", "credit amount", "paid in"],
+  toAmount: ["amount received", "to amount", "received amount", "buy amount", "converted amount"],
+  toCurrency: ["to currency", "currency received", "target currency", "buy currency"],
+  counterAccount: ["other account", "counterparty account", "counter account", "transfer account", "from/to account"],
 };
 
 /** Suggest a mapping from headers (case/space-insensitive aliases). Each header is used once. */
@@ -270,6 +279,8 @@ export interface RowContext {
   today: string;
   /** Look up a visible instrument by ticker or ISIN (case-insensitive). */
   resolveInstrument: (key: { symbol?: string; isin?: string }) => InstrumentRef | null;
+  /** Look up another of the organisation's accounts by name (case-insensitive); never the importing account. */
+  resolveAccount?: (name: string) => { id: string; currency: string; name: string } | null;
 }
 
 export type RowStatus = "ready" | "error" | "duplicate";
@@ -443,6 +454,51 @@ export function prepareRows(parsed: ParsedCsv, mapping: ImportMapping, ctx: RowC
           if (quantity) input = { ...base, ...acc, instrumentId: instrument!.id, quantity };
           break;
         }
+        case "fx_conversion": {
+          const fromAmount = num("amount", { required: true });
+          const toAmount = num("toAmount", { required: true });
+          const toCurrency = col(rec, "toCurrency").toUpperCase();
+          if (!toCurrency) errors.push("Currency received is missing");
+          else if (!/^[A-Z]{3}$/.test(toCurrency)) errors.push(`Currency received “${toCurrency}” isn't a 3-letter code`);
+          else if (toCurrency === currency) errors.push("A conversion needs two different currencies");
+          const fees = num("fees") ?? "0";
+          if (fromAmount && toAmount && !errors.length) input = { ...base, type: "fx_conversion", ...acc, fromCurrency: currency, fromAmount, toCurrency, toAmount, fees };
+          break;
+        }
+        case "transfer_out":
+        case "transfer_in": {
+          const counterName = col(rec, "counterAccount");
+          const other = counterName ? (ctx.resolveAccount?.(counterName) ?? null) : null;
+          if (counterName && !other) {
+            errors.push(`Other account “${counterName}” isn't one of your accounts (use its name in WealthOS)`);
+            break;
+          }
+          const [fromAccountId, toAccountId] = type === "transfer_out" ? [ctx.accountId, other?.id] : [other?.id, ctx.accountId];
+          if (instrument) {
+            const quantity = num("quantity", { required: true });
+            if (!quantity) break;
+            if (other) input = { ...base, type: "security_transfer", fromAccountId, toAccountId, instrumentId: instrument.id, quantity };
+            else if (type === "transfer_in") {
+              const costBasis = num("costBasis") ?? num("amount");
+              if (!costBasis) errors.push("Shares moved in from outside WealthOS need their cost (Cost basis or Amount), or map the Other account column");
+              else {
+                warnings.push("No other account given: recorded as an opening position (shares moved in from outside WealthOS)");
+                input = { ...base, type: "opening_position", ...acc, instrumentId: instrument.id, currency, quantity, costBasis, acquiredOn: date };
+              }
+            } else errors.push("Shares moved out need the Other account they went to; selling or leaving WealthOS isn't a transfer");
+          } else {
+            const amount = num("amount", { required: true });
+            if (!amount) break;
+            if (other) {
+              if (other.currency !== currency && ctx.accountCurrency !== currency) warnings.push("Neither account is in this currency — check the Currency column");
+              input = { ...base, type: "transfer", fromAccountId, toAccountId, currency, amount };
+            } else {
+              warnings.push(type === "transfer_in" ? "No other account given: recorded as a deposit from outside WealthOS" : "No other account given: recorded as a withdrawal to outside WealthOS");
+              input = { ...base, type: type === "transfer_in" ? "deposit" : "withdrawal", ...acc, currency, amount };
+            }
+          }
+          break;
+        }
       }
     }
 
@@ -474,7 +530,9 @@ export function prepareRows(parsed: ParsedCsv, mapping: ImportMapping, ctx: RowC
 // ---------------------------------------------------------------------------------------------
 // Duplicates
 
-const FP_FIELDS = ["accountId", "instrumentId", "amount", "quantity", "price", "grossAmount", "proceeds", "costBasis", "currency"] as const;
+const FP_FIELDS = ["accountId", "instrumentId", "amount", "quantity", "price", "grossAmount", "proceeds", "costBasis", "currency", "fromAccountId", "toAccountId", "fromAmount", "toAmount", "fromCurrency", "toCurrency"] as const;
+/** Movements between two of the user's accounts appear in both statements, with different references. */
+const MATCH_BY_CONTENT_ALWAYS = new Set(["transfer", "security_transfer"]);
 
 /** Content fingerprint of a ledger event (type, date, account, instrument and key figures). */
 export function fingerprintOf(type: string, date: string, payload: Record<string, unknown>): string {
@@ -511,7 +569,9 @@ export function markDuplicates(rows: PreparedRow[], existing: ExistingEventKey[]
       row.duplicateOf = byRef.get(row.externalRef)!;
       continue;
     }
-    if (row.externalRef) continue; // a new reference is not a duplicate even if the figures match
+    // A new reference is not a duplicate even if the figures match — except for transfers between
+    // the user's own accounts, which each bank references differently.
+    if (row.externalRef && !(row.input && MATCH_BY_CONTENT_ALWAYS.has(row.input.type))) continue;
     const ids = pool.get(row.fingerprint);
     if (ids?.length) {
       row.status = "duplicate";

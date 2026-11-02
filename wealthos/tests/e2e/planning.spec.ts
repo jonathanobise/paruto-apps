@@ -8,6 +8,8 @@ const shots = process.env.SCREENSHOT_DIR;
 
 async function signUpVerified(page: Page): Promise<void> {
   const email = `plan.${Date.now()}@example.test`;
+  // Each browser sign-up comes from its own address (dev trusts no proxy), so the per-IP limit isn't shared.
+  await page.context().setExtraHTTPHeaders({ "x-forwarded-for": `10.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` });
   await page.goto("/sign-up");
   await page.fill("#displayName", "Pat Planner");
   await page.fill("#email", email);

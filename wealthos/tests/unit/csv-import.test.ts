@@ -180,3 +180,53 @@ describe("duplicate detection", () => {
     expect(fingerprintOf("deposit", "2026-01-01", { accountId: "a", amount: "1000.00", currency: "NGN" })).toBe(fingerprintOf("deposit", "2026-01-01", { accountId: "a", amount: "1000", currency: "NGN" }));
   });
 });
+
+describe("transfers between accounts and currency conversions", () => {
+  const OTHER = { id: "44444444-4444-4444-8444-444444444444", currency: "USD", name: "Dollar domiciliary" };
+  const ctx2: RowContext = { ...ctx, resolveAccount: (n) => (n.trim().toLowerCase() === "dollar domiciliary" ? OTHER : null) };
+  const prep2 = (csv: string) => {
+    const parsed = parseCsv(decodeCsv(enc(csv)));
+    return prepareRows(parsed, suggestMapping(parsed.headers), ctx2);
+  };
+
+  it("imports currency conversions with both legs", () => {
+    const [r] = prep2("date,type,amount,currency,amount received,to currency,fees\n02/10/2026,FX purchase,1500000,NGN,1000,USD,1500\n");
+    expect(r!.status).toBe("ready");
+    expect(r!.input).toMatchObject({ type: "fx_conversion", accountId: ACC, fromCurrency: "NGN", fromAmount: "1500000", toCurrency: "USD", toAmount: "1000", fees: "1500" });
+    const [bad] = prep2("date,type,amount,currency,amount received,to currency\n02/10/2026,fx,100,NGN,100,NGN\n");
+    expect(bad!.errors).toContain("A conversion needs two different currencies");
+  });
+
+  it("maps transfers to and from another of the user's accounts", () => {
+    const rows = prep2("date,type,amount,currency,other account,symbol,quantity\n01/10/2026,Transfer out,500,USD,Dollar domiciliary,,\n03/10/2026,Transfer in,200,USD,dollar domiciliary,,\n04/10/2026,transfer out,,,Dollar domiciliary,GTCO,100\n05/10/2026,transfer in,300,NGN,Unknown bank,,\n");
+    expect(rows[0]!.input).toMatchObject({ type: "transfer", fromAccountId: ACC, toAccountId: OTHER.id, amount: "500", currency: "USD" });
+    expect(rows[1]!.input).toMatchObject({ type: "transfer", fromAccountId: OTHER.id, toAccountId: ACC });
+    expect(rows[2]!.input).toMatchObject({ type: "security_transfer", fromAccountId: ACC, toAccountId: OTHER.id, instrumentId: GTCO.id, quantity: "100" });
+    expect(rows[3]!.errors[0]).toMatch(/isn't one of your accounts/);
+  });
+
+  it("without an other account: cash becomes a deposit/withdrawal, shares in become an opening position, shares out are refused", () => {
+    const rows = prep2("date,type,amount,currency,symbol,quantity,cost basis\n01/10/2026,transfer in,1000,NGN,,,\n02/10/2026,transfer out,400,NGN,,,\n03/10/2026,transfer in,,,GTCO,50,1500\n04/10/2026,transfer out,,,GTCO,50,\n");
+    expect(rows[0]!.input).toMatchObject({ type: "deposit", amount: "1000" });
+    expect(rows[0]!.warnings[0]).toMatch(/deposit from outside/);
+    expect(rows[1]!.input).toMatchObject({ type: "withdrawal" });
+    expect(rows[2]!.input).toMatchObject({ type: "opening_position", quantity: "50", costBasis: "1500" });
+    expect(rows[3]!.status).toBe("error");
+  });
+
+  it("the same transfer seen from the other account's statement is a duplicate even with a different reference", () => {
+    // Already in the ledger from the other account's import (its own reference): Dollar domiciliary → this account.
+    const posted = () => [{ id: "evt-1", externalRef: "BANK-A-REF-1", fingerprint: fingerprintOf("transfer", "2026-10-01", { fromAccountId: OTHER.id, toAccountId: ACC, amount: "500", currency: "USD" }) }];
+    const [same] = prep2("date,type,amount,currency,other account,reference\n01/10/2026,Transfer in,500,USD,Dollar domiciliary,BANK-B-REF-9\n");
+    markDuplicates([same!], posted());
+    expect(same).toMatchObject({ status: "duplicate", duplicateOf: "evt-1" });
+    // The opposite direction is a different movement.
+    const [opposite] = prep2("date,type,amount,currency,other account,reference\n01/10/2026,Transfer out,500,USD,Dollar domiciliary,BANK-B-REF-9\n");
+    markDuplicates([opposite!], posted());
+    expect(opposite!.status).toBe("ready");
+    // Ordinary rows with a new reference still aren't treated as duplicates on figures alone.
+    const [dep] = prep2("date,type,amount,currency,reference\n01/10/2026,deposit,500,USD,NEW-REF\n");
+    markDuplicates([dep!], [{ id: "evt-3", externalRef: "OLD-REF", fingerprint: dep!.fingerprint! }]);
+    expect(dep!.status).toBe("ready");
+  });
+});

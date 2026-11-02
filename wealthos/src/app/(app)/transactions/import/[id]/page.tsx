@@ -43,7 +43,8 @@ export default async function ImportPreviewPage({ params, searchParams }: { para
   const st = STATUS[batch.status]!;
   const isPreview = batch.status === "previewed" && !batch.expired;
   const unknownTypes = [...new Set(batch.rows.map((r) => r.cells.type).filter((t): t is string => Boolean(t) && !resolveType(t!, batch.mapping)))].slice(0, 20);
-  const typeOptions = IMPORTABLE_TYPES.map((t) => ({ value: t, label: EVENT_LABELS[t] }));
+  const IMPORT_ONLY_LABELS: Record<string, string> = { transfer_out: "Transfer to another of my accounts", transfer_in: "Transfer from another of my accounts" };
+  const typeOptions = IMPORTABLE_TYPES.map((t) => ({ value: t, label: IMPORT_ONLY_LABELS[t] ?? EVENT_LABELS[t as keyof typeof EVENT_LABELS] }));
 
   return (
     <>

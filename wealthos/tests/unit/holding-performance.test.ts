@@ -86,3 +86,38 @@ describe("holding performance across currencies", () => {
     expect(r2.local.gain.toFixed()).toBe("100");
   });
 });
+
+describe("batch holdings performance", () => {
+  it("equals the single-holding calculation for every holding (multi-account, transfers, FX, income, gaps)", async () => {
+    const { holdingsPerformanceBatch } = await import("@/engine");
+    const events: LedgerEvent[] = [
+      { id: "1", date: "2024-11-01", type: "deposit", accountId: "A", currency: "NGN", amount: d(10_000_000) },
+      { id: "2", date: "2024-11-02", type: "buy", accountId: "A", instrumentId: "EQ", quantity: d(1000), price: d(10), fees: d(15), currency: "NGN" },
+      { id: "3", date: "2025-02-10", type: "dividend", accountId: "A", instrumentId: "EQ", currency: "NGN", grossAmount: d(400), withholdingTax: d(40) },
+      { id: "4", date: "2025-03-15", type: "security_transfer", fromAccountId: "A", toAccountId: "B", instrumentId: "EQ", quantity: d(300) },
+      { id: "5", date: "2025-05-20", type: "sell", accountId: "B", instrumentId: "EQ", quantity: d(100), price: d(13), fees: d(5), currency: "NGN" },
+      { id: "6", date: "2025-01-05", type: "deposit", accountId: "U", currency: "USD", amount: d(5000) },
+      { id: "7", date: "2025-01-06", type: "buy", accountId: "U", instrumentId: "ETF", quantity: d(20), price: d(100), fees: d(1), currency: "USD" },
+      { id: "8", date: "2025-07-01", type: "sell", accountId: "U", instrumentId: "ETF", quantity: d(20), price: d(110), fees: d(1), currency: "USD" },
+      { id: "9", date: "2025-09-01", type: "buy", accountId: "U", instrumentId: "ETF", quantity: d(5), price: d(115), fees: d(1), currency: "USD" },
+      { id: "10", date: "2025-04-01", type: "fee", accountId: "A", instrumentId: "EQ", currency: "NGN", amount: d(25) },
+    ];
+    const prices = new PriceTable([
+      ...[["2024-11-01", "10"], ["2025-01-31", "11"], ["2025-03-31", "12.5"], ["2025-06-30", "12"], ["2025-12-31", "14"]].map(([date, p]) => ({ instrumentId: "EQ", price: d(p!), currency: "NGN", observedOn: date! })),
+      ...[["2025-01-06", "100"], ["2025-06-30", "108"], ["2025-09-01", "115"], ["2025-12-31", "120"]].map(([date, p]) => ({ instrumentId: "ETF", price: d(p!), currency: "USD", observedOn: date! })),
+    ]);
+    const fx = new FxTable(Array.from({ length: 430 }, (_, i) => {
+      const date = new Date(Date.UTC(2024, 9, 28) + i * 86_400_000).toISOString().slice(0, 10);
+      return { base: "USD", quote: "NGN", rate: d(1500).plus(i), observedOn: date, source: "test" };
+    }), { maxAgeDays: 5 });
+    const pairs = [{ accountId: "A", instrumentId: "EQ" }, { accountId: "B", instrumentId: "EQ" }, { accountId: "U", instrumentId: "ETF" }];
+    for (const [start, end] of [["2025-01-01", "2025-12-31"], ["2024-10-31", "2025-12-31"], ["2025-06-30", "2025-09-30"]] as const) {
+      const batch = holdingsPerformanceBatch({ events, instruments: INSTR, prices, fx, baseCurrency: "NGN", start, end, pairs });
+      for (const [i, p] of pairs.entries()) {
+        const single = holdingPerformance({ events, instruments: INSTR, prices, fx, baseCurrency: "NGN", ...p, start, end });
+        const norm = (x: typeof single) => JSON.parse(JSON.stringify(x, (_k, v) => (v && typeof v === "object" && "toFixed" in v && "isZero" in v ? (v as { toFixed(): string }).toFixed() : v)));
+        expect(norm(batch[i]!), `${p.accountId}/${p.instrumentId} ${start}..${end}`).toEqual(norm(single));
+      }
+    }
+  });
+});

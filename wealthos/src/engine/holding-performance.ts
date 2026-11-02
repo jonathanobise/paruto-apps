@@ -207,3 +207,117 @@ export function holdingPerformance(input: HoldingPerformanceInput): HoldingPerfo
     }),
   };
 }
+
+/**
+ * All holdings in one ledger replay. Each holding is valued on exactly the dates the single-holding
+ * calculation uses (period start/end, month ends and its own event dates), with the same flow and
+ * income rules, so results are identical to calling holdingPerformance once per holding — tested.
+ */
+export function holdingsPerformanceBatch(input: Omit<HoldingPerformanceInput, "accountId" | "instrumentId"> & { pairs: Array<{ accountId: string; instrumentId: string }> }): HoldingPerformance[] {
+  const events = sortEvents(effectiveEvents(input.events));
+  const policy = input.missingPricePolicy ?? "cost";
+  const baseDates = [input.start, input.end, ...monthEndsBetween(input.start, input.end)];
+  const inRange = (x: ISODate) => x >= input.start && x <= input.end;
+
+  interface PairState {
+    accountId: string;
+    instrumentId: string;
+    info: InstrumentInfo;
+    dates: Set<ISODate>;
+    local: Array<{ date: ISODate; value: Decimal; flow: Decimal }>;
+    base: Array<{ date: ISODate; value: Decimal; flow: Decimal }>;
+    flowLocal: Decimal;
+    flowBase: Decimal;
+    complete: boolean;
+    baseOk: boolean;
+    incomeGross: Decimal;
+    issues: ValuationIssue[];
+  }
+  const states: PairState[] = [];
+  const byInstrument = new Map<string, PairState[]>();
+  for (const p of input.pairs) {
+    const info = input.instruments.get(p.instrumentId);
+    if (!info) throw new RangeError(`Unknown instrument ${p.instrumentId}`);
+    const s: PairState = { ...p, info, dates: new Set(baseDates.filter(inRange)), local: [], base: [], flowLocal: ZERO, flowBase: ZERO, complete: true, baseOk: true, incomeGross: ZERO, issues: [] };
+    states.push(s);
+    byInstrument.set(p.instrumentId, [...(byInstrument.get(p.instrumentId) ?? []), s]);
+  }
+  for (const e of events) {
+    if (!("instrumentId" in e) || !e.instrumentId || e.date <= input.start || e.date > input.end) continue;
+    for (const s of byInstrument.get(e.instrumentId) ?? []) s.dates.add(e.date);
+  }
+  const allDates = [...new Set(states.flatMap((s) => [...s.dates]))].sort();
+  const book = new PortfolioBook({ baseCurrency: input.baseCurrency, instruments: input.instruments, lotMethod: input.lotMethod ?? "FIFO" });
+  const ctxAt = (date: ISODate, info: InstrumentInfo) => ({ date, baseCurrency: info.currency, instruments: input.instruments, prices: input.prices, fx: input.fx, missingPricePolicy: policy });
+  const fxRate = (s: PairState, date: ISODate): Decimal | null => {
+    try {
+      return input.fx.quote(s.info.currency, input.baseCurrency, date).rate;
+    } catch (err) {
+      if (err instanceof MissingFxRateError) {
+        s.issues.push({ code: "MISSING_FX", currency: s.info.currency, message: err.message });
+        return null;
+      }
+      throw err;
+    }
+  };
+
+  let idx = 0;
+  for (const [n, date] of allDates.entries()) {
+    while (idx < events.length && events[idx]!.date <= date) {
+      const e = events[idx++]!;
+      const touched = "instrumentId" in e && e.instrumentId ? (byInstrument.get(e.instrumentId) ?? []) : [];
+      const flows = touched.map((s) => holdingFlow(e, s.accountId, s.instrumentId, s.info, (qty) => valueUnits(ctxAt(e.date, s.info), s.instrumentId, qty, [], ZERO, [], {}).value));
+      const before = book.income.length;
+      book.apply(e);
+      if (n === 0) continue; // flows on or before the start are part of the starting value
+      touched.forEach((s, i) => {
+        const f = flows[i];
+        if (f === null || f === undefined) return;
+        for (const inc of book.income.slice(before)) if (inc.accountId === s.accountId && inc.instrumentId === s.instrumentId) s.incomeGross = s.incomeGross.plus(inc.gross);
+        s.flowLocal = s.flowLocal.plus(f);
+        const r = fxRate(s, e.date);
+        if (r === null) s.baseOk = false;
+        else s.flowBase = s.flowBase.plus(f.times(r));
+      });
+    }
+    const due = states.filter((s) => s.dates.has(date));
+    if (!due.length) continue;
+    const positions = new Map(book.positions().map((p) => [`${p.accountId}|${p.instrumentId}`, p]));
+    for (const s of due) {
+      const pos = positions.get(`${s.accountId}|${s.instrumentId}`);
+      const v = !pos || pos.quantity.isZero() ? ZERO : valueUnits(ctxAt(date, s.info), s.instrumentId, pos.quantity, pos.lots, pos.cost, s.issues, { accountId: s.accountId }).value;
+      const [fl, fb] = [s.flowLocal, s.flowBase];
+      s.flowLocal = ZERO;
+      s.flowBase = ZERO;
+      if (v === null) {
+        s.complete = false;
+        continue;
+      }
+      s.local.push({ date, value: v, flow: fl });
+      const r = fxRate(s, date);
+      if (r === null) s.baseOk = false;
+      else s.base.push({ date, value: v.times(r), flow: fb });
+    }
+  }
+  const days = daysBetween(input.start, input.end);
+  return states.map((s) => {
+    const seen = new Set<string>();
+    return {
+      accountId: s.accountId,
+      instrumentId: s.instrumentId,
+      start: input.start,
+      end: input.end,
+      days,
+      local: result(s.local, s.info.currency, days),
+      base: s.baseOk && s.base.length === s.local.length ? result(s.base, input.baseCurrency, days) : null,
+      incomeGross: s.incomeGross,
+      complete: s.complete && s.baseOk,
+      issues: s.issues.filter((i) => {
+        const k = `${i.code}|${i.currency ?? ""}|${i.instrumentId ?? ""}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      }),
+    };
+  });
+}
