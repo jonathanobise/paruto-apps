@@ -148,6 +148,20 @@
       "when": 1793595988269,
       "tag": "0020_billing_system_access",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793597168161,
+      "tag": "0021_support_cases",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793597169201,
+      "tag": "0022_admin_console_access",
+      "breakpoints": true
     }
   ]
 }

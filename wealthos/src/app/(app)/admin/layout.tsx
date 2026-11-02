@@ -5,9 +5,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   await requireAdminPage();
   const tabs = [
     ["/admin", "Overview"],
+    ["/admin/users", "Users"],
+    ["/admin/orgs", "Organisations"],
+    ["/admin/billing", "Billing"],
+    ["/admin/support", "Support"],
+    ["/admin/ai", "AI usage"],
+    ["/admin/jobs", "Jobs"],
+    ["/admin/audit", "Audit log"],
+    ["/admin/gates", "Feature gates"],
     ["/admin/sources", "Sources"],
     ["/admin/instruments", "Catalogue"],
-    ["/admin/imports", "Market data imports"],
+    ["/admin/imports", "Market data"],
   ];
   return (
     <>

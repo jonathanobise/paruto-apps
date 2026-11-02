@@ -10,3 +10,4 @@ export * from "./notifications";
 export * from "./ai";
 export * from "./billing";
 export * from "./platform";
+export * from "./support";

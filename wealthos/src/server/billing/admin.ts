@@ -127,3 +127,9 @@ export async function adminRevenue(admin: AdminContext) {
     return { mrr: mrr.toFixed(2), byPlan, monthly: monthly.rows, openInvoices: { count: Number(open?.n ?? 0), total: open?.total ?? "0" }, failedEvents, recentInvoices };
   });
 }
+
+export async function adminBillingConfig(admin: AdminContext) {
+  const { listPlans } = await import("./entitlements");
+  const { getBillingSettings } = await import("./settings");
+  return asAdmin(admin, async (tx) => ({ plans: await listPlans(tx), settings: await getBillingSettings(tx) }));
+}

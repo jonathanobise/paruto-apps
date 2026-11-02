@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, ArrowLeftRight, BookOpen, Calculator, Bell, Bot, ChartPie, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { Activity, ArrowLeftRight, LifeBuoy, BookOpen, Calculator, Bell, Bot, ChartPie, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const live = [
@@ -70,6 +70,11 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
         <li>
           <Link href="/settings" onClick={onNavigate} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium", pathname.startsWith("/settings") ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")}>
             <Settings className="size-4 text-text-3" aria-hidden /> Settings
+          </Link>
+        </li>
+        <li>
+          <Link href="/support" onClick={onNavigate} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium", pathname.startsWith("/support") ? "bg-accent-soft text-text" : "text-text-2 hover:bg-surface-2")}>
+            <LifeBuoy className="size-4 text-text-3" aria-hidden /> Help
           </Link>
         </li>
       </ul>
