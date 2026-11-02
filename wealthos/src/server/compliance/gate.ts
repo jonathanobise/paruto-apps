@@ -15,7 +15,7 @@ export async function featureDecision(key: string, jurisdiction = "NG"): Promise
     .orderBy(desc(regulatoryFeatureApprovals.createdAt))
     .limit(1);
   const [flag] = await db().select({ enabled: featureFlags.enabled }).from(featureFlags).where(eq(featureFlags.key, key)).limit(1);
-  return decideFeature(def, jurisdiction, { ...(approval ? { approval: approval.status } : {}), ...(flag ? { flagEnabled: flag.enabled } : {}), environment: env().NODE_ENV });
+  return decideFeature(def, jurisdiction, { ...(approval ? { approval: approval.status } : {}), ...(flag ? { flagEnabled: flag.enabled } : {}), environment: env().APP_ENV });
 }
 
 /** Server-side gate. UI hiding is never relied on. */

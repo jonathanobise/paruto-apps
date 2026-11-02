@@ -12,7 +12,9 @@ CSV import ✅ (preview, validation, duplicate detection, institution mappings, 
 Account editing, closing and re-opening ✅. Per-account and per-holding performance (TWR, XIRR, gain, income; local vs base currency; closed positions) ✅. Analytics snapshot cache with exact invalidation and a performance benchmark ✅.
 Carried forward: import of transfers/FX conversions; faster cold holdings performance (single replay for all holdings); catalogue-level corporate actions.
 
-## Milestone 3 — Research & planning
+## Milestone 3 — Research & planning (in progress)
+Done: admin-verified market data import, source registry, verified catalogue facts, explorer, instrument pages (price/NAV history, trailing price returns, rates by methodology, sources), methodology-aware comparisons with derived equivalents, watchlists, saved comparisons.
+
 Instrument explorer and detail pages from verified/admin-imported data; rate-methodology-aware comparisons; watchlists; goals and scenario simulator with stress tests (engine ready); user-created target mixes; alerts with a durable job queue; AI research assistant per AI_SAFETY.md; education content.
 
 ## Milestone 4 — Commercial beta

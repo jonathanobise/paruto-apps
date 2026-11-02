@@ -17,12 +17,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard" className="px-3">
           <Logo />
         </Link>
-        <Nav />
+        <Nav isAdmin={app.session.user.platformRole === "admin"} />
         <p className="mt-auto px-3 text-[11px] leading-relaxed text-text-3">{DISCLOSURES.non_custodial}</p>
       </aside>
       <div className="min-w-0">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg/90 px-4 backdrop-blur sm:px-6">
-          <MobileNav />
+          <MobileNav isAdmin={app.session.user.platformRole === "admin"} />
           <Link href="/dashboard" className="lg:hidden">
             <Logo />
           </Link>

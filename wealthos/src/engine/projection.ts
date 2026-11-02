@@ -20,12 +20,15 @@ export interface ProjectionAssumptions {
   annualInflation: Decimal;
   periodsPerYear: 1 | 4 | 12;
   years: number;
+  /** Total number of periods; overrides years × periodsPerYear (e.g. 30 months to a target date). */
+  horizonPeriods?: number;
   timing: ContributionTiming;
   /** Taxes are not modelled unless stated; recorded so it is always disclosed. */
   taxesModelled: false;
 }
 
 export interface ProjectionYear {
+  /** Years from the start; the final point may be a fraction of a year. */
   year: number;
   nominal: Decimal;
   real: Decimal;
@@ -51,37 +54,42 @@ export function periodRate(annual: Decimal, periodsPerYear: number): Decimal {
 
 export function project(a: ProjectionAssumptions): ProjectionResult {
   if (a.years < 0 || !Number.isInteger(a.years)) throw new RangeError("years must be a non-negative integer");
+  if (a.horizonPeriods !== undefined && (a.horizonPeriods < 0 || !Number.isInteger(a.horizonPeriods))) throw new RangeError("horizonPeriods must be a non-negative integer");
   const n = a.periodsPerYear;
+  const total = a.horizonPeriods ?? a.years * n;
   const gross = periodRate(a.annualReturn, n);
   const feeRate = periodRate(a.annualFee, n);
   let balance = a.startingBalance;
   let contributed = a.startingBalance;
   let totalFees = ZERO;
   let contribution = a.contributionPerPeriod;
+  let yearGrowth = ZERO;
+  let yearFees = ZERO;
   const path: ProjectionYear[] = [{ year: 0, nominal: balance, real: balance, contributed, growth: ZERO, fees: ZERO }];
-  for (let y = 1; y <= a.years; y++) {
-    let yearGrowth = ZERO;
-    let yearFees = ZERO;
-    for (let p = 0; p < n; p++) {
-      if (a.timing === "beginning") {
-        balance = balance.plus(contribution);
-        contributed = contributed.plus(contribution);
-      }
-      const growth = balance.times(gross);
-      balance = balance.plus(growth);
-      const fee = balance.times(feeRate);
-      balance = balance.minus(fee);
-      yearGrowth = yearGrowth.plus(growth);
-      yearFees = yearFees.plus(fee);
-      if (a.timing === "end") {
-        balance = balance.plus(contribution);
-        contributed = contributed.plus(contribution);
-      }
+  for (let p = 1; p <= total; p++) {
+    if (a.timing === "beginning") {
+      balance = balance.plus(contribution);
+      contributed = contributed.plus(contribution);
     }
-    totalFees = totalFees.plus(yearFees);
-    const deflator = a.annualInflation.plus(1).pow(y);
-    path.push({ year: y, nominal: balance, real: balance.div(deflator), contributed, growth: yearGrowth, fees: yearFees });
-    contribution = contribution.times(a.contributionGrowthAnnual.plus(1));
+    const growth = balance.times(gross);
+    balance = balance.plus(growth);
+    const fee = balance.times(feeRate);
+    balance = balance.minus(fee);
+    yearGrowth = yearGrowth.plus(growth);
+    yearFees = yearFees.plus(fee);
+    totalFees = totalFees.plus(fee);
+    if (a.timing === "end") {
+      balance = balance.plus(contribution);
+      contributed = contributed.plus(contribution);
+    }
+    const yearEnd = p % n === 0;
+    if (yearEnd || p === total) {
+      const year = p / n;
+      path.push({ year, nominal: balance, real: balance.div(a.annualInflation.plus(1).pow(year)), contributed, growth: yearGrowth, fees: yearFees });
+      yearGrowth = ZERO;
+      yearFees = ZERO;
+    }
+    if (yearEnd) contribution = contribution.times(a.contributionGrowthAnnual.plus(1));
   }
   const last = path[path.length - 1]!;
   return {
@@ -115,7 +123,7 @@ export function projectScenarios(base: Omit<ProjectionAssumptions, "annualReturn
 
 /** Level per-period contribution needed to reach `target` (nominal) under the assumptions. */
 export function requiredContribution(target: Decimal, a: Omit<ProjectionAssumptions, "contributionPerPeriod" | "contributionGrowthAnnual">): Decimal {
-  const n = a.periodsPerYear * a.years;
+  const n = a.horizonPeriods ?? a.periodsPerYear * a.years;
   const net = periodRate(a.annualReturn, a.periodsPerYear).plus(1).times(d(1).minus(periodRate(a.annualFee, a.periodsPerYear))).minus(1);
   const growthFactor = net.plus(1).pow(n);
   const fvStart = a.startingBalance.times(growthFactor);

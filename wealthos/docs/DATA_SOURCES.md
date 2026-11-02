@@ -16,7 +16,12 @@
 | CPI / inflation | National Bureau of Statistics | Official; rebasing history |
 | Global ETF prices, FX | Licensed vendor (e.g. exchange or market-data API) | Licence cost — ask before committing |
 
-Until a licensed feed exists, the planned path is an **administrator-controlled verified import** (CSV upload by an admin, validation, preview, provenance, four-eyes approval) — Milestone 3/4.
+## Administrator-verified import (built)
+Until a licensed feed exists, data enters only through the admin console (`/admin`), available to platform administrators with two-step verification (granted by an operator via `scripts/grant-admin.ts`; Postgres re-checks the role on every write):
+1. **Register the source** with its kind (official / licensed / admin-verified import), URL, licence or terms note and freshness threshold.
+2. **Catalogue instruments** with identity (name, ticker, ISIN, issuer, class, currency, country, valuation model, maturity) and structured facts (charges, minimums, liquidity, distributions, benchmark, risks, tax notes). An instrument is marked *verified* only with a cited official source URL and as-of date; users see facts only for verified instruments.
+3. **Import** prices/NAVs, published rates (with methodology, tenor, basis, source URL) or FX rates as CSV: rows are validated and previewed, then committed as `verified` under the chosen source. Corrections update in place and invalidate analytics caches. Expected returns are refused — they are assumptions, not published data.
+Planned: second-admin approval (four-eyes) before commit, and scheduled pulls from licensed APIs through the same validation.
 
 ## Rules
 - Prefer official and licensed sources; do not scrape protected sources or breach terms.

@@ -4,7 +4,7 @@
 
 Frameworks to confirm (versions and applicability to be verified by counsel): Investments and Securities Act 2025 and SEC Nigeria rules (https://sec.gov.ng) — including whether any WealthOS feature constitutes investment advice, research, or adviser activity requiring registration and capital; Nigeria Data Protection Act 2023 and NDPC directives (https://ndpc.gov.ng) — lawful basis, DPIA, registration as a data controller of major importance, cross-border transfers; CBN rules relevant to payments and any future account-aggregation/open-banking; FCCPC consumer protection; tax rules referenced in content.
 
-Source of truth in code: `src/server/compliance/features.ts`. A feature is available only if not hard-disabled, its latest decision for the jurisdiction allows it (`regulatory_feature_approvals`, append-only), and its operational flag is on. **`pending_review` features are unavailable in production** until approved.
+Source of truth in code: `src/server/compliance/features.ts`. A feature is available only if not hard-disabled, its latest decision for the jurisdiction allows it (`regulatory_feature_approvals`, append-only), and its operational flag is on. **`pending_review` features are unavailable in production** until approved. `APP_ENV` (development | test | staging | production, independent of the build mode) decides this: staging runs a production build but may show pending features for review.
 
 | Feature key | Classification | Permissions | Disclosures | Default status | Audit | Jurisdictions | Questions for counsel |
 |---|---|---|---|---|---|---|---|

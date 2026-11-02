@@ -97,7 +97,7 @@ export interface FeatureDecision {
  * available ONLY in non-production environments (so they can be built and reviewed) unless
  * explicitly approved; regulated features are never available in Version 1.
  */
-export function decideFeature(def: FeatureDefinition, jurisdiction: string, opts: { approval?: ApprovalStatus; flagEnabled?: boolean; environment: "development" | "test" | "production" }): FeatureDecision {
+export function decideFeature(def: FeatureDefinition, jurisdiction: string, opts: { approval?: ApprovalStatus; flagEnabled?: boolean; environment: "development" | "test" | "staging" | "production" }): FeatureDecision {
   if (def.hardDisabled || def.classification === "regulated_advice" || def.classification === "regulated_execution") {
     return { available: false, status: "rejected", reason: "Not permitted in WealthOS Version 1 (regulated activity)." };
   }

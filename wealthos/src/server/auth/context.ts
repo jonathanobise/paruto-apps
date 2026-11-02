@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { userPreferences } from "@/server/db/schema";
@@ -77,4 +77,18 @@ async function buildContext(session: SessionRecord): Promise<AppContext> {
     canWrite: org.role !== "viewer",
     preferences: prefs ?? { userId: session.userId, baseCurrency: "NGN", locale: "en-NG", timezone: "Africa/Lagos", theme: "system", notifications: { inApp: true, email: false, productUpdates: false }, updatedAt: new Date() },
   };
+}
+
+/** Platform administrators must have two-step verification on and satisfied for this session. */
+export async function requireAdminPage(): Promise<AppContext> {
+  const app = await requireApp();
+  if (app.session.user.platformRole !== "admin") notFound();
+  if (!app.session.user.mfaEnabled || !app.session.mfaSatisfied) redirect("/settings/security?admin=mfa");
+  return app;
+}
+
+export async function requireAdminForAction(): Promise<AppContext> {
+  const app = await requireAppForAction();
+  if (app.session.user.platformRole !== "admin" || !app.session.user.mfaEnabled || !app.session.mfaSatisfied) throw new AppError("FORBIDDEN", "Administrator access with two-step verification is required.");
+  return app;
 }

@@ -1,4 +1,4 @@
-import { boolean, date, index, integer, pgEnum, pgTable, text, timestamp, uuid, uniqueIndex, unique } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, uniqueIndex, unique } from "drizzle-orm/pg-core";
 import { createdAt, id, quantity, rate, updatedAt } from "./_shared";
 import { organizations } from "./tenancy";
 import { users } from "./identity";
@@ -68,6 +68,10 @@ export const instruments = pgTable("instruments", {
   verifiedAt: timestamp("verified_at", { withTimezone: true }),
   verifiedBy: uuid("verified_by").references(() => users.id),
   officialUrl: text("official_url"),
+  /** Structured product facts (see src/server/research/facts.ts). Shown to users only once verified. */
+  facts: jsonb("facts").$type<Record<string, unknown>>().notNull().default({}),
+  factsSourceUrl: text("facts_source_url"),
+  factsAsOf: date("facts_as_of", { mode: "string" }),
   isDemo: boolean("is_demo").notNull().default(false),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -112,3 +116,55 @@ export const fxRates = pgTable("fx_rates", {
   createdAt: createdAt(),
 }, (t) => [uniqueIndex("fx_rates_unique_obs").on(t.base, t.quote, t.sourceId, t.observedOn), index("fx_rates_lookup").on(t.base, t.quote, t.observedOn)]);
 
+
+export const rateMethodology = pgEnum("rate_methodology", [
+  "discount_rate",
+  "true_yield",
+  "effective_annual_yield",
+  "yield_to_maturity",
+  "trailing_return",
+  "distribution_yield",
+  "advertised_deposit_rate",
+  "money_market_yield",
+  "expected_return",
+  "coupon_rate",
+]);
+
+/**
+ * Published rates and yields (fund yields, T-bill auction results, deposit rates, coupons) with
+ * their methodology. Values are decimals (0.1825 = 18.25%). Rates with different methodologies are
+ * never compared as if identical.
+ */
+export const publishedRates = pgTable("published_rates", {
+  id: id(),
+  instrumentId: uuid("instrument_id").notNull().references(() => instruments.id, { onDelete: "cascade" }),
+  methodology: rateMethodology("methodology").notNull(),
+  value: rate("value").notNull(),
+  tenorDays: integer("tenor_days"),
+  /** Day count / compounding / period detail needed to interpret the figure (e.g. "ACT/365", "7-day annualised"). */
+  basis: text("basis"),
+  asOf: date("as_of", { mode: "string" }).notNull(),
+  sourceId: uuid("source_id").notNull().references(() => marketDataSources.id),
+  sourceUrl: text("source_url"),
+  verificationState: verificationState("verification_state").notNull(),
+  retrievedAt: timestamp("retrieved_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: createdAt(),
+}, (t) => [unique("published_rates_unique_obs").on(t.instrumentId, t.methodology, t.tenorDays, t.asOf, t.sourceId).nullsNotDistinct(), index("published_rates_lookup").on(t.instrumentId, t.asOf)]);
+
+export const marketImportStatus = pgEnum("market_import_status", ["previewed", "committed", "discarded"]);
+
+/** Administrator-controlled verified imports of market data (prices/NAVs, published rates, FX). */
+export const marketDataImports = pgTable("market_data_imports", {
+  id: id(),
+  kind: text("kind").notNull(),
+  sourceId: uuid("source_id").notNull().references(() => marketDataSources.id),
+  fileName: text("file_name").notNull(),
+  fileSha256: text("file_sha256").notNull(),
+  rows: jsonb("rows").$type<unknown[]>().notNull(),
+  summary: jsonb("summary").$type<Record<string, unknown>>().notNull(),
+  status: marketImportStatus("status").notNull().default("previewed"),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: createdAt(),
+  committedBy: uuid("committed_by").references(() => users.id),
+  committedAt: timestamp("committed_at", { withTimezone: true }),
+}, (t) => [index("market_data_imports_created_idx").on(t.createdAt)]);

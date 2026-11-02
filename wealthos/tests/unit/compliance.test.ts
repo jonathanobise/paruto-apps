@@ -35,3 +35,11 @@ describe("regulatory feature gates", () => {
     expect(decideFeature(def, "NG", { flagEnabled: false, environment: "production" }).available).toBe(false);
   });
 });
+
+describe("deployment environments", () => {
+  it("shows pending features on staging but not production", () => {
+    const def = featureDefinition("INSTRUMENT_EXPLORER");
+    expect(decideFeature(def, "NG", { environment: "staging" }).available).toBe(true);
+    expect(decideFeature(def, "NG", { environment: "production" }).available).toBe(false);
+  });
+});
