@@ -1,13 +1,7 @@
 import { requireAppForAction } from "@/server/auth/context";
 import { listTransactions } from "@/server/analytics/portfolio";
 import { AppError } from "@/server/platform/errors";
-
-function csvCell(v: unknown): string {
-  const s = v === null || v === undefined ? "" : String(v);
-  // Neutralise spreadsheet formula injection and quote every cell.
-  const safe = /^[=+\-@\t\r]/.test(s) && !/^-?\d/.test(s) ? `'${s}` : s;
-  return `"${safe.replace(/"/g, '""')}"`;
-}
+import { csvCell } from "@/server/imports/export";
 
 export async function GET() {
   try {

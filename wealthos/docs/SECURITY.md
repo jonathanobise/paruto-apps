@@ -16,10 +16,10 @@ Guided by OWASP ASVS 4 (Level 2 target). Status per control:
 | Privacy | Consent records (append-only, versioned), JSON export of all user data, erasure via SECURITY DEFINER function (deletes solely-owned orgs, anonymises the user, keeps opaque ids in logs), no bank/broker credentials stored, masked numbers ≤ 4 chars | DPIA; retention schedule; DSAR workflow tooling |
 | Audit | `audit_events` (tenant actions), `security_events` (auth) — both append-only | Admin audit viewer, alerting |
 | Supply chain | Exact-pinned dependencies; `npm audit --omit=dev` clean at commit time | Dependabot/Renovate, SBOM, CI scanning |
-| Files | No uploads yet | Malware scanning, type sniffing, size limits for CSV imports (M4) |
+| Files | CSV imports only: 2 MiB / 5,000 rows / 50 columns / 500-char cells, strict UTF-8, binary (NUL) rejection, rate-limited, nothing executed; raw text deleted after commit/discard; formula neutralisation on export (docs/IMPORTS.md) | Malware scanning if other file types are ever accepted |
 
 ## Adversarial tests (`tests/integration/tenancy.test.ts`)
-Forged org context, raw SQL inserts into another org, cross-tenant FK, ledger tampering (UPDATE/DELETE), self-adding to another org's memberships, calling SECURITY DEFINER functions for another user, runtime role attempting `ALTER TABLE … DISABLE ROW LEVEL SECURITY` and `SET ROLE` to the owner, viewer write attempts, export scoping. Plus identity tests (enumeration, lockout, token single use, MFA) and E2E checks that APIs reject unauthenticated access.
+Forged org context, cross-tenant import read/commit/rollback, illegal import status transitions, raw SQL inserts into another org, cross-tenant FK, ledger tampering (UPDATE/DELETE), self-adding to another org's memberships, calling SECURITY DEFINER functions for another user, runtime role attempting `ALTER TABLE … DISABLE ROW LEVEL SECURITY` and `SET ROLE` to the owner, viewer write attempts, export scoping. Plus identity tests (enumeration, lockout, token single use, MFA) and E2E checks that APIs reject unauthenticated access.
 
 ## Known dev-dependency advisories
 `npm audit` reports moderate `minimatch` ReDoS advisories inside the ESLint toolchain (dev only, not shipped). Production dependency audit is clean.

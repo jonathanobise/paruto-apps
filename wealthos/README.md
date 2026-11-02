@@ -52,7 +52,7 @@ See [docs/TESTING.md](docs/TESTING.md).
 
 ```
 src/engine/        Pure, deterministic financial engine (no I/O). Decimal money, FX, lots, returns…
-src/server/        Domain modules: identity, accounts, ledger, market-data, analytics, compliance, privacy, demo
+src/server/        Domain modules: identity, accounts, ledger, imports, market-data, analytics, compliance, privacy, demo
 src/server/db/     Drizzle schema; tenant context (withTenant) that sets Postgres RLS variables
 src/app/           Next.js routes: (auth) sign-in/up, (app) signed-in screens, api/ exports + health
 src/components/    UI primitives (ui/) and app components (app/)

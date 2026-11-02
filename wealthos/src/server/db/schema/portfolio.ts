@@ -1,4 +1,4 @@
-import { boolean, date, foreignKey, index, jsonb, pgEnum, pgTable, text, uuid, uniqueIndex, unique, check } from "drizzle-orm/pg-core";
+import { boolean, date, foreignKey, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, uniqueIndex, unique, check } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { amount, createdAt, id, quantity, updatedAt } from "./_shared";
 import { organizations } from "./tenancy";
@@ -63,6 +63,52 @@ export const financialAccounts = pgTable("financial_accounts", {
 
 export const ledgerSource = pgEnum("ledger_source", ["manual", "import", "demo", "system"]);
 
+export const importStatus = pgEnum("import_status", ["previewed", "committed", "rolled_back", "discarded"]);
+
+/**
+ * A CSV import. Rows are parsed and validated into `rows` at preview time; commit posts exactly
+ * the previewed rows. `raw_text` is kept only while the batch is a preview (for re-mapping) and
+ * cleared on commit or discard (data minimisation).
+ */
+export const importBatches = pgTable("import_batches", {
+  id: id(),
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  accountId: uuid("account_id").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSha256: text("file_sha256").notNull(),
+  fileSize: integer("file_size").notNull(),
+  mapping: jsonb("mapping").$type<Record<string, unknown>>().notNull(),
+  headers: jsonb("headers").$type<string[]>().notNull(),
+  rawText: text("raw_text"),
+  rows: jsonb("rows").$type<unknown[]>().notNull(),
+  summary: jsonb("summary").$type<Record<string, unknown>>().notNull(),
+  status: importStatus("status").notNull().default("previewed"),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: createdAt(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  committedAt: timestamp("committed_at", { withTimezone: true }),
+  committedBy: uuid("committed_by").references(() => users.id),
+  rolledBackAt: timestamp("rolled_back_at", { withTimezone: true }),
+  rolledBackBy: uuid("rolled_back_by").references(() => users.id),
+  rollbackReason: text("rollback_reason"),
+}, (t) => [
+  unique("import_batches_org_id_key").on(t.orgId, t.id),
+  index("import_batches_org_idx").on(t.orgId, t.createdAt),
+  index("import_batches_file_idx").on(t.orgId, t.fileSha256),
+  foreignKey({ columns: [t.orgId, t.accountId], foreignColumns: [financialAccounts.orgId, financialAccounts.id], name: "import_batches_account_fk" }).onDelete("cascade"),
+]);
+
+/** Saved column/type mappings for an institution's CSV export format. */
+export const importMappings = pgTable("import_mappings", {
+  id: id(),
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  mapping: jsonb("mapping").$type<Record<string, unknown>>().notNull(),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (t) => [uniqueIndex("import_mappings_org_name").on(t.orgId, t.name)]);
+
 /**
  * Immutable financial event ledger. Rows are never updated or deleted by the application
  * (enforced by a trigger); corrections are new reversal events.
@@ -78,10 +124,17 @@ export const ledgerEvents = pgTable("ledger_events", {
   reversesEventId: uuid("reverses_event_id"),
   source: ledgerSource("source").notNull().default("manual"),
   idempotencyKey: text("idempotency_key"),
+  /** Import batch that created this event (source = import). */
+  importBatchId: uuid("import_batch_id"),
+  /** Institution's own transaction reference, used for duplicate detection. */
+  externalRef: text("external_ref"),
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: createdAt(),
 }, (t) => [
   unique("ledger_events_org_id_key").on(t.orgId, t.id),
+  index("ledger_events_external_ref_idx").on(t.orgId, t.externalRef),
+  index("ledger_events_import_idx").on(t.orgId, t.importBatchId),
+  foreignKey({ columns: [t.orgId, t.importBatchId], foreignColumns: [importBatches.orgId, importBatches.id], name: "ledger_events_import_fk" }),
   uniqueIndex("ledger_events_idempotency").on(t.orgId, t.idempotencyKey),
   uniqueIndex("ledger_events_single_reversal").on(t.reversesEventId),
   index("ledger_events_org_date_idx").on(t.orgId, t.occurredOn),

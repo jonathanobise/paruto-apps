@@ -14,6 +14,8 @@ const config: NextConfig = {
   // pg is a Node-only driver; keep it out of the bundler.
   serverExternalPackages: ["pg"],
   typedRoutes: false,
+  // CSV imports accept files up to 2 MiB (validated again server-side); allow multipart overhead.
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

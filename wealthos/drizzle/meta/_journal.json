@@ -15,6 +15,20 @@
       "when": 1793570894628,
       "tag": "0001_security_rls_immutability",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793582664938,
+      "tag": "0002_csv_imports",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793582665799,
+      "tag": "0003_csv_imports_security",
+      "breakpoints": true
     }
   ]
 }

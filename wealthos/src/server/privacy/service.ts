@@ -1,6 +1,6 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
-import { accountValuations, consentRecords, financialAccounts, instruments, ledgerEntries, ledgerEvents, memberships, modelPortfolios, organizations, securityEvents, userPreferences, users } from "@/server/db/schema";
+import { accountValuations, consentRecords, financialAccounts, importBatches, importMappings, instruments, ledgerEntries, ledgerEvents, memberships, modelPortfolios, organizations, securityEvents, userPreferences, users } from "@/server/db/schema";
 import { db, withTenant, withUser } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
 import { recordSecurityEvent, type RequestMeta } from "@/server/audit/audit";
@@ -31,6 +31,9 @@ export async function exportUserData(userId: string, meta: RequestMeta) {
       valuations: await tx.select().from(accountValuations),
       privateInstruments: await tx.select().from(instruments).where(eq(instruments.orgId, org.id)),
       modelPortfolios: await tx.select().from(modelPortfolios),
+      // Raw file text is never exported (it is deleted after commit/discard anyway).
+      imports: (await tx.select().from(importBatches)).map(({ rawText: _r, ...rest }) => rest),
+      importMappings: await tx.select().from(importMappings),
     }));
     orgData.push({ organization: org, ...data });
   }

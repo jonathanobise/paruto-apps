@@ -32,6 +32,7 @@ Instruments are the founder's research candidates (Coronation MMF, Stanbic IBTC 
 | Accounts list / detail / new; manual valuations | Built |
 | Holdings (lot-based cost, valuation method, sample badges) | Built |
 | Transactions (ledger, reversal, CSV export) and record form (18 event types) | Built |
+| CSV import (upload, preview, column/type mapping, duplicates, commit, rollback) | Built |
 | Net worth (history, assets, liabilities) | Built |
 | Target mix (drift vs user-defined hypothetical mix; gated, pending review) | Built (view only) |
 | Settings: preferences, security (MFA, sessions, password, activity), privacy (export, consents, deletion) | Built |

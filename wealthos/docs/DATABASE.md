@@ -26,6 +26,9 @@ erDiagram
   market_data_sources ||--o{ market_prices : provides
   market_data_sources ||--o{ fx_rates : provides
   institutions ||--o{ financial_accounts : "held at"
+  financial_accounts ||--o{ import_batches : "imported into"
+  import_batches ||--o{ ledger_events : created
+  organizations ||--o{ import_mappings : saves
 ```
 
 Also: `audit_events`, `email_outbox`, `rate_limit_buckets`, `regulatory_feature_approvals`, `feature_flags`.
@@ -35,7 +38,7 @@ Also: `audit_events`, `email_outbox`, `rate_limit_buckets`, `regulatory_feature_
 |---|---|---|
 | Identity | users, sessions, verification_tokens, user_preferences, consent_records, security_events, email_outbox, rate_limit_buckets | Not tenant-scoped (needed before a tenant is known); service layer only. consent/security logs append-only |
 | Tenancy | organizations, memberships | RLS: members read their own; writes only via `app_create_organization()` |
-| Portfolio (tenant) | financial_accounts, ledger_events, ledger_entries, account_valuations, model_portfolios | RLS by verified membership; viewers read-only |
+| Portfolio (tenant) | financial_accounts, ledger_events, ledger_entries, account_valuations, model_portfolios, import_batches, import_mappings | RLS by verified membership; viewers read-only |
 | Reference | instruments, instrument_identifiers, market_prices, fx_rates, market_data_sources, institutions | Global rows (org_id NULL) readable by all; tenants may add private instruments/prices; global writes via owner/admin only |
 | Compliance | regulatory_feature_approvals (append-only), feature_flags, audit_events (append-only) | |
 
@@ -49,10 +52,11 @@ Also: `audit_events`, `email_outbox`, `rate_limit_buckets`, `regulatory_feature_
 7. **No negative holdings:** posting replays the entire ledger with the new event; any resulting oversell is rejected.
 8. **Exact amounts:** `numeric(38,10)` money, `numeric(38,12)` quantities/prices, `numeric(38,16)` FX; read and written as strings.
 9. **Ownership range:** `0 < ownership_percent ≤ 100`; masked account numbers ≤ 4 characters; no credential columns exist.
-10. **Provenance:** every price/FX row has a source, methodology, observation date, retrieval timestamp and verification state; sources carry licence notes and freshness thresholds.
+10. **Import lifecycle:** `guard_import_batch()` allows only previewed → committed | discarded and committed → rolled_back; file, account and organisation never change; committed rows/mapping are frozen; batches cannot be deleted by the runtime role. Raw file text exists only while previewed.
+11. **Provenance:** every price/FX row has a source, methodology, observation date, retrieval timestamp and verification state; sources carry licence notes and freshness thresholds.
 
 ## Migration policy
 Generated SQL is reviewed before commit. Destructive changes need a two-step plan (expand → backfill → contract) and a backup. Never edit a migration that has run in a shared environment; add a new one. (`0000` was amended once, before any shared deployment, to create the `citext` extension.)
 
 ## Not yet built (validated against the domain first, per the directive)
-corporate_actions (catalogue-level), fund_yields, treasury_auctions, holdings/valuation_snapshots (materialised caches), goals, projection_scenarios, watchlists, alerts, notifications, ai_conversations, ai_source_references, subscriptions, payments, entitlements, import_batches. Holdings are currently derived on read from the ledger, which is the source of truth; snapshots will be a cache, never authoritative.
+corporate_actions (catalogue-level), fund_yields, treasury_auctions, holdings/valuation_snapshots (materialised caches), goals, projection_scenarios, watchlists, alerts, notifications, ai_conversations, ai_source_references, subscriptions, payments, entitlements. Holdings are currently derived on read from the ledger, which is the source of truth; snapshots will be a cache, never authoritative.

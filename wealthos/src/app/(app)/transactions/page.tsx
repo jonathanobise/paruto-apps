@@ -26,6 +26,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
         actions={
           <>
             <Button asChild variant="secondary"><a href="/api/export/transactions.csv">Export CSV</a></Button>
+            {app.canWrite ? <Button asChild variant="secondary"><Link href="/transactions/import">Import CSV</Link></Button> : null}
             {app.canWrite ? <Button asChild><Link href="/transactions/new"><Plus aria-hidden /> Record transaction</Link></Button> : null}
           </>
         }
@@ -59,6 +60,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
                       <span className={t.reversedBy ? "text-text-3 line-through" : "font-medium"}>{t.label}</span>
                       {t.reversedBy ? <Badge className="ml-2">Reversed</Badge> : null}
                       {t.source === "demo" ? <Badge tone="demo" className="ml-2">Demo</Badge> : null}
+                      {t.source === "import" ? <Badge className="ml-2">Imported</Badge> : null}
                       {t.description ? <p className="text-text-3">{t.description}</p> : null}
                     </td>
                     <td className="px-4 py-2.5 text-text-2">{t.account}</td>

@@ -71,7 +71,12 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
         eyebrow={<Link href="/accounts" className="hover:text-text">← Accounts</Link>}
         title={account.name}
         description={`${typeLabel}${account.institutionName ? ` · ${account.institutionName}` : ""}${account.isInvestment ? " · included in investment performance" : ""}`}
-        actions={app.canWrite ? <Button asChild variant="secondary"><Link href={`/transactions/new?account=${id}`}><Plus aria-hidden /> Record transaction</Link></Button> : null}
+        actions={app.canWrite ? (
+          <>
+            <Button asChild variant="secondary"><Link href={`/transactions/import?account=${id}`}>Import CSV</Link></Button>
+            <Button asChild variant="secondary"><Link href={`/transactions/new?account=${id}`}><Plus aria-hidden /> Record transaction</Link></Button>
+          </>
+        ) : null}
       />
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card>
