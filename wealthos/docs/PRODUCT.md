@@ -37,5 +37,10 @@ Instruments are the founder's research candidates (Coronation MMF, Stanbic IBTC 
 | Target mix (drift vs user-defined hypothetical mix; gated, pending review) | Built (view only) |
 | Settings: preferences, security (MFA, sessions, password, activity), privacy (export, consents, deletion) | Built |
 | Onboarding | Minimal (empty states + demo) |
-| Explorer, instrument pages, comparisons, goals, simulator, AI research, watchlists, alerts | Milestone 3 |
+| Explorer, instrument pages (price/NAV history, rates by methodology, sources), comparisons, watchlists (gated, pending review) | Built |
+| Goals with scenarios, simulator, stress tests | Built |
+| Alerts and in-app notifications (background worker) | Built |
+| Research assistant (consent, sources, advice boundary; gated, pending review) | Built, not connected to a provider |
+| Learn (7 general education articles) | Built |
+| Admin: sources, verified catalogue, market-data imports | Built (platform admins with 2FA) |
 | Reports, billing, admin console | Milestone 4 |

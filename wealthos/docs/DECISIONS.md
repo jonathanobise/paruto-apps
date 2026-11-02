@@ -28,6 +28,12 @@
 
 **ADR-014 Holding performance convention.** A holding is measured as its own mini-portfolio with purchases as money in and net sale/maturity proceeds and net income as money out; returns are shown in the instrument currency (ex-FX) and in the display currency. Withholding tax reduces income returned; fees are part of cost.
 
+**ADR-015 Background work in Postgres.** Alerts and future scheduled work use a jobs table claimed with `FOR UPDATE SKIP LOCKED`, exponential backoff, dead letters and stale-claim recovery, run by `npm run worker`. Avoids new infrastructure (Redis/queue service) at this scale; the queue API is the seam if that changes.
+
+**ADR-016 AI assistant shape.** A manual tool-use loop over read-only tools that run under the caller's RLS context, rather than giving the model data up front: only what the question needs leaves WealthOS, and the same authorisation applies as in the app. The advice boundary does not rely on the model alone (deterministic classifier + output check). The provider sits behind an interface: with no key the UI says "not connected"; tests use a scripted provider; a labelled test provider exists for browser tests and is refused in production. Personal-data tools need a separate, withdrawable consent. Model: `claude-opus-5-5` with server-side refusal fallback; availability fallback to a smaller model with the same tools.
+
+**ADR-017 Education as code.** Articles are typed data reviewed like code, with every worked-example figure recomputed by the engine in a unit test and the output policy applied to the text. No CMS until non-engineers need to publish.
+
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
 - No live market data; licensing costs unknown.
@@ -35,3 +41,5 @@
 - Cold (uncached) analytics replay the full ledger; acceptable up to a few thousand events (see TESTING.md perf), revisit with incremental snapshots if users import much larger histories.
 - Admin/support access path not yet designed in RLS terms.
 - TOTP step replay within 30 s not prevented.
+- The AI assistant has never run against a real model; its live eval (`npm run ai:eval -- --yes`) is unrun. The request classifier is pattern-based and will miss some phrasings (the prompt and output check are the other layers).
+- No admin view yet for conversations flagged `needs_review`.

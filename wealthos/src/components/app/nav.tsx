@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, ArrowLeftRight, Calculator, Bell, Bot, ChartPie, CreditCard, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { Activity, ArrowLeftRight, BookOpen, Calculator, Bell, Bot, ChartPie, CreditCard, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const live = [
@@ -18,6 +18,7 @@ const live = [
   { href: "/watchlists", label: "Watchlists", icon: Star },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/assistant", label: "Research assistant", icon: Bot },
+  { href: "/learn", label: "Learn", icon: BookOpen },
 ];
 
 // Modules on the roadmap. Shown so the product shape is clear, but not clickable until built.

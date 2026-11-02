@@ -15,7 +15,7 @@ Source of truth in code: `src/server/compliance/features.ts`. A feature is avail
 | INSTRUMENT_EXPLORER | information | research:read | not_advice, data_freshness, past_performance | pending_review | none | NG | Registration needed for factual fund/product comparisons? Advertising rules for yields? Data licences |
 | GOAL_PROJECTIONS | hypothetical | portfolio:read | hypothetical, not_advice | pending_review | none | NG | Projection presentation rules |
 | STRESS_TESTS | hypothetical | portfolio:read | hypothetical, not_advice | pending_review | none | NG | Risk-warning format for stress illustrations on a user's own portfolio? |
-| EDUCATION | education | — | not_advice | not_required | none | NG | — |
+| EDUCATION | education | — | not_advice | not_required | none | NG | — (content rules: general only, no current rates, illustrative examples verified by the engine, output policy applied in tests) |
 | AI_RESEARCH_ASSISTANT | information | ai:use, research:read | ai_limits, not_advice | pending_review | all_access | NG | Lawful basis/transfer for AI vendors; refusal boundaries; liability for errors. Built (docs/AI_SAFETY.md): three-layer advice boundary, separate `ai_data_processing` consent, redaction, per-turn audit; not connected to any provider |
 | ALERTS_USER_DEFINED | tooling | portfolio:read | data_freshness | not_required | writes | NG | Alerts must avoid buy/sell calls to action |
 | PERSONALISED_RECOMMENDATIONS | regulated_advice | adviser:clients | — | rejected (hard-disabled) | all_access | — | Licensing path if ever pursued |

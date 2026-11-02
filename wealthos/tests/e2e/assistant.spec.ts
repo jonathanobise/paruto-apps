@@ -8,7 +8,7 @@ import { config } from "dotenv";
 
 config({ path: ".env.local", quiet: true });
 
-test("ask the assistant, see the lookups it ran, manage consent and delete the conversation", async ({ page }) => {
+test("read a Learn article, ask the assistant, see the lookups it ran, manage consent and delete the conversation", async ({ page }) => {
   const email = `assistant.${Date.now()}@example.test`;
   await page.goto("/sign-up");
   await page.fill("#displayName", "Ada Assistant");
@@ -21,6 +21,17 @@ test("ask the assistant, see the lookups it ran, manage consent and delete the c
   const r = await pool.query("select text_body from email_outbox where to_address = $1 order by created_at desc limit 1", [email]);
   await page.goto(`/verify-email/confirm?token=${/token=([A-Za-z0-9_-]+)/.exec(r.rows[0].text_body)![1]}`);
   await page.waitForURL("**/dashboard**");
+
+  // Education: index → article with a worked example and related links.
+  await page.getByRole("link", { name: "Learn" }).first().click();
+  await page.waitForURL("**/learn");
+  await page.getByRole("link", { name: /Treasury bill yields/ }).click();
+  await page.waitForURL("**/learn/treasury-bill-yields");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/discount rate, true yield/);
+  await expect(page.getByRole("row", { name: /Price paid/ }).first()).toContainText("₦820,493.15");
+  await page.screenshot({ path: "test-results/screens/learn-article.png", fullPage: true });
+  await page.getByRole("navigation", { name: "Related" }).getByRole("link").first().click();
+  await page.waitForURL("**/learn/money-market-fund-yields");
 
   await page.getByRole("link", { name: "Research assistant" }).first().click();
   await page.waitForURL("**/assistant");

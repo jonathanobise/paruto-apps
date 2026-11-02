@@ -95,6 +95,7 @@ export default async function InstrumentPage({ params }: { params: Promise<{ id:
                   ))}
                 </ul>
               ) : <p className="text-sm text-text-3">No published rates recorded.</p>}
+              <p className="mt-3 text-[12px] text-text-3">Learn: <Link href="/learn/treasury-bill-yields" className="text-accent hover:underline">T-bill yields</Link> · <Link href="/learn/money-market-fund-yields" className="text-accent hover:underline">fund yields</Link></p>
             </CardContent>
           </Card>
           <Card>

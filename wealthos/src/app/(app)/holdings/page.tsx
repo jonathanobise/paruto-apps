@@ -122,7 +122,7 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
           </div>
         </Card>
       ) : null}
-      <p className="mt-4 text-[12px] text-text-3">Cost basis in {ccy} uses the exchange rate on each purchase date, so unrealised gains include currency movements. “Accrued” T-bills are valued by straight-line accretion to face value at maturity when no market price is available. Return is time-weighted over the selected period (purchases and sales are money in and out, not gains); “ex-FX” is the same holding measured in its own currency. Periods under a year are not annualised.</p>
+      <p className="mt-4 text-[12px] text-text-3">Cost basis in {ccy} uses the exchange rate on each purchase date, so unrealised gains include currency movements. “Accrued” T-bills are valued by straight-line accretion to face value at maturity when no market price is available. Return is time-weighted over the selected period (purchases and sales are money in and out, not gains); “ex-FX” is the same holding measured in its own currency. Periods under a year are not annualised. <Link href="/learn/twr-vs-xirr" className="text-accent hover:underline">How returns are measured</Link> · <Link href="/learn/currency-risk" className="text-accent hover:underline">currency effects</Link></p>
     </>
   );
 }

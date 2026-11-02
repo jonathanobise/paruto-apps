@@ -99,7 +99,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           </table>
         </div>
       </Card>
-      <p className="mt-4 text-[12px] text-text-3">{DISCLOSURES.not_advice} {DISCLOSURES.past_performance}</p>
+      <p className="mt-4 text-[12px] text-text-3">Why rates are converted before comparing: <Link href="/learn/treasury-bill-yields" className="text-accent hover:underline">T-bill yields</Link>, <Link href="/learn/money-market-fund-yields" className="text-accent hover:underline">fund yields</Link>. {DISCLOSURES.not_advice} {DISCLOSURES.past_performance}</p>
     </>
   );
 }
