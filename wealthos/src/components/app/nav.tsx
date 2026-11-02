@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, ArrowLeftRight, BookOpen, Calculator, Bell, Bot, ChartPie, CreditCard, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { Activity, ArrowLeftRight, BookOpen, Calculator, Bell, Bot, ChartPie, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const live = [
@@ -18,14 +18,12 @@ const live = [
   { href: "/watchlists", label: "Watchlists", icon: Star },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/assistant", label: "Research assistant", icon: Bot },
+  { href: "/reports", label: "Reports", icon: FileText },
   { href: "/learn", label: "Learn", icon: BookOpen },
 ];
 
 // Modules on the roadmap. Shown so the product shape is clear, but not clickable until built.
-const upcoming = [
-  { label: "Reports", icon: FileText, milestone: "M4" },
-  { label: "Billing", icon: CreditCard, milestone: "M4" },
-];
+const upcoming: Array<{ label: string; icon: typeof FileText; milestone: string }> = [];
 
 export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; isAdmin?: boolean }) {
   const pathname = usePathname();
@@ -49,7 +47,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
           );
         })}
       </ul>
-      <div>
+      {upcoming.length ? <div>
         <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-3">Coming next</p>
         <ul className="flex flex-col gap-0.5">
           {upcoming.map(({ label, icon: Icon, milestone }) => (
@@ -60,7 +58,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
             </li>
           ))}
         </ul>
-      </div>
+      </div> : null}
       <ul className="flex flex-col gap-0.5">
         {isAdmin ? (
           <li>

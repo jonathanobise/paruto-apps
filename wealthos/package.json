@@ -2,7 +2,7 @@
   "name": "wealthos",
   "version": "0.1.0",
   "private": true,
-  "description": "WealthOS \u2014 non-custodial financial intelligence and wealth management SaaS (Nigeria first).",
+  "description": "WealthOS — non-custodial financial intelligence and wealth management SaaS (Nigeria first).",
   "type": "module",
   "engines": {
     "node": ">=22.12"
@@ -36,6 +36,7 @@
     "lucide-react": "1.66.0",
     "next": "16.4.3",
     "papaparse": "5.7.0",
+    "pdfkit": "0.20.2",
     "pg": "8.23.1",
     "qrcode": "1.5.4",
     "radix-ui": "1.8.1",
@@ -51,6 +52,7 @@
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.5",
     "@types/papaparse": "5.5.2",
+    "@types/pdfkit": "0.17.7",
     "@types/pg": "8.23.1",
     "@types/qrcode": "1.5.6",
     "@types/react": "19.3.0",

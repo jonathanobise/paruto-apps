@@ -11,8 +11,10 @@ const securityHeaders = [
 const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  // pg is a Node-only driver; keep it out of the bundler.
-  serverExternalPackages: ["pg"],
+  // Node-only packages kept out of the bundler (pdfkit reads its own font metrics at runtime).
+  serverExternalPackages: ["pg", "pdfkit"],
+  // Report fonts are read from disk at runtime; ship them with standalone/traced builds.
+  outputFileTracingIncludes: { "/api/reports/*": ["./src/server/reports/fonts/*"] },
   typedRoutes: false,
   // CSV imports accept files up to 2 MiB (validated again server-side); allow multipart overhead.
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
