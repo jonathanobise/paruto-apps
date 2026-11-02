@@ -169,6 +169,20 @@
       "when": 1793597731704,
       "tag": "0023_totp_replay",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793599795692,
+      "tag": "0024_household_ownership",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793599808980,
+      "tag": "0025_household_security",
+      "breakpoints": true
     }
   ]
 }

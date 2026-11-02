@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, ArrowLeftRight, LifeBuoy, BookOpen, Calculator, Bell, Bot, ChartPie, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { Activity, ArrowLeftRight, LifeBuoy, Users, BookOpen, Calculator, Bell, Bot, ChartPie, FileText, Gauge, Landmark, Layers, Menu, Search, Settings, Shield, Star, Target, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const live = [
@@ -12,6 +12,7 @@ const live = [
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
   { href: "/model", label: "Target mix", icon: ChartPie },
   { href: "/goals", label: "Goals", icon: Target },
+  { href: "/household", label: "Household", icon: Users },
   { href: "/simulator", label: "Simulator", icon: Calculator },
   { href: "/stress", label: "Stress tests", icon: Activity },
   { href: "/explore", label: "Explorer", icon: Search },
