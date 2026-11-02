@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDb, withTenant } from "@/server/db/client";
 import { accountOwners } from "@/server/db/schema";
-import { createAccount, addValuation } from "@/server/accounts/service";
+import { createAccount } from "@/server/accounts/service";
 import { postEvent } from "@/server/ledger/service";
 import { householdView, setAccountOwners } from "@/server/household/service";
 import { acceptInvitation, createSharedSpace, inviteMember, removeMember } from "@/server/identity/members";
