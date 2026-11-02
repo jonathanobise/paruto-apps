@@ -1,4 +1,4 @@
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { aiUsage } from "@/server/admin/console";
 import { AI_LIMITS } from "@/server/ai/assistant";
 import { getProvider } from "@/server/ai/provider";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata = { title: "AI usage · Admin · WealthOS" };
 
 export default async function AdminAi() {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["compliance"]);
   const r = await aiUsage({ userId: app.session.userId });
   const connected = getProvider() !== null;
   return (

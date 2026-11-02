@@ -6,7 +6,7 @@ import { recordPaymentAction, voidInvoiceAction } from "./console-actions";
 export interface InvoiceRow { id: string; number: string; status: string; total: string; totalLabel: string; currency: string; issuedAt: string; dueAt: string; description: string; paid: string | null }
 
 /** An invoice with the reconciliation actions an administrator can take on it. */
-export function InvoiceAdmin({ invoice: i }: { invoice: InvoiceRow }) {
+export function InvoiceAdmin({ invoice: i, readOnly = false }: { invoice: InvoiceRow; readOnly?: boolean }) {
   return (
     <div className="rounded-lg border border-border p-3 text-[13px]">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -14,7 +14,7 @@ export function InvoiceAdmin({ invoice: i }: { invoice: InvoiceRow }) {
         <p className="flex items-center gap-2"><span className="num font-semibold">{i.totalLabel}</span><Badge tone={i.status === "paid" ? "accent" : i.status === "open" ? "warning" : "neutral"}>{i.status}</Badge></p>
       </div>
       <p className="text-text-3">Issued {i.issuedAt} · due {i.dueAt}{i.paid ? ` · paid ${i.paid}` : ""}</p>
-      {i.status === "open" ? (
+      {i.status === "open" && !readOnly ? (
         <details className="mt-2"><summary className="cursor-pointer text-accent">Record payment or void</summary>
           <div className="mt-3 grid gap-4 lg:grid-cols-2">
             <AdminForm action={recordPaymentAction} submit="Record payment">

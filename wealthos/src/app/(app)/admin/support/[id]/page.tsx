@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { adminGetCase, SUPPORT_TOPICS } from "@/server/support/service";
 import { AppError } from "@/server/platform/errors";
 import { PageHeader } from "@/components/app/page-header";
@@ -12,7 +12,7 @@ import { supportCloseAction, supportReplyAction } from "../../console-actions";
 export const metadata = { title: "Support case · Admin · WealthOS" };
 
 export default async function AdminCase({ params }: { params: Promise<{ id: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support"]);
   const r = await adminGetCase({ userId: app.session.userId }, (await params).id).catch((e) => (e instanceof AppError && e.code === "NOT_FOUND" ? null : Promise.reject(e)));
   if (!r) notFound();
   return (

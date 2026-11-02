@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { adminListCases, SUPPORT_TOPICS } from "@/server/support/service";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata = { title: "Support · Admin · WealthOS" };
 
 export default async function AdminSupport({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support"]);
   const closed = (await searchParams).status === "closed";
   const rows = await adminListCases({ userId: app.session.userId }, closed ? ["closed"] : ["open", "answered"]);
   return (

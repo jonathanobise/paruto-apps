@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { userDetail } from "@/server/admin/console";
 import { AppError } from "@/server/platform/errors";
 import { PageHeader } from "@/components/app/page-header";
@@ -14,7 +14,7 @@ export const metadata = { title: "User · Admin · WealthOS" };
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "—");
 
 export default async function AdminUser({ params }: { params: Promise<{ id: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support"]);
   const r = await userDetail({ userId: app.session.userId }, (await params).id).catch((e) => (e instanceof AppError && e.code === "NOT_FOUND" ? null : Promise.reject(e)));
   if (!r) notFound();
   const u = r.user;

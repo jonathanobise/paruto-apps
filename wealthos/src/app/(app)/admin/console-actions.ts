@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdminForAction } from "@/server/auth/context";
+import { requireStaffForAction, type StaffRole } from "@/server/auth/context";
 import { toActionError, type ActionResult } from "@/server/platform/errors";
 import { revokeUserSessions, retryJob } from "@/server/admin/console";
 import { adminEndSubscription, adminGrantPlan, adminRecordPayment, adminSaveBillingSettings, adminSavePlan, adminVoidInvoice } from "@/server/billing/admin";
@@ -9,9 +9,9 @@ import { adminCloseCase, adminReply } from "@/server/support/service";
 
 type State = ActionResult<string | undefined> | null;
 const s = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
-const run = async (fn: (adminId: string) => Promise<string>, path: string): Promise<State> => {
+const run = async (fn: (adminId: string) => Promise<string>, path: string, roles: StaffRole[] = []): Promise<State> => {
   try {
-    const app = await requireAdminForAction();
+    const app = await requireStaffForAction(roles);
     const msg = await fn(app.session.userId);
     revalidatePath(path);
     return { ok: true, data: msg };
@@ -21,7 +21,7 @@ const run = async (fn: (adminId: string) => Promise<string>, path: string): Prom
 };
 
 export async function revokeSessionsAction(_: State, f: FormData): Promise<State> {
-  return run(async (id) => `Signed out of ${await revokeUserSessions({ userId: id }, s(f, "userId"))} session(s).`, "/admin/users");
+  return run(async (id) => `Signed out of ${await revokeUserSessions({ userId: id }, s(f, "userId"))} session(s).`, "/admin/users", ["support"]);
 }
 
 export async function recordPaymentAction(_: State, f: FormData): Promise<State> {
@@ -82,12 +82,20 @@ export async function supportReplyAction(_: State, f: FormData): Promise<State> 
   return run(async (id) => {
     await adminReply({ userId: id }, s(f, "caseId"), s(f, "body"), f.get("close") === "on");
     return "Reply sent.";
-  }, "/admin/support");
+  }, "/admin/support", ["support"]);
 }
 
 export async function supportCloseAction(_: State, f: FormData): Promise<State> {
   return run(async (id) => {
     await adminCloseCase({ userId: id }, s(f, "caseId"));
     return "Case closed.";
-  }, "/admin/support");
+  }, "/admin/support", ["support"]);
+}
+
+export async function recordDecisionAction(_: State, f: FormData): Promise<State> {
+  return run(async (id) => {
+    const { recordComplianceDecision } = await import("@/server/compliance/decisions");
+    await recordComplianceDecision({ userId: id }, { feature: s(f, "feature"), status: s(f, "status"), reference: s(f, "reference"), notes: s(f, "notes") || undefined });
+    return "Decision recorded. It applies immediately.";
+  }, "/admin/gates", ["compliance"]);
 }

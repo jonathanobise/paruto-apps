@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { orgDetail } from "@/server/admin/console";
 import { AppError } from "@/server/platform/errors";
 import { PageHeader } from "@/components/app/page-header";
@@ -16,7 +16,7 @@ export const metadata = { title: "Organisation · Admin · WealthOS" };
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "—");
 
 export default async function AdminOrg({ params }: { params: Promise<{ id: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support"]);
   const r = await orgDetail({ userId: app.session.userId }, (await params).id).catch((e) => (e instanceof AppError && e.code === "NOT_FOUND" ? null : Promise.reject(e)));
   if (!r) notFound();
   const current = r.subscriptions.find((s) => ["trialing", "active", "past_due"].includes(s.status));
@@ -31,6 +31,7 @@ export default async function AdminOrg({ params }: { params: Promise<{ id: strin
         <Card>
           <CardHeader><div><CardTitle>Plan</CardTitle><CardDescription>{current ? `${current.planCode} · ${current.complimentary ? "complimentary" : current.status} · to ${day(current.currentPeriodEnd)}${current.cancelAtPeriodEnd ? " (cancelling)" : ""}${current.pendingPlanCode ? ` → ${current.pendingPlanCode}` : ""}` : "Free"}</CardDescription></div></CardHeader>
           <CardContent className="flex flex-col gap-5">
+            {app.staffRole === "admin" ? <>
             <AdminForm action={grantPlanAction} submit="Grant complimentary plan">
               <input type="hidden" name="orgId" value={r.org.id} />
               <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
@@ -45,6 +46,7 @@ export default async function AdminOrg({ params }: { params: Promise<{ id: strin
                 <Field label="Reason (audited)" htmlFor="reason"><Input id="reason" name="reason" /></Field>
               </AdminForm>
             ) : null}
+            </> : <p className="text-[12.5px] text-text-3">Plan changes and payments are handled by administrators.</p>}
             <details className="text-[12.5px]"><summary className="cursor-pointer text-text-2">Subscription history ({r.subscriptions.length})</summary>
               <ul className="mt-2">{r.subscriptions.map((s) => <li key={s.id} className="border-t border-border py-1.5">{s.planCode} · {s.status}{s.complimentary ? " · comp" : ""} · {day(s.currentPeriodStart)} → {day(s.currentPeriodEnd)}{s.note ? ` · ${s.note}` : ""}</li>)}</ul>
             </details>
@@ -54,7 +56,7 @@ export default async function AdminOrg({ params }: { params: Promise<{ id: strin
       <Card className="mt-6">
         <CardHeader><CardTitle>Invoices</CardTitle></CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {r.invoices.length ? r.invoices.map((i) => <InvoiceAdmin key={i.id} invoice={{ id: i.id, number: i.number, status: i.status, total: i.total, currency: i.currency, issuedAt: day(i.issuedAt), dueAt: day(i.dueAt), description: i.lines.map((l) => l.description).join("; "), paid: i.status === "paid" ? `${day(i.paidAt)} · ${i.paymentMethod} · ${i.paymentRef}` : null, totalLabel: formatMoney(i.total, i.currency) }} />) : <p className="text-sm text-text-3">No invoices.</p>}
+          {r.invoices.length ? r.invoices.map((i) => <InvoiceAdmin key={i.id} readOnly={app.staffRole !== "admin"} invoice={{ id: i.id, number: i.number, status: i.status, total: i.total, currency: i.currency, issuedAt: day(i.issuedAt), dueAt: day(i.dueAt), description: i.lines.map((l) => l.description).join("; "), paid: i.status === "paid" ? `${day(i.paidAt)} · ${i.paymentMethod} · ${i.paymentRef}` : null, totalLabel: formatMoney(i.total, i.currency) }} />) : <p className="text-sm text-text-3">No invoices.</p>}
         </CardContent>
       </Card>
     </>

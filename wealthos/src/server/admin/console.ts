@@ -5,7 +5,7 @@ import { AppError } from "@/server/platform/errors";
 import { recordAudit } from "@/server/audit/audit";
 import { FEATURES } from "@/server/compliance/features";
 import { featureDecision } from "@/server/compliance/gate";
-import { asAdmin, type AdminContext } from "./context";
+import { asAdmin, asStaff, type AdminContext } from "./context";
 
 /**
  * Platform administration reads. Each runs in an admin transaction (Postgres re-checks the role
@@ -16,7 +16,7 @@ const escapeLike = (q: string) => `%${q.replace(/[%_\\]/g, (m) => `\\${m}`)}%`;
 const isUuid = (s: string) => /^[0-9a-f-]{36}$/i.test(s);
 
 export async function adminOverview(admin: AdminContext) {
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support", "compliance"], async (tx) => {
     const one = async (q: Promise<Array<{ n: number }>>) => Number((await q)[0]?.n ?? 0);
     const [usersN, orgsN, activeSubs, openInvoices, openCases, deadJobs, queuedJobs] = await Promise.all([
       one(tx.select({ n: count() }).from(users).where(isNull(users.deletedAt))),
@@ -51,7 +51,7 @@ export async function sourceFreshness(admin: AdminContext) {
 
 export async function searchUsers(admin: AdminContext, q: string) {
   const query = q.trim().slice(0, 80);
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     if (query) await recordAudit(tx, { orgId: null, actorUserId: admin.userId, action: "admin.users_searched", metadata: { query } });
     return tx
       .select({ id: users.id, email: users.email, name: users.displayName, role: users.platformRole, verified: users.emailVerifiedAt, mfa: users.mfaEnabledAt, lockedUntil: users.lockedUntil, deletedAt: users.deletedAt, createdAt: users.createdAt })
@@ -64,7 +64,7 @@ export async function searchUsers(admin: AdminContext, q: string) {
 
 export async function userDetail(admin: AdminContext, id: string) {
   if (!isUuid(id)) throw new AppError("NOT_FOUND", "User not found.");
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     const [u] = await tx.select().from(users).where(eq(users.id, id));
     if (!u) throw new AppError("NOT_FOUND", "User not found.");
     const orgs = await tx.select({ id: organizations.id, name: organizations.name, kind: organizations.kind, isDemo: organizations.isDemo, role: memberships.role }).from(memberships).innerJoin(organizations, eq(organizations.id, memberships.orgId)).where(eq(memberships.userId, id));
@@ -84,7 +84,7 @@ export async function userDetail(admin: AdminContext, id: string) {
 
 /** Sign a user out everywhere (e.g. suspected compromise). */
 export async function revokeUserSessions(admin: AdminContext, id: string): Promise<number> {
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     const r = await tx.update(sessions).set({ revokedAt: new Date() }).where(and(eq(sessions.userId, id), isNull(sessions.revokedAt))).returning({ id: sessions.id });
     await tx.insert(securityEvents).values({ userId: id, type: "admin.sessions_revoked", metadata: { by: admin.userId, count: r.length } });
     await recordAudit(tx, { orgId: null, actorUserId: admin.userId, action: "admin.sessions_revoked", targetType: "user", targetId: id, metadata: { count: r.length } });
@@ -94,7 +94,7 @@ export async function revokeUserSessions(admin: AdminContext, id: string): Promi
 
 export async function searchOrgs(admin: AdminContext, q: string) {
   const query = q.trim().slice(0, 80);
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     const rows = await tx
       .select({ id: organizations.id, name: organizations.name, kind: organizations.kind, isDemo: organizations.isDemo, createdAt: organizations.createdAt, members: sql<number>`(select count(*) from memberships m where m.org_id = ${organizations.id})`.mapWith(Number) })
       .from(organizations)
@@ -108,7 +108,7 @@ export async function searchOrgs(admin: AdminContext, q: string) {
 
 export async function orgDetail(admin: AdminContext, id: string) {
   if (!isUuid(id)) throw new AppError("NOT_FOUND", "Organisation not found.");
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     const [org] = await tx.select().from(organizations).where(eq(organizations.id, id));
     if (!org) throw new AppError("NOT_FOUND", "Organisation not found.");
     const members = await tx.select({ userId: users.id, email: users.email, name: users.displayName, role: memberships.role, joinedAt: memberships.createdAt }).from(memberships).innerJoin(users, eq(users.id, memberships.userId)).where(eq(memberships.orgId, id));
@@ -133,7 +133,7 @@ export async function retryJob(admin: AdminContext, id: string): Promise<void> {
 }
 
 export async function auditLog(admin: AdminContext, f: { action?: string; orgId?: string; actorId?: string }) {
-  return asAdmin(admin, (tx) =>
+  return asStaff(admin, ["compliance"], (tx) =>
     tx.select().from(auditEvents)
       .where(and(f.action ? like(auditEvents.action, `${f.action.replace(/[%_\\]/g, "")}%`) : undefined, f.orgId && isUuid(f.orgId) ? eq(auditEvents.orgId, f.orgId) : undefined, f.actorId && isUuid(f.actorId) ? eq(auditEvents.actorUserId, f.actorId) : undefined))
       .orderBy(desc(auditEvents.createdAt))
@@ -142,7 +142,7 @@ export async function auditLog(admin: AdminContext, f: { action?: string; orgId?
 }
 
 export async function securityLog(admin: AdminContext, f: { type?: string; userId?: string }) {
-  return asAdmin(admin, (tx) =>
+  return asStaff(admin, ["compliance"], (tx) =>
     tx.select().from(securityEvents)
       .where(and(f.type ? like(securityEvents.type, `${f.type.replace(/[%_\\]/g, "")}%`) : undefined, f.userId && isUuid(f.userId) ? eq(securityEvents.userId, f.userId) : undefined))
       .orderBy(desc(securityEvents.createdAt))
@@ -151,7 +151,7 @@ export async function securityLog(admin: AdminContext, f: { type?: string; userI
 }
 
 export async function aiUsage(admin: AdminContext) {
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["compliance"], async (tx) => {
     const usage = await tx.execute<{ org_id: string; org_name: string; questions: string; tokens: string; flagged_conversations: string; users: string }>(sql`select * from app_admin_ai_usage()`);
     const flags = await tx.execute<{ conversation_id: string; org_name: string; flagged_at: string; policy_flags: string[]; tools: string[]; model: string | null }>(sql`select * from app_admin_ai_flags()`);
     return { usage: usage.rows, flags: flags.rows };
@@ -160,7 +160,7 @@ export async function aiUsage(admin: AdminContext) {
 
 /** Every registered feature with its current decision and recorded compliance decisions. */
 export async function featureGates(admin: AdminContext) {
-  const approvals = await asAdmin(admin, (tx) => tx.select().from(regulatoryFeatureApprovals).orderBy(desc(regulatoryFeatureApprovals.createdAt)).limit(200));
+  const approvals = await asStaff(admin, ["compliance"], (tx) => tx.select().from(regulatoryFeatureApprovals).orderBy(desc(regulatoryFeatureApprovals.createdAt)).limit(200));
   const rows = [];
   for (const f of FEATURES) rows.push({ ...f, decision: await featureDecision(f.key, "NG"), approvals: approvals.filter((a) => a.featureKey === f.key) });
   return rows;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { auditLog, securityLog } from "@/server/admin/console";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/form";
 export const metadata = { title: "Audit log · Admin · WealthOS" };
 
 export default async function AdminAudit({ searchParams }: { searchParams: Promise<{ tab?: string; action?: string; org?: string; actor?: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["compliance"]);
   const sp = await searchParams;
   const security = sp.tab === "security";
   const admin = { userId: app.session.userId };

@@ -95,3 +95,21 @@ export async function requireAdminForAction(): Promise<AppContext> {
   if (app.session.user.platformRole !== "admin" || !app.session.user.mfaEnabled || !app.session.mfaSatisfied) throw new AppError("FORBIDDEN", "Administrator access with two-step verification is required.");
   return app;
 }
+
+export type StaffRole = "admin" | "support" | "compliance";
+
+/** Staff pages: a platform role (admins always qualify) with two-step verification. */
+export async function requireStaffPage(roles: StaffRole[] = ["admin", "support", "compliance"]): Promise<AppContext & { staffRole: StaffRole }> {
+  const app = await requireApp();
+  const role = app.session.user.platformRole;
+  if (role === "user" || (role !== "admin" && !roles.includes(role as StaffRole))) notFound();
+  if (!app.session.user.mfaEnabled || !app.session.mfaSatisfied) redirect("/settings/security?admin=mfa");
+  return { ...app, staffRole: role as StaffRole };
+}
+
+export async function requireStaffForAction(roles: StaffRole[]): Promise<AppContext & { staffRole: StaffRole }> {
+  const app = await requireAppForAction();
+  const role = app.session.user.platformRole;
+  if (role === "user" || (role !== "admin" && !roles.includes(role as StaffRole)) || !app.session.user.mfaEnabled || !app.session.mfaSatisfied) throw new AppError("FORBIDDEN", "Staff access with two-step verification is required.");
+  return { ...app, staffRole: role as StaffRole };
+}

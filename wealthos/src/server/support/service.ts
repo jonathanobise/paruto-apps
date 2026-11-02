@@ -7,7 +7,7 @@ import { AppError } from "@/server/platform/errors";
 import { rateLimit } from "@/server/platform/rate-limit";
 import { parseOrThrow } from "@/server/identity/service";
 import { recordAudit } from "@/server/audit/audit";
-import { asAdmin, type AdminContext } from "@/server/admin/context";
+import { asStaff, type AdminContext } from "@/server/admin/context";
 import { appUrl, sendEmail } from "@/server/identity/email";
 
 export const SUPPORT_TOPICS = { account: "Account and sign-in", billing: "Plans and billing", data: "Figures look wrong", imports: "Importing data", privacy: "Privacy and my data", bug: "Something isn't working", other: "Something else" } as const;
@@ -61,7 +61,7 @@ export async function closeMyCase(userId: string, id: string): Promise<void> {
 
 // --- Administrators ---------------------------------------------------------------------------
 export async function adminListCases(admin: AdminContext, status: Array<"open" | "answered" | "closed"> = ["open", "answered"]) {
-  return asAdmin(admin, (tx) =>
+  return asStaff(admin, ["support"], (tx) =>
     tx.select({ id: supportCases.id, topic: supportCases.topic, subject: supportCases.subject, status: supportCases.status, updatedAt: supportCases.updatedAt, createdAt: supportCases.createdAt, email: users.email, name: users.displayName })
       .from(supportCases).innerJoin(users, eq(users.id, supportCases.userId)).where(inArray(supportCases.status, status)).orderBy(desc(supportCases.updatedAt)).limit(200),
   );
@@ -69,7 +69,7 @@ export async function adminListCases(admin: AdminContext, status: Array<"open" |
 
 export async function adminGetCase(admin: AdminContext, id: string) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new AppError("NOT_FOUND", "Case not found.");
-  return asAdmin(admin, async (tx) => {
+  return asStaff(admin, ["support"], async (tx) => {
     const [c] = await tx.select().from(supportCases).where(eq(supportCases.id, id));
     if (!c) throw new AppError("NOT_FOUND", "Case not found.");
     const [u] = await tx.select({ email: users.email, name: users.displayName }).from(users).where(eq(users.id, c.userId));
@@ -81,7 +81,7 @@ export async function adminGetCase(admin: AdminContext, id: string) {
 
 export async function adminReply(admin: AdminContext, id: string, body: unknown, close = false): Promise<void> {
   const b = parseOrThrow(bodySchema, body);
-  const to = await asAdmin(admin, async (tx) => {
+  const to = await asStaff(admin, ["support"], async (tx) => {
     const [c] = await tx.select().from(supportCases).where(eq(supportCases.id, id));
     if (!c) throw new AppError("NOT_FOUND", "Case not found.");
     await tx.insert(supportMessages).values({ caseId: id, authorId: admin.userId, fromStaff: true, body: b });
@@ -94,7 +94,7 @@ export async function adminReply(admin: AdminContext, id: string, body: unknown,
 }
 
 export async function adminCloseCase(admin: AdminContext, id: string): Promise<void> {
-  await asAdmin(admin, async (tx) => {
+  await asStaff(admin, ["support"], async (tx) => {
     await tx.update(supportCases).set({ status: "closed", closedAt: new Date(), updatedAt: new Date() }).where(eq(supportCases.id, id));
     await recordAudit(tx, { orgId: null, actorUserId: admin.userId, action: "admin.support_closed", targetType: "support_case", targetId: id });
   });

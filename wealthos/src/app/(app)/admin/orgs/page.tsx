@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { searchOrgs } from "@/server/admin/console";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { formatDate } from "@/lib/format";
 export const metadata = { title: "Organisations · Admin · WealthOS" };
 
 export default async function AdminOrgs({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support"]);
   const q = (await searchParams).q ?? "";
   const rows = await searchOrgs({ userId: app.session.userId }, q);
   return (

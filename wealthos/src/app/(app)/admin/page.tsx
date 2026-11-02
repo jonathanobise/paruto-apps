@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/server/auth/context";
+import { requireStaffPage } from "@/server/auth/context";
 import { listCatalogue, listMarketImports } from "@/server/admin/catalogue";
 import { adminOverview, sourceFreshness } from "@/server/admin/console";
 import { ARTICLES } from "@/content/learn";
@@ -12,10 +12,11 @@ import { formatDate } from "@/lib/format";
 export const metadata = { title: "Admin · WealthOS" };
 
 export default async function AdminHome() {
-  const app = await requireAdminPage();
+  const app = await requireStaffPage(["support", "compliance"]);
   const admin = { userId: app.session.userId };
-  const [o, fresh, catalogue, imports] = await Promise.all([adminOverview(admin), sourceFreshness(admin), listCatalogue(admin), listMarketImports(admin)]);
-  const cards: Array<[string, string, number, string]> = [
+  const isAdmin = app.staffRole === "admin";
+  const [o, fresh, catalogue, imports] = await Promise.all([adminOverview(admin), isAdmin ? sourceFreshness(admin) : Promise.resolve([]), isAdmin ? listCatalogue(admin) : Promise.resolve([]), isAdmin ? listMarketImports(admin) : Promise.resolve([])]);
+  const all: Array<[string, string, number, string]> = [
     ["/admin/users", "Users", o.users, "active accounts"],
     ["/admin/orgs", "Organisations", o.orgs, "excluding demos"],
     ["/admin/billing", "Subscriptions", o.activeSubs, `current · ${o.openInvoices} unpaid invoices`],
@@ -23,6 +24,19 @@ export default async function AdminHome() {
     ["/admin/jobs", "Jobs", o.deadJobs, `dead-lettered · ${o.queuedJobs} queued`],
     ["/admin/instruments", "Catalogue", catalogue.filter((c) => !c.isDemo).length, `instruments · ${catalogue.filter((c) => c.verificationState === "verified").length} verified · ${imports.length} imports`],
   ];
+  const allowed: Record<string, string[]> = { admin: all.map(([h]) => h), support: ["/admin/users", "/admin/orgs", "/admin/support"], compliance: [] };
+  const cards = all.filter(([href]) => allowed[app.staffRole]!.includes(href));
+  if (!isAdmin) {
+    return (
+      <>
+        <PageHeader title="Staff console" description={app.staffRole === "support" ? "Help customers with their accounts and requests. Every view of a person's or organisation's details is recorded in the audit log. You can't see financial records." : "Review the audit trail, AI usage and feature decisions. Record compliance decisions under Feature gates."} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map(([href, title, n, sub]) => <Link key={href} href={href}><Card className="h-full hover:border-border-strong"><CardContent className="pt-5"><p className="text-[13px] text-text-3">{title}</p><p className="num text-3xl font-semibold">{n}</p><p className="text-[13px] text-text-2">{sub}</p></CardContent></Card></Link>)}
+          {app.staffRole === "compliance" ? [["/admin/audit", "Audit log"], ["/admin/ai", "AI usage"], ["/admin/gates", "Feature gates"]].map(([href, title]) => <Link key={href} href={href!}><Card className="h-full hover:border-border-strong"><CardContent className="pt-5"><p className="text-[15px] font-medium">{title}</p></CardContent></Card></Link>) : null}
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <PageHeader title="Administration" description="Every view of a person's or organisation's details and every change is written to the audit log. The database re-checks your administrator role and two-step verification on each request." />
