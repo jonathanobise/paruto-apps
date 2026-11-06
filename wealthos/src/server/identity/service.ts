@@ -10,6 +10,7 @@ import { decryptSecret, encryptSecret, generateRecoveryCodes, generateTotpSecret
 import { createSession, markSessionMfa, revokeAllSessions } from "./sessions";
 import { CONSENT_VERSIONS, passwordSchema, signInSchema, signUpSchema } from "./validation";
 import { z } from "zod";
+import { BRAND } from "@/lib/brand";
 
 const LOCK_AFTER_FAILURES = 5;
 const LOCK_MINUTES = 15;
@@ -48,8 +49,8 @@ export async function sendVerificationEmail(userId: string, email: string): Prom
   const token = await issueToken(userId, "email_verification", 24 * 60);
   await sendEmail({
     to: email,
-    subject: "Confirm your WealthOS email address",
-    text: `Confirm your email address to finish setting up WealthOS:\n\n${appUrl(`/verify-email/confirm?token=${token}`)}\n\nThe link expires in 24 hours. If you did not create an account, ignore this email.`,
+    subject: `Confirm your ${BRAND} email address`,
+    text: `Confirm your email address to finish setting up ${BRAND}:\n\n${appUrl(`/verify-email/confirm?token=${token}`)}\n\nThe link expires in 24 hours. If you did not create an account, ignore this email.`,
     purpose: "email_verification",
   });
 }
@@ -66,7 +67,7 @@ export async function signUp(input: unknown, meta: RequestMeta): Promise<SignUpR
   const existing = await db().select({ id: users.id }).from(users).where(eq(users.email, data.email)).limit(1);
   if (existing[0]) {
     // Do not reveal that the address is registered; tell the owner instead.
-    await sendEmail({ to: data.email, subject: "Someone tried to create a WealthOS account with your email", text: `An attempt was made to register a new WealthOS account with this email address. If it was you, sign in instead or reset your password at ${appUrl("/reset-password")}.`, purpose: "security_notice" });
+    await sendEmail({ to: data.email, subject: `Someone tried to create a ${BRAND} account with your email`, text: `An attempt was made to register a new ${BRAND} account with this email address. If it was you, sign in instead or reset your password at ${appUrl("/reset-password")}.`, purpose: "security_notice" });
     await recordSecurityEvent(existing[0].id, "signup.duplicate_attempt", meta);
     return { session: null };
   }
@@ -191,7 +192,7 @@ export async function confirmMfaEnrollment(userId: string, sessionId: string, co
   await markSessionMfa(sessionId);
   await revokeAllSessions(userId, sessionId);
   await recordSecurityEvent(userId, "mfa.enabled", meta);
-  await sendEmail({ to: user.email, subject: "Two-step verification is on", text: "Two-step verification was turned on for your WealthOS account. Other signed-in devices were signed out. If this wasn't you, reset your password immediately.", purpose: "security_notice" });
+  await sendEmail({ to: user.email, subject: "Two-step verification is on", text: `Two-step verification was turned on for your ${BRAND} account. Other signed-in devices were signed out. If this wasn't you, reset your password immediately.`, purpose: "security_notice" });
   return { recoveryCodes };
 }
 
@@ -200,7 +201,7 @@ export async function disableMfa(userId: string, password: string, meta: Request
   if (!user || !(await verifyPassword(password, user.passwordHash))) throw new AppError("UNAUTHENTICATED", "Password is incorrect.");
   await db().update(users).set({ mfaEnabledAt: null, mfaTotpSecretEnc: null, mfaRecoveryCodeHashes: null, mfaLastUsedStep: null }).where(eq(users.id, userId));
   await recordSecurityEvent(userId, "mfa.disabled", meta);
-  await sendEmail({ to: user.email, subject: "Two-step verification was turned off", text: "Two-step verification was turned off for your WealthOS account. If this wasn't you, reset your password immediately.", purpose: "security_notice" });
+  await sendEmail({ to: user.email, subject: "Two-step verification was turned off", text: `Two-step verification was turned off for your ${BRAND} account. If this wasn't you, reset your password immediately.`, purpose: "security_notice" });
 }
 
 export async function requestPasswordReset(emailInput: unknown, meta: RequestMeta): Promise<void> {
@@ -210,7 +211,7 @@ export async function requestPasswordReset(emailInput: unknown, meta: RequestMet
   const [user] = await db().select({ id: users.id }).from(users).where(and(eq(users.email, email), isNull(users.deletedAt)));
   if (!user) return; // same response either way
   const token = await issueToken(user.id, "password_reset", 60);
-  await sendEmail({ to: email, subject: "Reset your WealthOS password", text: `Use this link to choose a new password (valid for 1 hour):\n\n${appUrl(`/reset-password/confirm?token=${token}`)}\n\nIf you did not ask for this, you can ignore this email.`, purpose: "password_reset" });
+  await sendEmail({ to: email, subject: `Reset your ${BRAND} password`, text: `Use this link to choose a new password (valid for 1 hour):\n\n${appUrl(`/reset-password/confirm?token=${token}`)}\n\nIf you did not ask for this, you can ignore this email.`, purpose: "password_reset" });
   await recordSecurityEvent(user.id, "password.reset_requested", meta);
 }
 

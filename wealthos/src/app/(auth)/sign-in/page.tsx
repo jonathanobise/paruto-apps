@@ -4,8 +4,9 @@ import { getSession } from "@/server/auth/context";
 import { safeNext } from "@/lib/safe-next";
 import { Alert } from "@/components/ui/alert";
 import { SignInForm } from "./form";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Sign in · WealthOS" };
+export const metadata = { title: "Sign in" };
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ reset?: string; verified?: string; next?: string }> }) {
   const session = await getSession();
@@ -16,7 +17,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
     <div>
       <h1 className="font-display text-[36px] leading-[1.05]">Welcome <em>back</em></h1>
       <p className="mt-2 text-sm text-text-2">
-        New to WealthOS?{" "}
+        New to {BRAND}?{" "}
         <Link href={next.startsWith("/invite") ? `/sign-up?next=${encodeURIComponent(next)}` : "/sign-up"} className="font-medium text-accent hover:underline">
           Create an account
         </Link>

@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { Delta } from "@/components/ui/money";
 import { formatDate, formatMoney } from "@/lib/format";
 
-export const metadata = { title: "Stress tests · WealthOS" };
+export const metadata = { title: "Stress tests" };
 
 export default async function StressPage() {
   const app = await requireApp();

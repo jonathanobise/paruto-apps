@@ -1,4 +1,6 @@
-# WealthOS
+# Paruto Wealth (codename WealthOS)
+
+**Paruto Wealth** is the working public name until the permanent name is secured; it is set in one place, `src/lib/brand.ts` (ADR-028). "WealthOS" remains the internal codename (folder, package, database).
 
 Non-custodial financial intelligence and wealth-management SaaS — Nigeria first. Track every account, holding and liability; measure performance correctly; see currency exposure and data freshness; plan with honest scenarios.
 

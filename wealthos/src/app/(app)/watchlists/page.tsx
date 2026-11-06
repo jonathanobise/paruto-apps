@@ -11,7 +11,7 @@ import { RateLine, StatusBadge } from "@/components/app/research";
 import { formatDate, formatMoney } from "@/lib/format";
 import { deleteComparisonAction, unwatchAction } from "../explore/actions";
 
-export const metadata = { title: "Watchlists · WealthOS" };
+export const metadata = { title: "Watchlists" };
 
 export default async function WatchlistsPage() {
   const app = await requireApp();

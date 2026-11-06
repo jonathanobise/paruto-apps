@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Simulator } from "./simulator";
 
-export const metadata = { title: "Simulator · WealthOS" };
+export const metadata = { title: "Simulator" };
 
 export default async function SimulatorPage() {
   const app = await requireApp();

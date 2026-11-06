@@ -8,8 +8,9 @@ import { AdminForm } from "@/components/app/admin-form";
 import { Textarea } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { supportCloseAction, supportReplyAction } from "../../console-actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Support case · Admin · WealthOS" };
+export const metadata = { title: "Support case · Admin" };
 
 export default async function AdminCase({ params }: { params: Promise<{ id: string }> }) {
   const app = await requireStaffPage(["support"]);
@@ -20,7 +21,7 @@ export default async function AdminCase({ params }: { params: Promise<{ id: stri
       <PageHeader title={r.case.subject} description={`${r.user.name} · ${r.user.email} · ${SUPPORT_TOPICS[r.case.topic]} · ${r.case.status}`} />
       <div className="flex max-w-3xl flex-col gap-3">
         {r.messages.map((m) => (
-          <Card key={m.id} className={cn(m.fromStaff ? "ml-8 border-accent/40" : "")}><CardContent className="pt-4 text-[14px]"><p className="mb-1 text-[12px] text-text-3">{m.fromStaff ? "WealthOS support" : r.user.name} · {m.createdAt.toISOString().slice(0, 16).replace("T", " ")}</p><p className="whitespace-pre-wrap">{m.body}</p></CardContent></Card>
+          <Card key={m.id} className={cn(m.fromStaff ? "ml-8 border-accent/40" : "")}><CardContent className="pt-4 text-[14px]"><p className="mb-1 text-[12px] text-text-3">{m.fromStaff ? `${BRAND} support` : r.user.name} · {m.createdAt.toISOString().slice(0, 16).replace("T", " ")}</p><p className="whitespace-pre-wrap">{m.body}</p></CardContent></Card>
         ))}
         {r.case.status !== "closed" ? (
           <Card><CardContent className="pt-4">

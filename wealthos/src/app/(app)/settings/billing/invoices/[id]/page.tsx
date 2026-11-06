@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { PrintButton } from "@/components/app/print-button";
 import { formatDate, formatMoney } from "@/lib/format";
 import { withdrawInvoiceAction } from "../../actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Invoice · WealthOS" };
+export const metadata = { title: "Invoice" };
 
 export default async function InvoicePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ new?: string }> }) {
   const app = await requireApp();
@@ -74,7 +75,7 @@ export default async function InvoicePage({ params, searchParams }: { params: Pr
             </div>
           ) : <Alert tone="warning" className="mt-8">Payment details haven&apos;t been set up yet. Contact support before paying.</Alert>
         ) : null}
-        <p className="mt-8 text-[11.5px] text-text-3">WealthOS is a subscription software service. It does not hold client money or provide investment advice.</p>
+        <p className="mt-8 text-[11.5px] text-text-3">{BRAND} is a subscription software service. It does not hold client money or provide investment advice.</p>
       </article>
     </div>
   );

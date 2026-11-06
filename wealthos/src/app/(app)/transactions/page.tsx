@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import { ReverseForm } from "./reverse-form";
 
-export const metadata = { title: "Transactions · WealthOS" };
+export const metadata = { title: "Transactions" };
 
 export default async function TransactionsPage({ searchParams }: { searchParams: Promise<{ saved?: string; reversed?: string; type?: string }> }) {
   const app = await requireApp();

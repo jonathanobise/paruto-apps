@@ -4,6 +4,7 @@ import path from "node:path";
 import PDFDocument from "pdfkit";
 import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import type { WealthStatement } from "./statement";
+import { BRAND } from "@/lib/brand";
 
 /**
  * Renders a wealth statement to PDF (A4). Text is set in embedded Inter (SIL OFL, see
@@ -24,7 +25,7 @@ interface Column { label: string; width: number; align?: Align }
 
 export async function renderStatementPdf(s: WealthStatement): Promise<Buffer> {
   const f = loadFonts();
-  const doc = new PDFDocument({ size: "A4", margin: M, bufferPages: true, info: { Title: `Wealth statement — ${s.orgName}`, Author: "WealthOS", Subject: `${s.periodLabel} to ${s.dash.asOf}`, Creator: "WealthOS" } });
+  const doc = new PDFDocument({ size: "A4", margin: M, bufferPages: true, info: { Title: `Wealth statement — ${s.orgName}`, Author: BRAND, Subject: `${s.periodLabel} to ${s.dash.asOf}`, Creator: BRAND } });
   doc.registerFont("r", f.regular);
   doc.registerFont("b", f.semibold);
   const chunks: Buffer[] = [];
@@ -93,7 +94,7 @@ export async function renderStatementPdf(s: WealthStatement): Promise<Buffer> {
 
   // Cover header
   doc.rect(0, 0, doc.page.width, 110).fill(C.brand);
-  doc.font("b").fontSize(11).fillColor("#cfe8da").text("WealthOS", M, 34);
+  doc.font("b").fontSize(11).fillColor("#cfe8da").text(BRAND, M, 34);
   doc.font("b").fontSize(22).fillColor("#f6f3ec").text("Wealth statement", M, 52);
   doc.font("r").fontSize(10).fillColor("#cfe8da").text(`${s.orgName} · ${s.periodLabel} to ${formatDate(s.dash.asOf)} · ${ccy}`, M, 82);
   doc.y = 130;
@@ -210,7 +211,7 @@ export async function renderStatementPdf(s: WealthStatement): Promise<Buffer> {
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i);
     doc.page.margins.bottom = 0; // writing in the bottom margin must not start a new page
-    doc.font("r").fontSize(7).fillColor(C.faint).text(`WealthOS · ${s.orgName} · generated ${s.generatedAt.slice(0, 16).replace("T", " ")} UTC · not investment advice`, M, doc.page.height - M + 6, { width: W - 60, lineBreak: false });
+    doc.font("r").fontSize(7).fillColor(C.faint).text(`${BRAND} · ${s.orgName} · generated ${s.generatedAt.slice(0, 16).replace("T", " ")} UTC · not investment advice`, M, doc.page.height - M + 6, { width: W - 60, lineBreak: false });
     doc.text(`Page ${i - range.start + 1} of ${range.count}`, M + W - 60, doc.page.height - M + 6, { width: 60, align: "right", lineBreak: false });
   }
   doc.end();

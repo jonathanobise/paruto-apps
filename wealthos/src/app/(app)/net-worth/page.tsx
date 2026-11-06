@@ -7,7 +7,7 @@ import { NetWorthChart } from "@/components/app/net-worth-chart";
 import { formatDate, formatMoney } from "@/lib/format";
 import { DISCLOSURES } from "@/server/compliance/features";
 
-export const metadata = { title: "Net worth · WealthOS" };
+export const metadata = { title: "Net worth" };
 
 export default async function NetWorthPage() {
   const app = await requireApp();

@@ -5,7 +5,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AcceptInviteForm } from "./form";
 
-export const metadata = { title: "Invitation · WealthOS" };
+export const metadata = { title: "Invitation" };
 
 export default async function InvitePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const token = (await searchParams).token ?? "";

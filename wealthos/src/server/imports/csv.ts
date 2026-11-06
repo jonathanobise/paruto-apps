@@ -10,6 +10,7 @@ import Papa from "papaparse";
 import { createHash } from "node:crypto";
 import { d, isISODate } from "@/engine";
 import { eventInputSchema, type EventInput } from "@/server/ledger/codec";
+import { BRAND } from "@/lib/brand";
 
 export const LIMITS = { maxBytes: 2 * 1024 * 1024, maxRows: 5000, maxColumns: 50, maxCell: 500 } as const;
 
@@ -470,7 +471,7 @@ export function prepareRows(parsed: ParsedCsv, mapping: ImportMapping, ctx: RowC
           const counterName = col(rec, "counterAccount");
           const other = counterName ? (ctx.resolveAccount?.(counterName) ?? null) : null;
           if (counterName && !other) {
-            errors.push(`Other account “${counterName}” isn't one of your accounts (use its name in WealthOS)`);
+            errors.push(`Other account “${counterName}” isn't one of your accounts (use its name in ${BRAND})`);
             break;
           }
           const [fromAccountId, toAccountId] = type === "transfer_out" ? [ctx.accountId, other?.id] : [other?.id, ctx.accountId];
@@ -480,12 +481,12 @@ export function prepareRows(parsed: ParsedCsv, mapping: ImportMapping, ctx: RowC
             if (other) input = { ...base, type: "security_transfer", fromAccountId, toAccountId, instrumentId: instrument.id, quantity };
             else if (type === "transfer_in") {
               const costBasis = num("costBasis") ?? num("amount");
-              if (!costBasis) errors.push("Shares moved in from outside WealthOS need their cost (Cost basis or Amount), or map the Other account column");
+              if (!costBasis) errors.push(`Shares moved in from outside ${BRAND} need their cost (Cost basis or Amount), or map the Other account column`);
               else {
-                warnings.push("No other account given: recorded as an opening position (shares moved in from outside WealthOS)");
+                warnings.push(`No other account given: recorded as an opening position (shares moved in from outside ${BRAND})`);
                 input = { ...base, type: "opening_position", ...acc, instrumentId: instrument.id, currency, quantity, costBasis, acquiredOn: date };
               }
-            } else errors.push("Shares moved out need the Other account they went to; selling or leaving WealthOS isn't a transfer");
+            } else errors.push(`Shares moved out need the Other account they went to; selling or leaving ${BRAND} isn't a transfer`);
           } else {
             const amount = num("amount", { required: true });
             if (!amount) break;
@@ -493,7 +494,7 @@ export function prepareRows(parsed: ParsedCsv, mapping: ImportMapping, ctx: RowC
               if (other.currency !== currency && ctx.accountCurrency !== currency) warnings.push("Neither account is in this currency — check the Currency column");
               input = { ...base, type: "transfer", fromAccountId, toAccountId, currency, amount };
             } else {
-              warnings.push(type === "transfer_in" ? "No other account given: recorded as a deposit from outside WealthOS" : "No other account given: recorded as a withdrawal to outside WealthOS");
+              warnings.push(type === "transfer_in" ? `No other account given: recorded as a deposit from outside ${BRAND}` : `No other account given: recorded as a withdrawal to outside ${BRAND}`);
               input = { ...base, type: type === "transfer_in" ? "deposit" : "withdrawal", ...acc, currency, amount };
             }
           }

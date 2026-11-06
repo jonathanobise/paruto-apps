@@ -11,7 +11,7 @@ import { AdminForm } from "@/components/app/admin-form";
 import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { ownersAction } from "./actions";
 
-export const metadata = { title: "Household · WealthOS" };
+export const metadata = { title: "Household" };
 
 export default async function HouseholdPage() {
   const app = await requireApp();

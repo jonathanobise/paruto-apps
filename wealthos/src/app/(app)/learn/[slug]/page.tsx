@@ -13,7 +13,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const a = getArticle((await params).slug);
-  return { title: a ? `${a.title} · WealthOS` : "Learn · WealthOS" };
+  return { title: a ? a.title : "Learn" };
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {

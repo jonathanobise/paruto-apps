@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 /**
  * General financial education (feature EDUCATION). Rules for this content:
  * - General explanations only: no recommendation of any product, allocation or timing.
@@ -47,7 +48,7 @@ export const ARTICLES: Article[] = [
       { kind: "example", id: "tbill-364", title: "A 364-day bill at an 18% discount rate, ₦1,000,000 face value", rows: [["Price paid", "₦820,493.15"], ["Received at maturity", "₦1,000,000.00"], ["True yield", "21.94%"], ["Effective annual yield", "21.94%"]], note: `${ILLUSTRATIVE} At almost a full year there is nothing to reinvest, so the true and effective yields are nearly equal; both are well above the 18% discount rate.` },
       { kind: "example", id: "tbill-91", title: "A 91-day bill at the same 18% discount rate", rows: [["Price paid", "₦955,123.29"], ["True yield", "18.85%"], ["Effective annual yield", "20.22%"]], note: `${ILLUSTRATIVE} The same discount rate means very different yields at different tenors.` },
       { kind: "h", text: "What this means when comparing" },
-      { kind: "p", text: "A discount rate, a true yield, a money market fund's quoted yield and a fixed deposit rate are different measures. Comparing them directly can mislead by several percentage points. WealthOS labels every published rate with its methodology and only places rates side by side after converting them to the same basis, showing the conversion." },
+      { kind: "p", text: `A discount rate, a true yield, a money market fund's quoted yield and a fixed deposit rate are different measures. Comparing them directly can mislead by several percentage points. ${BRAND} labels every published rate with its methodology and only places rates side by side after converting them to the same basis, showing the conversion.` },
       { kind: "p", text: "Short bills also carry reinvestment risk: the effective yield assumes you can roll over at the same rate, which may not be possible. Tax treatment and fees (for example, when buying through a bank or broker) can change the return you keep; check the current rules and charges for your route." },
     ],
     related: ["money-market-fund-yields", "inflation-and-real-returns"],
@@ -65,7 +66,7 @@ export const ARTICLES: Article[] = [
       { kind: "list", items: [
         "Most funds publish an annualised yield, usually net of fees. It is a recent rate restated per year, not a promise: it changes as the fund's holdings mature and are replaced.",
         "Some funds keep a fixed unit price and pay or reinvest income as distributions; others let the unit price (NAV) rise. The same economics can look different on a statement.",
-        "Funds differ in how they annualise (simple or compounded) and over what window (daily, 7-day, 30-day). The factsheet should say which; WealthOS records the methodology with every published rate.",
+        `Funds differ in how they annualise (simple or compounded) and over what window (daily, 7-day, 30-day). The factsheet should say which; ${BRAND} records the methodology with every published rate.`,
       ] },
       { kind: "h", text: "Working out your own return from prices" },
       { kind: "p", text: "For an accumulating fund you can measure the return yourself from two unit prices, then annualise it to compare with other products." },
@@ -78,18 +79,18 @@ export const ARTICLES: Article[] = [
   {
     slug: "twr-vs-xirr",
     title: "Time-weighted vs money-weighted returns",
-    summary: "Two honest ways to measure performance that can disagree, and why WealthOS shows both.",
+    summary: `Two honest ways to measure performance that can disagree, and why ${BRAND} shows both.`,
     minutes: 5,
     reviewedOn: "2026-11-02",
     topics: ["Performance"],
     body: [
-      { kind: "p", text: "When you add or withdraw money, \"how much did my portfolio grow?\" stops having one answer. Deposits are not profit, so WealthOS always separates contributions from investment gain, and reports two kinds of return." },
+      { kind: "p", text: `When you add or withdraw money, "how much did my portfolio grow?" stops having one answer. Deposits are not profit, so ${BRAND} always separates contributions from investment gain, and reports two kinds of return.` },
       { kind: "list", items: [
         "Time-weighted return (TWR) measures how the investments themselves performed, removing the effect of when you added or took out money. It is the right measure for judging a fund or a strategy.",
         "Money-weighted return (XIRR, the internal rate of return of your cash flows) measures what your money actually earned, so the timing of your deposits counts. It is the right measure for \"how did I do?\"",
       ] },
       { kind: "example", id: "twr-xirr", title: "₦1,000,000 invested on 1 January; it rises 10% by 1 July, when you add another ₦1,000,000; the whole portfolio then falls 5% by 31 December", rows: [["Value on 1 July after the deposit", "₦2,100,000.00"], ["Value on 31 December", "₦1,995,000.00"], ["Time-weighted return", "4.50%"], ["Money-weighted return (XIRR, annual)", "−0.33%"]], note: `${ILLUSTRATIVE} The investments gained over the year, but more money was exposed to the fall than to the rise, so the investor lost slightly.` },
-      { kind: "h", text: "Conventions WealthOS uses" },
+      { kind: "h", text: `Conventions ${BRAND} uses` },
       { kind: "list", items: [
         "Cash flows are treated as happening at the end of their day.",
         "Returns for periods shorter than a year are not annualised, because doing so extrapolates short-term results.",
@@ -110,7 +111,7 @@ export const ARTICLES: Article[] = [
       { kind: "formula", text: "Naira return = (1 + return in USD) × (1 + change in the ₦ per $ rate) − 1" },
       { kind: "example", id: "fx-up", title: "$1,000 bought at ₦1,500/$; a year later the asset is worth $1,050 and the rate is ₦1,650/$", rows: [["Cost in naira", "₦1,500,000.00"], ["Value in naira", "₦1,732,500.00"], ["Return in dollars", "5.00%"], ["Return in naira", "15.50%"]], note: ILLUSTRATIVE },
       { kind: "example", id: "fx-down", title: "Same asset, but the rate moves to ₦1,350/$", rows: [["Value in naira", "₦1,417,500.00"], ["Return in naira", "−5.50%"]], note: `${ILLUSTRATIVE} The asset still gained 5% in dollars.` },
-      { kind: "h", text: "How WealthOS handles currencies" },
+      { kind: "h", text: `How ${BRAND} handles currencies` },
       { kind: "list", items: [
         "Every conversion uses a dated rate from a named source, never a rate from a different day. If no recent rate exists, the value is flagged as unavailable instead of guessed.",
         "Performance shows how much of your gain came from currency moves, by comparing with a constant-rate calculation.",
@@ -132,7 +133,7 @@ export const ARTICLES: Article[] = [
       { kind: "formula", text: "Real return = (1 + nominal return) ÷ (1 + inflation) − 1" },
       { kind: "example", id: "real-return", title: "A 20% nominal return in a year with 25% inflation", rows: [["Real return", "−4.00%"]], note: ILLUSTRATIVE },
       { kind: "example", id: "purchasing-power", title: "What ₦1,000,000 buys after five years of 20% annual inflation, in today's money", rows: [["Purchasing power", "₦401,877.57"]], note: ILLUSTRATIVE },
-      { kind: "p", text: "Goals and projections in WealthOS can show targets and results in today's money, using an inflation assumption you set. These are hypothetical illustrations, not forecasts." },
+      { kind: "p", text: `Goals and projections in ${BRAND} can show targets and results in today's money, using an inflation assumption you set. These are hypothetical illustrations, not forecasts.` },
     ],
     related: ["fees-and-compounding", "treasury-bill-yields"],
   },
@@ -163,7 +164,7 @@ export const ARTICLES: Article[] = [
       { kind: "list", items: [
         "The dashboard shows your largest holding and its share of your investments.",
         "Allocation by asset class, currency and geography shows exposures that a list of holdings can hide (for example, several funds that all hold Nigerian bank shares).",
-        "You can set a concentration alert at a level you choose. What level suits you depends on your circumstances; WealthOS does not set one for you.",
+        `You can set a concentration alert at a level you choose. What level suits you depends on your circumstances; ${BRAND} does not set one for you.`,
       ] },
     ],
     related: ["currency-risk", "twr-vs-xirr"],

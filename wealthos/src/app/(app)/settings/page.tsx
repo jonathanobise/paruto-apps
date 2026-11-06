@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SettingsTabs } from "./tabs";
 import { PreferencesForm } from "./preferences-form";
 
-export const metadata = { title: "Settings · WealthOS" };
+export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const app = await requireApp();

@@ -1,6 +1,7 @@
 import "server-only";
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, scrypt as scryptCb, timingSafeEqual, type ScryptOptions } from "node:crypto";
 import { env } from "@/server/platform/env";
+import { BRAND } from "@/lib/brand";
 
 function scrypt(password: string, salt: Buffer, keylen: number, options: ScryptOptions): Promise<Buffer> {
   return new Promise((resolve, reject) => scryptCb(password, salt, keylen, options, (err, key) => (err ? reject(err) : resolve(key))));
@@ -136,7 +137,7 @@ export function verifyTotp(secretBase32: string, code: string, atMs = Date.now()
   return totpStep(secretBase32, code, atMs) !== null;
 }
 
-export function otpauthUri(secret: string, account: string, issuer = "WealthOS"): string {
+export function otpauthUri(secret: string, account: string, issuer = BRAND): string {
   return `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(account)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }
 

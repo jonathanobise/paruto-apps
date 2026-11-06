@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { BRAND_LAST, BRAND_LEAD } from "@/lib/brand";
 
 /** Layered app-icon mark (gradient tile, inner gloss, mark) + editorial wordmark. */
 export function LogoMark({ className = "size-7" }: { className?: string }) {
@@ -31,8 +32,8 @@ export function Logo({ className, compact = false }: { className?: string; compa
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <LogoMark />
-      <span className={`font-display text-[19px] ${compact ? "hidden sm:inline" : ""}`}>
-        Wealth<em>OS</em>
+      <span className={`font-display text-[19px] whitespace-nowrap ${compact ? "hidden sm:inline" : ""}`}>
+        {BRAND_LEAD} <em>{BRAND_LAST}</em>
       </span>
     </span>
   );

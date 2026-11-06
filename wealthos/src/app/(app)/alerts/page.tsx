@@ -14,7 +14,7 @@ import { formatDate } from "@/lib/format";
 import { CheckNowForm, NewAlertForm } from "./forms";
 import { deleteAlertAction, toggleAlertAction } from "./actions";
 
-export const metadata = { title: "Alerts · WealthOS" };
+export const metadata = { title: "Alerts" };
 
 function describe(kind: string, p: Record<string, string | number>, names: Map<string, string>): string {
   switch (kind) {

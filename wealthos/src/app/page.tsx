@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BarChart3, FileSearch, Landmark, LineChart, ShieldCheck, Target } from "lucide-react";
 import { Logo } from "@/components/app/logo";
 import { Button } from "@/components/ui/button";
+import { BRAND } from "@/lib/brand";
 
 const pillars = [
   { icon: Landmark, title: "Everything in one place", body: "Bank accounts, funds, T-bills, shares, global ETFs, property, business interests and loans — in naira, dollars, pounds or euros." },
@@ -18,7 +19,8 @@ export default function Landing() {
       <header className="glass sticky top-3 z-30 mx-3 mt-3 flex max-w-6xl items-center justify-between rounded-full py-2 pl-4 pr-2 sm:mx-auto">
         <Logo />
         <nav className="flex items-center gap-1.5">
-          <Button asChild variant="ghost">
+          {/* Phones: the hero's own Sign in button sits just below, so the bar keeps the wordmark on one line. */}
+          <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/sign-in">Sign in</Link>
           </Button>
           <Button asChild>
@@ -31,7 +33,7 @@ export default function Landing() {
           <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-3">Private-wealth clarity, for everyone</p>
           <h1 className="font-display mt-5 max-w-4xl text-[44px] leading-[1.02] sm:text-[76px]">Understand, protect and grow what you <em>own.</em></h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-text-2">
-            WealthOS brings your whole financial position into one calm, precise view — net worth, performance, currency exposure and goals — built on an auditable ledger and deterministic calculations.
+            {BRAND} brings your whole financial position into one calm, precise view — net worth, performance, currency exposure and goals — built on an auditable ledger and deterministic calculations.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -60,7 +62,7 @@ export default function Landing() {
         <section className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-2">
           <div>
             <h2 className="font-display text-[34px] leading-tight">Clear about what we are — and <em>aren&apos;t</em></h2>
-            <p className="mt-4 leading-relaxed text-text-2">WealthOS is a non-custodial record-keeping, analytics and research platform. We never hold your money, never place trades, and do not tell you which security to buy. You stay in control; we give you the clarity.</p>
+            <p className="mt-4 leading-relaxed text-text-2">{BRAND} is a non-custodial record-keeping, analytics and research platform. We never hold your money, never place trades, and do not tell you which security to buy. You stay in control; we give you the clarity.</p>
           </div>
           <ul className="space-y-4 text-[15px]">
             {[
@@ -81,7 +83,7 @@ export default function Landing() {
       </main>
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-text-3 sm:px-8">
-          <span>© 2026 WealthOS. Information and tools, not investment advice.</span>
+          <span>© 2026 {BRAND}. Information and tools, not investment advice.</span>
           <span className="flex gap-4">
             <Link href="/legal/terms" className="hover:text-text">Terms</Link>
             <Link href="/legal/privacy" className="hover:text-text">Privacy</Link>

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatMoney } from "@/lib/format";
 
-export const metadata = { title: "Accounts · WealthOS" };
+export const metadata = { title: "Accounts" };
 
 export default async function AccountsPage() {
   const app = await requireApp();

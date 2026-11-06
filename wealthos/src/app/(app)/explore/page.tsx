@@ -15,7 +15,7 @@ import { RateLine, StatusBadge, VerificationBadge } from "@/components/app/resea
 import { formatDate, formatMoney } from "@/lib/format";
 import { ASSET_CLASSES, ASSET_CLASS_LABELS } from "@/engine";
 
-export const metadata = { title: "Explorer · WealthOS" };
+export const metadata = { title: "Explorer" };
 
 export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ q?: string; assetClass?: string; currency?: string }> }) {
   const app = await requireApp();

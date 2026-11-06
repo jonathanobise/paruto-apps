@@ -13,8 +13,9 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatMoney, formatPercent } from "@/lib/format";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Target mix · WealthOS" };
+export const metadata = { title: "Target mix" };
 
 export default async function ModelPage() {
   const app = await requireApp();
@@ -31,10 +32,10 @@ export default async function ModelPage() {
   const ccy = dash.baseCurrency;
   return (
     <>
-      <PageHeader title="Target mix" description="Compare your investments with an allocation you defined yourself. WealthOS describes the drift; it does not tell you what to buy or sell." />
+      <PageHeader title="Target mix" description={`Compare your investments with an allocation you defined yourself. ${BRAND} describes the drift; it does not tell you what to buy or sell.`} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-6" title="Pre-release feature">{gate.reason}</Alert> : null}
       {models.length === 0 ? (
-        <EmptyState icon={<ChartPie />} title="No target mix yet">Describe the allocation you are aiming for below, and WealthOS will show how far your holdings are from it.</EmptyState>
+        <EmptyState icon={<ChartPie />} title="No target mix yet">Describe the allocation you are aiming for below, and {BRAND} will show how far your holdings are from it.</EmptyState>
       ) : (
         models.map((m) => {
           const drift = driftAgainstModel(m.targets, dash, false);
@@ -92,7 +93,7 @@ export default async function ModelPage() {
       )}
       {app.canWrite ? (
         <Card className="mt-6">
-          <CardHeader><div><CardTitle>New target mix</CardTitle><CardDescription>Your own hypothetical allocation. WealthOS only describes how far you are from it; it never tells you what to buy or sell.</CardDescription></div></CardHeader>
+          <CardHeader><div><CardTitle>New target mix</CardTitle><CardDescription>Your own hypothetical allocation. {BRAND} only describes how far you are from it; it never tells you what to buy or sell.</CardDescription></div></CardHeader>
           <CardContent><NewModelForm buckets={Object.entries(BUCKET_PRESETS).map(([key, b]) => ({ key, label: b.label }))} /></CardContent>
         </Card>
       ) : null}

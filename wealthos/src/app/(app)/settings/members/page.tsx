@@ -10,8 +10,9 @@ import { formatDate } from "@/lib/format";
 import { SettingsTabs } from "../tabs";
 import { CreateSpaceForm, InviteForm } from "./forms";
 import { removeAction, revokeAction, roleAction } from "./actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Members · WealthOS" };
+export const metadata = { title: "Members" };
 
 export default async function MembersPage({ searchParams }: { searchParams: Promise<{ created?: string }> }) {
   const app = await requireApp();
@@ -74,7 +75,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
           </Card>
           {manage ? (
             <Card>
-              <CardHeader><div><CardTitle>Invite someone</CardTitle><CardDescription>They&apos;ll need a WealthOS account with the same email address.</CardDescription></div></CardHeader>
+              <CardHeader><div><CardTitle>Invite someone</CardTitle><CardDescription>They&apos;ll need a {BRAND} account with the same email address.</CardDescription></div></CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <InviteForm />
                 <dl className="flex flex-col gap-1.5 text-[12.5px]">{(["admin", "member", "viewer"] as const).map((k) => <div key={k}><dt className="inline font-medium">{ROLE_LABELS[k]}: </dt><dd className="inline text-text-2">{ROLE_HELP[k]}</dd></div>)}</dl>

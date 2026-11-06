@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AdminForm } from "@/components/app/admin-form";
 import { retryJobAction } from "../console-actions";
 
-export const metadata = { title: "Jobs · Admin · WealthOS" };
+export const metadata = { title: "Jobs · Admin" };
 const STATUSES = ["dead", "queued", "running", "succeeded"] as const;
 
 export default async function AdminJobs({ searchParams }: { searchParams: Promise<{ status?: string }> }) {

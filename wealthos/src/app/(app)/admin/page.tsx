@@ -9,7 +9,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
 
-export const metadata = { title: "Admin · WealthOS" };
+export const metadata = { title: "Admin" };
 
 export default async function AdminHome() {
   const app = await requireStaffPage(["support", "compliance"]);

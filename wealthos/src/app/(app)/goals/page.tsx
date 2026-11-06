@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatMoney } from "@/lib/format";
 
-export const metadata = { title: "Goals · WealthOS" };
+export const metadata = { title: "Goals" };
 
 export default async function GoalsPage() {
   const app = await requireApp();

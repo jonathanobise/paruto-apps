@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { AdminForm } from "@/components/app/admin-form";
 import { formatDate } from "@/lib/format";
 import { connectAction, disconnectAction, syncAction } from "./connection-actions";
+import { BRAND } from "@/lib/brand";
 
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "never");
 
@@ -34,25 +35,25 @@ export async function ConnectionsCard({ ctx, jurisdiction, account, canWrite }: 
             ) : null}
           </div>
         ) : !providers.length ? (
-          <Alert tone="info" title="Not connected">No authorised data provider is connected to WealthOS yet, so accounts can&apos;t be linked. Keep importing statements as CSV.</Alert>
+          <Alert tone="info" title="Not connected">No authorised data provider is connected to {BRAND} yet, so accounts can&apos;t be linked. Keep importing statements as CSV.</Alert>
         ) : canWrite && account.status === "open" ? (
           <AdminForm action={connectAction} submit="Give consent and connect">
             <input type="hidden" name="accountId" value={account.id} />
             <label className="flex flex-col gap-1">Provider
               <select name="provider" className="h-9 rounded-[var(--radius-inner)] border border-border bg-surface px-2">{providers.map((p) => <option key={p.key} value={p.key}>{p.name}</option>)}</select>
             </label>
-            <fieldset className="flex flex-col gap-1"><legend className="mb-1">What WealthOS may read</legend>
+            <fieldset className="flex flex-col gap-1"><legend className="mb-1">What {BRAND} may read</legend>
               {Object.entries(SCOPE_LABELS).map(([k, v]) => <label key={k} className="flex items-center gap-2"><input type="checkbox" name="scopes" value={k} defaultChecked /> {v}</label>)}
             </fieldset>
             <label className="flex flex-col gap-1">For how long
               <select name="days" defaultValue="90" className="h-9 max-w-40 rounded-[var(--radius-inner)] border border-border bg-surface px-2"><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option></select>
             </label>
             <ul className="list-disc space-y-1 pl-5 text-text-2">
-              <li>Access is read-only: WealthOS can&apos;t move money or see your bank password.</li>
+              <li>Access is read-only: {BRAND} can&apos;t move money or see your bank password.</li>
               <li>The provider&apos;s access token is stored encrypted and deleted when you disconnect or consent ends.</li>
               <li>You can disconnect at any time here.</li>
             </ul>
-            <label className="flex items-start gap-2"><input type="checkbox" name="consent" className="mt-0.5" /> <span>I consent to WealthOS reading the information above from this account through the selected provider for the period chosen.</span></label>
+            <label className="flex items-start gap-2"><input type="checkbox" name="consent" className="mt-0.5" /> <span>I consent to {BRAND} reading the information above from this account through the selected provider for the period chosen.</span></label>
           </AdminForm>
         ) : null}
         {connections.filter((c) => c !== live).length ? <p className="text-[12px] text-text-3">Earlier connections: {connections.filter((c) => c !== live).map((c) => `${c.institutionName} (${c.status}, ${day(c.consentGrantedAt)})`).join("; ")}</p> : null}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { RequestResetForm } from "./form";
 
-export const metadata = { title: "Reset password · WealthOS" };
+export const metadata = { title: "Reset password" };
 
 export default function ResetPage() {
   return (

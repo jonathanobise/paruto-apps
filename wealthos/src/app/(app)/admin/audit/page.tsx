@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/form";
 
-export const metadata = { title: "Audit log · Admin · WealthOS" };
+export const metadata = { title: "Audit log · Admin" };
 
 export default async function AdminAudit({ searchParams }: { searchParams: Promise<{ tab?: string; action?: string; org?: string; actor?: string }> }) {
   const app = await requireStaffPage(["compliance"]);

@@ -13,7 +13,7 @@ import { formatDate } from "@/lib/format";
 import { UploadForm } from "./upload-form";
 import { STATUS } from "./status";
 
-export const metadata = { title: "Import CSV · WealthOS" };
+export const metadata = { title: "Import CSV" };
 
 export default async function ImportPage({ searchParams }: { searchParams: Promise<{ account?: string }> }) {
   const app = await requireApp();

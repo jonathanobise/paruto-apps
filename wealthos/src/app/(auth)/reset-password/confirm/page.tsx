@@ -1,6 +1,6 @@
 import { NewPasswordForm } from "../form";
 
-export const metadata = { title: "Choose a new password · WealthOS" };
+export const metadata = { title: "Choose a new password" };
 
 export default async function ConfirmResetPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token = "" } = await searchParams;

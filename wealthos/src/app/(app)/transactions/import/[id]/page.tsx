@@ -20,7 +20,7 @@ import { CommitForm, MappingForm, RollbackForm } from "./forms";
 import { discardAction } from "../actions";
 import { STATUS } from "../status";
 
-export const metadata = { title: "Import preview · WealthOS" };
+export const metadata = { title: "Import preview" };
 
 const FILTERS = ["all", "ready", "error", "duplicate"] as const;
 

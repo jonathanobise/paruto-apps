@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import { markReadAction } from "../alerts/actions";
 
-export const metadata = { title: "Notifications · WealthOS" };
+export const metadata = { title: "Notifications" };
 const dt = (d: Date) => new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Lagos" }).format(d);
 
 export default async function NotificationsPage() {

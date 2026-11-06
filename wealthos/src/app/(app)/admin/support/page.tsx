@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Support · Admin · WealthOS" };
+export const metadata = { title: "Support · Admin" };
 
 export default async function AdminSupport({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const app = await requireStaffPage(["support"]);

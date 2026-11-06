@@ -11,6 +11,7 @@ import { recordAudit, type RequestMeta } from "@/server/audit/audit";
 import { discardImport, getImport, previewImport } from "@/server/imports/service";
 import { csvCell } from "@/server/imports/export";
 import { availableProviders, getConnectionProvider } from "./providers";
+import { BRAND } from "@/lib/brand";
 
 export const CONNECTION_CONSENT_KEY = "institution_data_access";
 export const CONNECTION_CONSENT_VERSION = "2026-11-02";
@@ -53,7 +54,7 @@ export async function connectAccount(ctx: TenantContext, accountId: string, inpu
     const link = await provider.completeLink(c.linkCode);
     const pa = link.accounts[0];
     if (!pa) throw new AppError("VALIDATION", "The provider returned no account to link.");
-    if (pa.currency !== acc.currency) throw new AppError("VALIDATION", `The linked account is in ${pa.currency} but this WealthOS account is in ${acc.currency}.`);
+    if (pa.currency !== acc.currency) throw new AppError("VALIDATION", `The linked account is in ${pa.currency} but this ${BRAND} account is in ${acc.currency}.`);
     const [row] = await tx.insert(institutionConnections).values({ orgId: ctx.orgId, accountId, provider: provider.key, providerAccountRef: pa.ref, institutionName: link.institutionName, scopes: c.scopes, consentGrantedBy: ctx.userId, consentExpiresAt: new Date(Date.now() + c.days * 86_400_000), credentialsEnc: encryptSecret(link.credentials) }).returning({ id: institutionConnections.id });
     await tx.update(financialAccounts).set({ dataSource: provider.sandbox ? "connection-sandbox" : "connection", updatedAt: new Date() }).where(eq(financialAccounts.id, accountId));
     await recordAudit(tx, { orgId: ctx.orgId, actorUserId: ctx.userId, action: "connection.created", targetType: "institution_connection", targetId: row!.id, metadata: { provider: provider.key, scopes: c.scopes, days: c.days } });

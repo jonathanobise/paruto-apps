@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { NewAccountForm } from "./form";
 
-export const metadata = { title: "Add account · WealthOS" };
+export const metadata = { title: "Add account" };
 
 export default async function NewAccountPage() {
   const app = await requireApp();

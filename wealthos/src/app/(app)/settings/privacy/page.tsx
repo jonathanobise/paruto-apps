@@ -8,8 +8,9 @@ import { SettingsTabs } from "../tabs";
 import { EraseForm } from "./erase-form";
 import { marketingConsentAction } from "../actions";
 import { formatDate } from "@/lib/format";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Privacy & data · WealthOS" };
+export const metadata = { title: "Privacy & data" };
 
 const LABELS: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Notice", marketing_email: "Product news by email" };
 
@@ -23,7 +24,7 @@ export default async function PrivacyPage() {
       <SettingsTabs current="privacy" />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader><div><CardTitle>Your data</CardTitle><CardDescription>Download everything WealthOS holds about you, in a documented JSON format.</CardDescription></div></CardHeader>
+          <CardHeader><div><CardTitle>Your data</CardTitle><CardDescription>Download everything {BRAND} holds about you, in a documented JSON format.</CardDescription></div></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Button asChild variant="secondary"><a href="/api/export/account"><Download aria-hidden /> Download all data (JSON)</a></Button>
             <Button asChild variant="ghost"><a href="/api/export/transactions.csv">Transactions (CSV)</a></Button>

@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { GoalForm } from "../goal-form";
 
-export const metadata = { title: "New goal · WealthOS" };
+export const metadata = { title: "New goal" };
 
 export default async function NewGoal() {
   const app = await requireApp();

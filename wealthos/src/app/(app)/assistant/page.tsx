@@ -13,8 +13,9 @@ import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { AskForm } from "./forms";
 import { consentAction, deleteConversationAction } from "./actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Research assistant · WealthOS" };
+export const metadata = { title: "Research assistant" };
 
 const SUGGESTIONS = ["What is the difference between a T-bill's discount rate and its true yield?", "Compare the money market funds in the catalogue", "How has my portfolio performed this year?", "If I save ₦100,000 a month for 10 years, what could it grow to at 8% and 14%?"];
 
@@ -29,7 +30,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader title="Research assistant" description="Ask about investment products, financial concepts or your own recorded finances. Answers are grounded in WealthOS data and calculations, with sources and dates." />
+      <PageHeader title="Research assistant" description={`Ask about investment products, financial concepts or your own recorded finances. Answers are grounded in ${BRAND} data and calculations, with sources and dates.`} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
       {!connected ? (
         <Alert tone="info" className="mb-4" title="Not connected">
@@ -77,7 +78,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
                 <ul className="mt-2 list-disc space-y-1 pl-5">
                   <li>Your questions, and the data the assistant looks up to answer them, are sent to Anthropic (a US-based AI provider) to generate the answer. With access off, no account, holding or transaction data is sent.</li>
                   <li>Email addresses, phone numbers and account or card numbers in your questions are masked before sending and storing.</li>
-                  <li>WealthOS keeps your conversations (questions, answers, which lookups ran and the sources cited) so you can return to them; it does not keep the looked-up data. You can delete any conversation, and turning access off takes effect immediately.</li>
+                  <li>{BRAND} keeps your conversations (questions, answers, which lookups ran and the sources cited) so you can return to them; it does not keep the looked-up data. You can delete any conversation, and turning access off takes effect immediately.</li>
                   <li>You can ask up to {AI_LIMITS.messagesPerDay} questions a day.</li>
                 </ul>
               </details>
@@ -104,7 +105,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
                             ))}
                           </ul>
                         </div>
-                      ) : m.toolCalls.some((t) => t.ok) ? <p>The lookups returned no dated sources.</p> : <p>No WealthOS data was looked up for this answer; treat it as general explanation.</p>}
+                      ) : m.toolCalls.some((t) => t.ok) ? <p>The lookups returned no dated sources.</p> : <p>No {BRAND} data was looked up for this answer; treat it as general explanation.</p>}
                       <div className="flex flex-wrap gap-1.5">
                         {m.toolCalls.map((t, j) => <Badge key={j} tone={t.ok ? "neutral" : "warning"}>{t.name.replace(/_/g, " ")}{t.ok ? "" : " (not run)"}</Badge>)}
                         {m.policyFlags.some((f) => f.startsWith("output:")) ? <Badge tone="warning">Replaced by a safe answer</Badge> : null}

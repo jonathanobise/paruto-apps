@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatMoney, formatNumber, formatPercent } from "@/lib/format";
 
-export const metadata = { title: "Holdings · WealthOS" };
+export const metadata = { title: "Holdings" };
 
 const METHOD: Record<string, { label: string; tone: "neutral" | "warning" | "accent" }> = {
   market: { label: "Market", tone: "neutral" },

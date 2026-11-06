@@ -2,7 +2,7 @@
   "name": "wealthos",
   "version": "0.1.0",
   "private": true,
-  "description": "WealthOS — non-custodial financial intelligence and wealth management SaaS (Nigeria first).",
+  "description": "Paruto Wealth (codename WealthOS) — non-custodial financial intelligence and wealth management SaaS (Nigeria first).",
   "type": "module",
   "engines": {
     "node": ">=22.12"

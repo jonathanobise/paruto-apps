@@ -12,7 +12,7 @@ import { InvoiceAdmin } from "../../invoice-admin";
 import { formatDate, formatMoney } from "@/lib/format";
 import { endSubscriptionAction, grantPlanAction } from "../../console-actions";
 
-export const metadata = { title: "Organisation · Admin · WealthOS" };
+export const metadata = { title: "Organisation · Admin" };
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "—");
 
 export default async function AdminOrg({ params }: { params: Promise<{ id: string }> }) {

@@ -10,6 +10,7 @@ import { signOutAction } from "../(auth)/actions";
 import { setCurrencyAction, setThemeAction, switchOrgAction } from "./shell-actions";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { SUPPORTED_CURRENCIES } from "@/engine";
+import { BRAND } from "@/lib/brand";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const app = await requireApp();
@@ -40,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               </form>
             }
           />
-          <Link href="/dashboard" className="spring lg:hidden" aria-label="WealthOS home">
+          <Link href="/dashboard" className="spring lg:hidden" aria-label={`${BRAND} home`}>
             <Logo compact />
           </Link>
           <p className="hidden pl-2 text-[13px] text-text-3 lg:block">

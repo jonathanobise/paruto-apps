@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 /**
  * Regulatory feature registry — the single source of truth for what WealthOS may do.
  *
@@ -45,14 +46,14 @@ export interface FeatureDefinition {
 }
 
 export const DISCLOSURES = {
-  not_advice: "WealthOS provides information and tools for your own decisions. It is not investment advice and does not recommend any security for your circumstances.",
+  not_advice: `${BRAND} provides information and tools for your own decisions. It is not investment advice and does not recommend any security for your circumstances.`,
   hypothetical: "This is a hypothetical illustration based on assumptions you control. It is not a forecast, and outcomes are not guaranteed.",
   past_performance: "Past performance is not a reliable indicator of future results. Investments can lose value.",
   data_freshness: "Prices, rates and FX can be delayed, stale or incomplete. Check the as-of date and source before relying on any figure.",
   demo_data: "DEMO: this portfolio uses synthetic SAMPLE prices and FX rates. It is not market data and not a recommendation.",
   estimates: "Manual valuations are your own estimates, not verified market prices.",
-  ai_limits: "AI answers can be wrong. Figures come from WealthOS calculations and cited sources; the assistant does not give personal investment advice.",
-  non_custodial: "WealthOS never holds your money or investments and cannot place trades.",
+  ai_limits: `AI answers can be wrong. Figures come from ${BRAND} calculations and cited sources; the assistant does not give personal investment advice.`,
+  non_custodial: `${BRAND} never holds your money or investments and cannot place trades.`,
 } as const;
 export type DisclosureKey = keyof typeof DISCLOSURES;
 
@@ -70,7 +71,7 @@ export const FEATURES: FeatureDefinition[] = [
   { key: "AI_RESEARCH_ASSISTANT", name: "AI research assistant (non-advisory, tool-grounded)", module: "ai-research", classification: "information", requiredPermissions: ["ai:use", "research:read"], disclosures: ["ai_limits", "not_advice"], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 3, counselQuestions: ["Lawful basis and cross-border transfer requirements (NDPA 2023, GAID 2025) for sending user portfolio data to an AI vendor.", "Refusal boundaries for personalised questions."] },
   { key: "ALERTS_USER_DEFINED", name: "User-defined alerts (prices, maturities, thresholds)", module: "notifications", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["data_freshness"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 3 },
   { key: "HOUSEHOLD_PLANNING", name: "Household view: who owns what and net worth by person", module: "household", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["estimates"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 5 },
-  { key: "INSTITUTION_CONNECTIONS", name: "Read-only bank connections through an authorised data provider (user-consented, reviewed before import)", module: "connections", classification: "tooling", requiredPermissions: ["portfolio:read", "portfolio:write"], disclosures: ["data_freshness", "non_custodial"], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 5, counselQuestions: ["CBN Open Banking Regulatory Framework / Operational Guidelines: does WealthOS need to register as a participant (e.g. as a third-party provider) to receive account data through a licensed provider?", "Consent wording, duration and renewal requirements; NDPA lawful basis for account data.", "Provider due diligence and data-processing agreement."] },
+  { key: "INSTITUTION_CONNECTIONS", name: "Read-only bank connections through an authorised data provider (user-consented, reviewed before import)", module: "connections", classification: "tooling", requiredPermissions: ["portfolio:read", "portfolio:write"], disclosures: ["data_freshness", "non_custodial"], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 5, counselQuestions: [`CBN Open Banking Regulatory Framework / Operational Guidelines: does ${BRAND} need to register as a participant (e.g. as a third-party provider) to receive account data through a licensed provider?`, "Consent wording, duration and renewal requirements; NDPA lawful basis for account data.", "Provider due diligence and data-processing agreement."] },
   { key: "SHARED_SPACES", name: "Household and business spaces with invited members and roles", module: "tenancy", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["non_custodial"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 4 },
   { key: "REPORTS", name: "Wealth statement and transaction reports (PDF/CSV)", module: "reports", classification: "tooling", requiredPermissions: ["portfolio:read"], disclosures: ["past_performance", "data_freshness", "not_advice"], defaultApproval: "not_required", hardDisabled: false, auditLogging: "all_access", jurisdictions: NG, milestone: 4 },
   { key: "SUBSCRIPTION_BILLING", name: "Paid plans, trials, invoices and receipts", module: "billing", classification: "commercial", requiredPermissions: ["portfolio:read"], disclosures: [], defaultApproval: "pending_review", hardDisabled: false, auditLogging: "writes", jurisdictions: NG, milestone: 4, counselQuestions: ["Terms of sale, refunds and cancellation rights under the FCCPA 2018.", "VAT registration and whether plan prices are quoted inclusive or exclusive of VAT; invoice requirements.", "Retention period for invoices after account erasure (tax law vs NDPA)."] },
@@ -107,7 +108,7 @@ export interface FeatureDecision {
  */
 export function decideFeature(def: FeatureDefinition, jurisdiction: string, opts: { approval?: ApprovalStatus; flagEnabled?: boolean; environment: "development" | "test" | "staging" | "production" }): FeatureDecision {
   if (def.hardDisabled || def.classification === "regulated_advice" || def.classification === "regulated_execution") {
-    return { available: false, status: "rejected", reason: "Not permitted in WealthOS Version 1 (regulated activity)." };
+    return { available: false, status: "rejected", reason: `Not permitted in ${BRAND} Version 1 (regulated activity).` };
   }
   if (!def.jurisdictions.includes(jurisdiction)) return { available: false, status: "rejected", reason: `Not offered in ${jurisdiction}.` };
   if (opts.flagEnabled === false) return { available: false, status: opts.approval ?? def.defaultApproval, reason: "Temporarily switched off." };

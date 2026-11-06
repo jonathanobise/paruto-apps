@@ -12,7 +12,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Reports · WealthOS" };
+export const metadata = { title: "Reports" };
 
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<{ period?: string; currency?: string }> }) {
   const app = await requireApp();

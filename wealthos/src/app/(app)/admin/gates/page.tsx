@@ -8,7 +8,7 @@ import { Field, Input, Select } from "@/components/ui/form";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { recordDecisionAction } from "../console-actions";
 
-export const metadata = { title: "Feature gates · Admin · WealthOS" };
+export const metadata = { title: "Feature gates · Admin" };
 
 export default async function AdminGates() {
   const app = await requireStaffPage(["compliance"]);

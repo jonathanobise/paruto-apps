@@ -11,8 +11,9 @@ import { AdminForm } from "@/components/app/admin-form";
 import { Textarea } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { closeAction, replyAction } from "../actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Help request · WealthOS" };
+export const metadata = { title: "Help request" };
 
 export default async function CasePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ new?: string }> }) {
   const app = await requireApp();
@@ -26,7 +27,7 @@ export default async function CasePage({ params, searchParams }: { params: Promi
       {sp.new ? <Alert tone="success" className="mb-4">Request sent. We&apos;ll reply here and by email.</Alert> : null}
       <div className="flex max-w-3xl flex-col gap-3">
         {r.messages.map((m) => (
-          <Card key={m.id} className={cn(m.fromStaff ? "border-accent/40" : "ml-8")}><CardContent className="pt-4 text-[14px]"><p className="mb-1 text-[12px] text-text-3">{m.fromStaff ? "WealthOS support" : "You"} · {m.createdAt.toISOString().slice(0, 16).replace("T", " ")} UTC</p><p className="whitespace-pre-wrap">{m.body}</p></CardContent></Card>
+          <Card key={m.id} className={cn(m.fromStaff ? "border-accent/40" : "ml-8")}><CardContent className="pt-4 text-[14px]"><p className="mb-1 text-[12px] text-text-3">{m.fromStaff ? `${BRAND} support` : "You"} · {m.createdAt.toISOString().slice(0, 16).replace("T", " ")} UTC</p><p className="whitespace-pre-wrap">{m.body}</p></CardContent></Card>
         ))}
         {r.case.status !== "closed" ? (
           <Card><CardContent className="flex flex-col gap-3 pt-4">

@@ -18,7 +18,7 @@ import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { createDemoAction } from "./actions";
 
-export const metadata = { title: "Dashboard · WealthOS" };
+export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; welcome?: string }> }) {
   const app = await requireApp();

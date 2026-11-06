@@ -10,7 +10,7 @@ import { AdminForm } from "@/components/app/admin-form";
 import { formatDate } from "@/lib/format";
 import { revokeSessionsAction } from "../../console-actions";
 
-export const metadata = { title: "User · Admin · WealthOS" };
+export const metadata = { title: "User · Admin" };
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "—");
 
 export default async function AdminUser({ params }: { params: Promise<{ id: string }> }) {

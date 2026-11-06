@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 /**
  * Advice-boundary and privacy policy for the research assistant (pure, unit-tested).
  *
@@ -35,10 +36,10 @@ export function checkOutput(text: string): string[] {
 }
 
 export const ADVICE_BOUNDARY_NOTE =
-  "The user's latest message asks for a personalised investment decision (what to buy, sell or how to allocate their own money). WealthOS is not authorised to give personalised investment advice. Do not name a security, fund or allocation for them to choose, and do not say what they should do. Instead: briefly say you can't make that choice for them, explain the factors a person would weigh for this decision, offer objective facts from the tools (with sources and dates) if relevant, and suggest speaking to an SEC-registered adviser for a personal recommendation.";
+  `The user's latest message asks for a personalised investment decision (what to buy, sell or how to allocate their own money). ${BRAND} is not authorised to give personalised investment advice. Do not name a security, fund or allocation for them to choose, and do not say what they should do. Instead: briefly say you can't make that choice for them, explain the factors a person would weigh for this decision, offer objective facts from the tools (with sources and dates) if relevant, and suggest speaking to an SEC-registered adviser for a personal recommendation.`;
 
 export const SAFE_ANSWER =
-  "I can't tell you what to buy, sell or how to allocate your money — that would be personal investment advice, which WealthOS doesn't provide. I can explain how to compare options (risk, liquidity, fees, currency, time horizon), show factual data on specific products with sources, or run hypothetical scenarios with assumptions you choose. For a personal recommendation, please speak to an SEC-registered investment adviser.";
+  `I can't tell you what to buy, sell or how to allocate your money — that would be personal investment advice, which ${BRAND} doesn't provide. I can explain how to compare options (risk, liquidity, fees, currency, time horizon), show factual data on specific products with sources, or run hypothetical scenarios with assumptions you choose. For a personal recommendation, please speak to an SEC-registered investment adviser.`;
 
 /** Mask personal identifiers before text is stored in logs. */
 export function redact(text: string): string {

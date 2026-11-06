@@ -4,7 +4,7 @@ import { safeNext } from "@/lib/safe-next";
 import { MfaForm } from "./form";
 import { signOutAction } from "../../actions";
 
-export const metadata = { title: "Two-step verification · WealthOS" };
+export const metadata = { title: "Two-step verification" };
 
 export default async function MfaPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const session = await getSession();

@@ -11,7 +11,7 @@ import { Alert } from "@/components/ui/alert";
 import { TransactionForm } from "./form";
 import { InstrumentForm } from "./instrument-form";
 
-export const metadata = { title: "Record transaction · WealthOS" };
+export const metadata = { title: "Record transaction" };
 
 export default async function NewTransactionPage({ searchParams }: { searchParams: Promise<{ account?: string }> }) {
   const app = await requireApp();

@@ -3,14 +3,15 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import { ServiceWorker } from "@/components/app/service-worker";
 import { THEME_COOKIE } from "@/server/auth/context";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "WealthOS — financial intelligence for your wealth",
+  title: { default: `${BRAND} — financial intelligence for your wealth`, template: `%s · ${BRAND}` },
   description: "Track every account, holding and liability; measure performance properly; research and plan with evidence. Non-custodial. Built for Nigeria first.",
   robots: { index: false, follow: false },
-  applicationName: "WealthOS",
+  applicationName: BRAND,
   icons: { icon: [{ url: "/icons/icon.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192" }], apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "WealthOS", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: BRAND, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

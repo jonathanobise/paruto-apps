@@ -5,6 +5,7 @@ import { uploadAction } from "./actions";
 import { Field, Input, Select } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage, fieldError } from "@/components/ui/form-message";
+import { BRAND } from "@/lib/brand";
 
 export function UploadForm({ accounts, mappings, defaultAccount }: { accounts: Array<{ id: string; name: string; currency: string }>; mappings: Array<{ id: string; name: string }>; defaultAccount?: string }) {
   const [state, action, actionPending] = useActionState(uploadAction, null);
@@ -16,7 +17,7 @@ export function UploadForm({ accounts, mappings, defaultAccount }: { accounts: A
           {accounts.map((a) => <option key={a.id} value={a.id}>{a.name} ({a.currency})</option>)}
         </Select>
       </Field>
-      <Field label="File layout" htmlFor="mappingId" hint="Auto-detect works for the WealthOS template and most statements; you can adjust columns in the preview.">
+      <Field label="File layout" htmlFor="mappingId" hint={`Auto-detect works for the ${BRAND} template and most statements; you can adjust columns in the preview.`}>
         <Select id="mappingId" name="mappingId" defaultValue="">
           <option value="">Auto-detect columns</option>
           {mappings.map((m) => <option key={m.id} value={m.id}>Saved: {m.name}</option>)}

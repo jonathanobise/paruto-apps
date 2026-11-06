@@ -16,7 +16,7 @@ import { SettingsTabs } from "../tabs";
 import { PlanButton } from "./plan-button";
 import { cancelAction } from "./actions";
 
-export const metadata = { title: "Plan & billing · WealthOS" };
+export const metadata = { title: "Plan & billing" };
 
 const STATUS: Record<string, { label: string; tone: "accent" | "warning" | "neutral" | "danger" }> = {
   trialing: { label: "Free trial", tone: "accent" },

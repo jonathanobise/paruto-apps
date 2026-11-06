@@ -9,6 +9,7 @@ import { parseOrThrow } from "@/server/identity/service";
 import { recordAudit } from "@/server/audit/audit";
 import { asStaff, type AdminContext } from "@/server/admin/context";
 import { appUrl, sendEmail } from "@/server/identity/email";
+import { BRAND } from "@/lib/brand";
 
 export const SUPPORT_TOPICS = { account: "Account and sign-in", billing: "Plans and billing", data: "Figures look wrong", imports: "Importing data", privacy: "Privacy and my data", bug: "Something isn't working", other: "Something else" } as const;
 
@@ -90,7 +91,7 @@ export async function adminReply(admin: AdminContext, id: string, body: unknown,
     const [u] = await tx.select({ email: users.email }).from(users).where(eq(users.id, c.userId));
     return { email: u!.email, subject: c.subject };
   });
-  await sendEmail({ to: to.email, subject: `Re: ${to.subject}`, text: `WealthOS support replied to your request "${to.subject}".\n\nRead and reply: ${appUrl(`/support/${id}`)}`, purpose: "support" });
+  await sendEmail({ to: to.email, subject: `Re: ${to.subject}`, text: `${BRAND} support replied to your request "${to.subject}".\n\nRead and reply: ${appUrl(`/support/${id}`)}`, purpose: "support" });
 }
 
 export async function adminCloseCase(admin: AdminContext, id: string): Promise<void> {

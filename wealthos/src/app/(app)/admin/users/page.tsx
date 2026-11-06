@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/form";
 import { formatDate } from "@/lib/format";
 
-export const metadata = { title: "Users · Admin · WealthOS" };
+export const metadata = { title: "Users · Admin" };
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const app = await requireStaffPage(["support"]);

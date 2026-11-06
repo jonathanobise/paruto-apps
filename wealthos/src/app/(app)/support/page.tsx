@@ -7,15 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { AdminForm } from "@/components/app/admin-form";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { newCaseAction } from "./actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Help · WealthOS" };
+export const metadata = { title: "Help" };
 
 export default async function SupportPage() {
   const app = await requireApp();
   const cases = await listMyCases(app.session.userId);
   return (
     <>
-      <PageHeader title="Help" description="Ask the WealthOS team about your account, data, imports or billing. Only you and WealthOS support can see your requests." />
+      <PageHeader title="Help" description={`Ask the ${BRAND} team about your account, data, imports or billing. Only you and ${BRAND} support can see your requests.`} />
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <Card>
           <CardHeader><div><CardTitle>New request</CardTitle><CardDescription>We&apos;ll never ask for your password, sign-in codes or bank login details. We can&apos;t give personal investment advice.</CardDescription></div></CardHeader>

@@ -5,7 +5,7 @@ import { getSession } from "@/server/auth/context";
 import { ResendForm } from "./resend";
 import { signOutAction } from "../actions";
 
-export const metadata = { title: "Confirm your email · WealthOS" };
+export const metadata = { title: "Confirm your email" };
 
 export default async function VerifyEmailPage() {
   const session = await getSession();

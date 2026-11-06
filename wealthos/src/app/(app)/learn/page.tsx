@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Learn · WealthOS" };
+export const metadata = { title: "Learn" };
 
 export default async function LearnPage() {
   const app = await requireApp();

@@ -9,7 +9,7 @@ import { DisableMfa, EnableMfa } from "./mfa";
 import { PasswordForm } from "./password-form";
 import { revokeSessionAction } from "../actions";
 
-export const metadata = { title: "Security · WealthOS" };
+export const metadata = { title: "Security" };
 
 function device(ua: string | null): string {
   if (!ua) return "Unknown device";

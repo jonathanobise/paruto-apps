@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { platformSettings } from "@/server/db/schema";
 import type { Tx } from "@/server/db/client";
+import { BRAND } from "@/lib/brand";
 
 /**
  * Billing configuration (platform_settings key "billing"). Tax treatment and bank details are
@@ -18,7 +19,7 @@ export const billingSettingsSchema = z.object({
   paymentDueDays: z.coerce.number().int().min(1).max(30).default(7),
   graceDays: z.coerce.number().int().min(0).max(30).default(7),
   renewalNoticeDays: z.coerce.number().int().min(1).max(30).default(7),
-  sellerName: z.string().trim().max(120).default("WealthOS"),
+  sellerName: z.string().trim().max(120).default(BRAND),
   sellerDetails: z.string().trim().max(500).default(""),
   bankTransfer: z
     .object({ accountName: z.string().trim().min(2).max(120), bankName: z.string().trim().min(2).max(80), accountNumber: z.string().regex(/^\d{10}$/, "10-digit NUBAN"), instructions: z.string().trim().max(500).default("") })

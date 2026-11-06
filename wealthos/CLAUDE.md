@@ -1,5 +1,7 @@
 # WealthOS — working notes for Claude
 
+Public name: **Paruto Wealth** (working name; ADR-028). Never hard-code the product name in UI, emails, PDFs or prompts: use `BRAND` from `src/lib/brand.ts`. "WealthOS" is only the internal codename (folder, package, database, cookies).
+
 Read `docs/ARCHITECTURE.md` and `docs/FINANCIAL_ENGINE.md` before changing domain code.
 
 ## Non-negotiables

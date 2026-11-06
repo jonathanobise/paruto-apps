@@ -10,8 +10,9 @@ import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { formatDate, formatMoney } from "@/lib/format";
 import { InvoiceAdmin } from "../invoice-admin";
 import { saveBillingSettingsAction, savePlanAction } from "../console-actions";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Billing · Admin · WealthOS" };
+export const metadata = { title: "Billing · Admin" };
 const day = (x: Date | null) => (x ? formatDate(x.toISOString().slice(0, 10)) : "—");
 const KEYS = Object.keys(LIMIT_LABELS) as LimitKey[];
 
@@ -23,7 +24,7 @@ export default async function AdminBilling() {
   const s = cfg.settings;
   return (
     <>
-      <PageHeader title="Billing" description="Revenue from WealthOS's own records, payment reconciliation, plans and billing settings. Every change is audited." />
+      <PageHeader title="Billing" description={`Revenue from ${BRAND}'s own records, payment reconciliation, plans and billing settings. Every change is audited.`} />
       <Alert tone="info" className="mb-6" title="No payment provider is connected">Customers pay by bank transfer against an invoice; record each payment here after it appears in the bank account. A provider (card/transfer checkout and notifications) needs its terms confirmed first.</Alert>
       <div className="grid gap-4 sm:grid-cols-3">
         <Card><CardContent className="pt-5"><p className="text-[13px] text-text-3">Monthly recurring revenue</p><p className="num text-3xl font-semibold">{formatMoney(rev.mrr, "NGN", { decimals: 0 })}</p><p className="text-[12px] text-text-3">active and past-due paid plans, excluding trials and complimentary</p></CardContent></Card>

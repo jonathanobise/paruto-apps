@@ -6,6 +6,7 @@ import { Field, Input } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FormMessage } from "@/components/ui/form-message";
 import { Alert } from "@/components/ui/alert";
+import { BRAND } from "@/lib/brand";
 
 export function EnableMfa() {
   const [begin, beginAction, beginActionPending] = useActionState(beginMfaAction, null);
@@ -23,7 +24,7 @@ export function EnableMfa() {
   if (begin?.ok && "secret" in begin.data) {
     return (
       <div className="flex flex-col gap-4">
-        <p className="text-sm text-text-2">Add WealthOS to an authenticator app (Google Authenticator, 1Password, Authy…). Scan with your phone or enter the key manually:</p>
+        <p className="text-sm text-text-2">Add {BRAND} to an authenticator app (Google Authenticator, 1Password, Authy…). Scan with your phone or enter the key manually:</p>
         <div className="size-44 rounded-[var(--radius-inner)] border border-border bg-white p-2 [&_svg]:size-full" role="img" aria-label="QR code for your authenticator app" dangerouslySetInnerHTML={{ __html: begin.data.qrSvg }} />
         <code className="num block break-all rounded-[var(--radius-inner)] bg-surface-2 px-3 py-2 text-sm tracking-wider" data-testid="totp-secret">{begin.data.secret}</code>
         <ActionForm action={confirmAction} pending={confirmActionPending} className="flex flex-col gap-3">

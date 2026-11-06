@@ -10,6 +10,7 @@ import { enforceLimit } from "@/server/billing/entitlements";
 import { appUrl, sendEmail } from "./email";
 import { randomToken, sha256 } from "./crypto";
 import { parseOrThrow } from "./service";
+import { BRAND } from "@/lib/brand";
 
 /**
  * Shared spaces (household / business organisations), invitations and member roles.
@@ -54,7 +55,7 @@ export async function createSharedSpace(userId: string, input: unknown): Promise
     const r = await tx.execute<{ id: string }>(sql`select app_create_organization(${userId}::uuid, ${s.name}, ${s.kind}::org_kind, false) as id`);
     const orgId = r.rows[0]!.id;
     // Only offered jurisdictions (Nigeria today); the organisation row defaults to NG.
-    if (s.jurisdiction !== "NG") throw new AppError("VALIDATION", "WealthOS is only available in Nigeria for now.", { fieldErrors: { jurisdiction: ["Not offered yet"] } });
+    if (s.jurisdiction !== "NG") throw new AppError("VALIDATION", `${BRAND} is only available in Nigeria for now.`, { fieldErrors: { jurisdiction: ["Not offered yet"] } });
     await tx.execute(sql`select set_config('app.org_id', ${orgId}, true)`);
     await recordAudit(tx, { orgId, actorUserId: userId, action: "org.created", targetType: "organization", targetId: orgId, metadata: { kind: s.kind } });
     return orgId;
@@ -103,8 +104,8 @@ export async function inviteMember(ctx: TenantContext, input: unknown): Promise<
   const link = appUrl(`/invite?token=${token}`);
   await sendEmail({
     to: inv.email,
-    subject: `${inviter?.name ?? "Someone"} invited you to "${result.orgName}" on WealthOS`,
-    text: `${inviter?.name ?? "Someone"} invited you to join "${result.orgName}" on WealthOS as ${ROLE_LABELS[inv.role].toLowerCase()}.\n\n${ROLE_HELP[inv.role]}\n\nAccept within ${INVITE_DAYS} days: ${link}\n\nYou'll need a WealthOS account with this email address. If you weren't expecting this, ignore this email.`,
+    subject: `${inviter?.name ?? "Someone"} invited you to "${result.orgName}" on ${BRAND}`,
+    text: `${inviter?.name ?? "Someone"} invited you to join "${result.orgName}" on ${BRAND} as ${ROLE_LABELS[inv.role].toLowerCase()}.\n\n${ROLE_HELP[inv.role]}\n\nAccept within ${INVITE_DAYS} days: ${link}\n\nYou'll need a ${BRAND} account with this email address. If you weren't expecting this, ignore this email.`,
     purpose: "invitation",
   });
   return { id: result.id, link };

@@ -17,7 +17,7 @@ import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { compareWithAction } from "../actions";
 import { SaveComparisonForm } from "./save-form";
 
-export const metadata = { title: "Compare · WealthOS" };
+export const metadata = { title: "Compare" };
 
 export default async function ComparePage({ searchParams }: { searchParams: Promise<{ ids?: string }> }) {
   const app = await requireApp();
