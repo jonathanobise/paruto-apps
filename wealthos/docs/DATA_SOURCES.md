@@ -1,31 +1,40 @@
-# Data sources and quality
+# Data sources and terms
 
-## Registry
-`market_data_sources`: key, name, kind (`official` · `licensed` · `admin_verified_import` · `user` · `synthetic`), URL, licence note, default freshness, active flag. Every data point stores: source, instrument identifier, value, currency/unit, methodology (close, NAV, mid, sample…), observation date, retrieval timestamp, verification state (`verified` · `unverified` · `synthetic` · `user_provided`). Freshness thresholds live on instruments (`stale_after_days`) and sources.
+The research platform shows only real data whose terms allow the use we make of it. This file
+records each source, what we take, how, and the evidence for the terms (checked 6 Nov 2026).
+Quotes are the source's own words. Re-check before any change of use (e.g. going public).
 
-## What is connected today
-**Nothing live.** The only source installed is `wealthos-sample` (synthetic, for the DEMO portfolio). No dashboard shows fictional rates as if real: synthetic rows are labelled SAMPLE in the UI and the data-quality panel.
+**Current use: private research by the owner.** Public display needs the licences marked below.
 
-## Candidate sources (to evaluate and license — not integrated)
-| Data | Candidate source | Notes |
-|---|---|---|
-| T-bill auctions, discount/true yields, MPR, official FX | Central Bank of Nigeria publications | Official; check reuse terms and formats |
-| FGN bonds, savings bonds | Debt Management Office Nigeria | Official |
-| NGX equity prices, corporate actions | Nigerian Exchange (NGX) data products | Licensed; redistribution rules |
-| Mutual / money-market fund NAVs and yields | SEC Nigeria weekly CIS valuation reports; fund managers' factsheets | Mixed methodologies — store methodology per figure |
-| CPI / inflation | National Bureau of Statistics | Official; rebasing history |
-| Global ETF prices, FX | Licensed vendor (e.g. exchange or market-data API) | Licence cost — ask before committing |
+## In use (ingested by `npm run ingest -- all`)
 
-## Administrator-verified import (built)
-Until a licensed feed exists, data enters only through the admin console (`/admin`), available to platform administrators with two-step verification (granted by an operator via `scripts/grant-admin.ts`; Postgres re-checks the role on every write):
-1. **Register the source** with its kind (official / licensed / admin-verified import), URL, licence or terms note and freshness threshold.
-2. **Catalogue instruments** with identity (name, ticker, ISIN, issuer, class, currency, country, valuation model, maturity) and structured facts (charges, minimums, liquidity, distributions, benchmark, risks, tax notes). An instrument is marked *verified* only with a cited official source URL and as-of date; users see facts only for verified instruments.
-3. **Import** prices/NAVs, published rates (with methodology, tenor, basis, source URL) or FX rates as CSV: rows are validated and previewed, then committed as `verified` under the chosen source. Corrections update in place and invalidate analytics caches. Expected returns are refused — they are assumptions, not published data.
-Planned: second-admin approval (four-eyes) before commit, and scheduled pulls from licensed APIs through the same validation.
+| Source | What we ingest | Endpoint | Terms (quoted) |
+|---|---|---|---|
+| Central Bank of Nigeria | Official exchange rates (daily, Dec 2001 →, ~15 currencies vs NGN, central rate); inflation y/y headline/food/core (monthly, 2003 →); money-market indicators (MPR, interbank, T-bill, deposit and lending rates; monthly, 2006 →); NTB and FGN bond primary auction results (2002 →) | `cbn.gov.ng/api/GetAllExchangeRates`, `GetAllInflationRates`, `GetAllMoneyMarketIndicators`, `GetAllSecuritiesNTB`, `GetAllSecuritiesFGNBond` (the JSON behind the CBN's public rate pages; undocumented) | [cbn.gov.ng/Legal.html](https://www.cbn.gov.ng/Legal.html): "It is permitted to copy material from this Internet address… provided that CBN is stated expressly as the source." "not permitted to amend or distort the contents." |
+| Federal Reserve Board | Effective federal funds rate (daily, 2000 →) | Data Download Program, H.15 CSV | Public domain; citation requested (series tagged "Public Domain: Citation Requested"). |
+| Bank of England | Bank Rate (changes, 2000 →) | Bank of England Database CSV, series IUDBEDR | [bankofengland.co.uk/legal](https://www.bankofengland.co.uk/legal): "Reproduction of data in the Database is subject to the terms of the UK Open Government Licence" (exceptions: selected exchange-rate data and LSEG-owned data — not used). |
+| Office for National Statistics | CPI index, all items, 2015 = 100 (D7BT; monthly) | ONS time-series CSV | [ons.gov.uk T&Cs](https://www.ons.gov.uk/help/termsandconditions): "All content is available under the Open Government Licence v3.0." Attribution: "Source: Office for National Statistics licensed under the Open Government Licence v3.0." |
+
+Derived series are computed by us and say so (source kind `derived`):
+- **Nigerian T-bills, 91-day rolled (total-return index):** buy the 91-day bill at each CBN primary
+  auction, hold to maturity, roll into the first auction on or after maturity (cash earns nothing
+  while waiting); valued at amortised cost between purchase and maturity; actual/365 discount basis.
+  `rolledBillIndex` in `src/engine/market-performance.ts`.
+
+## Not yet in use
+
+| Source | Data | Terms / cost | Next step |
+|---|---|---|---|
+| **EODHD** (recommended for prices) | End-of-day prices, dividends and splits: US, LSE, global ETFs **and NGX (XNSA, 159 tickers)**; 30+ years; FX | Personal plans $19.99–99.99/mo forbid "displaying" (to others); Commercial Internal $399/mo forbids display outside the company; display rights by quote (Enterprise $2,499/mo; Custom "from $399/mo") | Owner approval for a personal plan for the private phase; confirm in writing that a single-user private app is personal use; get a display quote before going public, including XNSA provenance |
+| NGX (direct) | NGX equity EOD prices, dividends, index values | EOD Prices API ₦125k/yr; Website/Mobile EOD licence ₦120k/yr; Historical Data Redistribution ₦1.25m/yr (+VAT). Policy §8.2.6: redistribution needs "prior written permission from NGX" | Needed before showing NGX data publicly, even if prices come from a vendor |
+| SEC Nigeria | Weekly NAV and unit price of every collective investment scheme, 2011 → (XLSX) | Terms of Use page has no body text: reuse unstated | Ask SEC for written permission; ingest privately in the meantime only with owner approval |
+| DMO | Eurobond daily prices/yields; FGN bond auction summaries; Savings bonds | "All Rights Reserved"; no reuse licence | Ask DMO for permission |
+| NBS | CPI index levels, inflation reports | Reported: no redistribution "without the written agreement" of NBS (page did not load for verification) | We use the CBN's republication of the inflation rates; confirm with NBS before public launch |
+| FMDQ | Secondary-market T-bill and FGN bond quotes | Redistribution licence ₦13.4m/yr; "may not be… displayed… without the prior written consent of FMDQ Group" | Deferred; primary-auction rates from the CBN instead |
+| BLS (US CPI) | CPI-U index | "everything that we publish… is in the public domain"; citation requested | API throttled without a registration key; register a key (free) |
+| Index providers (S&P DJI, FTSE Russell, NGX ASI) | Index levels | Licensed for display | Show tracking ETFs instead until licensed |
 
 ## Rules
-- Prefer official and licensed sources; do not scrape protected sources or breach terms.
-- A smaller set of reliably sourced instruments beats a large questionable catalogue.
-- Never compare different yield methodologies as if identical (`RateMethodology`, `assertComparable`).
-- Stale data is shown with its as-of date and flagged; missing data is never filled with another date's value.
-- Synthetic data is always labelled DEMO/SAMPLE.
+- Store provenance for every value (source, methodology, retrieval time); never fill gaps.
+- Show the attribution required by each source wherever its data appears.
+- Never use a source against its terms (e.g. Yahoo Finance's terms forbid this use; not used).

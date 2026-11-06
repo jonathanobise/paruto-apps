@@ -1,0 +1,72 @@
+[
+{
+"id": 298,
+"tyear": 2026,
+"tmonth": 9,
+"period": "September 2026",
+"allItemsYearOn": "14.63",
+"allItemsAverage": "15.80",
+"foodYearOn": "19.59",
+"foodAverage": "15.72",
+"allItemsLessFrmProdYearOn": "12.78",
+"allItemsLessFrmProdAverage": "15.91",
+"allItemsLessFrmProdAndEnergyYearOn": "12.95",
+"allItemsLessFrmProdAndEnergyAvg": "16.54"
+},
+{
+"id": 297,
+"tyear": 2026,
+"tmonth": 8,
+"period": "August 2026",
+"allItemsYearOn": "15.39",
+"allItemsAverage": "16.30",
+"foodYearOn": "19.57",
+"foodAverage": "15.70",
+"allItemsLessFrmProdYearOn": "12.64",
+"allItemsLessFrmProdAverage": "16.63",
+"allItemsLessFrmProdAndEnergyYearOn": "13.29",
+"allItemsLessFrmProdAndEnergyAvg": "17.30"
+},
+{
+"id": 296,
+"tyear": 2026,
+"tmonth": 7,
+"period": "July 2026",
+"allItemsYearOn": "15.43",
+"allItemsAverage": "16.89",
+"foodYearOn": "20.31",
+"foodAverage": "16.06",
+"allItemsLessFrmProdYearOn": "14.08",
+"allItemsLessFrmProdAverage": "17.45",
+"allItemsLessFrmProdAndEnergyYearOn": "14.97",
+"allItemsLessFrmProdAndEnergyAvg": "18.09"
+},
+{
+"id": 2,
+"tyear": 2003,
+"tmonth": 2,
+"period": "February 2003",
+"allItemsYearOn": "7.30",
+"allItemsAverage": "11.40",
+"foodYearOn": "3.50",
+"foodAverage": "9.70",
+"allItemsLessFrmProdYearOn": "14.20",
+"allItemsLessFrmProdAverage": "14.30",
+"allItemsLessFrmProdAndEnergyYearOn": "12.10",
+"allItemsLessFrmProdAndEnergyAvg": "8.90"
+},
+{
+"id": 1,
+"tyear": 2003,
+"tmonth": 1,
+"period": "January 2003",
+"allItemsYearOn": "10.60",
+"allItemsAverage": "12.30",
+"foodYearOn": "7.50",
+"foodAverage": "11.60",
+"allItemsLessFrmProdYearOn": "16.10",
+"allItemsLessFrmProdAverage": "13.40",
+"allItemsLessFrmProdAndEnergyYearOn": "13.60",
+"allItemsLessFrmProdAndEnergyAvg": "8.60"
+}
+]

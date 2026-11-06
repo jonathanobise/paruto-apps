@@ -16,3 +16,4 @@ export * from "./fixed-income";
 export * from "./holding-performance";
 export * from "./price-returns";
 export * from "./stress";
+export * from "./market-performance";

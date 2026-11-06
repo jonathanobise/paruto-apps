@@ -13,3 +13,4 @@ export * from "./platform";
 export * from "./support";
 export * from "./household";
 export * from "./connections";
+export * from "./research-data";

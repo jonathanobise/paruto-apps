@@ -1,0 +1,194 @@
+[
+{
+"id": 65356,
+"currency": "CFA",
+"ratedate": "2026-11-05",
+"buyingrate": "2.2746",
+"centralrate": "2.2846",
+"sellingrate": "2.2946"
+},
+{
+"id": 65357,
+"currency": "YUAN/RENMINBI",
+"ratedate": "2026-11-05",
+"buyingrate": "202.0935",
+"centralrate": "202.1685",
+"sellingrate": "202.2435"
+},
+{
+"id": 65358,
+"currency": "DANISH KRONA",
+"ratedate": "2026-11-05",
+"buyingrate": "202.3545",
+"centralrate": "202.4296",
+"sellingrate": "202.5046"
+},
+{
+"id": 65359,
+"currency": "EURO",
+"ratedate": "2026-11-05",
+"buyingrate": "1512.8399",
+"centralrate": "1513.4012",
+"sellingrate": "1513.9624"
+},
+{
+"id": 65360,
+"currency": "YEN",
+"ratedate": "2026-11-05",
+"buyingrate": "8.5069",
+"centralrate": "8.5100",
+"sellingrate": "8.5132"
+},
+{
+"id": 65361,
+"currency": "RIYAL",
+"ratedate": "2026-11-05",
+"buyingrate": "359.0435",
+"centralrate": "359.1767",
+"sellingrate": "359.3099"
+},
+{
+"id": 65362,
+"currency": "SOUTH AFRICAN RAND",
+"ratedate": "2026-11-05",
+"buyingrate": "82.1954",
+"centralrate": "82.2259",
+"sellingrate": "82.2564"
+},
+{
+"id": 65363,
+"currency": "SDR",
+"ratedate": "2026-11-05",
+"buyingrate": "1829.6940",
+"centralrate": "1830.3728",
+"sellingrate": "1831.0516"
+},
+{
+"id": 65364,
+"currency": "SWISS FRANC",
+"ratedate": "2026-11-05",
+"buyingrate": "1647.6059",
+"centralrate": "1648.2171",
+"sellingrate": "1648.8284"
+},
+{
+"id": 65365,
+"currency": "POUNDS STERLING",
+"ratedate": "2026-11-05",
+"buyingrate": "1815.6775",
+"centralrate": "1816.3511",
+"sellingrate": "1817.0247"
+},
+{
+"id": 65366,
+"currency": "US DOLLAR",
+"ratedate": "2026-11-05",
+"buyingrate": "1347.7416",
+"centralrate": "1348.2416",
+"sellingrate": "1348.7416"
+},
+{
+"id": 65367,
+"currency": "WAUA",
+"ratedate": "2026-11-05",
+"buyingrate": "1822.0977",
+"centralrate": "1822.7737",
+"sellingrate": "1823.4497"
+},
+{
+"id": 65368,
+"currency": "UAE DIRHAM",
+"ratedate": "2026-11-05",
+"buyingrate": "366.9521",
+"centralrate": "367.0882",
+"sellingrate": "367.2244"
+},
+{
+"id": 29350,
+"currency": "US DOLLAR",
+"ratedate": "2015-06-01",
+"buyingrate": "195.9500",
+"centralrate": "196.4500",
+"sellingrate": "196.9500"
+},
+{
+"id": 29351,
+"currency": "POUNDS STERLING",
+"ratedate": "2015-06-01",
+"buyingrate": "298.0400",
+"centralrate": "298.8005",
+"sellingrate": "299.5610"
+},
+{
+"id": 29352,
+"currency": "EURO",
+"ratedate": "2015-06-01",
+"buyingrate": "214.1929",
+"centralrate": "214.7395",
+"sellingrate": "215.2860"
+},
+{
+"id": 29353,
+"currency": "SWISS FRANC",
+"ratedate": "2015-06-01",
+"buyingrate": "207.3764",
+"centralrate": "207.9056",
+"sellingrate": "208.4348"
+},
+{
+"id": 29354,
+"currency": "YEN",
+"ratedate": "2015-06-01",
+"buyingrate": "1.5790",
+"centralrate": "1.5830",
+"sellingrate": "1.5870"
+},
+{
+"id": 29355,
+"currency": "CFA",
+"ratedate": "2015-06-01",
+"buyingrate": "0.3086",
+"centralrate": "0.3186",
+"sellingrate": "0.3286"
+},
+{
+"id": 29356,
+"currency": "WAUA",
+"ratedate": "2015-06-01",
+"buyingrate": "271.8459",
+"centralrate": "272.5395",
+"sellingrate": "273.2332"
+},
+{
+"id": 29357,
+"currency": "YUAN/RENMINBI",
+"ratedate": "2015-06-01",
+"buyingrate": "31.6014",
+"centralrate": "31.6825",
+"sellingrate": "31.7636"
+},
+{
+"id": 29358,
+"currency": "RIYAL",
+"ratedate": "2015-06-01",
+"buyingrate": "52.2505",
+"centralrate": "52.3839",
+"sellingrate": "52.5172"
+},
+{
+"id": 29359,
+"currency": "DANISH KRONA",
+"ratedate": "2015-06-01",
+"buyingrate": "28.7174",
+"centralrate": "28.7906",
+"sellingrate": "28.8639"
+},
+{
+"id": 29360,
+"currency": "SDR",
+"ratedate": "2015-06-01",
+"buyingrate": "272.0570",
+"centralrate": "272.7512",
+"sellingrate": "273.4454"
+}
+]

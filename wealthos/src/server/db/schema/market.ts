@@ -17,11 +17,13 @@ export const assetClass = pgEnum("asset_class", [
   "real_estate",
   "business",
   "pension",
+  "commodity",
+  "index",
   "other",
 ]);
 export const pricingModel = pgEnum("pricing_model", ["market", "nav", "discount_accrual", "manual"]);
 export const verificationState = pgEnum("verification_state", ["verified", "unverified", "synthetic", "user_provided"]);
-export const sourceKind = pgEnum("source_kind", ["official", "licensed", "admin_verified_import", "user", "synthetic"]);
+export const sourceKind = pgEnum("source_kind", ["official", "licensed", "admin_verified_import", "user", "synthetic", "derived"]);
 
 export const institutions = pgTable("institutions", {
   id: id(),
@@ -73,9 +75,17 @@ export const instruments = pgTable("instruments", {
   factsSourceUrl: text("facts_source_url"),
   factsAsOf: date("facts_as_of", { mode: "string" }),
   isDemo: boolean("is_demo").notNull().default(false),
+  /** Research classification (src/lib/markets.ts): ng | us | uk | global. */
+  market: text("market"),
+  /** Listing venue (ISO 10383 MIC where one exists, e.g. XNSA, XNYS, XLON). */
+  exchange: text("exchange"),
+  sectorKey: text("sector_key"),
+  industryKey: text("industry_key"),
+  /** Set on the instrument that represents an asset class on the markets scoreboard (unique). */
+  benchmarkKey: text("benchmark_key"),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-}, (t) => [index("instruments_org_idx").on(t.orgId), index("instruments_symbol_idx").on(t.symbol), unique("instruments_org_id_id_key").on(t.orgId, t.id)]);
+}, (t) => [index("instruments_market_idx").on(t.market, t.sectorKey), uniqueIndex("instruments_benchmark_key").on(t.benchmarkKey), index("instruments_org_idx").on(t.orgId), index("instruments_symbol_idx").on(t.symbol), unique("instruments_org_id_id_key").on(t.orgId, t.id)]);
 
 export const instrumentIdentifiers = pgTable("instrument_identifiers", {
   id: id(),

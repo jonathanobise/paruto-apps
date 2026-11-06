@@ -20,6 +20,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed-demo": "tsx --conditions=react-server scripts/seed-demo.ts",
+    "ingest": "tsx --conditions=react-server scripts/ingest.ts",
     "check": "npm run typecheck && npm run lint && npm run test",
     "test:perf": "vitest run --project perf",
     "worker": "tsx --conditions=react-server scripts/worker.ts",
