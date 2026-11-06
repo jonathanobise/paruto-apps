@@ -12,12 +12,14 @@ import { DISCLOSURES } from "@/server/compliance/features";
 import { SUPPORTED_CURRENCIES } from "@/engine";
 import { BRAND } from "@/lib/brand";
 import { isDemoMode } from "@/server/demo/mode";
+import { researchAvailability } from "@/server/research/availability";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const app = await requireApp();
   const unread = await unreadCount(app.ctx);
   const light = app.preferences.theme === "light" || (await cookies()).get(THEME_COOKIE)?.value === "light";
   const isStaff = app.session.user.platformRole !== "user";
+  const research = await researchAvailability(app.org.jurisdiction);
   const iconBtn = "spring flex size-9 items-center justify-center rounded-full text-text-2 hover:bg-text/10 hover:text-text";
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[264px_1fr] print:block">
@@ -26,7 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard" className="spring w-fit px-3">
           <Logo />
         </Link>
-        <Nav isAdmin={isStaff} />
+        <Nav isAdmin={isStaff} researchHref={research.href} />
         <p className="mt-auto px-3 text-[11px] leading-relaxed text-text-3">{DISCLOSURES.non_custodial}</p>
       </aside>
       <div className="min-w-0">
@@ -34,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="glass sticky top-3 z-30 mx-3 mt-3 flex h-14 items-center gap-2 rounded-full pl-2 pr-2 sm:gap-3 sm:pl-3 print:hidden">
           <MobileNav
             isAdmin={isStaff}
+            researchHref={research.href}
             footer={
               <form action={signOutAction}>
                 <button className="flex w-full items-center gap-3 rounded-full px-3 py-2 text-sm font-medium text-text-2 hover:bg-text/10">

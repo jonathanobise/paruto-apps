@@ -59,7 +59,7 @@ export default async function BacktestPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader title="Backtest a portfolio" description="See how a mix you choose would have behaved in the past, in one currency, with optional monthly contributions and rebalancing. A hypothetical illustration of history, not a forecast or a recommendation." />
-      <ResearchTabs current="/research/backtest" />
+      <ResearchTabs current="/research/backtest" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
       <Alert tone="info" className="mb-6">{DISCLOSURES.hypothetical} {DISCLOSURES.past_performance}</Alert>
 

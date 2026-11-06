@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { researchAvailability } from "@/server/research/availability";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPercent } from "@/lib/format";
 import { RATE_METHODOLOGIES, type RateMethodology } from "@/engine";
@@ -43,11 +44,14 @@ const RESEARCH_TABS = [
   { href: "/research/fixed-income", label: "Fixed income" },
 ];
 
-/** Segmented control between the research pages (a floating control, so Liquid Glass). */
-export function ResearchTabs({ current }: { current: string }) {
+/** Segmented control between the research pages (a floating control, so Liquid Glass). Tabs for areas not available here are left out. */
+export async function ResearchTabs({ current, jurisdiction }: { current: string; jurisdiction: string }) {
+  const avail = await researchAvailability(jurisdiction);
+  const tabs = RESEARCH_TABS.filter((t) => (t.href === "/research/backtest" ? avail.backtest : avail.research));
+  if (tabs.length < 2) return null;
   return (
     <nav aria-label="Research" className="glass mb-6 inline-flex max-w-full overflow-x-auto rounded-full p-1 [scrollbar-width:none]">
-      {RESEARCH_TABS.map((t) => (
+      {tabs.map((t) => (
         <Link key={t.href} href={t.href} aria-current={t.href === current ? "page" : undefined} className={`spring shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-medium ${t.href === current ? "bg-brand text-brand-ink shadow-sm" : "text-text-2 hover:text-text"}`}>
           {t.label}
         </Link>

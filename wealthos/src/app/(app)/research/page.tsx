@@ -45,7 +45,7 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <PageHeader title="Markets at a glance" description="How the main asset classes have done over the long run, in the currency you spend, before and after inflation. Every figure comes from an official or licensed source, shown at the foot of the page." />
-      <ResearchTabs current="/research" />
+      <ResearchTabs current="/research" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
 
       <dl className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
