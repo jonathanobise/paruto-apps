@@ -57,3 +57,15 @@ describe("data quality", () => {
     expect(findIsolatedSpikes(rows).map((r) => r.date)).toEqual(["2003-12-09"]);
   });
 });
+
+describe("BLS", () => {
+  it("monthly CPI values, skipping the annual average and reporting refusals", async () => {
+    const { parseBlsSeries } = await import("@/server/ingest/official");
+    const ok = parseBlsSeries({ status: "REQUEST_SUCCEEDED", Results: { series: [{ seriesID: "CUUR0000SA0", data: [{ year: "2024", period: "M13", value: "313.689" }, { year: "2024", period: "M12", value: "315.605" }] }] } }, "US.CPI");
+    expect(ok.rows).toEqual([{ seriesKey: "US.CPI", date: "2024-12-31", value: "315.605" }]);
+    expect(ok.skipped).toBe(1);
+    const refused = parseBlsSeries({ status: "REQUEST_NOT_PROCESSED", message: ["daily threshold reached"] }, "US.CPI");
+    expect(refused.rows).toEqual([]);
+    expect(refused.notes[0]).toContain("daily threshold");
+  });
+});

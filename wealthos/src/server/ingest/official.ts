@@ -265,3 +265,27 @@ export function parseOnsMonthlyCsv(text: string, seriesKey: string): ParseReport
   }
   return { rows, skipped, notes: [] };
 }
+
+/**
+ * BLS Public Data API v2 response → monthly index values (M01–M12; the annual average M13 is skipped).
+ * Shape: { status, Results: { series: [{ seriesID, data: [{ year, period, value }] }] } }.
+ */
+export function parseBlsSeries(json: unknown, seriesKey: string): ParseReport<MonthlyObs> {
+  const rows: MonthlyObs[] = [];
+  let skipped = 0;
+  const j = json as { status?: string; message?: string[]; Results?: { series?: Array<{ data?: Array<Record<string, unknown>> }> } };
+  if (j?.status !== "REQUEST_SUCCEEDED") return { rows, skipped, notes: [`BLS: ${j?.status ?? "no status"} ${(j?.message ?? []).join(" ")}`.trim()] };
+  for (const s of j.Results?.series ?? []) {
+    for (const r of s.data ?? []) {
+      const m = /^M(\d{2})$/.exec(String(r.period ?? ""));
+      const month = m ? Number(m[1]) : 0;
+      const v = decimalOrNull(r.value);
+      if (!m || month < 1 || month > 12 || v === null) {
+        skipped++;
+        continue;
+      }
+      rows.push({ seriesKey, date: monthEndOf(Number(r.year), month), value: v });
+    }
+  }
+  return { rows, skipped, notes: [] };
+}

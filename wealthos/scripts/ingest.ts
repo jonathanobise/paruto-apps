@@ -14,7 +14,7 @@ import pg from "pg";
 
 config({ path: process.env.ENV_FILE ?? ".env.local", quiet: true });
 
-const { parseBoeCsv, parseCbnAuctions, parseCbnExchangeRates, parseCbnInflation, parseCbnMoneyMarket, parseFedH15Csv, parseOnsMonthlyCsv } = await import("../src/server/ingest/official");
+const { parseBlsSeries, parseBoeCsv, parseCbnAuctions, parseCbnExchangeRates, parseCbnInflation, parseCbnMoneyMarket, parseFedH15Csv, parseOnsMonthlyCsv } = await import("../src/server/ingest/official");
 const { OFFICIAL_SOURCES, MACRO_SERIES, AUCTION_INSTRUMENTS, DERIVED } = await import("../src/server/ingest/catalogue");
 const { rolledBillIndex, d } = await import("../src/engine");
 const { BudgetExhausted, EodhdClient, mapSector, normaliseCurrency, parseDividends, parseEod, parseFundamentals, parseSplits } = await import("../src/server/ingest/eodhd");
@@ -168,6 +168,27 @@ const TASKS: Record<string, () => Promise<string>> = {
     const parsed = parseBoeCsv(await get("https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/2000&Dateto=now&SeriesCodes=IUDBEDR&CSVF=TN&UsingCodes=Y&VPD=Y&VFD=N"), "UK.BANKRATE");
     return `${await upsertMacro(parsed.rows, "bank-of-england")} rate changes`;
   },
+  "bls-cpi": async () => {
+    // Without a key BLS allows ~25 requests a day and 10 years per request; with BLS_API_KEY, 500 and 20.
+    const key = process.env.BLS_API_KEY;
+    const span = key ? 20 : 10;
+    const thisYear = new Date().getUTCFullYear();
+    const rows: Array<{ seriesKey: string; date: string; value: string }> = [];
+    const notes: string[] = [];
+    for (let start = 2000; start <= thisYear; start += span) {
+      const r = await fetch("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+        method: "POST",
+        headers: { "content-type": "application/json", "user-agent": UA },
+        body: JSON.stringify({ seriesid: ["CUUR0000SA0"], startyear: String(start), endyear: String(Math.min(start + span - 1, thisYear)), ...(key ? { registrationkey: key } : {}) }),
+        signal: AbortSignal.timeout(60_000),
+      });
+      const parsed = parseBlsSeries(await r.json(), "US.CPI");
+      rows.push(...parsed.rows);
+      notes.push(...parsed.notes);
+    }
+    if (!rows.length) throw new Error(`no data${notes.length ? `: ${notes.join("; ")}` : ""}${key ? "" : " (no BLS_API_KEY set)"}`);
+    return `${await upsertMacro(rows, "bls")} monthly index values${notes.length ? ` (${notes.join("; ")})` : ""}`;
+  },
   "ons-cpi": async () => {
     const parsed = parseOnsMonthlyCsv(await get("https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23"), "UK.CPI");
     return `${await upsertMacro(parsed.rows, "ons")} monthly index values`;
@@ -301,7 +322,7 @@ async function eodhdTask(): Promise<string> {
 }
 TASKS.eodhd = eodhdTask;
 
-const ALL = ["cbn-fx", "cbn-inflation", "cbn-money-market", "cbn-auctions", "fed-funds", "boe-bank-rate", "ons-cpi"];
+const ALL = ["cbn-fx", "cbn-inflation", "cbn-money-market", "cbn-auctions", "fed-funds", "boe-bank-rate", "ons-cpi", "bls-cpi"];
 const requested = process.argv.slice(2).filter((a) => !a.startsWith("-"));
 const tasks = requested.includes("all") || requested.length === 0 ? ALL : requested;
 let failed = 0;

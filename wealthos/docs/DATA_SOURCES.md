@@ -13,6 +13,7 @@ Quotes are the source's own words. Re-check before any change of use (e.g. going
 | Central Bank of Nigeria | Official exchange rates (daily, Dec 2001 →, ~15 currencies vs NGN, central rate); inflation y/y headline/food/core (monthly, 2003 →); money-market indicators (MPR, interbank, T-bill, deposit and lending rates; monthly, 2006 →); NTB and FGN bond primary auction results (2002 →) | `cbn.gov.ng/api/GetAllExchangeRates`, `GetAllInflationRates`, `GetAllMoneyMarketIndicators`, `GetAllSecuritiesNTB`, `GetAllSecuritiesFGNBond` (the JSON behind the CBN's public rate pages; undocumented) | [cbn.gov.ng/Legal.html](https://www.cbn.gov.ng/Legal.html): "It is permitted to copy material from this Internet address… provided that CBN is stated expressly as the source." "not permitted to amend or distort the contents." |
 | Federal Reserve Board | Effective federal funds rate (daily, 2000 →) | Data Download Program, H.15 CSV | Public domain; citation requested (series tagged "Public Domain: Citation Requested"). |
 | Bank of England | Bank Rate (changes, 2000 →) | Bank of England Database CSV, series IUDBEDR | [bankofengland.co.uk/legal](https://www.bankofengland.co.uk/legal): "Reproduction of data in the Database is subject to the terms of the UK Open Government Licence" (exceptions: selected exchange-rate data and LSEG-owned data — not used). |
+| US Bureau of Labor Statistics | CPI-U index, all items, US city average, NSA (CUUR0000SA0; monthly, 2000 →) | Public Data API v2 (`BLS_API_KEY` optional: without it ~25 requests/day, 10 years per request) | [bls.gov copyright](https://www.bls.gov/opub/copyright-information.htm): "everything that we publish… is in the public domain"; citation requested. |
 | Office for National Statistics | CPI index, all items, 2015 = 100 (D7BT; monthly) | ONS time-series CSV | [ons.gov.uk T&Cs](https://www.ons.gov.uk/help/termsandconditions): "All content is available under the Open Government Licence v3.0." Attribution: "Source: Office for National Statistics licensed under the Open Government Licence v3.0." |
 
 Derived series are computed by us and say so (source kind `derived`):
@@ -31,7 +32,6 @@ Derived series are computed by us and say so (source kind `derived`):
 | DMO | Eurobond daily prices/yields; FGN bond auction summaries; Savings bonds | "All Rights Reserved"; no reuse licence | Ask DMO for permission |
 | NBS | CPI index levels, inflation reports | Reported: no redistribution "without the written agreement" of NBS (page did not load for verification) | We use the CBN's republication of the inflation rates; confirm with NBS before public launch |
 | FMDQ | Secondary-market T-bill and FGN bond quotes | Redistribution licence ₦13.4m/yr; "may not be… displayed… without the prior written consent of FMDQ Group" | Deferred; primary-auction rates from the CBN instead |
-| BLS (US CPI) | CPI-U index | "everything that we publish… is in the public domain"; citation requested | API throttled without a registration key; register a key (free) |
 | Index providers (S&P DJI, FTSE Russell, NGX ASI) | Index levels | Licensed for display | Show tracking ETFs instead until licensed |
 
 ## Rules

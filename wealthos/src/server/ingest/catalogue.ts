@@ -35,6 +35,13 @@ export const OFFICIAL_SOURCES: Record<string, SourceDef> = {
     licenseNote: "Source: Bank of England Database (IUDBEDR). Reproduced under the UK Open Government Licence v3.0.",
     freshnessDays: 45,
   },
+  bls: {
+    name: "US Bureau of Labor Statistics",
+    kind: "official",
+    url: "https://www.bls.gov/cpi/",
+    licenseNote: "Source: U.S. Bureau of Labor Statistics. BLS: \"everything that we publish… is in the public domain\"; citation requested.",
+    freshnessDays: 45,
+  },
   ons: {
     name: "Office for National Statistics",
     kind: "official",
@@ -79,6 +86,7 @@ export const MACRO_SERIES: Record<string, MacroDef> = {
   "NG.MAX_LENDING": { name: "Nigeria maximum lending rate", country: "NG", unit: "percent", frequency: "monthly", description: "Average maximum lending rate (CBN money-market indicators)." },
   "US.FEDFUNDS": { name: "US effective federal funds rate", country: "US", unit: "percent", frequency: "daily", description: "Effective federal funds rate, daily (Federal Reserve H.15)." },
   "UK.BANKRATE": { name: "UK Bank Rate", country: "GB", unit: "percent", frequency: "event", description: "Bank of England official Bank Rate; one value per change." },
+  "US.CPI": { name: "US consumer price index (CPI-U, 1982–84 = 100)", country: "US", unit: "index", frequency: "monthly", description: "All items, U.S. city average, not seasonally adjusted (BLS series CUUR0000SA0)." },
   "UK.CPI": { name: "UK consumer price index (2015 = 100)", country: "GB", unit: "index", frequency: "monthly", description: "ONS CPI index, all items (series D7BT)." },
 };
 
