@@ -46,3 +46,14 @@ describe("official source parsers (excerpts of real responses)", () => {
     expect(ons.rows.every((r) => /-\d{2}-(28|29|30|31)$/.test(r.date))).toBe(true);
   });
 });
+
+describe("data quality", () => {
+  it("excludes isolated one-day spikes but keeps lasting moves", async () => {
+    const { findIsolatedSpikes } = await import("@/server/ingest/official");
+    const rows = [
+      { date: "2003-12-08", rate: "136.8" }, { date: "2003-12-09", rate: "1376.8" }, { date: "2003-12-10", rate: "136.63" },
+      { date: "2016-06-17", rate: "199" }, { date: "2016-06-20", rate: "280" }, { date: "2016-06-21", rate: "282" },
+    ];
+    expect(findIsolatedSpikes(rows).map((r) => r.date)).toEqual(["2003-12-09"]);
+  });
+});

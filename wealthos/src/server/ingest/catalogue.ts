@@ -42,6 +42,13 @@ export const OFFICIAL_SOURCES: Record<string, SourceDef> = {
     licenseNote: "Source: Office for National Statistics licensed under the Open Government Licence v3.0.",
     freshnessDays: 45,
   },
+  eodhd: {
+    name: "EODHD (EOD Historical Data)",
+    kind: "licensed",
+    url: "https://eodhd.com",
+    licenseNote: "End-of-day prices, dividends, splits and fundamentals licensed from EODHD under the owner's subscription, for the subscriber's own use. Not for display to others without a display licence (docs/DATA_SOURCES.md).",
+    freshnessDays: 5,
+  },
   "paruto-derived": {
     name: "Computed by us from official data",
     kind: "derived",

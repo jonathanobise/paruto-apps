@@ -17,6 +17,10 @@ config({ path: process.env.ENV_FILE ?? ".env.local", quiet: true });
 const { parseBoeCsv, parseCbnAuctions, parseCbnExchangeRates, parseCbnInflation, parseCbnMoneyMarket, parseFedH15Csv, parseOnsMonthlyCsv } = await import("../src/server/ingest/official");
 const { OFFICIAL_SOURCES, MACRO_SERIES, AUCTION_INSTRUMENTS, DERIVED } = await import("../src/server/ingest/catalogue");
 const { rolledBillIndex, d } = await import("../src/engine");
+const { BudgetExhausted, EodhdClient, mapSector, normaliseCurrency, parseDividends, parseEod, parseFundamentals, parseSplits } = await import("../src/server/ingest/eodhd");
+const { CURATED, marketOfCode } = await import("../src/server/ingest/universe");
+
+const FLAGS = Object.fromEntries(process.argv.slice(2).filter((a) => a.startsWith("--")).map((a) => { const [k, v] = a.slice(2).split("="); return [k!, v ?? "1"]; }));
 
 const ownerUrl = process.env.DATABASE_OWNER_URL;
 if (!ownerUrl) throw new Error("DATABASE_OWNER_URL is required");
@@ -110,6 +114,7 @@ const TASKS: Record<string, () => Promise<string>> = {
         chunk.flatMap((r) => [r.base, r.quote, r.rate, r.date]),
       );
     });
+    for (const r of parsed.rejected) await pool.query("delete from fx_rates where base = $1 and quote = $2 and observed_on = $3 and source_id = $4", [r.base, r.quote, r.date, sourceId]);
     return `${parsed.rows.length} official rates (${parsed.skipped} rows skipped${parsed.notes.length ? `; ${parsed.notes.join("; ")}` : ""})`;
   },
   "cbn-inflation": async () => {
@@ -168,6 +173,133 @@ const TASKS: Record<string, () => Promise<string>> = {
     return `${await upsertMacro(parsed.rows, "ons")} monthly index values`;
   },
 };
+
+// ---------------------------------------------------------------- EODHD (licensed; owner's subscription)
+
+type SymbolMeta = { Code: string; Name: string; Country: string; Exchange: string; Currency: string; Type: string; Isin: string | null };
+const ASSET_CLASS: Record<string, string> = { "common stock": "equity", "preferred stock": "equity", etf: "etf", fund: "equity_fund", "mutual fund": "equity_fund", index: "index", etc: "etf" };
+const REGION: Record<string, string> = { ng: "Africa", us: "North America", uk: "Europe", global: "Global" };
+const COUNTRY: Record<string, string> = { ng: "NG", us: "US", uk: "GB", global: "GLOBAL" };
+
+async function eodhdTask(): Promise<string> {
+  const key = process.env.EODHD_API_KEY;
+  if (!key) throw new Error("EODHD_API_KEY is not set: add it as an environment secret (never in the repository)");
+  let budget = Number(FLAGS.budget ?? 20);
+  const client0 = new EodhdClient(key, budget);
+  const usage = await client0.usage().catch(() => null);
+  if (usage) budget = Math.max(0, Math.min(budget, usage.limit - usage.used));
+  const client = new EodhdClient(key, budget);
+  const sourceId = await source("eodhd");
+  const withFundamentals = FLAGS.fundamentals === "1";
+  const symbolLists = new Map<string, Map<string, SymbolMeta>>();
+  const listFor = async (exchange: string) => {
+    if (!symbolLists.has(exchange)) {
+      const rows = ((await client.get("symbols", `exchange-symbol-list/${exchange}`)) ?? []) as SymbolMeta[];
+      symbolLists.set(exchange, new Map(rows.map((r) => [r.Code, r])));
+    }
+    return symbolLists.get(exchange)!;
+  };
+
+  let universe = FLAGS.symbols ? FLAGS.symbols.split(",").map((code) => ({ code: code.trim(), market: marketOfCode(code.trim()) })) : [...CURATED];
+  if (!FLAGS.symbols && FLAGS.ng !== "0") {
+    try {
+      const ngx = await listFor("XNSA");
+      universe = [...universe, ...[...ngx.values()].filter((r) => /common stock/i.test(r.Type)).map((r) => ({ code: `${r.Code}.XNSA`, market: "ng" as const }))];
+    } catch (err) {
+      if (err instanceof BudgetExhausted) return "budget exhausted before the NGX symbol list";
+      console.warn(`  NGX symbol list unavailable: ${err instanceof Error ? err.message : err}`);
+    }
+  }
+
+  const report = { created: 0, updated: 0, prices: 0, dividends: 0, splits: 0, fundamentals: 0, unknown: [] as string[], skippedFresh: 0 };
+  for (const entry of universe) {
+    try {
+      const [ticker, exch] = [entry.code.slice(0, entry.code.lastIndexOf(".")), entry.code.slice(entry.code.lastIndexOf(".") + 1)];
+      const idRow = await pool.query("select i.id, i.currency from instrument_identifiers x join instruments i on i.id = x.instrument_id where x.scheme = 'EODHD' and x.value = $1", [entry.code]);
+      let instrumentId: string | undefined = idRow.rows[0]?.id;
+      let currency: string = idRow.rows[0]?.currency;
+      const last = instrumentId ? (await pool.query("select max(observed_on)::text as last, max(retrieved_at) as fetched from market_prices where instrument_id = $1 and source_id = $2", [instrumentId, sourceId])).rows[0] : null;
+      if (last?.fetched && Date.now() - new Date(last.fetched).getTime() < 18 * 3600_000 && !FLAGS.force) {
+        report.skippedFresh++;
+        continue;
+      }
+      let fundamentals: ReturnType<typeof parseFundamentals> = null;
+      const fundAge = instrumentId ? (await pool.query("select retrieved_at from instrument_fundamentals where instrument_id = $1", [instrumentId])).rows[0]?.retrieved_at : null;
+      if (withFundamentals && (!fundAge || Date.now() - new Date(fundAge).getTime() > 7 * 86400_000) && client.remaining() >= 13) {
+        fundamentals = parseFundamentals(await client.get("fundamentals", `fundamentals/${entry.code}`));
+      }
+      if (!instrumentId) {
+        const meta = fundamentals ? null : (await listFor(exch === "US" ? "US" : exch)).get(ticker);
+        if (!fundamentals && !meta) {
+          report.unknown.push(entry.code);
+          continue;
+        }
+        const name = fundamentals?.profile.name ?? meta!.Name;
+        const type = (fundamentals?.profile.type ?? meta!.Type ?? "").toLowerCase();
+        const rawCcy = fundamentals?.profile.currency ?? meta!.Currency ?? (exch === "XNSA" ? "NGN" : "USD");
+        currency = normaliseCurrency("1", rawCcy).currency;
+        const assetClass = ASSET_CLASS[type] ?? "other";
+        const sectorKey = mapSector(fundamentals?.profile.sector ?? null, type) ?? (assetClass === "etf" ? "broad-market" : null);
+        const r = await pool.query(
+          `insert into instruments (symbol, name, issuer, asset_class, country, region, currency, pricing_model, stale_after_days, verification_state, verified_at, market, exchange, sector_key, benchmark_key)
+           values ($1,$2,$3,$4,$5,$6,$7,'market',5,'verified',now(),$8,$9,$10,$11) returning id`,
+          [ticker, name, name, assetClass, COUNTRY[entry.market], REGION[entry.market], currency, entry.market, meta?.Exchange ?? fundamentals?.profile.exchange ?? exch, sectorKey, (entry as { benchmarkKey?: string }).benchmarkKey ?? null],
+        );
+        instrumentId = r.rows[0].id as string;
+        await pool.query("insert into instrument_identifiers (instrument_id, scheme, value, verification_state) values ($1,'EODHD',$2,'verified') on conflict do nothing", [instrumentId, entry.code]);
+        const isin = fundamentals?.profile.isin ?? meta?.Isin;
+        if (isin) await pool.query("insert into instrument_identifiers (instrument_id, scheme, value, verification_state) values ($1,'ISIN',$2,'verified') on conflict do nothing", [instrumentId, isin]);
+        report.created++;
+      } else report.updated++;
+      if (fundamentals) {
+        await pool.query(
+          `insert into instrument_fundamentals (instrument_id, source_id, data) values ($1,$2,$3) on conflict (instrument_id) do update set data = excluded.data, source_id = excluded.source_id, retrieved_at = now()`,
+          [instrumentId, sourceId, JSON.stringify(fundamentals)],
+        );
+        const sectorKey = mapSector(fundamentals.profile.sector, fundamentals.profile.type);
+        if (sectorKey) await pool.query("update instruments set sector_key = $2 where id = $1 and sector_key is distinct from $2", [instrumentId, sectorKey]);
+        report.fundamentals++;
+      }
+      const from = last?.last ? new Date(Date.parse(last.last) - 10 * 86400_000).toISOString().slice(0, 10) : "1990-01-01";
+      const eod = parseEod(await client.get("eod", `eod/${entry.code}`, { from }), currency);
+      await chunked(eod.rows, 1000, async (chunk) => {
+        const values = chunk.map((_, j) => `('${instrumentId}','${sourceId}',$${j * 2 + 1}::date,$${j * 2 + 2}::numeric,'${eod.currency}','close','verified')`).join(",");
+        await pool.query(
+          `insert into market_prices (instrument_id, source_id, observed_on, price, currency, methodology, verification_state) values ${values}
+           on conflict (instrument_id, source_id, observed_on) do update set price = excluded.price, retrieved_at = now() where market_prices.price <> excluded.price`,
+          chunk.flatMap((p) => [p.date, p.close]),
+        );
+      });
+      if (!eod.rows.length) await pool.query("update market_prices set retrieved_at = now() where instrument_id = $1 and source_id = $2 and observed_on = $3", [instrumentId, sourceId, last?.last ?? "1900-01-01"]);
+      report.prices += eod.rows.length;
+      const actionsFrom = last?.last ? new Date(Date.parse(last.last) - 60 * 86400_000).toISOString().slice(0, 10) : "1990-01-01";
+      const divs = parseDividends(await client.get("div", `div/${entry.code}`, { from: actionsFrom }), currency);
+      const splits = parseSplits(await client.get("splits", `splits/${entry.code}`, { from: actionsFrom }));
+      for (const dv of divs.rows) {
+        await pool.query(
+          `insert into corporate_actions (instrument_id, kind, ex_date, pay_date, amount, currency, source_id, verification_state) values ($1,'cash_dividend',$2,$3,$4,$5,$6,'verified')
+           on conflict on constraint corporate_actions_unique_obs do update set amount = excluded.amount, pay_date = excluded.pay_date, currency = excluded.currency, retrieved_at = now()`,
+          [instrumentId, dv.exDate, dv.payDate, dv.amount, dv.currency, sourceId],
+        );
+      }
+      for (const sp of splits.rows) {
+        await pool.query(
+          `insert into corporate_actions (instrument_id, kind, ex_date, ratio, source_id, verification_state) values ($1,'split',$2,$3,$4,'verified')
+           on conflict on constraint corporate_actions_unique_obs do update set ratio = excluded.ratio, retrieved_at = now()`,
+          [instrumentId, sp.exDate, sp.ratio, sourceId],
+        );
+      }
+      report.dividends += divs.rows.length;
+      report.splits += splits.rows.length;
+    } catch (err) {
+      if (err instanceof BudgetExhausted) break;
+      console.warn(`  ${entry.code}: ${err instanceof Error ? err.message : err}`);
+    }
+  }
+  const done = report.created + report.updated + report.skippedFresh;
+  return `${done}/${universe.length} symbols (${report.created} new, ${report.updated} refreshed, ${report.skippedFresh} already fresh); ${report.prices} prices, ${report.dividends} dividends, ${report.splits} splits, ${report.fundamentals} fundamentals; ${client.calls}/${budget} API calls${report.unknown.length ? `; not found: ${report.unknown.join(", ")}` : ""}${done < universe.length ? " — budget reached; run again tomorrow to continue" : ""}`;
+}
+TASKS.eodhd = eodhdTask;
 
 const ALL = ["cbn-fx", "cbn-inflation", "cbn-money-market", "cbn-auctions", "fed-funds", "boe-bank-rate", "ons-cpi"];
 const requested = process.argv.slice(2).filter((a) => !a.startsWith("-"));

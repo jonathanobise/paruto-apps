@@ -225,6 +225,20 @@
       "when": 1793966382336,
       "tag": "0031_source_kind_derived",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1793967578347,
+      "tag": "0032_instrument_fundamentals",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1793967579625,
+      "tag": "0033_instrument_fundamentals_security",
+      "breakpoints": true
     }
   ]
 }

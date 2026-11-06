@@ -50,8 +50,26 @@ const CBN_CURRENCIES: Record<string, string> = {
 
 export interface CbnFxRow { base: string; quote: "NGN"; date: ISODate; rate: string }
 
+/**
+ * Single-day keying errors in published series (e.g. 1376.80 for 136.80): a value that differs from
+ * BOTH neighbours by more than `jump` while the neighbours agree within `calm` is excluded and
+ * reported. Lasting moves (a devaluation) persist into the next observation, so they are kept.
+ */
+export function findIsolatedSpikes<T extends { date: ISODate; rate: string }>(rows: T[], jump = 0.25, calm = 0.1): T[] {
+  const sorted = [...rows].sort((a, b) => (a.date < b.date ? -1 : 1));
+  const out: T[] = [];
+  for (let i = 1; i < sorted.length - 1; i++) {
+    const a = d(sorted[i - 1]!.rate);
+    const b = d(sorted[i]!.rate);
+    const c = d(sorted[i + 1]!.rate);
+    if (a.lte(0) || c.lte(0)) continue;
+    if (b.div(a).minus(1).abs().gt(jump) && b.div(c).minus(1).abs().gt(jump) && c.div(a).minus(1).abs().lt(calm)) out.push(sorted[i]!);
+  }
+  return out;
+}
+
 /** /api/GetAllExchangeRates → official central rates, naira per unit of each currency. */
-export function parseCbnExchangeRates(json: unknown): ParseReport<CbnFxRow> {
+export function parseCbnExchangeRates(json: unknown): ParseReport<CbnFxRow> & { rejected: CbnFxRow[] } {
   const out = new Map<string, CbnFxRow>();
   let skipped = 0;
   const conflicts: string[] = [];
@@ -73,7 +91,15 @@ export function parseCbnExchangeRates(json: unknown): ParseReport<CbnFxRow> {
     out.set(k, { base: iso, quote: "NGN", date, rate });
   }
   for (const k of conflicts) out.delete(k);
-  return { rows: [...out.values()], skipped: skipped + conflicts.length, notes: conflicts.length ? [`${conflicts.length} currency-days had conflicting values and were left out`] : [] };
+  const byCcy = new Map<string, CbnFxRow[]>();
+  for (const r of out.values()) byCcy.set(r.base, [...(byCcy.get(r.base) ?? []), r]);
+  const rejected = [...byCcy.values()].flatMap((rows) => findIsolatedSpikes(rows));
+  for (const r of rejected) out.delete(`${r.base}|${r.date}`);
+  const notes = [
+    ...(conflicts.length ? [`${conflicts.length} currency-days had conflicting values and were left out`] : []),
+    ...(rejected.length ? [`${rejected.length} isolated one-day spikes (suspected keying errors) were excluded`] : []),
+  ];
+  return { rows: [...out.values()], skipped: skipped + conflicts.length + rejected.length, notes, rejected };
 }
 
 // ---------------------------------------------------------------- CBN monthly series
@@ -163,7 +189,8 @@ export function parseCbnAuctions(json: unknown, security: "NTB" | "FGN_BOND"): P
     const auctionDate = parseCbnDate(r.auctionDate);
     const maturityDate = parseCbnDate(r.maturityDate);
     const rate = pctToFraction(r.rate);
-    if (!auctionDate || !maturityDate || !rate || d(rate).lte(0) || maturityDate <= auctionDate) {
+    // A stop rate of 60% or more is a keying error in this history (rates have ranged ~1–30%).
+    if (!auctionDate || !maturityDate || !rate || d(rate).lte(0) || d(rate).gte("0.6") || maturityDate <= auctionDate) {
       skipped++;
       continue;
     }

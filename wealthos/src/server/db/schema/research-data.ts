@@ -77,3 +77,11 @@ export const instrumentPerformance = pgTable("instrument_performance", {
   result: jsonb("result").$type<Record<string, unknown>>().notNull(),
   computedAt: timestamp("computed_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.instrumentId, t.currency] })]);
+
+/** Latest company/fund fundamentals per instrument (profile, snapshot, annual statements, ETF data). */
+export const instrumentFundamentals = pgTable("instrument_fundamentals", {
+  instrumentId: uuid("instrument_id").primaryKey().references(() => instruments.id, { onDelete: "cascade" }),
+  sourceId: uuid("source_id").notNull().references(() => marketDataSources.id),
+  data: jsonb("data").$type<Record<string, unknown>>().notNull(),
+  retrievedAt: timestamp("retrieved_at", { withTimezone: true }).notNull().defaultNow(),
+});
