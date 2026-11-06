@@ -134,9 +134,9 @@ export async function computePerformance(tx: Tx, instrumentId: string, lens: Len
 
   const actions = await tx.select().from(corporateActions).where(eq(corporateActions.instrumentId, instrumentId));
   const priceCcy = loaded.rows[0]!.currency;
-  const usable: CorporateActionInput[] = actions.flatMap((a) => {
-    if (a.kind === "split" && a.ratio) return [{ kind: "split" as const, exDate: a.exDate, ratio: d(a.ratio) }];
-    if (a.kind === "cash_dividend" && a.amount && (!a.currency || a.currency === priceCcy)) return [{ kind: "cash_dividend" as const, exDate: a.exDate, amount: d(a.amount) }];
+  const usable = actions.flatMap((a): CorporateActionInput[] => {
+    if (a.kind === "split" && a.ratio) return [{ kind: "split", exDate: a.exDate, ratio: d(a.ratio) }];
+    if (a.kind === "cash_dividend" && a.amount && (!a.currency || a.currency === priceCcy)) return [{ kind: "cash_dividend", exDate: a.exDate, amount: d(a.amount) }];
     return [];
   });
   const otherCcyDividends = actions.filter((a) => a.kind === "cash_dividend" && a.currency && a.currency !== priceCcy).length;
