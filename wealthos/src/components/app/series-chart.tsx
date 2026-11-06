@@ -14,6 +14,14 @@ const COLORS = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthLabel = (m: string) => `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slice(0, 4)}`;
 
+/** Short axis labels for large values (1.2k, 3.4m, 5bn); deterministic, unlike Intl's compact notation. */
+function compact(v: number): string {
+  const a = Math.abs(v);
+  const [div, suffix] = a >= 1e9 ? [1e9, "bn"] : a >= 1e6 ? [1e6, "m"] : a >= 1e4 ? [1e3, "k"] : [1, ""];
+  const x = v / div;
+  return `${div === 1 ? Math.round(x) : Number(x.toFixed(Math.abs(x) < 10 ? 1 : 0))}${suffix}`.replace(/^-/, "\u2212");
+}
+
 /**
  * Monthly line chart for up to three series (the validated palette has three hues). A legend with
  * text labels names each line; the data is also available as a table.
@@ -23,7 +31,7 @@ export function SeriesChart({ rows, series, unit, label, step = false }: { rows:
   const used = rows.filter((r) => defs.some((s) => typeof r[s.key] === "number"));
   if (used.length < 2) return <p className="text-sm text-text-3">Not enough history to chart yet.</p>;
   const fmt = (v: number | null | undefined) => (v === null || v === undefined ? "—" : unit === "percent" ? formatPercent(v, { decimals: 2 }) : formatNumber(String(v), 2));
-  const axis = (v: number) => (unit === "percent" ? formatPercent(v, { decimals: 0 }) : formatNumber(String(Math.round(v)), 0));
+  const axis = (v: number) => (unit === "percent" ? formatPercent(v, { decimals: 0 }) : compact(v));
   return (
     <div>
       <ul className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-2" aria-hidden>

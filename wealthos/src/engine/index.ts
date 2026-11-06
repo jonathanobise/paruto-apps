@@ -18,3 +18,4 @@ export * from "./price-returns";
 export * from "./stress";
 export * from "./market-performance";
 export * from "./market-compare";
+export * from "./backtest";

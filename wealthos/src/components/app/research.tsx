@@ -38,6 +38,7 @@ const RESEARCH_TABS = [
   { href: "/research", label: "Markets" },
   { href: "/research/screener", label: "Screener" },
   { href: "/research/compare", label: "Compare" },
+  { href: "/research/backtest", label: "Backtest" },
   { href: "/research/macro", label: "Macro" },
   { href: "/research/fixed-income", label: "Fixed income" },
 ];

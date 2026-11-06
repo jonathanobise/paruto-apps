@@ -158,6 +158,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           <div className="mt-4 flex flex-col gap-1 text-[12px] text-text-3">
             {cmp.items.flatMap((it) => (it.result?.notes ?? []).map((n) => <p key={`${it.id}${n}`}>{label(it)}: {n}</p>))}
             <p>Sources: {[...new Set(cmp.items.flatMap((it) => it.result?.sources.map((s) => s.name) ?? []))].join("; ")}.</p>
+            <p><Link href={backtestHref(cmp.items.map((i) => i.id), lens)} className="text-accent hover:underline">Backtest a mix of these</Link> (equal weights to start; change them there).</p>
           </div>
         </>
       )}
@@ -165,4 +166,15 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
       <p className="mt-6 text-[12px] text-text-3">{DISCLOSURES.past_performance} {DISCLOSURES.not_advice} {DISCLOSURES.data_freshness}</p>
     </>
   );
+}
+
+/** Equal weights in whole percent that add up to exactly 100 (e.g. 34/33/33). */
+function backtestHref(ids: string[], lens: string): string {
+  const base = Math.floor(100 / ids.length);
+  const p = new URLSearchParams({ lens });
+  ids.forEach((id, i) => {
+    p.set(`h${i}`, id);
+    p.set(`w${i}`, String(base + (i < 100 - base * ids.length ? 1 : 0)));
+  });
+  return `/research/backtest?${p.toString()}`;
 }

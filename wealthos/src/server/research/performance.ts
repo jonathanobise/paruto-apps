@@ -103,7 +103,7 @@ export async function fxSeries(tx: Tx, from: string, to: string, allowSynthetic:
 }
 
 /** Inflation source for a currency lens: an index (UK, US) or year-on-year rates (Nigeria, as the CBN publishes). */
-async function inflationFor(tx: Tx, currency: string, allowSynthetic: boolean): Promise<{ kind: "index" | "yoy"; months: Map<string, Decimal>; label: string } | null> {
+export async function inflationFor(tx: Tx, currency: string, allowSynthetic: boolean): Promise<{ kind: "index" | "yoy"; months: Map<string, Decimal>; label: string } | null> {
   const options: Record<string, Array<{ key: string; kind: "index" | "yoy" }>> = {
     NGN: [{ key: "NG.CPI_YOY", kind: "yoy" }, { key: "NG.CPI", kind: "index" }],
     GBP: [{ key: "UK.CPI", kind: "index" }],

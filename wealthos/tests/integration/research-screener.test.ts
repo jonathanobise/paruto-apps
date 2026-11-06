@@ -40,10 +40,11 @@ beforeAll(async () => {
   await prices(ids.ng, official, "NGN", 10, 1.01); // +1% a month in naira
   await prices(ids.us, official, "USD", 100, 1.005); // +0.5% a month in dollars
   await prices(ids.lic, licensed, "USD", 50, 1.02);
-  // The naira weakens 0.5% a month against the dollar, on the same dates (official rates).
+  // The naira weakens 0.5% a month against the dollar (official rates). The rate is a function of the
+  // date, so rows other test files insert for the same dates agree with these.
   await pool.query(
     `insert into fx_rates (base, quote, rate, observed_on, source_id, methodology, verification_state)
-     select 'USD', 'NGN', 400 * power(1.005::numeric, i - 1), d::date, $1, 'official', 'verified' from unnest($2::text[]) with ordinality as t(d, i)
+     select 'USD', 'NGN', 400 * power(1.005::numeric, (extract(year from d::date)::int - 2000) * 12 + extract(month from d::date)::int - 1), d::date, $1, 'official', 'verified' from unnest($2::text[]) with ordinality as t(d, i)
      on conflict do nothing`,
     [official, dates],
   );
