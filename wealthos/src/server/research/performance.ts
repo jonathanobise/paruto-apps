@@ -17,6 +17,7 @@ import {
   type ObservedValue,
 } from "@/engine";
 import type { Tx } from "@/server/db/client";
+import { hiddenSourceKinds } from "./licence";
 import { corporateActions, fxRates, instrumentPerformance, instruments, macroObservations, macroSeries, marketDataSources, marketPrices } from "@/server/db/schema";
 
 /** Bump when the calculation changes, so cached results are recomputed. */
@@ -63,7 +64,7 @@ async function loadPrices(tx: Tx, instrumentId: string) {
     .select({ sourceId: marketPrices.sourceId, n: sql<number>`count(*)::int`, kind: marketDataSources.kind, name: marketDataSources.name, license: marketDataSources.licenseNote })
     .from(marketPrices)
     .innerJoin(marketDataSources, eq(marketDataSources.id, marketPrices.sourceId))
-    .where(and(eq(marketPrices.instrumentId, instrumentId), isNull(marketPrices.orgId)))
+    .where(and(eq(marketPrices.instrumentId, instrumentId), isNull(marketPrices.orgId), ...hiddenSourceKinds().map((k) => ne(marketDataSources.kind, k))))
     .groupBy(marketPrices.sourceId, marketDataSources.kind, marketDataSources.name, marketDataSources.licenseNote);
   if (!counts.length) return null;
   const best = [...counts].sort((a, b) => Number(a.kind === "synthetic") - Number(b.kind === "synthetic") || b.n - a.n)[0]!;
@@ -233,11 +234,17 @@ async function marketVersion(tx: Tx): Promise<number> {
   return Number(r.rows[0]?.version ?? 0);
 }
 
+/** A cached result built from a source this deployment may not display is recomputed without it. */
+function displayable(r: PerformanceResult): boolean {
+  const hidden: string[] = hiddenSourceKinds();
+  return !r.sources.some((x) => hidden.includes(x.kind));
+}
+
 /** Cached performance for catalogue instruments (recomputed when market data or the engine changes). */
 export async function getPerformance(tx: Tx, instrumentId: string, lens: Lens): Promise<PerformanceResult | null> {
   const version = await marketVersion(tx);
   const [hit] = await tx.select().from(instrumentPerformance).where(and(eq(instrumentPerformance.instrumentId, instrumentId), eq(instrumentPerformance.currency, lens))).limit(1);
-  if (hit && hit.marketVersion === version && hit.engineVersion === PERFORMANCE_ENGINE_VERSION) return hit.result as unknown as PerformanceResult;
+  if (hit && hit.marketVersion === version && hit.engineVersion === PERFORMANCE_ENGINE_VERSION && displayable(hit.result as unknown as PerformanceResult)) return hit.result as unknown as PerformanceResult;
   const result = await computePerformance(tx, instrumentId, lens);
   if (!result) return null;
   const [inst] = await tx.select({ orgId: instruments.orgId }).from(instruments).where(eq(instruments.id, instrumentId)).limit(1);
@@ -256,7 +263,7 @@ export async function getPerformanceMany(tx: Tx, instrumentIds: string[], lens: 
   if (!instrumentIds.length) return out;
   const version = await marketVersion(tx);
   const cached = await tx.select().from(instrumentPerformance).where(and(inArray(instrumentPerformance.instrumentId, instrumentIds), eq(instrumentPerformance.currency, lens)));
-  for (const c of cached) if (c.marketVersion === version && c.engineVersion === PERFORMANCE_ENGINE_VERSION) out.set(c.instrumentId, c.result as unknown as PerformanceResult);
+  for (const c of cached) if (c.marketVersion === version && c.engineVersion === PERFORMANCE_ENGINE_VERSION && displayable(c.result as unknown as PerformanceResult)) out.set(c.instrumentId, c.result as unknown as PerformanceResult);
   for (const id of instrumentIds) {
     if (out.has(id)) continue;
     const r = await getPerformance(tx, id, lens);

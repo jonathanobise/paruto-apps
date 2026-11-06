@@ -5,6 +5,7 @@ import { withTenant, type TenantContext, type Tx } from "@/server/db/client";
 import { AppError } from "@/server/platform/errors";
 import { ASSET_CLASS_LABELS, d, daysBetween, discountToTrueYield, simpleToEffectiveAnnual, trailingReturns, weeklySeries, type RateMethodology } from "@/engine";
 import { factsSchema, type ProductFacts } from "./facts";
+import { hiddenSourceKinds } from "./licence";
 
 export type DataStatus = "current" | "stale" | "no_data";
 
@@ -47,6 +48,7 @@ async function latestPrices(tx: Tx, ids: string[]) {
   const rows = await tx.execute<{ instrument_id: string; price: string; observed_on: string; methodology: string; verification_state: string }>(sql`
     select distinct on (instrument_id) instrument_id, price::text, observed_on::text, methodology, verification_state::text
     from market_prices where instrument_id = any(${sql.param(ids)}::uuid[])
+      and source_id not in (select id from market_data_sources where kind::text = any(${sql.param(hiddenSourceKinds() as string[])}::text[]))
     order by instrument_id, observed_on desc`);
   return new Map(rows.rows.map((r) => [r.instrument_id, { price: r.price, observedOn: r.observed_on, methodology: r.methodology, synthetic: r.verification_state === "synthetic" }]));
 }
@@ -145,7 +147,7 @@ export async function getInstrument(ctx: TenantContext, id: string): Promise<Ins
       .select({ date: marketPrices.observedOn, price: marketPrices.price, sourceName: marketDataSources.name, sourceKind: marketDataSources.kind, license: marketDataSources.licenseNote, url: marketDataSources.url, verification: marketPrices.verificationState, methodology: marketPrices.methodology })
       .from(marketPrices)
       .innerJoin(marketDataSources, eq(marketDataSources.id, marketPrices.sourceId))
-      .where(eq(marketPrices.instrumentId, id))
+      .where(and(eq(marketPrices.instrumentId, id), ...hiddenSourceKinds().map((k) => sql`${marketDataSources.kind} <> ${k}`)))
       .orderBy(asc(marketPrices.observedOn));
     const last = series[series.length - 1];
     const points = series.map((p) => ({ date: p.date, price: d(p.price) }));

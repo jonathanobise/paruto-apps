@@ -18,9 +18,13 @@ import { PriceChart } from "@/components/app/price-chart";
 import { StatusBadge, VerificationBadge, methodologyLabel } from "@/components/app/research";
 import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { watchAction } from "../actions";
+import { getFundamentals, getInstrumentPerformance } from "@/server/research/markets";
+import { LENSES, type Lens } from "@/server/research/performance";
+import { FundamentalsCard, LongRunPerformance } from "./performance";
 
-export default async function InstrumentPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function InstrumentPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ lens?: string }> }) {
   const { id } = await params;
+  const sp = await searchParams;
   const app = await requireApp();
   const gate = await featureDecision("INSTRUMENT_EXPLORER", app.org.jurisdiction);
   if (!gate.available) notFound();
@@ -32,6 +36,9 @@ export default async function InstrumentPage({ params }: { params: Promise<{ id:
     throw err;
   }
   const watched = await isWatched(app.ctx, id);
+  const research = (await featureDecision("MARKET_RESEARCH", app.org.jurisdiction)).available;
+  const lens: Lens = (LENSES as string[]).includes(sp.lens ?? "") ? (sp.lens as Lens) : "local";
+  const [perf, fundamentals] = research ? await Promise.all([getInstrumentPerformance(app.ctx, id, lens), getFundamentals(app.ctx, id)]) : [null, null];
   const facts = x.facts;
   return (
     <>
@@ -110,6 +117,9 @@ export default async function InstrumentPage({ params }: { params: Promise<{ id:
           </Card>
         </div>
       </div>
+
+      {research && (perf || x.chart.length > 1) ? <LongRunPerformance id={id} lens={lens} perf={perf} currency={x.currency} /> : null}
+      {fundamentals ? <FundamentalsCard f={fundamentals} currency={x.currency} /> : null}
 
       <Card className="mt-6">
         <CardHeader><div><CardTitle>Product facts</CardTitle>{facts ? <CardDescription>From the <a href={x.factsSourceUrl!} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">official source</a>, as of {formatDate(x.factsAsOf)}.</CardDescription> : null}</div></CardHeader>
