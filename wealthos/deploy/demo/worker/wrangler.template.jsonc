@@ -1,0 +1,17 @@
+// Template: deploy.sh fills in IMAGE_URI (the pushed image, tagged with the git commit) and
+// writes wrangler.generated.jsonc next to it. Run ../deploy.sh, not wrangler directly.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "paruto-wealth-demo",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "account_id": "a25384cacd2f73f58b8ef26abfa5b533",
+  "workers_dev": false,
+  "preview_urls": false,
+  // vio.paruto.com is the home (ADR-030); wealth-demo.paruto.com stays attached only to redirect old links.
+  "routes": [{ "pattern": "vio.paruto.com", "custom_domain": true }, { "pattern": "wealth-demo.paruto.com", "custom_domain": true }],
+  "containers": [{ "class_name": "DemoApp", "image": "IMAGE_URI", "instance_type": "basic", "max_instances": 1 }],
+  "durable_objects": { "bindings": [{ "name": "DEMO", "class_name": "DemoApp" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DemoApp"] }],
+  "observability": { "enabled": true }
+}

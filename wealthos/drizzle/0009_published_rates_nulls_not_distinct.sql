@@ -1,0 +1,2 @@
+DROP INDEX "published_rates_unique_obs";--> statement-breakpoint
+ALTER TABLE "published_rates" ADD CONSTRAINT "published_rates_unique_obs" UNIQUE NULLS NOT DISTINCT("instrument_id","methodology","tenor_days","as_of","source_id");

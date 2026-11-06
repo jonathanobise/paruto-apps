@@ -1,0 +1,67 @@
+# CI for WealthOS. INACTIVE: GitHub only runs workflows under .github/workflows at the repository
+# root. To enable it (it uses GitHub Actions minutes), copy this file to
+# .github/workflows/wealthos-ci.yml in jonathanobise/paruto-apps.
+name: WealthOS CI
+on:
+  push:
+    paths: ["wealthos/**"]
+  pull_request:
+    paths: ["wealthos/**"]
+permissions:
+  contents: read
+concurrency:
+  group: wealthos-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: wealthos
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGPASSWORD: postgres
+      DATABASE_URL: postgres://wealthos_app:wealthos_app_dev@localhost:5432/wealthos
+      DATABASE_OWNER_URL: postgres://wealthos_owner:wealthos_owner_dev@localhost:5432/wealthos
+      APP_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+      APP_ORIGIN: http://localhost:3100
+      EMAIL_TRANSPORT: outbox
+      SCRYPT_LOG_N: "12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.4
+          cache: npm
+          cache-dependency-path: wealthos/package-lock.json
+      - name: Databases and roles
+        run: |
+          psql -h localhost -U postgres -f scripts/sql/bootstrap-roles.sql
+          for db in wealthos wealthos_test; do
+            psql -h localhost -U postgres -c "CREATE DATABASE $db OWNER wealthos_owner"
+            psql -h localhost -U postgres -d $db -c "CREATE EXTENSION IF NOT EXISTS pgcrypto; CREATE EXTENSION IF NOT EXISTS citext;"
+          done
+      - run: npm ci
+      - run: npm audit --omit=dev
+      - run: npm run db:migrate
+      - run: npm run check
+      - name: End-to-end
+        run: |
+          printf 'DATABASE_URL=%s\nDATABASE_OWNER_URL=%s\nAPP_ENCRYPTION_KEY=%s\nAPP_ORIGIN=%s\nEMAIL_TRANSPORT=outbox\n' "$DATABASE_URL" "$DATABASE_OWNER_URL" "$APP_ENCRYPTION_KEY" "$APP_ORIGIN" > .env.local
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - run: npm run test:perf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wealthos-test-results
+          path: wealthos/test-results
+          retention-days: 7

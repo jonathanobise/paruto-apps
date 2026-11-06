@@ -1,0 +1,73 @@
+# Architecture decision records
+
+**ADR-001 Modular monolith in Next.js App Router.** One deployable, domain modules under `src/server`, pure engine under `src/engine`. Split later along module boundaries if needed.
+
+**ADR-002 Location.** Built in `wealthos/` of the existing repo (the only repo in scope), excluded from the static showcase publish via `.assetsignore`. Reversible via `git subtree split`.
+
+**ADR-003 PostgreSQL + Drizzle ORM.** Drizzle gives typed SQL with transparent migrations; security-critical SQL (RLS, triggers, SECURITY DEFINER) is hand-written in a custom migration. node-postgres driver (postgres.js 4.0 was days old at selection time).
+
+**ADR-004 Tenant isolation in the database.** RLS with per-transaction `set_config`, membership verified in Postgres (`app_current_org()`), runtime role without owner/bypass privileges, composite FKs. Defence in depth over service checks alone.
+
+**ADR-005 Immutable event ledger.** Typed events stored as validated JSON payloads + normalised per-account entries; append-only enforced by triggers; corrections by reversal; holdings derived by replay. Chosen over full double-entry accounting for MVP clarity; the entries table preserves a double-entry-style audit trail per account.
+
+**ADR-006 Decimal everywhere.** decimal.js (40 digits, half-even); Postgres `numeric`; strings across boundaries. Binary floats only for presentation and IRR root-finding.
+
+**ADR-007 Self-hosted authentication.** The directive suggests managed auth; none was available without vendor credentials, and keeping identity data in our Postgres simplifies NDPA residency. Implemented with vetted primitives only (node:crypto scrypt, AES-GCM, HMAC; RFC 6238), covered by integration tests. Revisit (e.g. Better Auth, a managed IdP) before launch if a vendor is approved; the `identity` module is the seam.
+
+**ADR-008 Versions (Nov 2026).** Next 16.4.3, React 19.3.1, Drizzle 0.45.4, Zod 4.6.7, Tailwind 4.3.3, Recharts 3.10.1, Vitest 5.0.5, Playwright 1.63 (matches the environment's browser). TypeScript 6.0.3 instead of 7.0 (native compiler) because Next's type tooling relies on the JS compiler API. All pinned exactly.
+
+**ADR-009 Design system.** *Superseded by ADR-027.* Originally a light, forest-green theme with Inter and Fraunces.
+
+**ADR-010 Valuation conventions.** End-of-day flow convention for TWR; FIFO default; discount instruments accrete straight-line; missing price → at cost (flagged); missing FX → excluded (flagged). See FINANCIAL_ENGINE.md.
+
+**ADR-011 Demo data.** Demo portfolio is a separate organisation flagged `is_demo`, built through the real ledger service, with deterministic synthetic prices under a `synthetic` source. Never mixed with a user's real organisation.
+
+**ADR-012 Feature gating.** Code registry is the source of truth for classification; compliance decisions are append-only rows; regulated features hard-disabled; `pending_review` blocked in production.
+
+**ADR-013 Analytics cache, not materialised holdings.** Positions stay derived from the ledger (single source of truth). Expensive views are cached as whole JSON results keyed by an exact input fingerprint rather than maintaining incremental holdings tables, which would need their own reconciliation. Invalidation is by construction (any input change → new key), verified by tests for each input type.
+
+**ADR-014 Holding performance convention.** A holding is measured as its own mini-portfolio with purchases as money in and net sale/maturity proceeds and net income as money out; returns are shown in the instrument currency (ex-FX) and in the display currency. Withholding tax reduces income returned; fees are part of cost.
+
+**ADR-015 Background work in Postgres.** Alerts and future scheduled work use a jobs table claimed with `FOR UPDATE SKIP LOCKED`, exponential backoff, dead letters and stale-claim recovery, run by `npm run worker`. Avoids new infrastructure (Redis/queue service) at this scale; the queue API is the seam if that changes.
+
+**ADR-016 AI assistant shape.** A manual tool-use loop over read-only tools that run under the caller's RLS context, rather than giving the model data up front: only what the question needs leaves WealthOS, and the same authorisation applies as in the app. The advice boundary does not rely on the model alone (deterministic classifier + output check). The provider sits behind an interface: with no key the UI says "not connected"; tests use a scripted provider; a labelled test provider exists for browser tests and is refused in production. Personal-data tools need a separate, withdrawable consent. Model: `claude-opus-5-5` with server-side refusal fallback; availability fallback to a smaller model with the same tools.
+
+**ADR-017 Education as code.** Articles are typed data reviewed like code, with every worked-example figure recomputed by the engine in a unit test and the output policy applied to the text. No CMS until non-engineers need to publish.
+
+**ADR-018 Provider-neutral billing first.** The directive requires confirming a payment provider's terms before integrating. Billing is built around our own subscription state machine and immutable invoices, with administrator bank-transfer reconciliation and a provider-adapter interface for signed notifications. Connecting a provider adds an adapter and a checkout step; nothing else changes.
+
+**ADR-019 PDF reports with pdfkit and embedded Inter.** Server-side PDF generation without a headless browser (lighter to deploy). The standard PDF fonts can't render ₦ or Yoruba/Igbo diacritics, so Inter (SIL OFL) is embedded; files are vendored with their licence.
+
+**ADR-020 Nonce CSP via the Next 16 proxy.** Every page is dynamically rendered (the root layout reads cookies), so Next applies a per-request nonce to its scripts; `strict-dynamic` lets them load chunks. Inline style attributes stay allowed (charts); scripts are strict.
+
+**ADR-021 Trusted proxy hops for client IP.** Rate limits and security logs need the real client address; `X-Forwarded-For` is trusted only for entries appended by proxies we run. Production must declare its proxy topology.
+
+**ADR-022 Batch holding performance.** All holdings are computed in one ledger replay, valuing each holding only on the dates the single-holding calculation would, so results are identical (tested) and cold time drops.
+
+**ADR-023 Connections feed the import pipeline.** Bank data enters the same preview → review → commit flow as CSV files (provider transaction ids as references), so validation, duplicate detection, audit and rollback are shared and nothing reaches the ledger without the user.
+
+**ADR-024 Staff roles in Postgres.** Support and compliance roles are checked by `app_staff_role()` in every policy and function they use, not only in pages, matching how tenancy is enforced.
+
+**ADR-025 PWA without data caching.** The service worker caches only a static offline page; financial pages and API responses are never stored on the device. Native apps are deferred until a token-based API and store accounts are justified.
+
+**ADR-026 Jurisdictions as data, features gated per jurisdiction.** Expansion is a compliance decision per feature per country, not a code switch; planned countries are catalogued but unavailable by construction.
+
+**ADR-027 Paruto design standard.** WealthOS follows the Paruto design language: dark editorial base for every visitor regardless of OS setting (light is opt-in from the header toggle, saved as a preference; no prefers-color-scheme switching), refined with Apple's HIG — SF Pro via the system stack (self-hosted Geist fallback) with Instrument Serif italic as the accent (last word of page titles), Liquid Glass (`.glass`) only on floating controls (top bar, navigation, segmented controls, chips, secondary buttons, menus, chart tooltips), never on content panels; Apple system colours for gains/losses/status stepped to ≥ 4.5:1 text contrast on every surface; capsule buttons with spring motion; concentric radii (24px panels, 12px inner); layered app-icon mark. Chart series (green, blue, orange) pass all six dataviz-validator checks in both modes; series 1 and 2 are the pair drawn together. Fonts are self-hosted (CSP allows no third-party requests). Printed pages are always light.
+
+**ADR-028 Public name** (superseded by ADR-030). The product is presented as **Paruto Wealth**, a working name until the permanent name (Granavo) has its domains and a Nigerian trademark search cleared. The name lives in one constant, `BRAND` in `src/lib/brand.ts`, used for page titles (root `title.template`), the web-app manifest, the wordmark (last word in Instrument Serif italic), emails, PDF statements, the authenticator label, the assistant prompt, disclaimers and the default invoice seller name. "WealthOS" stays the internal codename: folder, package, database, cookies, source keys and the `demo@wealthos.test` login are unchanged, so a rename never touches data. Renaming: change `BRAND`, run `grep -rn "Paruto Wealth" src public tests` for the few literal copies (offline page, tests, AI eval set), and update the billing seller name in Admin → Billing if it was saved. Existing authenticator entries keep the old label until re-enrolled (codes still work).
+
+**ADR-029 Public demo.** A shareable demo runs as a separate, throwaway deployment (docs/DEMO.md): one Cloudflare Container with the app and its own Postgres, SAMPLE data baked in at build time, reset whenever it sleeps. `DEMO_MODE=1` closes sign-up (visitors enter as a shared demo user), refuses anything that could lock other visitors out, contact people or create money owed, and stores nothing identifying visitors. It runs with `APP_ENV=production`, so features awaiting compliance review stay hidden, and with no providers connected. It is not the production topology (docs/DEPLOYMENT.md), which still awaits owner, legal and vendor decisions.
+
+## Open risks
+- No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
+- No live market data; licensing costs unknown.
+- No production email provider; verification emails only reach the dev outbox.
+- Cold (uncached) analytics replay the full ledger; acceptable up to a few thousand events (see TESTING.md perf), revisit with incremental snapshots if users import much larger histories.
+- Admin/support access path not yet designed in RLS terms.
+- The AI assistant has never run against a real model; its live eval (`npm run ai:eval -- --yes`) is unrun. The request classifier is pattern-based and will miss some phrasings (the prompt and output check are the other layers).
+- Admin AI view shows flagged turns' metadata only; reviewing content would need the user's permission (not built).
+- No payment or email provider connected; paid plans can't go live until terms, VAT and a provider are decided (docs/BILLING.md).
+- No independent penetration test yet (docs/SECURITY_REVIEW.md).
+
+**ADR-030 Public name: VioWealth.** The owner renamed the product **VioWealth** (supersedes the working name in ADR-028; Granavo is no longer planned). The mechanism is unchanged: `BRAND` in `src/lib/brand.ts`, now built from two parts so the wordmark reads "Vio" + italic "Wealth" with no space. Until production it lives at **vio.paruto.com** (the public demo's host; the old wealth-demo.paruto.com redirects there, keeping the path). Before production the owner will secure **viowealth.com**; a Nigerian trademark search for the name is still to be done and should be recorded here. Internal names (WealthOS codename, the `paruto-wealth-demo` Worker and image, database, cookies, `demo@wealthos.test`) are unchanged so the rename touches no data or infrastructure identity. Authenticator entries enrolled earlier keep the old label until re-enrolled; a billing seller name saved in Admin → Billing must be updated there.
+

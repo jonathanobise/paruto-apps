@@ -1,0 +1,70 @@
+# VioWealth (codename WealthOS)
+
+**VioWealth** is the public name (ADR-030), set in one place, `src/lib/brand.ts`. For now it lives at https://vio.paruto.com (the public demo); viowealth.com is to be secured before production. "WealthOS" remains the internal codename (folder, package, database).
+
+Non-custodial financial intelligence and wealth-management SaaS — Nigeria first. Track every account, holding and liability; measure performance correctly; see currency exposure and data freshness; plan with honest scenarios.
+
+> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed to production; a throwaway public demo with SAMPLE data runs at https://vio.paruto.com ([docs/DEMO.md](docs/DEMO.md)). Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
+
+WealthOS Version 1 never holds money, never places trades and never gives personalised investment advice. Regulated features are hard-disabled in code ([docs/COMPLIANCE_MATRIX.md](docs/COMPLIANCE_MATRIX.md)).
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript 6 (strict) · Tailwind CSS 4 with shadcn-style components (Radix) · PostgreSQL 16 with row-level security · Drizzle ORM + SQL migrations · Zod 4 · decimal.js · Recharts 3 · Vitest 5 · Playwright. Rationale in [docs/DECISIONS.md](docs/DECISIONS.md).
+
+## Local development
+
+Requirements: Node ≥ 22.12, PostgreSQL ≥ 16 (superuser access once, to create roles).
+
+```bash
+psql -U postgres -f scripts/sql/bootstrap-roles.sql
+```
+
+```bash
+psql -U postgres -c "CREATE DATABASE wealthos_dev OWNER wealthos_owner" -c "CREATE DATABASE wealthos_test OWNER wealthos_owner"
+```
+
+```bash
+cp .env.example .env.local   # then set APP_ENCRYPTION_KEY (command in the file)
+```
+
+```bash
+npm install && npm run db:migrate && npm run db:seed-demo -- --with-user
+```
+
+```bash
+npm run dev   # http://localhost:3100 — sign in as demo@wealthos.test / sample-portfolio-2026
+```
+
+Emails (verification, password reset) are not delivered in development; open http://localhost:3100/dev/outbox.
+
+## Quality checks
+
+```bash
+npm run check        # typecheck + lint + unit + integration tests
+```
+
+```bash
+npm run test:e2e     # builds, starts the app and runs the browser journeys (uses .env.local's database)
+```
+
+See [docs/TESTING.md](docs/TESTING.md).
+
+## Layout
+
+```
+src/engine/        Pure, deterministic financial engine (no I/O). Decimal money, FX, lots, returns…
+src/server/        Domain modules: identity (incl. members), accounts, ledger, imports, market-data, analytics, models,
+                   research, admin, planning, jobs, alerts, ai, billing, reports, support, household, connections,
+                   compliance, privacy, audit, demo
+src/server/db/     Drizzle schema; tenant context (withTenant) that sets Postgres RLS variables
+src/app/           Next.js routes: (auth) sign-in/up, (app) signed-in screens, api/ exports + health
+src/components/    UI primitives (ui/) and app components (app/)
+src/content/       Education articles (worked examples verified against the engine in tests)
+drizzle/           SQL migrations (0001 = RLS policies, append-only triggers, grants)
+tests/             unit/ (engine, gates, AI policy, content), integration/ (Postgres, adversarial tenancy, AI with a mock
+                   provider), e2e/ (Playwright), perf/ (large ledger), ai/ (live eval cases, run manually)
+docs/              Product, architecture, database, engine, data, AI safety, billing, compliance, security (+ review),
+                   deployment, runbook…
+Dockerfile, ci/    Container image and an (inactive) CI workflow
+```
