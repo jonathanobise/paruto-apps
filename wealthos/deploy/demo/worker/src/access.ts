@@ -12,9 +12,11 @@ async function accessKeys(team: string, refresh = false): Promise<Jwk[]> {
   return keyCache.keys;
 }
 
-function b64urlBytes(s: string): Uint8Array {
+function b64urlBytes(s: string): Uint8Array<ArrayBuffer> {
   const b = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (s.length % 4)) % 4));
-  return Uint8Array.from(b, (c) => c.charCodeAt(0));
+  const out = new Uint8Array(new ArrayBuffer(b.length));
+  for (let i = 0; i < b.length; i++) out[i] = b.charCodeAt(i);
+  return out;
 }
 const b64urlJson = (s: string) => JSON.parse(new TextDecoder().decode(b64urlBytes(s))) as Record<string, unknown>;
 
