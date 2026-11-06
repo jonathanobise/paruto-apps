@@ -66,7 +66,7 @@ export default function Landing() {
           <div className="mx-auto grid max-w-6xl gap-4 px-5 pb-14 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
             {pillars.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-[var(--radius-card)] border border-border bg-surface p-6 shadow-[var(--shadow)]">
-                <div className="flex size-11 items-center justify-center rounded-[13px] bg-[linear-gradient(160deg,#3ddc68,#0d6b2e)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]">
+                <div className="flex size-11 items-center justify-center rounded-[13px] bg-[linear-gradient(160deg,#9b6bff,#6a2fe0_55%,#2e0f7a)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]">
                   <Icon className="size-5" aria-hidden />
                 </div>
                 <h2 className="mt-4 text-base font-semibold">{title}</h2>
