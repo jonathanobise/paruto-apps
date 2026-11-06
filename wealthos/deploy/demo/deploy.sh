@@ -28,6 +28,11 @@ if [ "${1:-}" = "--dry-run" ]; then
   npx wrangler deploy --config wrangler.generated.jsonc --dry-run --outdir .wrangler/dry-run
   echo "Dry run: image paruto-wealth-demo:$TAG built; nothing uploaded."; exit 0
 fi
-npx wrangler containers push "paruto-wealth-demo:$TAG"
+# Registry uploads occasionally fail mid-push ("blob unknown"); pushed layers are skipped on retry.
+for attempt in 1 2 3 4; do
+  npx wrangler containers push "paruto-wealth-demo:$TAG" && break
+  [ "$attempt" = 4 ] && { echo "Image push failed." >&2; exit 1; }
+  sleep $((attempt * 5))
+done
 npx wrangler deploy --config wrangler.generated.jsonc --tag "$TAG" --message "demo $TAG"
 echo "Deployed demo $TAG: https://wealth-demo.paruto.com"
