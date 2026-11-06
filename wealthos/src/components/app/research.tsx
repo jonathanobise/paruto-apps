@@ -36,6 +36,8 @@ export function RateLine({ r }: { r: RateView }) {
 
 const RESEARCH_TABS = [
   { href: "/research", label: "Markets" },
+  { href: "/research/screener", label: "Screener" },
+  { href: "/research/compare", label: "Compare" },
   { href: "/research/macro", label: "Macro" },
   { href: "/research/fixed-income", label: "Fixed income" },
 ];
@@ -43,9 +45,9 @@ const RESEARCH_TABS = [
 /** Segmented control between the research pages (a floating control, so Liquid Glass). */
 export function ResearchTabs({ current }: { current: string }) {
   return (
-    <nav aria-label="Research" className="glass mb-6 inline-flex rounded-full p-1">
+    <nav aria-label="Research" className="glass mb-6 inline-flex max-w-full overflow-x-auto rounded-full p-1 [scrollbar-width:none]">
       {RESEARCH_TABS.map((t) => (
-        <Link key={t.href} href={t.href} aria-current={t.href === current ? "page" : undefined} className={`spring rounded-full px-3.5 py-1.5 text-[13px] font-medium ${t.href === current ? "bg-brand text-brand-ink shadow-sm" : "text-text-2 hover:text-text"}`}>
+        <Link key={t.href} href={t.href} aria-current={t.href === current ? "page" : undefined} className={`spring shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-medium ${t.href === current ? "bg-brand text-brand-ink shadow-sm" : "text-text-2 hover:text-text"}`}>
           {t.label}
         </Link>
       ))}

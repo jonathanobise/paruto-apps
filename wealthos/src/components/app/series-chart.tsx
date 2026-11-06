@@ -10,7 +10,9 @@ export interface SeriesDef {
 type Row = { month: string } & Record<string, number | null | string>;
 
 const COLORS = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
-const monthLabel = (m: string) => new Date(`${m}-15T00:00:00Z`).toLocaleDateString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
+// Fixed names, not Intl: server (Node) and browser ICU abbreviate some months differently ("Sept"/"Sep"), which breaks hydration.
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthLabel = (m: string) => `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slice(0, 4)}`;
 
 /**
  * Monthly line chart for up to three series (the validated palette has three hues). A legend with

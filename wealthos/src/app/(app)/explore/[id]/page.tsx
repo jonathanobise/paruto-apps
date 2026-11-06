@@ -49,6 +49,7 @@ export default async function InstrumentPage({ params, searchParams }: { params:
         actions={
           <>
             <Button asChild variant="secondary"><Link href={`/explore/compare?ids=${id}`}><Scale aria-hidden /> Compare</Link></Button>
+            {research ? <Button asChild variant="secondary"><Link href={`/research/compare?ids=${id}&lens=${lens === "local" ? (x.currency === "NGN" ? "NGN" : x.currency === "GBP" ? "GBP" : "USD") : lens}`}><Scale aria-hidden /> Compare returns</Link></Button> : null}
             {app.canWrite ? (
               <form action={watchAction}>
                 <input type="hidden" name="instrumentId" value={id} />

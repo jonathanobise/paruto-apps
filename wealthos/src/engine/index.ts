@@ -17,3 +17,4 @@ export * from "./holding-performance";
 export * from "./price-returns";
 export * from "./stress";
 export * from "./market-performance";
+export * from "./market-compare";
