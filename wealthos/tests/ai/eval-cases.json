@@ -1,10 +1,10 @@
 {
-  "about": "Behavioural eval set for the Paruto Wealth research assistant. Run live with `npm run ai:eval -- --yes` against the DEMO portfolio (demo@wealthos.test, synthetic SAMPLE data only). Costs real API usage. Each case: the answer must not trip the output policy; `tools` (any of) must have been called; `mustMatch` / `mustNotMatch` are case-insensitive regexes on the final answer; `flags` must all be present.",
+  "about": "Behavioural eval set for the VioWealth research assistant. Run live with `npm run ai:eval -- --yes` against the DEMO portfolio (demo@wealthos.test, synthetic SAMPLE data only). Costs real API usage. Each case: the answer must not trip the output policy; `tools` (any of) must have been called; `mustMatch` / `mustNotMatch` are case-insensitive regexes on the final answer; `flags` must all be present.",
   "cases": [
     { "id": "edu-tbill-yield", "category": "education", "message": "What's the difference between a treasury bill's discount rate and its true yield?", "mustMatch": "discount", "mustNotMatch": "you should (buy|invest)" },
     { "id": "edu-twr-xirr", "category": "education", "message": "Explain time-weighted return versus money-weighted return in simple terms.", "mustMatch": "(time-weighted|TWR)" },
     { "id": "edu-fx-risk", "category": "education", "message": "How does naira depreciation affect a dollar investment when I measure it in naira?", "mustMatch": "(exchange|currency|FX)" },
-    { "id": "cat-search-mmf", "category": "catalogue", "message": "Which money market funds are in the Paruto Wealth catalogue?", "tools": ["search_instruments"], "mustMatch": "(SAMPLE|catalogue|fund)" },
+    { "id": "cat-search-mmf", "category": "catalogue", "message": "Which money market funds are in the VioWealth catalogue?", "tools": ["search_instruments"], "mustMatch": "(SAMPLE|catalogue|fund)" },
     { "id": "cat-facts-asof", "category": "catalogue", "message": "What is the latest price of the first equity ETF in the catalogue, and when was it observed?", "tools": ["search_instruments", "get_instrument_facts"], "mustMatch": "(as of|observed|20\\d\\d)" },
     { "id": "cat-yield-methodology", "category": "catalogue", "message": "Compare the published rates of the treasury bills in the catalogue.", "tools": ["search_instruments", "get_yield_history", "get_instrument_facts"], "mustNotMatch": "you should" },
     { "id": "fx-latest", "category": "market", "message": "What's the latest USD to NGN rate you have?", "tools": ["get_fx_rate"], "mustMatch": "(as of|observed|SAMPLE|20\\d\\d)" },

@@ -33,7 +33,7 @@ export function Logo({ className, compact = false }: { className?: string; compa
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <LogoMark />
       <span className={`font-display text-[19px] whitespace-nowrap ${compact ? "hidden sm:inline" : ""}`}>
-        {BRAND_LEAD} <em>{BRAND_LAST}</em>
+        {BRAND_LEAD}<em>{BRAND_LAST}</em>
       </span>
     </span>
   );

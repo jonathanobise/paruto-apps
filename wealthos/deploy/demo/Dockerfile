@@ -1,4 +1,4 @@
-# Paruto Wealth public demo: the app and its own Postgres in one container, with the SAMPLE
+# VioWealth public demo: the app and its own Postgres in one container, with the SAMPLE
 # portfolio baked in at build time. Every container start begins from this clean state, so the
 # demo resets whenever it sleeps (see worker/index.ts). Not a production topology.
 #
@@ -47,7 +47,7 @@ RUN npm prune --omit=dev --no-audit --no-fund >/dev/null && rm -rf .next/cache
 FROM base AS runtime
 ENV NODE_ENV=production APP_ENV=production DEMO_MODE=1 PORT=8080 \
     DATABASE_URL=postgres://wealthos_app:x@127.0.0.1:5432/wealthos_demo \
-    APP_ORIGIN=https://wealth-demo.paruto.com \
+    APP_ORIGIN=https://vio.paruto.com \
     TRUSTED_IP_HEADER=cf-connecting-ip EMAIL_TRANSPORT=outbox
 COPY --from=build --chown=postgres:postgres /var/lib/demo-pg /var/lib/demo-pg
 COPY --from=build --chown=app:app /app/package.json /app/next.config.ts /app/tsconfig.json /app/.demo-key ./

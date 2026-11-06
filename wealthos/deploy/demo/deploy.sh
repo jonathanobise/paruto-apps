@@ -1,6 +1,6 @@
 #!/bin/sh
-# Build the Paruto Wealth demo image from the committed code, push it to Cloudflare's registry and
-# deploy the Worker in front of it (https://wealth-demo.paruto.com). Needs Docker and a Cloudflare
+# Build the VioWealth demo image from the committed code, push it to Cloudflare's registry and
+# deploy the Worker in front of it (https://vio.paruto.com). Needs Docker and a Cloudflare
 # token with Workers + Containers access (CLOUDFLARE_API_TOKEN, or `wrangler login`).
 #
 #   deploy/demo/deploy.sh             # build, push, deploy
@@ -35,4 +35,4 @@ for attempt in 1 2 3 4; do
   sleep $((attempt * 5))
 done
 npx wrangler deploy --config wrangler.generated.jsonc --tag "$TAG" --message "demo $TAG"
-echo "Deployed demo $TAG: https://wealth-demo.paruto.com"
+echo "Deployed demo $TAG: https://vio.paruto.com"

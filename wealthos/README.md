@@ -1,10 +1,10 @@
-# Paruto Wealth (codename WealthOS)
+# VioWealth (codename WealthOS)
 
-**Paruto Wealth** is the working public name until the permanent name is secured; it is set in one place, `src/lib/brand.ts` (ADR-028). "WealthOS" remains the internal codename (folder, package, database).
+**VioWealth** is the public name (ADR-030), set in one place, `src/lib/brand.ts`. For now it lives at https://vio.paruto.com (the public demo); viowealth.com is to be secured before production. "WealthOS" remains the internal codename (folder, package, database).
 
 Non-custodial financial intelligence and wealth-management SaaS — Nigeria first. Track every account, holding and liability; measure performance correctly; see currency exposure and data freshness; plan with honest scenarios.
 
-> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed to production; a throwaway public demo with SAMPLE data runs at https://wealth-demo.paruto.com ([docs/DEMO.md](docs/DEMO.md)). Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed to production; a throwaway public demo with SAMPLE data runs at https://vio.paruto.com ([docs/DEMO.md](docs/DEMO.md)). Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 WealthOS Version 1 never holds money, never places trades and never gives personalised investment advice. Regulated features are hard-disabled in code ([docs/COMPLIANCE_MATRIX.md](docs/COMPLIANCE_MATRIX.md)).
 

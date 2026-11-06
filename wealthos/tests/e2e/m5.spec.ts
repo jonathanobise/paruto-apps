@@ -30,7 +30,7 @@ test("phone layouts, PWA manifest, service worker and offline page", async ({ br
   expect(overflow).toEqual([]);
 
   const manifest = await (await page.request.get("/manifest.webmanifest")).json();
-  expect(manifest).toMatchObject({ name: "Paruto Wealth", display: "standalone", start_url: "/dashboard" });
+  expect(manifest).toMatchObject({ name: "VioWealth", display: "standalone", start_url: "/dashboard" });
   expect(manifest.icons.some((i: { purpose?: string }) => i.purpose === "maskable")).toBe(true);
   expect((await page.request.get("/icons/icon-512.png")).headers()["content-type"]).toBe("image/png");
 

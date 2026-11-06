@@ -1,11 +1,12 @@
 /**
- * The product's public name, in one place. "Paruto Wealth" is the working name until the
- * permanent one is secured (ADR-028); "WealthOS" stays as the internal codename (folder,
- * package, database, cookies). To rename: change BRAND here, then `grep -rn "Paruto Wealth"`
- * for the prose that spells it out (legal drafts, help text, offline page).
+ * The product's public name, in one place: **VioWealth** (ADR-030). "WealthOS" stays the internal
+ * codename (folder, package, database, cookies). To rename: change the two parts here, then
+ * `grep -rn "VioWealth" src public tests` for the prose that spells it out (offline page, tests,
+ * AI eval set).
  */
-export const BRAND = "Paruto Wealth";
-
-/** The brand split for the wordmark: the last word is set in Instrument Serif italic. */
-export const BRAND_LEAD = BRAND.split(" ").slice(0, -1).join(" ");
-export const BRAND_LAST = BRAND.split(" ").at(-1)!;
+/** The wordmark is one word set in two parts: the second in Instrument Serif italic. */
+export const BRAND_LEAD = "Vio";
+export const BRAND_LAST = "Wealth";
+export const BRAND = `${BRAND_LEAD}${BRAND_LAST}`;
+/** Where the product lives for now (the public demo); viowealth.com once it's secured for production. */
+export const BRAND_DOMAIN = "vio.paruto.com";

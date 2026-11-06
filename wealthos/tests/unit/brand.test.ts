@@ -11,8 +11,9 @@ function files(dir: string): string[] {
 }
 
 describe("brand", () => {
-  it("splits the wordmark so the last word takes the serif accent", () => {
-    expect(`${BRAND_LEAD} ${BRAND_LAST}`.trim()).toBe(BRAND);
+  it("builds the one-word name from the wordmark's two parts (the second takes the serif accent)", () => {
+    expect(`${BRAND_LEAD}${BRAND_LAST}`).toBe(BRAND);
+    expect(BRAND).toBe("VioWealth");
     expect(BRAND_LAST).not.toContain(" ");
   });
 

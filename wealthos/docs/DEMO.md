@@ -1,6 +1,6 @@
 # Public demo
 
-**https://wealth-demo.paruto.com**: a shareable, throwaway copy of the app on the SAMPLE portfolio.
+**https://vio.paruto.com**: a shareable, throwaway copy of the app on the SAMPLE portfolio. The old address, https://wealth-demo.paruto.com, redirects there (same path).
 It is not a production deployment: no real users, no providers, no persistence.
 
 ## What visitors get
@@ -37,5 +37,5 @@ From a clean checkout of the commit to publish:
     deploy/demo/deploy.sh --dry-run   # build and check only
 
 It refuses to run with uncommitted changes and tags the image and Worker version with the commit.
-Check it: `curl -sI https://wealth-demo.paruto.com/ | grep -i server` (`cloudflare`).
+Check it: `curl -sI https://vio.paruto.com/ | grep -i server` (`cloudflare`).
 Take it down: `npx wrangler delete --name paruto-wealth-demo` (from `deploy/demo/worker`).
