@@ -1,4 +1,4 @@
-// Template: deploy.sh fills in IMAGE_URI (the pushed image, tagged with the git commit) and
+// Template: deploy.sh fills in IMAGE_URI and the vars (the pushed image, tagged with the git commit) and
 // writes wrangler.generated.jsonc next to it. Run ../deploy.sh, not wrangler directly.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -13,5 +13,7 @@
   "containers": [{ "class_name": "DemoApp", "image": "IMAGE_URI", "instance_type": "basic", "max_instances": 1 }],
   "durable_objects": { "bindings": [{ "name": "DEMO", "class_name": "DemoApp" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DemoApp"] }],
+  // deploy.sh replaces this line with the profile's vars (owner email and Access settings, or none).
+  "VARS_PLACEHOLDER": null,
   "observability": { "enabled": true }
 }

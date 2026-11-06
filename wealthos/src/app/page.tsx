@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
 import { DemoEntry } from "@/components/app/demo-entry";
 import { isDemoMode } from "@/server/demo/mode";
+import { redirect } from "next/navigation";
+import { isPrivateMode } from "@/lib/private-mode";
 
 const pillars = [
   { icon: Landmark, title: "Everything in one place", body: "Bank accounts, funds, T-bills, shares, global ETFs, property, business interests and loans — in naira, dollars, pounds or euros." },
@@ -14,6 +16,7 @@ const pillars = [
 ];
 
 export default function Landing() {
+  if (isPrivateMode()) redirect("/private/enter");
   const demo = isDemoMode();
   return (
     <div className="relative min-h-dvh overflow-hidden">
