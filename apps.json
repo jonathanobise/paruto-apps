@@ -624,6 +624,22 @@
       "featured": false,
       "highlights": ["Every hour of the night", "Moves only on the sign"],
       "media": []
+    },
+    {
+      "id": "project-furrow",
+      "name": "Project Furrow",
+      "tagline": "The field that keeps its own book.",
+      "description": "For ten seasons a farmer brought in a full harvest, and for ten seasons the seed merchant asked who he was. Then the field began to keep its own book. The merchant read one page and opened his store.",
+      "status": "in-development",
+      "category": "Unannounced",
+      "platforms": ["Web"],
+      "accent": "#e3a948",
+      "accent2": "#3f6b2a",
+      "icon": "🌾",
+      "added": "2026-11-06",
+      "featured": false,
+      "highlights": ["Ten seasons remembered", "Read in one page"],
+      "media": []
     }
   ]
 }
