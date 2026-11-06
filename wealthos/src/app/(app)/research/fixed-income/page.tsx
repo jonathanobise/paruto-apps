@@ -39,7 +39,7 @@ export default async function FixedIncomePage() {
   return (
     <>
       <PageHeader title="Nigerian government yields" description="What the Federal Government paid at its latest primary auctions of Treasury bills and FGN bonds, money-market rates, and how they compare with inflation. Results as published by the CBN." />
-      <ResearchTabs current="/research/fixed-income" />
+      <ResearchTabs current="/research/fixed-income" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
 
       <Card className="mb-6 overflow-hidden">

@@ -31,6 +31,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   const rawIds = (Array.isArray(sp.ids) ? sp.ids : (sp.ids ?? "").split(",")).map((s) => s.trim()).filter(Boolean);
   const lens: Exclude<Lens, "local"> = (LENSES as string[]).includes(sp.lens ?? "") && sp.lens !== "local" ? (sp.lens as Exclude<Lens, "local">) : "NGN";
   const cmp = await compareMarkets(app.ctx, rawIds, lens);
+  const canBacktest = (await featureDecision("PORTFOLIO_BACKTEST", app.org.jurisdiction)).available;
   const tooMany = new Set(rawIds).size > COMPARE_MAX;
   const label = (i: (typeof cmp.items)[number]) => i.symbol ?? i.name;
   const grouped = Object.entries(MARKETS).map(([k, name]) => ({ name, options: cmp.options.filter((o) => o.market === k) })).filter((g) => g.options.length);
@@ -39,7 +40,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   return (
     <>
       <PageHeader title="Compare across markets" description="Put up to three instruments or benchmarks side by side in one currency, whatever they're priced in, over the period they all cover. Conversions use same-day official exchange rates; nothing is filled in from another day." />
-      <ResearchTabs current="/research/compare" />
+      <ResearchTabs current="/research/compare" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
 
       <Card className="mb-6">
@@ -158,7 +159,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           <div className="mt-4 flex flex-col gap-1 text-[12px] text-text-3">
             {cmp.items.flatMap((it) => (it.result?.notes ?? []).map((n) => <p key={`${it.id}${n}`}>{label(it)}: {n}</p>))}
             <p>Sources: {[...new Set(cmp.items.flatMap((it) => it.result?.sources.map((s) => s.name) ?? []))].join("; ")}.</p>
-            <p><Link href={backtestHref(cmp.items.map((i) => i.id), lens)} className="text-accent hover:underline">Backtest a mix of these</Link> (equal weights to start; change them there).</p>
+            {canBacktest ? <p><Link href={backtestHref(cmp.items.map((i) => i.id), lens)} className="text-accent hover:underline">Backtest a mix of these</Link> (equal weights to start; change them there).</p> : null}
           </div>
         </>
       )}

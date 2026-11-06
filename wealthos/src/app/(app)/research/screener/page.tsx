@@ -52,7 +52,7 @@ export default async function ScreenerPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader title="Screen the market" description="Filter real listed instruments, ETFs and computed benchmarks by market, sector, long-run returns and risk. Columns are facts about the past, sorted however you choose; nothing here is ranked as a recommendation." />
-      <ResearchTabs current="/research/screener" />
+      <ResearchTabs current="/research/screener" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
 
       <Card className="mb-5">

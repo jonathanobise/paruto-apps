@@ -48,7 +48,7 @@ export default async function MacroPage() {
   return (
     <>
       <PageHeader title="The economic backdrop" description="Inflation, policy rates and the naira's official exchange rates, for Nigeria alongside the United States and the United Kingdom. Monthly, from the official publishers." />
-      <ResearchTabs current="/research/macro" />
+      <ResearchTabs current="/research/macro" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
 
       <div className="grid gap-6 xl:grid-cols-2">

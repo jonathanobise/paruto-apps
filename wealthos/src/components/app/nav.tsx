@@ -15,7 +15,6 @@ const live = [
   { href: "/household", label: "Household", icon: Users },
   { href: "/simulator", label: "Simulator", icon: Calculator },
   { href: "/stress", label: "Stress tests", icon: Activity },
-  { href: "/research", label: "Markets", icon: Globe },
   { href: "/explore", label: "Explorer", icon: Search },
   { href: "/watchlists", label: "Watchlists", icon: Star },
   { href: "/alerts", label: "Alerts", icon: Bell },
@@ -30,13 +29,15 @@ const upcoming: Array<{ label: string; icon: typeof FileText; milestone: string 
 /** Capsule nav items; the active one is lifted (Paruto standard). */
 const item = (active: boolean) => cn("flex items-center gap-3 rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200", active ? "bg-text/10 text-text shadow-[inset_0_1px_0_var(--hi)]" : "text-text-2 hover:bg-text/5 hover:text-text");
 
-export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; isAdmin?: boolean }) {
+/** `researchHref`: where "Markets" leads, or null to hide it (research not available here yet). */
+export function Nav({ onNavigate, isAdmin = false, researchHref = null }: { onNavigate?: () => void; isAdmin?: boolean; researchHref?: string | null }) {
   const pathname = usePathname();
+  const items = researchHref ? live.flatMap((x) => (x.href === "/explore" ? [{ href: researchHref, label: "Markets", icon: Globe }, x] : [x])) : live;
   return (
     <nav aria-label="Main" className="flex flex-col gap-6">
       <ul className="flex flex-col gap-0.5">
-        {live.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`);
+        {items.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(`${href}/`) || (label === "Markets" && pathname.startsWith("/research"));
           return (
             <li key={href}>
               <Link
@@ -87,7 +88,7 @@ export function Nav({ onNavigate, isAdmin = false }: { onNavigate?: () => void; 
   );
 }
 
-export function MobileNav({ isAdmin = false, footer }: { isAdmin?: boolean; footer?: React.ReactNode }) {
+export function MobileNav({ isAdmin = false, researchHref = null, footer }: { isAdmin?: boolean; researchHref?: string | null; footer?: React.ReactNode }) {
   return (
     <details className="group lg:hidden">
       <summary className="spring flex size-9 cursor-pointer list-none items-center justify-center rounded-full text-text-2 hover:bg-text/10" aria-label="Open menu">
@@ -96,7 +97,7 @@ export function MobileNav({ isAdmin = false, footer }: { isAdmin?: boolean; foot
       {/* Anchored under the glass bar (a backdrop-filter parent is the containing block, so not fixed);
           near-opaque so the menu stays readable over content. */}
       <div className="absolute inset-x-0 top-[calc(100%+8px)] z-40 max-h-[calc(100dvh-96px)] overflow-y-auto rounded-[28px] border border-[var(--glass-rim)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] p-3 shadow-[var(--glass-shadow)] backdrop-blur-xl">
-        <Nav isAdmin={isAdmin} />
+        <Nav isAdmin={isAdmin} researchHref={researchHref} />
         {footer ? <div className="mt-4 border-t border-border pt-3 sm:hidden">{footer}</div> : null}
       </div>
     </details>
