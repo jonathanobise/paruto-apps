@@ -7,3 +7,5 @@ playwright-report
 tsconfig.tsbuildinfo
 *.log
 deploy/demo/worker
+# Tests never run in the image (and some import the Worker, which is excluded above).
+tests
