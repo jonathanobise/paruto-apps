@@ -3,6 +3,8 @@ import { ArrowRight, BarChart3, FileSearch, Landmark, LineChart, ShieldCheck, Ta
 import { Logo } from "@/components/app/logo";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import { DemoEntry } from "@/components/app/demo-entry";
+import { isDemoMode } from "@/server/demo/mode";
 
 const pillars = [
   { icon: Landmark, title: "Everything in one place", body: "Bank accounts, funds, T-bills, shares, global ETFs, property, business interests and loans — in naira, dollars, pounds or euros." },
@@ -12,6 +14,7 @@ const pillars = [
 ];
 
 export default function Landing() {
+  const demo = isDemoMode();
   return (
     <div className="relative min-h-dvh overflow-hidden">
       {/* Accent light behind the hero */}
@@ -20,12 +23,18 @@ export default function Landing() {
         <Logo />
         <nav className="flex items-center gap-1.5">
           {/* Phones: the hero's own Sign in button sits just below, so the bar keeps the wordmark on one line. */}
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
-            <Link href="/sign-in">Sign in</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/sign-up">Get started</Link>
-          </Button>
+          {demo ? (
+            <DemoEntry size="md" label="Explore" />
+          ) : (
+            <>
+              <Button asChild variant="ghost" className="hidden sm:inline-flex">
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/sign-up">Get started</Link>
+              </Button>
+            </>
+          )}
         </nav>
       </header>
       <main id="main">
@@ -35,16 +44,23 @@ export default function Landing() {
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-text-2">
             {BRAND} brings your whole financial position into one calm, precise view — net worth, performance, currency exposure and goals — built on an auditable ledger and deterministic calculations.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href="/sign-up">
-                Create your free account <ArrowRight aria-hidden />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-          </div>
+          {demo ? (
+            <div className="mt-8 flex flex-col items-start gap-3">
+              <DemoEntry />
+              <p className="max-w-xl text-[13px] leading-relaxed text-text-3">Public demo: everyone explores the same SAMPLE portfolio with synthetic prices. It resets automatically; please don&apos;t enter real information.</p>
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link href="/sign-up">
+                  Create your free account <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+            </div>
+          )}
         </section>
         <section>
           <div className="mx-auto grid max-w-6xl gap-4 px-5 pb-14 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">

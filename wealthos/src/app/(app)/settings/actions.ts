@@ -10,6 +10,7 @@ import { beginMfaEnrollment, changePassword, confirmMfaEnrollment, disableMfa } 
 import { revokeSession } from "@/server/identity/sessions";
 import { eraseAccount } from "@/server/privacy/service";
 import { toActionError, type ActionResult } from "@/server/platform/errors";
+import { assertNotDemo } from "@/server/demo/mode";
 
 export type FormState = ActionResult<string | undefined> | null;
 export type MfaState = (ActionResult<{ secret: string; uri: string; qrSvg: string } | { recoveryCodes: string[] }> & { stage?: "setup" | "done" }) | null;
@@ -82,6 +83,7 @@ export async function changePasswordAction(_: FormState, form: FormData): Promis
 }
 
 export async function revokeSessionAction(form: FormData): Promise<void> {
+  assertNotDemo("Signing out other devices");
   const app = await requireAppForAction();
   await revokeSession(String(form.get("sessionId") ?? ""), app.session.userId);
   revalidatePath("/settings/security");

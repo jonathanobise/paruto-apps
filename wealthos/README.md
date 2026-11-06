@@ -4,7 +4,7 @@
 
 Non-custodial financial intelligence and wealth-management SaaS — Nigeria first. Track every account, holding and liability; measure performance correctly; see currency exposure and data freshness; plan with honest scenarios.
 
-> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed. Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: Milestones 0–5 engineering complete** (foundation, core wealth engine, research & planning, commercial beta, expansion foundations). Deployment, provider integrations (payments, email, AI, market data, bank data), launches outside Nigeria, native apps and any regulated advice await owner, legal or vendor decisions. Not deployed to production; a throwaway public demo with SAMPLE data runs at https://wealth-demo.paruto.com ([docs/DEMO.md](docs/DEMO.md)). Not legally reviewed. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 WealthOS Version 1 never holds money, never places trades and never gives personalised investment advice. Regulated features are hard-disabled in code ([docs/COMPLIANCE_MATRIX.md](docs/COMPLIANCE_MATRIX.md)).
 

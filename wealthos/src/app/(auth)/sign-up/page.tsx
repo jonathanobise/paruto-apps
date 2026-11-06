@@ -1,10 +1,21 @@
 import Link from "next/link";
 import { SignUpForm } from "./form";
 import { BRAND } from "@/lib/brand";
+import { DemoGate } from "@/components/app/demo-entry";
+import { isDemoMode } from "@/server/demo/mode";
 
 export const metadata = { title: "Create account" };
 
 export default function SignUpPage() {
+  if (isDemoMode())
+    return (
+      <div>
+        <h1 className="font-display text-[36px] leading-[1.05]">Explore the <em>demo</em></h1>
+        <div className="mt-6">
+          <DemoGate />
+        </div>
+      </div>
+    );
   return (
     <div>
       <h1 className="font-display text-[36px] leading-[1.05]">Create your <em>account</em></h1>

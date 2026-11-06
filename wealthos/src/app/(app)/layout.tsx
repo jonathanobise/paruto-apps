@@ -11,6 +11,7 @@ import { setCurrencyAction, setThemeAction, switchOrgAction } from "./shell-acti
 import { DISCLOSURES } from "@/server/compliance/features";
 import { SUPPORTED_CURRENCIES } from "@/engine";
 import { BRAND } from "@/lib/brand";
+import { isDemoMode } from "@/server/demo/mode";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const app = await requireApp();
@@ -93,6 +94,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </form>
           </div>
         </header>
+        {isDemoMode() ? (
+          <div className="mx-3 mt-3 rounded-[18px] bg-warning-soft px-4 py-2 text-[13px] text-text sm:rounded-full sm:px-5" role="note">
+            <strong className="font-semibold text-warning">PUBLIC DEMO</strong> · Everyone shares this demo and it resets automatically. Please don&apos;t enter real information.
+          </div>
+        ) : null}
         {app.org.isDemo ? (
           <div className="mx-3 mt-3 rounded-[18px] bg-demo-soft px-4 py-2 text-[13px] text-text sm:rounded-full sm:px-5" role="note">
             <strong className="font-semibold text-demo">DEMO PORTFOLIO</strong> · {DISCLOSURES.demo_data}

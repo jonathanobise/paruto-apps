@@ -8,6 +8,8 @@ import { SettingsTabs } from "../tabs";
 import { DisableMfa, EnableMfa } from "./mfa";
 import { PasswordForm } from "./password-form";
 import { revokeSessionAction } from "../actions";
+import { Alert } from "@/components/ui/alert";
+import { isDemoMode } from "@/server/demo/mode";
 
 export const metadata = { title: "Security" };
 
@@ -22,6 +24,16 @@ const dt = (d: Date) => new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", 
 
 export default async function SecurityPage() {
   const app = await requireApp();
+  if (isDemoMode())
+    return (
+      <>
+        <PageHeader title="Settings" />
+        <SettingsTabs current="security" />
+        <Alert tone="info" title="Not in the public demo">
+          Everyone shares the demo account, so its password, two-step verification and signed-in devices can&apos;t be viewed or changed here. In your own account this page lets you change your password, turn on two-step verification and sign out other devices.
+        </Alert>
+      </>
+    );
   const [sessions, events] = await Promise.all([listSessions(app.session.userId), recentSecurityEvents(app.session.userId)]);
   return (
     <>

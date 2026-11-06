@@ -12,6 +12,7 @@ import { listOrganizations, pickActiveOrg, type OrgSummary } from "@/server/iden
 import { AppError } from "@/server/platform/errors";
 import type { RequestMeta } from "@/server/audit/audit";
 import { isDisplayCurrency } from "@/engine";
+import { isDemoMode } from "@/server/demo/mode";
 
 export const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-wos_session" : "wos_session";
 export const THEME_COOKIE = "wos_theme";
@@ -26,6 +27,8 @@ export async function clearSessionCookie(): Promise<void> {
 }
 
 export async function requestMeta(): Promise<RequestMeta> {
+  // Public demo: visitors share one account, so record nothing that identifies them.
+  if (isDemoMode()) return { ip: null, userAgent: null };
   const h = await headers();
   const e = env();
   return { ip: clientIp((n) => h.get(n), { trustedHeader: e.TRUSTED_IP_HEADER ?? null, trustedHops: e.TRUSTED_PROXY_HOPS }), userAgent: h.get("user-agent") };

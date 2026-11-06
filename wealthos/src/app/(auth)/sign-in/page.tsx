@@ -5,6 +5,8 @@ import { safeNext } from "@/lib/safe-next";
 import { Alert } from "@/components/ui/alert";
 import { SignInForm } from "./form";
 import { BRAND } from "@/lib/brand";
+import { DemoGate } from "@/components/app/demo-entry";
+import { isDemoMode } from "@/server/demo/mode";
 
 export const metadata = { title: "Sign in" };
 
@@ -13,6 +15,15 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const sp = await searchParams;
   const next = safeNext(sp.next);
   if (session?.mfaSatisfied || (session && !session.user.mfaEnabled)) redirect(next);
+  if (isDemoMode())
+    return (
+      <div>
+        <h1 className="font-display text-[36px] leading-[1.05]">Explore the <em>demo</em></h1>
+        <div className="mt-6">
+          <DemoGate />
+        </div>
+      </div>
+    );
   return (
     <div>
       <h1 className="font-display text-[36px] leading-[1.05]">Welcome <em>back</em></h1>

@@ -9,6 +9,7 @@ import { isDisplayCurrency } from "@/engine";
 import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { userPreferences } from "@/server/db/schema";
+import { isDemoMode } from "@/server/demo/mode";
 
 export async function switchOrgAction(form: FormData): Promise<void> {
   const session = await getSession();
@@ -31,6 +32,6 @@ export async function setThemeAction(form: FormData): Promise<void> {
   const theme = String(form.get("theme")) === "light" ? "light" : "dark";
   (await cookies()).set(THEME_COOKIE, theme, { path: "/", sameSite: "lax", maxAge: 31536000 });
   const session = await getSession();
-  if (session) await db().update(userPreferences).set({ theme, updatedAt: new Date() }).where(eq(userPreferences.userId, session.userId));
+  if (session && !isDemoMode()) await db().update(userPreferences).set({ theme, updatedAt: new Date() }).where(eq(userPreferences.userId, session.userId));
   revalidatePath("/", "layout");
 }

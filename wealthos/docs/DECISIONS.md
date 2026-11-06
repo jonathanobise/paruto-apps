@@ -56,6 +56,8 @@
 
 **ADR-028 Public name.** The product is presented as **Paruto Wealth**, a working name until the permanent name (Granavo) has its domains and a Nigerian trademark search cleared. The name lives in one constant, `BRAND` in `src/lib/brand.ts`, used for page titles (root `title.template`), the web-app manifest, the wordmark (last word in Instrument Serif italic), emails, PDF statements, the authenticator label, the assistant prompt, disclaimers and the default invoice seller name. "WealthOS" stays the internal codename: folder, package, database, cookies, source keys and the `demo@wealthos.test` login are unchanged, so a rename never touches data. Renaming: change `BRAND`, run `grep -rn "Paruto Wealth" src public tests` for the few literal copies (offline page, tests, AI eval set), and update the billing seller name in Admin → Billing if it was saved. Existing authenticator entries keep the old label until re-enrolled (codes still work).
 
+**ADR-029 Public demo.** A shareable demo runs as a separate, throwaway deployment (docs/DEMO.md): one Cloudflare Container with the app and its own Postgres, SAMPLE data baked in at build time, reset whenever it sleeps. `DEMO_MODE=1` closes sign-up (visitors enter as a shared demo user), refuses anything that could lock other visitors out, contact people or create money owed, and stores nothing identifying visitors. It runs with `APP_ENV=production`, so features awaiting compliance review stay hidden, and with no providers connected. It is not the production topology (docs/DEPLOYMENT.md), which still awaits owner, legal and vendor decisions.
+
 ## Open risks
 - No legal review yet (COMPLIANCE_MATRIX.md). Terms/Privacy are drafts.
 - No live market data; licensing costs unknown.

@@ -10,6 +10,7 @@ import { recordAudit } from "@/server/audit/audit";
 import { asStaff, type AdminContext } from "@/server/admin/context";
 import { appUrl, sendEmail } from "@/server/identity/email";
 import { BRAND } from "@/lib/brand";
+import { assertNotDemo } from "@/server/demo/mode";
 
 export const SUPPORT_TOPICS = { account: "Account and sign-in", billing: "Plans and billing", data: "Figures look wrong", imports: "Importing data", privacy: "Privacy and my data", bug: "Something isn't working", other: "Something else" } as const;
 
@@ -21,6 +22,7 @@ const caseSchema = z.object({
 const bodySchema = z.string().trim().min(2, "Write a message").max(5000);
 
 export async function createCase(ctx: TenantContext, input: unknown): Promise<string> {
+  assertNotDemo("Contacting support");
   const c = parseOrThrow(caseSchema, input);
   await rateLimit(`support:${ctx.userId}`, 10, 86_400);
   return withTenant(ctx, async (tx) => {
@@ -45,6 +47,7 @@ export async function getMyCase(userId: string, id: string) {
 }
 
 export async function replyToMyCase(userId: string, id: string, body: unknown): Promise<void> {
+  assertNotDemo("Contacting support");
   const b = parseOrThrow(bodySchema, body);
   await rateLimit(`support-reply:${userId}`, 40, 86_400);
   await withUser(userId, async (tx) => {

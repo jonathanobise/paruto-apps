@@ -6,6 +6,7 @@ import { AppError } from "@/server/platform/errors";
 import { recordSecurityEvent, type RequestMeta } from "@/server/audit/audit";
 import { verifyPassword } from "@/server/identity/crypto";
 import { rateLimit } from "@/server/platform/rate-limit";
+import { assertNotDemo } from "@/server/demo/mode";
 
 export const EXPORT_FORMAT_VERSION = "wealthos-export/1";
 
@@ -16,6 +17,7 @@ export const EXPORT_FORMAT_VERSION = "wealthos-export/1";
  * alerts, notifications and research-assistant conversations.
  */
 export async function exportUserData(userId: string, meta: RequestMeta) {
+  assertNotDemo("Downloading account data");
   await rateLimit(`export:${userId}`, 5, 3600);
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user) throw new AppError("NOT_FOUND", "User not found.");
@@ -66,6 +68,7 @@ export async function exportUserData(userId: string, meta: RequestMeta) {
  * where the user is the only owner are deleted with all their records.
  */
 export async function eraseAccount(userId: string, password: string, confirmation: string, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Deleting the account");
   if (confirmation.trim() !== "DELETE MY ACCOUNT") throw new AppError("VALIDATION", 'Type "DELETE MY ACCOUNT" to confirm.', { fieldErrors: { confirmation: ["Type the phrase exactly"] } });
   const [user] = await db().select({ hash: users.passwordHash }).from(users).where(eq(users.id, userId));
   if (!user || !(await verifyPassword(password, user.hash))) throw new AppError("UNAUTHENTICATED", "Password is incorrect.");

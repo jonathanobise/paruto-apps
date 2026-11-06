@@ -5,6 +5,7 @@ import { safeNext } from "@/lib/safe-next";
 import { clearSessionCookie, getSession, requestMeta, setSessionCookie } from "@/server/auth/context";
 import { completeMfaChallenge, requestPasswordReset, resendVerification, resetPassword, signIn, signUp } from "@/server/identity/service";
 import { revokeSession } from "@/server/identity/sessions";
+import { startDemoSession } from "@/server/demo/session";
 import { toActionError, type ActionResult } from "@/server/platform/errors";
 
 export type FormState = ActionResult<string | undefined> | null;
@@ -82,4 +83,11 @@ export async function signOutAction(): Promise<void> {
   if (session) await revokeSession(session.id, session.userId);
   await clearSessionCookie();
   redirect("/sign-in");
+}
+
+/** Public demo only: enter as the shared demo user (src/server/demo/session.ts). */
+export async function demoSignInAction(): Promise<void> {
+  const s = await startDemoSession();
+  await setSessionCookie(s.token, s.expiresAt);
+  redirect("/dashboard");
 }

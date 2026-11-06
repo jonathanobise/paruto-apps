@@ -7,6 +7,7 @@ import { parseOrThrow } from "./service";
 import { CONSENT_VERSIONS } from "./validation";
 import type { RequestMeta } from "@/server/audit/audit";
 import { SUPPORTED_CURRENCIES } from "@/engine";
+import { assertNotDemo } from "@/server/demo/mode";
 
 export const preferencesSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
@@ -26,6 +27,7 @@ export const preferencesSchema = z.object({
 });
 
 export async function updatePreferences(userId: string, input: unknown): Promise<void> {
+  assertNotDemo("Changing profile settings");
   const data = parseOrThrow(preferencesSchema, input);
   await db().update(users).set({ displayName: data.displayName, updatedAt: new Date() }).where(eq(users.id, userId));
   await db()
@@ -43,6 +45,7 @@ export async function currentConsents(userId: string): Promise<Record<string, { 
 }
 
 export async function setMarketingConsent(userId: string, granted: boolean, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Changing email preferences");
   await db().insert(consentRecords).values({ userId, consentKey: "marketing_email", version: CONSENT_VERSIONS.marketing_email, granted, ip: meta.ip ?? null, userAgent: meta.userAgent?.slice(0, 500) ?? null });
 }
 

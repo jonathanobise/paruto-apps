@@ -29,4 +29,4 @@ Paruto design standard (docs/DECISIONS.md ADR-027): dark by default for everyone
 Integration tests recreate the `wealthos_test` schema each run. Schema changes: edit `src/server/db/schema`, run `npm run db:generate`, add RLS/grants for new tenant tables in a custom migration (`npx drizzle-kit generate --custom`), and extend `tests/integration/tenancy.test.ts`.
 
 ## Deployment
-Not deployed. Ask before any production deployment, paid service, or change with regulatory implications. This folder is excluded from the apps.paruto.com publish via the repo root `.assetsignore`.
+Public demo only: https://wealth-demo.paruto.com (docs/DEMO.md; deploy with `deploy/demo/deploy.sh`, from committed code). Demo mode (`DEMO_MODE=1`) must keep refusing anything that could lock visitors out, contact people or create money owed: new features with those effects call `assertNotDemo`. Production: not deployed. Ask before any production deployment, paid service, or change with regulatory implications. This folder is excluded from the apps.paruto.com publish via the repo root `.assetsignore`.

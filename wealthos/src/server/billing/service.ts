@@ -8,6 +8,7 @@ import { sendEmail, appUrl } from "@/server/identity/email";
 import { d, ZERO, type Decimal } from "@/engine";
 import { effectivePlan, listPlans, type PlanView } from "./entitlements";
 import { getBillingSettings, type BillingSettings } from "./settings";
+import { assertNotDemo } from "@/server/demo/mode";
 
 /**
  * Provider-neutral subscription billing.
@@ -118,6 +119,7 @@ async function planOrThrow(tx: Tx, code: string): Promise<PlanView> {
 }
 
 export async function startTrial(ctx: TenantContext, planCode: string): Promise<void> {
+  assertNotDemo("Starting a trial");
   const eff = await requireBillingRole(ctx);
   if (eff.subscription && ["trialing", "active", "past_due"].includes(eff.subscription.status)) throw new AppError("CONFLICT", "You already have a plan. Change it instead.");
   await withTenant(ctx, async (tx) => {
@@ -138,6 +140,7 @@ export async function startTrial(ctx: TenantContext, planCode: string): Promise<
  * the rest of the period. Moving to a cheaper plan or Free: scheduled for the period end.
  */
 export async function changePlan(ctx: TenantContext, planCode: string): Promise<{ invoiceId: string | null; scheduled: boolean }> {
+  assertNotDemo("Changing plan");
   const eff = await requireBillingRole(ctx);
   const sub = eff.subscription && ["trialing", "active", "past_due"].includes(eff.subscription.status) ? eff.subscription : null;
   if (planCode === "free") {
@@ -182,6 +185,7 @@ export async function changePlan(ctx: TenantContext, planCode: string): Promise<
 }
 
 export async function cancelAtPeriodEnd(ctx: TenantContext, cancel: boolean): Promise<void> {
+  assertNotDemo("Cancelling a plan");
   const eff = await requireBillingRole(ctx);
   const sub = eff.subscription;
   if (!sub || !["trialing", "active", "past_due"].includes(sub.status)) throw new AppError("CONFLICT", "There's no plan to cancel.");
@@ -197,6 +201,7 @@ export async function cancelAtPeriodEnd(ctx: TenantContext, cancel: boolean): Pr
 
 /** Withdraw an unpaid plan or upgrade invoice the customer asked for. */
 export async function withdrawInvoice(ctx: TenantContext, invoiceId: string): Promise<void> {
+  assertNotDemo("Withdrawing an invoice");
   await requireBillingRole(ctx);
   const [inv] = await withTenant(ctx, (tx) => tx.select().from(invoices).where(eq(invoices.id, invoiceId)));
   if (!inv) throw new AppError("NOT_FOUND", "Invoice not found.");

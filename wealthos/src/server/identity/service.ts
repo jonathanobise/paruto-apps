@@ -11,6 +11,7 @@ import { createSession, markSessionMfa, revokeAllSessions } from "./sessions";
 import { CONSENT_VERSIONS, passwordSchema, signInSchema, signUpSchema } from "./validation";
 import { z } from "zod";
 import { BRAND } from "@/lib/brand";
+import { assertNotDemo } from "@/server/demo/mode";
 
 const LOCK_AFTER_FAILURES = 5;
 const LOCK_MINUTES = 15;
@@ -61,6 +62,7 @@ export interface SignUpResult {
 }
 
 export async function signUp(input: unknown, meta: RequestMeta): Promise<SignUpResult> {
+  assertNotDemo("Creating an account");
   const data = parseOrThrow(signUpSchema, input);
   await rateLimit(`signup:ip:${meta.ip ?? "unknown"}`, 10, 3600);
 
@@ -173,6 +175,7 @@ export async function completeMfaChallenge(sessionId: string, userId: string, co
 }
 
 export async function beginMfaEnrollment(userId: string): Promise<{ secret: string; uri: string }> {
+  assertNotDemo("Two-step verification");
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user) throw new AppError("NOT_FOUND", "User not found.");
   if (user.mfaEnabledAt) throw new AppError("CONFLICT", "Two-step verification is already enabled.");
@@ -182,6 +185,7 @@ export async function beginMfaEnrollment(userId: string): Promise<{ secret: stri
 }
 
 export async function confirmMfaEnrollment(userId: string, sessionId: string, code: string, meta: RequestMeta): Promise<{ recoveryCodes: string[] }> {
+  assertNotDemo("Two-step verification");
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user?.mfaTotpSecretEnc) throw new AppError("VALIDATION", "Start the set-up again.");
   if (user.mfaEnabledAt) throw new AppError("CONFLICT", "Two-step verification is already enabled.");
@@ -197,6 +201,7 @@ export async function confirmMfaEnrollment(userId: string, sessionId: string, co
 }
 
 export async function disableMfa(userId: string, password: string, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Two-step verification");
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user || !(await verifyPassword(password, user.passwordHash))) throw new AppError("UNAUTHENTICATED", "Password is incorrect.");
   await db().update(users).set({ mfaEnabledAt: null, mfaTotpSecretEnc: null, mfaRecoveryCodeHashes: null, mfaLastUsedStep: null }).where(eq(users.id, userId));
@@ -205,6 +210,7 @@ export async function disableMfa(userId: string, password: string, meta: Request
 }
 
 export async function requestPasswordReset(emailInput: unknown, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Password reset");
   const email = parseOrThrow(z.object({ email: z.string().trim().toLowerCase().email() }), emailInput).email;
   await rateLimit(`reset:ip:${meta.ip ?? "unknown"}`, 10, 3600);
   await rateLimit(`reset:email:${email}`, 3, 3600);
@@ -216,6 +222,7 @@ export async function requestPasswordReset(emailInput: unknown, meta: RequestMet
 }
 
 export async function resetPassword(token: string, newPassword: unknown, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Password reset");
   const password = parseOrThrow(z.object({ password: passwordSchema }), { password: newPassword }).password;
   const userId = await consumeToken(token, "password_reset");
   if (!userId) throw new AppError("VALIDATION", "This reset link is invalid or has expired. Request a new one.");
@@ -225,6 +232,7 @@ export async function resetPassword(token: string, newPassword: unknown, meta: R
 }
 
 export async function changePassword(userId: string, sessionId: string, current: string, next: unknown, meta: RequestMeta): Promise<void> {
+  assertNotDemo("Changing the password");
   const password = parseOrThrow(z.object({ password: passwordSchema }), { password: next }).password;
   const [user] = await db().select().from(users).where(eq(users.id, userId));
   if (!user || !(await verifyPassword(current, user.passwordHash))) throw new AppError("UNAUTHENTICATED", "Current password is incorrect.");

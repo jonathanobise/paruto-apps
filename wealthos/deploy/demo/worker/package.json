@@ -1,0 +1,12 @@
+{
+  "name": "paruto-wealth-demo-worker",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker that fronts the Paruto Wealth public demo container.",
+  "dependencies": {
+    "@cloudflare/containers": "0.3.7"
+  },
+  "devDependencies": {
+    "wrangler": "4.141.0"
+  }
+}

@@ -11,6 +11,7 @@ import { appUrl, sendEmail } from "./email";
 import { randomToken, sha256 } from "./crypto";
 import { parseOrThrow } from "./service";
 import { BRAND } from "@/lib/brand";
+import { assertNotDemo } from "@/server/demo/mode";
 
 /**
  * Shared spaces (household / business organisations), invitations and member roles.
@@ -49,6 +50,7 @@ async function mapDbErrors<T>(p: Promise<T>): Promise<T> {
 const spaceSchema = z.object({ name: z.string().trim().min(2, "Give the space a name").max(80), kind: z.enum(["household", "business"]), jurisdiction: z.string().default("NG") });
 
 export async function createSharedSpace(userId: string, input: unknown): Promise<string> {
+  assertNotDemo("Creating a shared space");
   const s = parseOrThrow(spaceSchema, input);
   await rateLimit(`space-create:${userId}`, 5, 86_400);
   return withUser(userId, async (tx) => {
@@ -82,6 +84,7 @@ const inviteSchema = z.object({ email: z.string().trim().toLowerCase().email("En
 
 /** Returns the invitation link (also emailed). Owners and admins only; shared spaces only. */
 export async function inviteMember(ctx: TenantContext, input: unknown): Promise<{ id: string; link: string }> {
+  assertNotDemo("Inviting people");
   const inv = parseOrThrow(inviteSchema, input);
   await rateLimit(`invite:${ctx.userId}`, 20, 86_400);
   const token = randomToken(32);
@@ -112,6 +115,7 @@ export async function inviteMember(ctx: TenantContext, input: unknown): Promise<
 }
 
 export async function revokeInvitation(ctx: TenantContext, id: string): Promise<void> {
+  assertNotDemo("Managing invitations");
   await withTenant(ctx, async (tx) => {
     const r = await tx.update(orgInvitations).set({ revokedAt: new Date() }).where(and(eq(orgInvitations.id, id), isNull(orgInvitations.acceptedAt))).returning({ id: orgInvitations.id });
     if (!r.length) throw new AppError("NOT_FOUND", "Invitation not found.");
@@ -126,6 +130,7 @@ export async function previewInvitation(token: string) {
 }
 
 export async function acceptInvitation(userId: string, token: string): Promise<string> {
+  assertNotDemo("Accepting invitations");
   await rateLimit(`invite-accept:${userId}`, 20, 3600);
   if (!/^[A-Za-z0-9_-]{20,100}$/.test(token)) throw new AppError("NOT_FOUND", "This invitation link isn't valid.");
   return mapDbErrors(
@@ -140,6 +145,7 @@ export async function acceptInvitation(userId: string, token: string): Promise<s
 }
 
 export async function setMemberRole(ctx: TenantContext, userId: string, role: unknown): Promise<void> {
+  assertNotDemo("Changing member roles");
   const r = parseOrThrow(z.enum(["owner", "admin", "member", "viewer"]), role);
   await mapDbErrors(
     withTenant(ctx, async (tx) => {
@@ -150,6 +156,7 @@ export async function setMemberRole(ctx: TenantContext, userId: string, role: un
 }
 
 export async function removeMember(ctx: TenantContext, userId: string): Promise<void> {
+  assertNotDemo("Removing members");
   await mapDbErrors(
     withTenant(ctx, async (tx) => {
       await tx.execute(sql`select app_remove_member(${userId}::uuid)`);
