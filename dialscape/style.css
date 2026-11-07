@@ -296,3 +296,56 @@ input[type="time"] {
 .phone.tap-mode::after { content: "Tap your subject"; position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); font: 600 12px var(--sans); color: #fff; pointer-events: none; white-space: nowrap; }
 .phone.working canvas { filter: saturate(0.6) brightness(0.8); transition: filter 0.3s; }
 .phone.working::after { content: "Cutting out…"; position: absolute; inset: 0; display: grid; place-items: center; font: 600 14px var(--sans); color: #fff; pointer-events: none; }
+
+/* ── editor, export, mockup ── */
+.undo { width: 52px; height: 52px; }
+.undo[disabled] { opacity: 0.35; cursor: default; }
+.undo svg { width: 19px; height: 19px; }
+@media (max-width: 899px) { .undo { width: 44px; height: 44px; } .shuffle { padding: 0 16px; } .lock { padding: 0 8px; font-size: 12.5px; } }
+.tabs { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 899px) { .tabs button { font-size: 12.5px; } }
+.describe { display: flex; gap: 8px; margin-bottom: 12px; }
+.describe-input {
+  flex: 1; min-width: 0; height: 42px; padding: 0 16px; border-radius: 999px; font: 500 14px var(--sans); color: var(--ink);
+  background: var(--glass); border: 1px solid var(--glass-line);
+}
+.describe-input::placeholder { color: var(--ink-3); }
+.chip.solid { background: var(--accent); color: var(--accent-ink); border: 0; height: 42px; padding: 0 18px; font-weight: 650; }
+.chips.coll { margin-bottom: 12px; }
+.colour { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+.colour input { appearance: none; -webkit-appearance: none; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--glass-line); padding: 0; background: none; cursor: pointer; }
+.colour input::-webkit-color-swatch-wrapper { padding: 0; }
+.colour input::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.colour input::-moz-color-swatch { border: 0; border-radius: 50%; }
+.field .slider { margin-bottom: 8px; }
+.phone.dragging { cursor: grabbing; }
+.exports { display: grid; gap: 8px; }
+.export {
+  display: grid; gap: 3px; text-align: left; padding: 14px 16px; border-radius: var(--r-md); border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04); transition: transform 0.35s var(--spring), background 0.2s;
+}
+.export:hover { background: rgba(255, 255, 255, 0.08); }
+.export:active { transform: scale(0.98); }
+.export b { font-size: 15px; }
+.export span { font-size: 13px; color: var(--ink-2); }
+.export[disabled] { opacity: 0.6; cursor: progress; }
+
+/* lock-screen mockup, drawn over the preview in proportion to the phone */
+.phone { container-type: inline-size; }
+.mock { position: absolute; inset: 0; pointer-events: none; display: none; color: #fff; font-family: -apple-system, "SF Pro Display", "Inter", system-ui, sans-serif; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25); }
+.phone[data-mock="ios"] .mock, .phone[data-mock="android"] .mock { display: block; }
+.m-bar { position: absolute; top: 4.2cqw; left: 9cqw; right: 8cqw; display: flex; justify-content: space-between; font-weight: 600; font-size: 4.4cqw; }
+.m-icons { width: 18cqw; height: 3.6cqw; background: linear-gradient(90deg, #fff 0 22%, transparent 22% 30%, #fff 30% 52%, transparent 52% 62%, rgba(255,255,255,0.9) 62% 100%); border-radius: 1cqw; opacity: 0.9; }
+.m-date { position: absolute; top: 15cqw; left: 0; right: 0; text-align: center; font-weight: 600; font-size: 5cqw; opacity: 0.92; }
+.m-time { position: absolute; top: 19cqw; left: 0; right: 0; text-align: center; font-weight: 700; font-size: 25cqw; letter-spacing: -0.02em; line-height: 1.05; opacity: 0.94; }
+.m-bottom { position: absolute; left: 11cqw; right: 11cqw; bottom: 9cqw; display: flex; justify-content: space-between; }
+.m-bottom i { width: 13cqw; height: 13cqw; border-radius: 50%; background: rgba(40, 40, 40, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.m-home { position: absolute; bottom: 2.4cqw; left: 50%; width: 36cqw; height: 1.4cqw; margin-left: -18cqw; border-radius: 1cqw; background: #fff; }
+.phone[data-mock="android"] .m-bar { top: 3.4cqw; left: 6cqw; right: 6cqw; font-size: 4cqw; font-weight: 500; }
+.phone[data-mock="android"] .m-date { top: 22cqw; text-align: left; left: 8cqw; font-weight: 500; font-size: 4.4cqw; }
+.phone[data-mock="android"] .m-time { top: 27cqw; text-align: left; left: 7cqw; font-weight: 400; font-size: 21cqw; }
+.phone[data-mock="android"] .m-home { width: 30cqw; margin-left: -15cqw; height: 1cqw; }
+.phone[data-mock="android"] .m-bottom i { border-radius: 30%; }
+.field > label.slider { display: flex; text-transform: none; letter-spacing: 0; font: 400 14px var(--sans); color: var(--ink-2); margin-bottom: 8px; }
+.field > label.slider span { min-width: 3.5em; }
+.phone[data-mock="ios"] .live-hint, .phone[data-mock="android"] .live-hint { display: none; }

@@ -51,6 +51,13 @@
       <p class="kicker" id="kicker">Today's wallpaper</p>
       <div class="phone" id="phone">
         <canvas id="preview" role="img" aria-label="Wallpaper preview"></canvas>
+        <div class="mock mock-ios" aria-hidden="true">
+          <div class="m-bar"><span id="mockBar">9:41</span><i class="m-icons"></i></div>
+          <div class="m-date" id="mockDate"></div>
+          <div class="m-time" id="mockTime"></div>
+          <div class="m-bottom"><i></i><i></i></div>
+          <div class="m-home"></div>
+        </div>
         <div class="guides" id="guides" aria-hidden="true">
           <div class="guide g-clock"><span>System clock</span></div>
           <div class="guide g-dock"><span>Dock</span></div>
@@ -72,6 +79,9 @@
           <button class="lock glass" data-lock="bg" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0"/></svg>Art</button>
           <button class="lock glass" data-lock="pal" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0"/></svg>Colour</button>
         </div>
+        <button class="glass round undo" id="undoBtn" aria-label="Undo" title="Undo (Z)" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+        </button>
         <button class="shuffle" id="shuffleBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5c2 0 3.2.9 4.3 2.6l2.4 4.8c1.1 1.7 2.3 2.6 4.3 2.6H21M3 17h3.5c1.4 0 2.4-.4 3.3-1.3M21 7h-3.5c-1.4 0-2.4.4-3.3 1.3M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
           Shuffle
@@ -83,6 +93,7 @@
         <button role="tab" aria-selected="false" data-tab="clock">Clock</button>
         <button role="tab" aria-selected="false" data-tab="bg">Art</button>
         <button role="tab" aria-selected="false" data-tab="pal">Colour</button>
+        <button role="tab" aria-selected="false" data-tab="edit">Edit</button>
         <button role="tab" aria-selected="false" data-tab="fit">Fit</button>
       </div>
       <div class="panel" id="panel" role="tabpanel"></div>
@@ -98,8 +109,8 @@
         <button class="glass round" id="favBtn" aria-label="Add to saved" aria-pressed="false" title="Add to saved">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1z"/></svg>
         </button>
-        <button class="glass round" id="shareBtn" aria-label="Share this design" title="Share this design">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4 4 4M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg>
+        <button class="glass round" id="moreBtn" aria-label="More ways to save" title="More ways to save" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></svg>
         </button>
       </div>
       <p class="fine">Wallpapers are pictures, so the clock shows the time you save it (or a time you pick under <b>Fit</b>). For a clock that ticks, open the <b>live clock</b>: a full-screen bedside or desk clock that keeps the screen awake. Your photos are cut out on this device and never uploaded.</p>
@@ -129,6 +140,21 @@
   <div class="grid" id="collectionGrid"></div>
 </dialog>
 
+<!-- More ways to save -->
+<dialog class="sheet" id="export" aria-labelledby="exportTitle">
+  <div class="sheet-head">
+    <h2 id="exportTitle">Save as</h2>
+    <button class="glass round" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="exports">
+    <button class="export" data-export="single"><b>Wallpaper</b><span>One picture at your screen size.</span></button>
+    <button class="export" data-export="pair"><b>Lock + Home pair</b><span>The design with the time, plus a matching home-screen picture without it.</span></button>
+    <button class="export" data-export="pack"><b>Shuffle pack</b><span>Eight takes on this design, for iPhone's Photo Shuffle or Samsung's lock-screen rotation, so it changes by itself.</span></button>
+    <button class="export" data-export="motion"><b>Motion wallpaper</b><span>An 8-second looping video with the layers drifting for depth. For Android and Samsung video wallpapers.</span></button>
+    <button class="export" data-export="link"><b>Share a link</b><span>Opens this exact design in Dialscape on another device.</span></button>
+  </div>
+</dialog>
+
 <!-- After saving -->
 <dialog class="sheet" id="howto" aria-labelledby="howtoTitle">
   <div class="sheet-head">
@@ -139,17 +165,7 @@
     <button role="tab" data-os="ios" aria-selected="true">iPhone</button>
     <button role="tab" data-os="android" aria-selected="false">Android</button>
   </div>
-  <ol class="steps" data-os-steps="ios">
-    <li>Tap <b>Save Image</b> in the share sheet, so it goes to Photos.</li>
-    <li>Open <b>Photos</b>, choose the picture, tap <b>Share</b> and then <b>Use as Wallpaper</b>.</li>
-    <li>Turn off <b>Depth Effect</b> if it hides the clock, then tap <b>Add</b>.</li>
-    <li>Choose <b>Set as Wallpaper Pair</b>, or <b>Customise Home Screen</b> to use it there only.</li>
-  </ol>
-  <ol class="steps" data-os-steps="android" hidden>
-    <li>Open <b>Photos</b> or <b>Gallery</b> and find the picture (it's in Downloads if you saved the file).</li>
-    <li>Tap <b>⋮</b> and then <b>Use as</b> or <b>Set as wallpaper</b>.</li>
-    <li>Pick <b>Lock screen</b>, <b>Home screen</b> or <b>both</b>, and tap <b>Set</b>.</li>
-  </ol>
+  <ol class="steps" id="howtoSteps"></ol>
   <p class="fine">Tip: your phone draws its own clock at the top of the lock screen. Under <b>Fit</b>, move the design's clock to the middle or lower down so the two never collide.</p>
 </dialog>
 

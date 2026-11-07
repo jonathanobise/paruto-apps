@@ -1,8 +1,10 @@
 import {
   TYPE_STYLES, CLASSIC_CLOCKS, SCENE_STYLES, PATTERN_STYLES, ALL_CLOCKS, ALL_BACKS, isClock, isBack, clockHasSeconds,
-  randomSpec, dailySpec, buildLayers, compose, paletteOf, autoPlace, photoRect, randomSeed,
+  randomSpec, dailySpec, buildLayers, compose, paletteOf, autoPlace, photoRect, randomSeed, DATE_FORMATS, TYPEFACES, timePalette,
 } from "./render.js";
 import * as Photo from "./photo.js";
+import { describe } from "./describe.js";
+import { zip } from "./zip.js";
 
 /* ───────────── devices ───────────── */
 // Screen sizes in pixels (portrait). "auto" reads this device's screen.
@@ -43,8 +45,10 @@ const state = {
   lock: { clock: false, bg: false, pal: false, ...(prefs.lock || {}) },
   device: prefs.device || (isTouch ? "auto" : "iphone-max"),
   time: "now", // or "HH:MM"
-  guides: !!prefs.guides,
+  mock: prefs.mock || (prefs.guides ? "guides" : "off"), // lock-screen preview: off · guides · ios · android
   tab: "explore",
+  collection: "all",
+  history: [],
   palOptions: [],
   explore: [],
   saved: store.get("saved", []),
@@ -53,9 +57,9 @@ const state = {
   tapMode: false,
   busy: false,
 };
-const savePrefs = () => store.set("prefs", { lock: state.lock, device: state.device, guides: state.guides });
+const savePrefs = () => store.set("prefs", { lock: state.lock, device: state.device, mock: state.mock });
 
-const specKey = (s) => [s.clock, s.bg, s.pal, s.seed, s.pos, s.bg === "photo" ? s.photo : ""].join("|");
+const specKey = (s) => hashOf(s);
 const designKey = (s) => [s.clock, s.bg, s.pal, s.seed, s.bg === "photo" ? s.photo : ""].join("|");
 function specFromHash() {
   const q = new URLSearchParams(location.hash.slice(1));
@@ -64,9 +68,46 @@ function specFromHash() {
   const clean = (v) => (v || "").replace(/[^a-z0-9~]/gi, "").slice(0, 16) || randomSeed();
   const spec = { clock, bg, pal: clean(q.get("p")), seed: clean(q.get("s")), pos: ["high", "middle", "low"].includes(q.get("y")) ? q.get("y") : "middle" };
   if (bg === "photo") spec.photo = clean(q.get("ph"));
-  return spec;
+  // editor settings
+  const num = (k, lo, hi) => { const v = Number(q.get(k)); return q.has(k) && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : undefined; };
+  const hex = (k) => (/^[0-9a-f]{6}$/i.test(q.get(k) || "") ? "#" + q.get(k).toLowerCase() : undefined);
+  Object.assign(spec, {
+    sz: num("z", 0.5, 1.5), dx: num("x", -0.5, 0.5), dy: num("v", -0.5, 0.5), ink: hex("i"), acc: hex("a"),
+    h12: q.get("t") === "12" || undefined,
+    df: DATE_FORMATS.some((d) => d.id === q.get("d")) ? q.get("d") : undefined,
+    face: TYPEFACES.some((d) => d.id === q.get("f")) ? q.get("f") : undefined,
+    cap: q.get("cap") ? q.get("cap").slice(0, 48) : undefined,
+  });
+  return tidy(spec);
 }
-const hashOf = (s) => `#c=${s.clock}&b=${s.bg}&p=${s.pal}&s=${s.seed}&y=${s.pos}${s.bg === "photo" ? `&ph=${s.photo}` : ""}`;
+// drops editor fields left at their defaults
+function tidy(spec) {
+  const s = { ...spec };
+  if (s.sz == null || Math.abs(s.sz - 1) < 0.005) delete s.sz;
+  for (const k of ["dx", "dy"]) if (s[k] == null || Math.abs(s[k]) < 0.002) delete s[k];
+  for (const k of ["ink", "acc", "h12", "cap"]) if (!s[k]) delete s[k];
+  for (const k of ["df", "face"]) if (!s[k] || s[k] === "auto") delete s[k];
+  if (s.bg !== "photo") delete s.photo;
+  return s;
+}
+const r3 = (v) => Math.round(v * 1000) / 1000;
+function hashOf(s) {
+  let out = `#c=${s.clock}&b=${s.bg}&p=${s.pal}&s=${s.seed}&y=${s.pos}${s.bg === "photo" ? `&ph=${s.photo}` : ""}`;
+  if (s.sz) out += `&z=${r3(s.sz)}`;
+  if (s.dx) out += `&x=${r3(s.dx)}`;
+  if (s.dy) out += `&v=${r3(s.dy)}`;
+  if (s.ink) out += `&i=${s.ink.slice(1)}`;
+  if (s.acc) out += `&a=${s.acc.slice(1)}`;
+  if (s.h12) out += "&t=12";
+  if (s.df) out += `&d=${s.df}`;
+  if (s.face) out += `&f=${s.face}`;
+  if (s.cap) out += `&cap=${encodeURIComponent(s.cap)}`;
+  return out;
+}
+const EDIT_KEYS = ["sz", "dx", "dy", "ink", "acc", "h12", "df", "face", "cap"];
+const editsOf = (s) => Object.fromEntries(EDIT_KEYS.filter((k) => s[k] != null).map((k) => [k, s[k]]));
+// what the painted layers depend on (the time and editor settings are drawn on top every tick)
+const layerKeyOf = (s) => [s.bg, s.pal, s.seed, s.pos, s.bg === "photo" ? s.photo : ""].join("|");
 
 /* ───────────── elements ───────────── */
 const $ = (s, el = document) => el.querySelector(s);
@@ -106,6 +147,13 @@ function displayDate() {
 const photoCache = new Map();
 const photoFor = (spec) => (spec.bg === "photo" ? (state.photo?.id === spec.photo ? state.photo : photoCache.get(spec.photo)) : null);
 function layers(w, h, spec) { return buildLayers(w, h, spec, photoFor(spec)); }
+const layerCache = new Map();
+// layers for thumbnails, kept while the panel is open
+function cachedLayers(w, h, spec) {
+  const k = `${layerKeyOf(spec)}|${w}x${h}|${state.photoRev}`;
+  if (!layerCache.has(k)) { if (layerCache.size > 60) layerCache.clear(); layerCache.set(k, layers(w, h, spec)); }
+  return layerCache.get(k);
+}
 
 /* ───────────── preview ───────────── */
 let L = null, layerKey = "", raf = 0, tickTimer = 0;
@@ -128,10 +176,10 @@ function previewPixels() {
 
 function drawPreview() {
   const [w, h] = previewPixels();
-  const key = `${specKey(state.spec)}|${w}x${h}|${state.photoRev}`;
+  const key = `${layerKeyOf(state.spec)}|${w}x${h}|${state.photoRev}`;
   if (preview.width !== w || preview.height !== h) { preview.width = w; preview.height = h; }
   if (key !== layerKey) { L = layers(w, h, state.spec); layerKey = key; }
-  compose(preview.getContext("2d"), L, displayDate());
+  compose(preview.getContext("2d"), L, displayDate(), state.spec);
 }
 
 function loop() {
@@ -145,7 +193,7 @@ function loop() {
 }
 
 function themeFromPalette() {
-  const p = paletteOf(state.spec, photoFor(state.spec));
+  const p = timePalette(paletteOf(state.spec, photoFor(state.spec)), state.spec);
   const root = document.documentElement.style;
   root.setProperty("--glow", p.bg[2]);
   root.setProperty("--glow-2", p.bg[3]);
@@ -174,7 +222,13 @@ function updateMeta() {
   phone.classList.toggle("tap-mode", state.tapMode && s.bg === "photo");
 }
 
-function setSpec(spec, { push = false, animate = true, panel: repaint = true } = {}) {
+function setSpec(spec, { push = false, animate = true, panel: repaint = true, record = true } = {}) {
+  spec = tidy(spec);
+  if (record && state.spec && specKey(state.spec) !== specKey(spec)) {
+    state.history.push(state.spec);
+    if (state.history.length > 40) state.history.shift();
+  }
+  $("#undoBtn").disabled = !state.history.length;
   state.spec = spec;
   if (spec.bg !== "photo") state.tapMode = false;
   const url = hashOf(spec);
@@ -207,7 +261,7 @@ function paintThumbs(jobs) {
   requestAnimationFrame(step);
 }
 function paintSpec(cv, spec, date = displayDate()) {
-  compose(cv.getContext("2d"), layers(cv.width, cv.height, spec), date);
+  compose(cv.getContext("2d"), cachedLayers(cv.width, cv.height, spec), date, spec);
 }
 const optButton = (text, pressed, onclick, canvas, extra = "") =>
   h("button", { class: "opt " + extra, "aria-pressed": String(pressed), onclick }, canvas, h("span", {}, text));
@@ -222,11 +276,39 @@ function renderPanel() {
   const jobs = [];
 
   if (state.tab === "explore") {
-    if (!state.explore.length) state.explore = Array.from({ length: 12 }, () => randomSpec({}, { pos: "middle" }));
+    const COLLECTIONS = {
+      all: { name: "All" },
+      city: { name: "City", bg: ["skyline"], clock: ["neon", "tower", "fade", "split", "chrome", "glass", "knockout"] },
+      nature: { name: "Nature", bg: ["pines", "homestead", "bloom", "sea"], clock: ["thin", "fade", "script", "mirror", "tower", "glass"] },
+      space: { name: "Space", bg: ["star", "borealis"], clock: ["outline", "script", "thin", "glass", "neon", "dots"] },
+      retro: { name: "Retro", bg: ["retro"], clock: ["neon", "chrome", "dots", "extrude", "split"] },
+      minimal: { name: "Minimal", bg: ["mesh", "aurora", "prism", "halftone"], clock: ["thin", "fade", "mirror", "outline", "glass", "knockout", "column"] },
+    };
+    const input = h("input", { type: "text", class: "describe-input", placeholder: "Describe it: pink neon city at night", "aria-label": "Describe a wallpaper", maxlength: "80" });
+    const go = () => {
+      const words = input.value.trim();
+      if (!words) return input.focus();
+      const { spec, matched } = describe(words, { pos: s.pos, ...keptEdits(s, {}) });
+      setSpec(spec);
+      toast(matched.length ? `Made from: ${matched.join(" · ")}` : "No words matched, so here's a surprise. Try “gold city” or “misty forest”.", 3200);
+    };
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+    panel.append(h("div", { class: "describe" }, input, h("button", { class: "chip solid", onclick: go }, "Create")));
+    panel.append(h("div", { class: "chips coll" }, Object.entries(COLLECTIONS).map(([id, c]) =>
+      h("button", { class: "chip glass", "aria-pressed": String(state.collection === id), onclick: () => { state.collection = id; state.explore = []; renderPanel(); } }, c.name))));
+    if (!state.explore.length) {
+      const c = COLLECTIONS[state.collection];
+      const pickOf = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      state.explore = Array.from({ length: 12 }, () => {
+        const x = randomSpec({}, { pos: "middle" });
+        if (c.bg) { x.bg = pickOf(c.bg); x.clock = pickOf(c.clock); }
+        return x;
+      });
+    }
     const grid = h("div", { class: "explore" });
     for (const spec of state.explore) {
       const cv = thumbCanvas(104, 225);
-      const mine = { ...spec, pos: s.pos };
+      const mine = { ...spec, pos: s.pos, ...keptEdits(s, {}) };
       grid.append(h("button", {
         class: "opt big", "aria-pressed": String(designKey(spec) === designKey(s)),
         "aria-label": `${nameOf(ALL_CLOCKS, spec.clock)} on ${nameOf(ALL_BACKS, spec.bg)}`, onclick: () => setSpec(mine),
@@ -238,6 +320,8 @@ function renderPanel() {
       h("button", { class: "chip glass", onclick: pickPhoto }, "＋ Use your photo")));
   }
 
+  if (state.tab === "edit") panel.append(editPanel());
+
   if (state.tab === "clock") {
     let base = null;
     const strip = (items) => {
@@ -247,7 +331,7 @@ function renderPanel() {
         const spec = { ...s, clock: c.id };
         el.append(optButton(c.name, s.clock === c.id, () => setSpec(spec), cv));
         jobs.push(() => {
-          if (!base) base = layers(cv.width, cv.height, s);
+          if (!base) base = cachedLayers(cv.width, cv.height, s);
           compose(cv.getContext("2d"), base, date, spec);
         });
       }
@@ -311,9 +395,6 @@ function renderPanel() {
     const [aw, ah] = deviceSize("auto");
     const timeInput = h("input", { type: "time", value: state.time === "now" ? "10:10" : state.time, "aria-label": "Time shown on the wallpaper" });
     timeInput.addEventListener("change", () => { state.time = timeInput.value || "10:10"; renderPanel(); loop(); });
-    const guides = h("input", { type: "checkbox", role: "switch" });
-    guides.checked = state.guides;
-    guides.addEventListener("change", () => { state.guides = guides.checked; phone.classList.toggle("show-guides", state.guides); savePrefs(); });
     panel.append(h("div", { class: "fit" },
       h("div", { class: "field" }, h("span", { class: "label" }, "Screen"),
         chips(DEVICES.map((d) => ({ id: d.id, name: d.name, note: d.id === "auto" ? `${aw}×${ah}` : null })), state.device, (id) => {
@@ -327,11 +408,72 @@ function renderPanel() {
             state.time = id === "now" ? "now" : timeInput.value || "10:10"; renderPanel(); loop();
           }),
           state.time === "now" ? null : timeInput)),
-      h("label", { class: "switch" }, guides, "Show where the phone's own clock and dock sit"),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Preview on a lock screen"),
+        chips([{ id: "off", name: "Off" }, { id: "ios", name: "iPhone" }, { id: "android", name: "Android" }, { id: "guides", name: "Guides" }], state.mock, (id) => {
+          state.mock = id; savePrefs(); applyMock(); renderPanel();
+        })),
     ));
   }
   paintThumbs(jobs);
 }
+
+/* ───────────── editor ───────────── */
+function editPanel() {
+  const s = state.spec;
+  const pal = timePalette(paletteOf(s, photoFor(s)), s);
+  const set = (patch, opts) => setSpec({ ...state.spec, ...patch }, { animate: false, panel: false, ...opts });
+  const chips = (items, current, onpick) => h("div", { class: "chips" }, items.map((it) =>
+    h("button", { class: "chip glass", "aria-pressed": String(current === it.id), onclick: () => { onpick(it.id); renderPanel(); } }, it.name)));
+  const slider = (text, value, min, max, step, onchange) => {
+    const input = h("input", { type: "range", min, max, step, value: String(value), "aria-label": text });
+    input.addEventListener("pointerdown", () => state.history.push(state.spec));
+    input.addEventListener("input", () => onchange(Number(input.value)));
+    return h("label", { class: "slider" }, h("span", {}, text), input);
+  };
+  const colour = (text, key, current) => {
+    const input = h("input", { type: "color", value: current, "aria-label": text });
+    input.addEventListener("input", () => set({ [key]: input.value }, { record: false }));
+    input.addEventListener("change", () => set({ [key]: input.value }));
+    return h("label", { class: "colour" }, input, h("span", {}, text));
+  };
+  const caption = h("input", { type: "text", class: "describe-input", maxlength: "48", placeholder: "Add a line of your own (optional)", value: s.cap || "", "aria-label": "Caption" });
+  caption.addEventListener("input", () => set({ cap: caption.value }, { record: false }));
+  const classic = !ALL_CLOCKS.find((c) => c.id === s.clock)?.premium;
+  return h("div", { class: "fit" },
+    h("p", { class: "note" }, isTouch ? "Drag the time on the preview to move it." : "Drag the time on the preview to move it, or use the sliders."),
+    h("div", { class: "field" }, h("span", { class: "label" }, "Size and place"),
+      slider("Size", Math.round((s.sz ?? 1) * 100), 50, 150, 1, (v) => set({ sz: v / 100 }, { record: false })),
+      h("div", { class: "row" },
+        h("button", { class: "chip glass", onclick: () => { set({ dx: 0, dy: 0, sz: 1 }); renderPanel(); } }, "Centre and reset size"))),
+    h("div", { class: "field" }, h("span", { class: "label" }, "Colours"),
+      h("div", { class: "row" },
+        colour("Time", "ink", pal.ink), colour("Accent", "acc", pal.accent),
+        h("button", { class: "chip glass", disabled: !s.ink && !s.acc, onclick: () => { set({ ink: undefined, acc: undefined }); renderPanel(); } }, "Use the design's colours"))),
+    classic ? null : h("div", { class: "field" }, h("span", { class: "label" }, "Typeface"), chips(TYPEFACES, s.face || "auto", (id) => set({ face: id }))),
+    h("div", { class: "field" }, h("span", { class: "label" }, "Hours"), chips([{ id: "24", name: "24-hour" }, { id: "12", name: "12-hour" }], s.h12 ? "12" : "24", (id) => set({ h12: id === "12" }))),
+    classic ? null : h("div", { class: "field" }, h("span", { class: "label" }, "Date"), chips(DATE_FORMATS, s.df || "auto", (id) => set({ df: id }))),
+    h("div", { class: "field" }, h("span", { class: "label" }, "Your words"), caption),
+  );
+}
+
+// Dragging the time on the preview (Edit tab)
+let drag = null;
+phone.addEventListener("pointerdown", (e) => {
+  if (state.tab !== "edit" || state.tapMode || e.target.closest("button")) return;
+  const rect = preview.getBoundingClientRect();
+  drag = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height, dx: state.spec.dx ?? 0, dy: state.spec.dy ?? 0 };
+  state.history.push(state.spec);
+  phone.setPointerCapture(e.pointerId);
+  phone.classList.add("dragging");
+});
+phone.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const clamp = (v) => Math.max(-0.45, Math.min(0.45, v));
+  setSpec({ ...state.spec, dx: clamp(drag.dx + (e.clientX - drag.x) / drag.w), dy: clamp(drag.dy + (e.clientY - drag.y) / drag.h) }, { animate: false, panel: false, record: false });
+});
+const endDrag = () => { if (drag) { drag = null; phone.classList.remove("dragging"); } };
+phone.addEventListener("pointerup", endDrag);
+phone.addEventListener("pointercancel", endDrag);
 
 /* ───────────── photo tools ───────────── */
 function photoTools() {
@@ -440,9 +582,42 @@ phone.addEventListener("click", (e) => {
   runCutOut(point, !state.photo.mask);
 });
 
+// Settings that follow you from design to design: your preferences always; size, place and typeface while the
+// clock is locked; your colours while the colours are locked.
+function keptEdits(s, lock = state.lock) {
+  const keep = { h12: s.h12, df: s.df, cap: s.cap };
+  if (lock.clock) Object.assign(keep, { sz: s.sz, dx: s.dx, dy: s.dy, face: s.face });
+  if (lock.pal) Object.assign(keep, { ink: s.ink, acc: s.acc });
+  return keep;
+}
+
+/* ───────────── undo ───────────── */
+async function undo() {
+  const prev = state.history.pop();
+  if (!prev) return;
+  if (prev.bg === "photo") { const ph = await ensurePhoto(prev.photo); if (ph) { state.photo = ph; state.photoRev++; } }
+  setSpec(prev, { record: false });
+}
+
+/* ───────────── lock-screen mockup ───────────── */
+function applyMock() {
+  phone.classList.toggle("show-guides", state.mock === "guides");
+  phone.dataset.mock = state.mock;
+  updateMock();
+}
+function updateMock() {
+  if (state.mock !== "ios" && state.mock !== "android") return;
+  const d = new Date();
+  const hh = d.getHours(), mm = String(d.getMinutes()).padStart(2, "0");
+  $("#mockTime").textContent = state.mock === "ios" ? `${hh % 12 || 12}:${mm}` : `${String(hh).padStart(2, "0")}:${mm}`;
+  $("#mockDate").textContent = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+  $("#mockBar").textContent = `${hh % 12 || 12}:${mm}`;
+}
+setInterval(updateMock, 15000);
+
 /* ───────────── shuffle ───────────── */
 function shuffle() {
-  const next = randomSpec(state.lock, state.spec);
+  const next = { ...randomSpec(state.lock, state.spec), ...keptEdits(state.spec) };
   if (state.lock.bg && state.spec.bg === "photo") next.photo = state.spec.photo;
   else delete next.photo;
   setSpec(next);
@@ -452,56 +627,151 @@ function shuffle() {
 }
 
 /* ───────────── save / export ───────────── */
-async function makeWallpaper(spec = state.spec, device = state.device) {
-  const [w, hgt] = deviceSize(device);
+function canvasFor(device = state.device, cap = Infinity) {
+  let [w, hgt] = deviceSize(device);
+  const k = Math.min(1, cap / w);
+  w = Math.round((w * k) / 2) * 2; hgt = Math.round((hgt * k) / 2) * 2;
   const c = document.createElement("canvas");
   c.width = w; c.height = hgt;
-  compose(c.getContext("2d"), layers(w, hgt, spec), displayDate());
+  return c;
+}
+const jpeg = (c) => new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("canvas too large to encode"))), "image/jpeg", 0.94));
+const fileName = (spec, c, extra = "") => `dialscape-${spec.clock}-${spec.bg}${extra}-${c.width}x${c.height}.jpg`;
+
+async function makeWallpaper(spec = state.spec, opts = {}) {
+  const c = canvasFor();
+  compose(c.getContext("2d"), layers(c.width, c.height, spec), displayDate(), spec, opts);
   // JPEG: the film grain makes PNGs several times larger and slow to encode, with no visible gain
-  const blob = await new Promise((res) => c.toBlob(res, "image/jpeg", 0.94));
-  if (!blob) throw new Error("canvas too large to encode");
-  const name = `dialscape-${spec.clock}-${spec.bg}-${spec.pal}${spec.seed}-${w}x${hgt}.jpg`;
-  return { blob, name };
+  return { blob: await jpeg(c), name: fileName(spec, c, opts.home ? "-home" : "") };
+}
+
+// Hands files to the share sheet on phones (→ Photos), or downloads them (several as one ZIP) on computers
+async function deliver(files, title) {
+  const list = files.map((f) => new File([f.blob], f.name, { type: f.blob.type }));
+  if (isTouch && navigator.canShare?.({ files: list })) {
+    try { await navigator.share({ files: list, title }); return true; }
+    catch (e) { if (e.name === "AbortError") return false; }
+  }
+  const one = files.length === 1 ? files[0] : { blob: await zip(files), name: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.zip` };
+  const url = URL.createObjectURL(one.blob);
+  const a = h("a", { href: url, download: one.name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
+  toast(files.length === 1 ? "Saved" : `Saved ${files.length} files as a ZIP`);
+  return true;
+}
+
+async function busyButton(btn, text, fn) {
+  const label = btn?.querySelector("span, b") || btn;
+  const before = label?.textContent;
+  if (btn) btn.disabled = true;
+  if (label) label.textContent = text;
+  try { await new Promise((r) => setTimeout(r, 30)); return await fn(); }
+  catch (e) { console.error(e); toast("Couldn't make that. Try a smaller screen size under Fit."); }
+  finally { if (btn) btn.disabled = false; if (label) label.textContent = before; }
 }
 
 async function saveWallpaper() {
-  const btn = $("#saveBtn");
-  btn.disabled = true;
-  btn.querySelector("span").textContent = "Painting…";
-  try {
-    await new Promise((r) => setTimeout(r, 30));
-    const { blob, name } = await makeWallpaper();
-    const file = new File([blob], name, { type: "image/jpeg" });
-    let shared = false;
-    if (isTouch && navigator.canShare?.({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: "Dialscape wallpaper" }); shared = true; }
-      catch (e) { if (e.name === "AbortError") return; }
-    }
-    if (!shared) {
-      const url = URL.createObjectURL(blob);
-      const a = h("a", { href: url, download: name });
-      document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-      toast("Wallpaper saved");
-    }
-    openHowto();
-  } catch (e) {
-    console.error(e);
-    toast("Couldn't make the picture. Try a smaller screen size.");
-  } finally {
-    btn.disabled = false;
-    btn.querySelector("span").textContent = "Save wallpaper";
-  }
+  await busyButton($("#saveBtn"), "Painting…", async () => {
+    if (await deliver([await makeWallpaper()], "Dialscape wallpaper")) openHowto("single");
+  });
 }
 
-function openHowto() {
+async function savePair(btn) {
+  await busyButton(btn, "Painting both…", async () => {
+    const lock = await makeWallpaper();
+    const home = await makeWallpaper(state.spec, { home: true });
+    if (await deliver([lock, home], "Dialscape pair")) openHowto("pair");
+  });
+}
+
+// Eight takes on this design: every scene with your clock and colours (or, on your photo, eight clock styles)
+async function savePack(btn) {
+  await busyButton(btn, "Painting 8…", async () => {
+    const s = state.spec;
+    const specs = s.bg === "photo"
+      ? TYPE_STYLES.filter((t) => !t.seconds).slice(0, 8).map((t) => ({ ...s, clock: t.id }))
+      : SCENE_STYLES.slice(0, 8).map((b) => ({ ...s, bg: b.id, photo: undefined }));
+    const files = [];
+    for (const [i, spec] of specs.entries()) {
+      const c = canvasFor();
+      compose(c.getContext("2d"), layers(c.width, c.height, spec), displayDate(), spec);
+      files.push({ blob: await jpeg(c), name: `dialscape-pack-${i + 1}-${spec.bg}-${spec.clock}.jpg` });
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    if (await deliver(files, "Dialscape pack")) openHowto("pack");
+  });
+}
+
+// An 8-second looping video: the layers drift apart for depth while the clock ticks
+async function saveMotion(btn) {
+  if (typeof MediaRecorder === "undefined" || !HTMLCanvasElement.prototype.captureStream) return toast("This browser can't record video. Try Chrome or Safari.");
+  const types = ["video/mp4;codecs=avc1.640028", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
+  const mime = types.find((t) => MediaRecorder.isTypeSupported(t));
+  if (!mime) return toast("This browser can't record video. Try Chrome or Safari.");
+  await busyButton(btn, "Recording 8 s…", async () => {
+    const spec = state.spec;
+    const c = canvasFor(state.device, 1080);
+    const ctx = c.getContext("2d");
+    const Lx = layers(c.width, c.height, spec);
+    compose(ctx, Lx, new Date(), spec, { motion: 0 });
+    const rec = new MediaRecorder(c.captureStream(30), { mimeType: mime, videoBitsPerSecond: 10_000_000 });
+    const chunks = [];
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    const stopped = new Promise((r) => (rec.onstop = r));
+    rec.start(250);
+    const dur = 8000, t0 = performance.now();
+    await new Promise((done) => {
+      const frame = () => {
+        const t = (performance.now() - t0) / dur;
+        if (t >= 1) return done();
+        compose(ctx, Lx, new Date(), spec, { motion: t });
+        requestAnimationFrame(frame);
+      };
+      frame();
+    });
+    rec.stop();
+    await stopped;
+    const ext = mime.startsWith("video/mp4") ? "mp4" : "webm";
+    const blob = new Blob(chunks, { type: mime.split(";")[0] });
+    if (await deliver([{ blob, name: `dialscape-motion-${spec.clock}-${spec.bg}.${ext}` }], "Dialscape motion wallpaper")) openHowto("motion");
+  });
+}
+
+function openExport() {
+  const d = $("#export");
+  if (!d.open) d.showModal();
+}
+
+const STEPS = {
+  single: {
+    ios: ["Tap <b>Save Image</b> in the share sheet, so it goes to Photos.", "Open <b>Photos</b>, choose the picture, tap <b>Share</b> and then <b>Use as Wallpaper</b>.", "Turn off <b>Depth Effect</b> if it hides the clock, then tap <b>Add</b>.", "Choose <b>Set as Wallpaper Pair</b>, or <b>Customise Home Screen</b> to use it there only."],
+    android: ["Open <b>Photos</b> or <b>Gallery</b> and find the picture (it's in Downloads if you saved the file).", "Tap <b>⋮</b> and then <b>Use as</b> or <b>Set as wallpaper</b>.", "Pick <b>Lock screen</b>, <b>Home screen</b> or <b>both</b>, and tap <b>Set</b>."],
+  },
+  pair: {
+    ios: ["Tap <b>Save 2 Images</b>: one with the time for the Lock Screen, one without it (named <b>-home</b>) for the Home Screen.", "In <b>Settings → Wallpaper</b>, tap <b>Add New Wallpaper → Photos</b> and choose the picture with the time. Tap <b>Add</b>.", "Choose <b>Customise Home Screen</b>, tap <b>Photo</b> and choose the picture without the time."],
+    android: ["Save both pictures to your gallery.", "Set the picture with the time as the <b>Lock screen</b> wallpaper.", "Set the one without the time as the <b>Home screen</b> wallpaper."],
+  },
+  pack: {
+    ios: ["Tap <b>Save 8 Images</b>.", "In <b>Photos</b>, select the eight and <b>Add to Album</b> (a new album called Dialscape is handy).", "Touch and hold the Lock Screen, tap <b>+</b> and choose <b>Photo Shuffle</b>.", "Pick the eight pictures (or the album), then choose how often it changes: <b>On Tap</b>, <b>On Lock</b>, <b>Hourly</b> or <b>Daily</b>."],
+    android: ["Save the eight pictures to your gallery.", "On <b>Samsung Galaxy</b> phones, choose several pictures from <b>Gallery</b> as the lock-screen wallpaper and a new one shows each time you wake the phone.", "On other phones, set them one at a time, or use a wallpaper-changer app with the eight pictures."],
+  },
+  motion: {
+    ios: ["iPhone doesn't use videos as wallpapers, so the video won't work there. Save a picture or a Shuffle pack instead."],
+    android: ["Save the video to your gallery.", "On <b>Samsung Galaxy</b> phones, choose the video from <b>Gallery</b> as your lock-screen wallpaper (videos up to 15 seconds work).", "On other phones, use a video-wallpaper app, or save a picture instead."],
+  },
+};
+let howtoKind = "single";
+function openHowto(kind = "single") {
+  howtoKind = kind;
   const d = $("#howto");
-  setOS(isAndroid ? "android" : "ios");
+  setOS(isAndroid ? "android" : isIOS ? "ios" : kind === "motion" ? "android" : "ios");
   if (!d.open) d.showModal();
 }
 function setOS(os) {
   $$("#howto [data-os]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.os === os)));
-  $$("#howto [data-os-steps]").forEach((ol) => (ol.hidden = ol.dataset.osSteps !== os));
+  const ol = $("#howtoSteps");
+  ol.replaceChildren(...STEPS[howtoKind][os].map((html) => { const li = document.createElement("li"); li.innerHTML = html; return li; }));
 }
 
 /* ───────────── saved designs ───────────── */
@@ -583,6 +853,31 @@ async function shareLink() {
 /* ───────────── live clock ───────────── */
 const live = $("#live"), liveCanvas = $("#liveCanvas");
 let liveRaf = 0, liveL = null, liveKey = "", wakeLock = null, chromeTimer = 0;
+// 3D tilt: the layers shift apart as the phone tilts (or the mouse moves)
+const tilt = { on: false, x: 0, y: 0, tx: 0, ty: 0 };
+function onOrient(e) {
+  if (e.gamma == null) return;
+  tilt.on = true;
+  tilt.tx = Math.max(-1, Math.min(1, e.gamma / 25));
+  tilt.ty = Math.max(-1, Math.min(1, ((e.beta ?? 45) - 45) / 25));
+}
+function onMouseTilt(e) {
+  tilt.on = true;
+  tilt.tx = (e.clientX / innerWidth) * 2 - 1;
+  tilt.ty = (e.clientY / innerHeight) * 2 - 1;
+}
+async function startTilt() {
+  try {
+    if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) {
+      if ((await DeviceOrientationEvent.requestPermission()) !== "granted") return;
+    }
+  } catch { return; }
+  addEventListener("deviceorientation", onOrient);
+}
+function stopTilt() {
+  removeEventListener("deviceorientation", onOrient);
+  tilt.on = false; tilt.x = tilt.y = tilt.tx = tilt.ty = 0;
+}
 
 async function keepAwake() {
   try { if ("wakeLock" in navigator && !live.hidden) wakeLock = await navigator.wakeLock.request("screen"); } catch {}
@@ -595,11 +890,14 @@ function liveFrame() {
   if (live.hidden) return;
   const [w, hgt] = liveSize();
   const spec = state.spec.clock === "none" ? { ...state.spec, clock: "tower" } : state.spec;
-  const key = `${specKey(spec)}|${w}x${hgt}|${state.photoRev}`;
+  const key = `${layerKeyOf(spec)}|${w}x${hgt}|${state.photoRev}`;
   if (liveCanvas.width !== w || liveCanvas.height !== hgt) { liveCanvas.width = w; liveCanvas.height = hgt; }
   if (key !== liveKey) { liveL = layers(w, hgt, spec); liveKey = key; }
-  compose(liveCanvas.getContext("2d"), liveL, new Date());
-  if (clockHasSeconds(spec.clock)) liveRaf = requestAnimationFrame(liveFrame);
+  // ease the tilt towards the sensor reading
+  tilt.x += (tilt.tx - tilt.x) * 0.08;
+  tilt.y += (tilt.ty - tilt.y) * 0.08;
+  compose(liveCanvas.getContext("2d"), liveL, new Date(), spec, { parallax: tilt.on ? tilt : null });
+  if (tilt.on || clockHasSeconds(spec.clock)) liveRaf = requestAnimationFrame(liveFrame);
   else liveRaf = setTimeout(liveFrame, 1000 - (Date.now() % 1000) + 5);
 }
 function showChrome() {
@@ -609,6 +907,7 @@ function showChrome() {
 }
 function openLive() {
   live.hidden = false;
+  if (isTouch) startTilt();
   cancelAnimationFrame(raf); clearTimeout(tickTimer);
   live.requestFullscreen?.().catch(() => {});
   keepAwake();
@@ -617,6 +916,7 @@ function openLive() {
 }
 function closeLive() {
   cancelAnimationFrame(liveRaf); clearTimeout(liveRaf);
+  stopTilt();
   live.hidden = true;
   wakeLock?.release?.().catch(() => {});
   wakeLock = null;
@@ -647,20 +947,39 @@ $$(".lock").forEach((b) => {
 $$(".tabs [role=tab]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; renderPanel(); }));
 $("#saveBtn").addEventListener("click", saveWallpaper);
 $("#favBtn").addEventListener("click", toggleFav);
-$("#shareBtn").addEventListener("click", shareLink);
+$("#moreBtn").addEventListener("click", openExport);
+$("#undoBtn").addEventListener("click", undo);
+$$("#export [data-export]").forEach((b) => b.addEventListener("click", async () => {
+  const kind = b.dataset.export;
+  if (kind === "link") { $("#export").close(); return shareLink(); }
+  if (kind === "single") { $("#export").close(); return saveWallpaper(); }
+  if (kind === "pair") await savePair(b);
+  if (kind === "pack") await savePack(b);
+  if (kind === "motion") await saveMotion(b);
+  if ($("#howto").open) $("#export").close();
+}));
 $("#collectionBtn").addEventListener("click", openCollection);
 $("#liveBtn").addEventListener("click", openLive);
 $("#liveHint").addEventListener("click", (e) => { e.stopPropagation(); openLive(); });
 $("#liveClose").addEventListener("click", (e) => { e.stopPropagation(); closeLive(); });
 live.addEventListener("click", showChrome);
-live.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") showChrome(); });
+live.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "mouse") return;
+  showChrome();
+  const was = tilt.on;
+  onMouseTilt(e);
+  if (!was) { cancelAnimationFrame(liveRaf); clearTimeout(liveRaf); liveFrame(); }
+});
 $$("dialog [data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
 $$("dialog").forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close(); }));
 $$("#howto [data-os]").forEach((b) => b.addEventListener("click", () => setOS(b.dataset.os)));
 document.addEventListener("keydown", (e) => {
   if (!live.hidden && e.key === "Escape") return closeLive();
-  if (e.target.closest("input, dialog") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest("input, dialog")) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); return undo(); }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === " " && e.target === document.body) { e.preventDefault(); shuffle(); }
+  if (e.key.toLowerCase() === "z" && !e.shiftKey) undo();
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) return;
@@ -686,7 +1005,7 @@ phone.addEventListener("touchend", (e) => {
   if (touchX == null) return;
   const dx = e.changedTouches[0].clientX - touchX;
   touchX = null;
-  if (Math.abs(dx) > 60) shuffle();
+  if (Math.abs(dx) > 60 && state.tab !== "edit" && !state.tapMode) shuffle();
 });
 
 /* ───────────── start ───────────── */
@@ -700,7 +1019,7 @@ async function fontsReady() {
 }
 
 (async function start() {
-  phone.classList.toggle("show-guides", state.guides);
+  applyMock();
   sizePhone();
   await fontsReady();
   let spec = specFromHash();

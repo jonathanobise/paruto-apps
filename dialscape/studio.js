@@ -18,6 +18,8 @@ export const TYPEFACE = {
   hand: '"Caveat", "Yellowtail", cursive',
   grot: '"Space Grotesk", system-ui, -apple-system, sans-serif',
   mono: '"DM Mono", ui-monospace, Menlo, monospace',
+  serif: '"Instrument Serif", Georgia, serif',
+  wide: '"Unbounded", "Space Grotesk", sans-serif',
 };
 
 const MON = MONTHS.map((m) => m.slice(0, 3).toUpperCase());
@@ -79,9 +81,14 @@ function second(p) {
   return Math.abs(luminance(p.accent) - luminance(p.ink)) > 0.06 ? p.accent : p.bg[3];
 }
 function dateAbove(ctx, f, d, p, top, size, fmt = DATE.caps, align = "center", x = f.cx) {
+  const str = D(f, fmt, d);
+  if (!str) return;
   ctx.fillStyle = p.ink;
-  tracked(ctx, fmt(d), x, top - size * 0.35, size, `600 ${size}px ${TYPEFACE.grot}`, 0.14, align);
+  tracked(ctx, str, x, top - size * 0.35, size, `600 ${size}px ${TYPEFACE.grot}`, 0.14, align);
 }
+// The editor can swap the typeface (f.face) and the date format (f.date: a DATE function, or null for none)
+const fam = (f, def) => (f.face && TYPEFACE[f.face] ? TYPEFACE[f.face] : def);
+const D = (f, def, d) => { const fm = f.date === undefined ? def : f.date; return fm ? fm(d) : ""; };
 
 const DOTS = {
   0: ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
@@ -100,7 +107,7 @@ export const TYPES = {
   tower: {
     name: "Tower",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.anton}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
       const size = fit(ctx, "00", font, -0.01, f.W * 0.8, f.maxH * 0.46);
       const A = line(ctx, pad(t.H), font, size, -0.01), B = line(ctx, pad(t.M), font, size, -0.01);
       const gap = size * 0.04, total = A.asc * 2 + gap, top = f.cy - total / 2;
@@ -117,7 +124,7 @@ export const TYPES = {
   split: {
     name: "Split",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.bebas}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.bebas)}`;
       const size = fit(ctx, "0000", font, 0, f.W, f.maxH * 0.42);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0);
       const top = f.cy - L.asc / 2;
@@ -130,7 +137,7 @@ export const TYPES = {
         ctx.translate(f.w - bw / 2, f.cy + L.asc * 0.2);
         ctx.rotate(-Math.PI / 2);
         ctx.fillStyle = p.light ? p.ink : p.bg[0];
-        tracked(ctx, DATE.slash(t.d), 0, bw * 0.17, bw * 0.4, `600 ${bw * 0.4}px ${TYPEFACE.grot}`, 0.18);
+        tracked(ctx, D(f, DATE.slash, t.d), 0, bw * 0.17, bw * 0.4, `600 ${bw * 0.4}px ${TYPEFACE.grot}`, 0.18);
         ctx.restore();
       } else dateAbove(ctx, f, t.d, p, top, size * 0.06);
       softShadow(ctx, p, size);
@@ -149,7 +156,7 @@ export const TYPES = {
     name: "Hairline",
     seconds: true,
     draw(ctx, f, t, p) {
-      const font = (s) => `150 ${s}px ${TYPEFACE.shoulders}`;
+      const font = (s) => `150 ${s}px ${fam(f, TYPEFACE.shoulders)}`;
       const sample = "00 00 00";
       const size = fit(ctx, sample, font, 0.02, f.W, f.maxH * 0.5);
       const L = line(ctx, `${pad(t.H)} ${pad(t.M)} ${pad(t.S)}`, font, size, 0.02);
@@ -164,7 +171,7 @@ export const TYPES = {
   fade: {
     name: "Fade",
     draw(ctx, f, t, p) {
-      const font = (s) => `300 ${s}px ${TYPEFACE.shoulders}`;
+      const font = (s) => `300 ${s}px ${fam(f, TYPEFACE.shoulders)}`;
       const size = fit(ctx, "0000", font, 0.04, f.W, f.maxH * 0.62);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.04);
       const top = f.cy - L.asc * 0.55;
@@ -177,7 +184,7 @@ export const TYPES = {
   outline: {
     name: "Outline",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `200 ${s}px ${TYPEFACE.antonio}`;
+      const font = (s) => `200 ${s}px ${fam(f, TYPEFACE.antonio)}`;
       const size = fit(ctx, "0000", font, -0.02, f.W * 0.98, f.maxH * 0.5);
       const A = line(ctx, pad(t.H), font, size, -0.02), B = line(ctx, pad(t.M), font, size, -0.02);
       const full = A.width + B.width - size * 0.02;
@@ -192,7 +199,7 @@ export const TYPES = {
       ctx.strokeStyle = hexA(r.chance(0.5) ? second(p) : p.ink, 0.6);
       drawLine(ctx, B, -full / 2 + A.width - size * 0.02, -A.asc / 2, { align: "left", stroke: true });
       ctx.fillStyle = p.ink;
-      tracked(ctx, DATE.caps(t.d), -full / 2, -A.asc / 2 - size * 0.04, size * 0.055, `600 ${size * 0.055}px ${TYPEFACE.grot}`, 0.12, "left");
+      tracked(ctx, D(f, DATE.caps, t.d), -full / 2, -A.asc / 2 - size * 0.04, size * 0.055, `600 ${size * 0.055}px ${TYPEFACE.grot}`, 0.12, "left");
       ctx.restore();
     },
   },
@@ -200,7 +207,7 @@ export const TYPES = {
   column: {
     name: "Column",
     draw(ctx, f, t, p) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.anton}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
       const size = fit(ctx, "00", font, -0.01, f.W * 0.5, f.maxH * 0.44);
       const A = line(ctx, pad(t.H), font, size, -0.01), B = line(ctx, pad(t.M), font, size, -0.01);
       const gap = size * 0.03, total = A.asc * 2 + gap, top = f.cy - total * 0.62;
@@ -214,7 +221,7 @@ export const TYPES = {
       ctx.translate(f.portrait ? f.w * 0.955 : right + size * 0.12, top + total + size * 0.05);
       ctx.rotate(-Math.PI / 2);
       ctx.fillStyle = second(p);
-      tracked(ctx, DATE.slash(t.d), 0, 0, size * 0.075, `700 ${size * 0.075}px ${TYPEFACE.grot}`, 0.12, "left");
+      tracked(ctx, D(f, DATE.slash, t.d), 0, 0, size * 0.075, `700 ${size * 0.075}px ${TYPEFACE.grot}`, 0.12, "left");
       ctx.restore();
     },
   },
@@ -242,14 +249,14 @@ export const TYPES = {
         });
       });
       ctx.fillStyle = p.ink;
-      tracked(ctx, DATE.caps(t.d), left, top - d * 0.9, d * 0.95, `600 ${d * 0.95}px ${TYPEFACE.grot}`, 0.12, "left");
+      tracked(ctx, D(f, DATE.caps, t.d), left, top - d * 0.9, d * 0.95, `600 ${d * 0.95}px ${TYPEFACE.grot}`, 0.12, "left");
     },
   },
 
   script: {
     name: "Signature",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.sixcaps}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.sixcaps)}`;
       const size = fit(ctx, "0000", font, 0.06, f.W * 0.66, f.maxH * 0.6);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.06);
       const top = f.cy - L.asc / 2;
@@ -263,7 +270,7 @@ export const TYPES = {
       ctx.textAlign = "center";
       softShadow(ctx, p, ds * 3, 0.5);
       ctx.fillStyle = r.chance(0.6) ? second(p) : p.ink;
-      ctx.fillText(DATE.script(t.d), 0, 0);
+      ctx.fillText(D(f, DATE.script, t.d), 0, 0);
       ctx.restore();
     },
   },
@@ -271,7 +278,7 @@ export const TYPES = {
   torn: {
     name: "Torn",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.anton}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
       const size = fit(ctx, "0000", font, -0.01, f.W * 0.86, f.maxH * 0.32);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, -0.01);
       const paper = p.light ? "#191716" : "#f1ece3";
@@ -309,14 +316,14 @@ export const TYPES = {
         ctx.fillText(ch.c, x0 + ch.x, top + L.asc);
       });
       ctx.fillStyle = inkOnPaper;
-      tracked(ctx, DATE.slash(t.d), x0, top - size * 0.06, size * 0.06, `600 ${size * 0.06}px ${TYPEFACE.grot}`, 0.12, "left");
+      tracked(ctx, D(f, DATE.slash, t.d), x0, top - size * 0.06, size * 0.06, `600 ${size * 0.06}px ${TYPEFACE.grot}`, 0.12, "left");
     },
   },
 
   mirror: {
     name: "Mirror",
     draw(ctx, f, t, p) {
-      const font = (s) => `200 ${s}px ${TYPEFACE.antonio}`;
+      const font = (s) => `200 ${s}px ${fam(f, TYPEFACE.antonio)}`;
       const size = fit(ctx, "0000", font, 0.02, f.W * 0.92, f.maxH * 0.34);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.02);
       const base = f.cy;
@@ -342,14 +349,14 @@ export const TYPES = {
       }
       ctx.restore();
       ctx.fillStyle = p.ink;
-      tracked(ctx, DATE.long(t.d), f.cx, top - size * 0.08, size * 0.045, `600 ${size * 0.045}px ${TYPEFACE.grot}`, 0.16);
+      tracked(ctx, D(f, DATE.long, t.d), f.cx, top - size * 0.08, size * 0.045, `600 ${size * 0.045}px ${TYPEFACE.grot}`, 0.16);
     },
   },
 
   sketch: {
     name: "Sketch",
     draw(ctx, f, t, p, r) {
-      const font = (s) => `700 ${s}px ${TYPEFACE.antonio}`;
+      const font = (s) => `700 ${s}px ${fam(f, TYPEFACE.antonio)}`;
       const size = fit(ctx, "0000", font, 0.02, f.W * 0.86, f.maxH * 0.36);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.02);
       const top = f.cy - L.asc / 2;
@@ -385,7 +392,7 @@ export const TYPES = {
       ctx.font = `500 ${size * 0.15}px ${TYPEFACE.hand}`;
       ctx.textAlign = "right";
       ctx.fillStyle = p.ink;
-      ctx.fillText(DATE.script(t.d), 0, 0);
+      ctx.fillText(D(f, DATE.script, t.d), 0, 0);
       ctx.restore();
     },
   },
@@ -393,7 +400,7 @@ export const TYPES = {
   neon: {
     name: "Neon",
     draw(ctx, f, t, p) {
-      const font = (s) => `400 ${s}px ${TYPEFACE.bebas}`;
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.bebas)}`;
       const size = fit(ctx, "0000", font, 0.03, f.W * 0.92, f.maxH * 0.36);
       const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.03);
       const top = f.cy - L.asc / 2;
@@ -412,8 +419,122 @@ export const TYPES = {
       ctx.save();
       ctx.shadowColor = glow; ctx.shadowBlur = size * 0.05;
       ctx.fillStyle = mix(glow, "#ffffff", 0.6);
-      tracked(ctx, DATE.caps(t.d), f.cx, top - size * 0.08, size * 0.06, `500 ${size * 0.06}px ${TYPEFACE.mono}`, 0.2);
+      tracked(ctx, D(f, DATE.caps, t.d), f.cx, top - size * 0.08, size * 0.06, `500 ${size * 0.06}px ${TYPEFACE.mono}`, 0.2);
       ctx.restore();
+    },
+  },
+
+  glass: {
+    name: "Glass",
+    draw(ctx, f, t, p) {
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
+      const size = fit(ctx, "00", font, -0.01, f.W * 0.8, f.maxH * 0.46);
+      const A = line(ctx, pad(t.H), font, size, -0.01), B = line(ctx, pad(t.M), font, size, -0.01);
+      const gap = size * 0.05, total = A.asc * 2 + gap, top = f.cy - total / 2;
+      // frosted glass: the blurred scene behind, lifted and tinted, seen only through the digits
+      const glyphs = makeCanvas(f.w, f.h);
+      const g = glyphs.getContext("2d");
+      g.fillStyle = "#000";
+      drawLine(g, A, f.cx, top);
+      drawLine(g, B, f.cx, top + A.asc + gap);
+      const pane = makeCanvas(f.w, f.h);
+      const pc = pane.getContext("2d");
+      if (f.blurred) pc.drawImage(f.blurred, 0, 0, f.w, f.h);
+      else { pc.fillStyle = hexA(p.ink, 0.25); pc.fillRect(0, 0, f.w, f.h); }
+      pc.fillStyle = vgrad(pc, top, top + total, [[0, "rgba(255,255,255,0.34)"], [0.5, "rgba(255,255,255,0.16)"], [1, hexA(p.accent, 0.18)]]);
+      pc.fillRect(0, 0, f.w, f.h);
+      pc.globalCompositeOperation = "destination-in";
+      pc.drawImage(glyphs, 0, 0);
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.35)"; ctx.shadowBlur = size * 0.12; ctx.shadowOffsetY = size * 0.03;
+      ctx.drawImage(pane, 0, 0);
+      ctx.restore();
+      // rim light: bright on the top-left edges, fading round the glyph
+      const rim = ctx.createLinearGradient(f.cx - A.width / 2, top, f.cx + A.width / 2, top + total);
+      rim.addColorStop(0, "rgba(255,255,255,0.95)");
+      rim.addColorStop(0.45, "rgba(255,255,255,0.15)");
+      rim.addColorStop(1, "rgba(255,255,255,0.55)");
+      ctx.strokeStyle = rim;
+      ctx.lineWidth = Math.max(1, size * 0.008);
+      ctx.lineJoin = "round";
+      drawLine(ctx, A, f.cx, top, { stroke: true });
+      drawLine(ctx, B, f.cx, top + A.asc + gap, { stroke: true });
+      dateAbove(ctx, f, t.d, p, top, size * 0.065);
+    },
+  },
+
+  chrome: {
+    name: "Chrome",
+    draw(ctx, f, t, p) {
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.bebas)}`;
+      const size = fit(ctx, "0000", font, 0.02, f.W * 0.94, f.maxH * 0.38);
+      const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.02);
+      const top = f.cy - L.asc / 2;
+      const tint = (c) => mix(c, p.accent, 0.14);
+      ctx.fillStyle = vgrad(ctx, top, top + L.asc, [
+        [0, tint("#fbfbfb")], [0.38, tint("#aab2bb")], [0.49, tint("#3a4048")], [0.52, tint("#e4e8ec")], [0.78, tint("#848c95")], [1, tint("#f1f3f5")],
+      ]);
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = size * 0.1; ctx.shadowOffsetY = size * 0.03;
+      drawLine(ctx, L, f.cx, top);
+      ctx.restore();
+      ctx.strokeStyle = "rgba(255,255,255,0.75)";
+      ctx.lineWidth = Math.max(1, size * 0.005);
+      drawLine(ctx, L, f.cx, top, { stroke: true });
+      dateAbove(ctx, f, t.d, p, top, size * 0.06);
+    },
+  },
+
+  extrude: {
+    name: "3D",
+    draw(ctx, f, t, p) {
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
+      const size = fit(ctx, "0000", font, 0.01, f.W * 0.86, f.maxH * 0.36);
+      const L = line(ctx, pad(t.H) + pad(t.M), font, size, 0.01);
+      const top = f.cy - L.asc / 2 - size * 0.03;
+      const depth = size * 0.09, step = Math.max(1, size / 320);
+      const n = Math.ceil(depth / step);
+      const side = mix(second(p), "#000000", 0.3);
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = size * 0.08; ctx.shadowOffsetX = depth * 0.6; ctx.shadowOffsetY = depth * 0.6;
+      ctx.fillStyle = mix(side, "#000000", 0.5);
+      ctx.save(); ctx.translate(n * step * 0.7, n * step); drawLine(ctx, L, f.cx, top); ctx.restore();
+      ctx.restore();
+      for (let k = n; k >= 1; k--) {
+        ctx.fillStyle = mix(side, "#000000", (k / n) * 0.45);
+        ctx.save(); ctx.translate(k * step * 0.7, k * step); drawLine(ctx, L, f.cx, top); ctx.restore();
+      }
+      ctx.fillStyle = vgrad(ctx, top, top + L.asc, [[0, mix(p.ink, "#ffffff", 0.3)], [1, p.ink]]);
+      drawLine(ctx, L, f.cx, top);
+      dateAbove(ctx, f, t.d, p, top, size * 0.06);
+    },
+  },
+
+  knockout: {
+    name: "Cut-out",
+    covers: true,
+    draw(ctx, f, t, p) {
+      const panel = p.light ? "#f3efe8" : mix(p.bg[0], "#000000", 0.6);
+      ctx.fillStyle = panel;
+      ctx.fillRect(0, 0, f.w, f.h);
+      const font = (s) => `400 ${s}px ${fam(f, TYPEFACE.anton)}`;
+      const size = fit(ctx, "00", font, -0.01, f.W * 0.94, f.maxH * 0.62);
+      const A = line(ctx, pad(t.H), font, size, -0.01), B = line(ctx, pad(t.M), font, size, -0.01);
+      const gap = size * 0.03, total = A.asc * 2 + gap, top = f.cy - total / 2;
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      drawLine(ctx, A, f.cx, top);
+      drawLine(ctx, B, f.cx, top + A.asc + gap);
+      ctx.restore();
+      ctx.strokeStyle = hexA(second(p), 0.7);
+      ctx.lineWidth = Math.max(1, size * 0.004);
+      drawLine(ctx, A, f.cx, top, { stroke: true });
+      drawLine(ctx, B, f.cx, top + A.asc + gap, { stroke: true });
+      const str = D(f, DATE.caps, t.d);
+      if (str) {
+        ctx.fillStyle = second(p);
+        tracked(ctx, str, f.cx, top - size * 0.045, size * 0.05, `600 ${size * 0.05}px ${TYPEFACE.grot}`, 0.16);
+      }
     },
   },
 };

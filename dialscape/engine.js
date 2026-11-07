@@ -117,7 +117,24 @@ const CURATED = [
 
 const SCHEMES = ["analogous", "complement", "triad", "mono", "split", "neon"];
 
+// "h<degrees>" seeds (with "l" for light, "m" for monochrome) give a palette built on that hue, used by Describe it
+function huePalette(seed) {
+  const m = /^h(\d{1,3})([lm]*)$/.exec(seed);
+  if (!m) return null;
+  const h0 = Number(m[1]) % 360, light = m[2].includes("l"), mono = m[2].includes("m");
+  const C = mono ? 0.02 : 0.15;
+  const hs = mono ? [h0, h0, h0, h0] : [h0 - 20, h0 - 8, h0, h0 + 18];
+  const bg = light
+    ? [oklch(0.96, C * 0.25, hs[0]), oklch(0.9, C * 0.5, hs[1]), oklch(0.8, C * 0.8, hs[2]), oklch(0.68, C, hs[3])]
+    : [oklch(0.13, C * 0.45, hs[0]), oklch(0.27, C * 0.85, hs[1]), oklch(0.55, C, hs[2]), oklch(0.8, C * 0.9, hs[3])];
+  const ink = light ? oklch(0.2, 0.03, h0) : oklch(0.97, 0.02, h0);
+  const accent = light ? oklch(0.5, Math.max(C, 0.12), h0) : oklch(0.84, mono ? 0.02 : 0.16, h0 + 10);
+  return { name: "Described", bg, ink, accent, light, seed };
+}
+
 export function makePalette(seed) {
+  const hp = huePalette(String(seed));
+  if (hp) return hp;
   const r = rng("pal:" + seed);
   if (r.chance(0.28)) return { ...r.pick(CURATED), seed };
   const scheme = r.pick(SCHEMES);

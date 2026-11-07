@@ -3,9 +3,9 @@
 
 import {
   BACKGROUNDS, CLOCKS, makePalette, renderClock as drawClassicClock, rng, makeNoise, grain, makeCanvas, timeParts,
-  randomSeed, hexA, mix, luminance, oklch,
+  randomSeed, hexA, mix, luminance, oklch, clockFrame, hour12,
 } from "./engine.js";
-import { TYPES, SCENES } from "./studio.js";
+import { TYPES, SCENES, DATE, TYPEFACE } from "./studio.js";
 
 export const TYPE_STYLES = Object.entries(TYPES).map(([id, t]) => ({ id, name: t.name, seconds: !!t.seconds, premium: true }));
 export const CLASSIC_CLOCKS = Object.entries(CLOCKS).map(([id, c]) => ({ id, name: c.name, seconds: !!c.seconds }));
@@ -207,38 +207,145 @@ export function buildLayers(w, h, spec, photo) {
   return { w, h, back, front, type: null, pal, frame, water, spec };
 }
 
+/* ───────────── editor settings ───────────── */
+// Optional spec fields set in the editor: sz (time size), dx/dy (offset as a share of the screen), ink/acc (colours),
+// h12 (12-hour), df (date format), face (typeface), cap (caption line).
+export const DATE_FORMATS = [
+  { id: "auto", name: "Style's own" }, { id: "caps", name: "7 NOV 2026" }, { id: "slash", name: "07/11/2026" },
+  { id: "long", name: "SATURDAY, NOVEMBER 7" }, { id: "script", name: "7 Nov 2026" }, { id: "none", name: "No date" },
+];
+export const TYPEFACES = [
+  { id: "auto", name: "Style's own" }, { id: "anton", name: "Anton" }, { id: "bebas", name: "Bebas" }, { id: "shoulders", name: "Shoulders" },
+  { id: "antonio", name: "Antonio" }, { id: "sixcaps", name: "Six Caps" }, { id: "serif", name: "Serif" }, { id: "grot", name: "Grotesk" }, { id: "wide", name: "Unbounded" },
+];
+const HEX = /^#[0-9a-f]{6}$/i;
+
+function editedFrame(L, spec) {
+  const f = { ...L.frame, blurred: blurOf(L) };
+  const sz = Math.min(1.5, Math.max(0.5, spec.sz ?? 1));
+  f.W *= sz; f.maxH *= sz;
+  f.cx += (spec.dx ?? 0) * f.w;
+  f.cy += (spec.dy ?? 0) * f.h;
+  if (spec.face && spec.face !== "auto" && TYPEFACE[spec.face]) f.face = spec.face;
+  if (spec.df && spec.df !== "auto") f.date = spec.df === "none" ? null : DATE[spec.df];
+  return f;
+}
+export function timePalette(pal, spec) {
+  if (!spec.ink && !spec.acc) return pal;
+  return { ...pal, ink: HEX.test(spec.ink) ? spec.ink : pal.ink, accent: HEX.test(spec.acc) ? spec.acc : pal.accent };
+}
+// A soft copy of the back layer, for frosted-glass digits
+function blurOf(L) {
+  if (L.blurred) return L.blurred;
+  const small = makeCanvas(Math.max(8, Math.round(L.w / 6)), Math.max(8, Math.round(L.h / 6)));
+  const s = small.getContext("2d");
+  if ("filter" in s) { s.filter = `blur(${Math.max(2, Math.round(small.width / 40))}px)`; s.drawImage(L.back, -small.width * 0.05, -small.height * 0.05, small.width * 1.1, small.height * 1.1); }
+  else {
+    const tiny = makeCanvas(Math.max(4, Math.round(L.w / 30)), Math.max(4, Math.round(L.h / 30)));
+    tiny.getContext("2d").drawImage(L.back, 0, 0, tiny.width, tiny.height);
+    s.imageSmoothingQuality = "high";
+    s.drawImage(tiny, 0, 0, small.width, small.height);
+  }
+  L.blurred = small;
+  return small;
+}
+
 /** Draws the time alone onto ctx (transparent elsewhere). */
 export function drawTime(ctx, L, spec, date) {
   if (spec.clock === "none") return;
+  const pal = timePalette(L.pal, spec);
   const T = TYPES[spec.clock];
-  if (T) {
-    ctx.save();
-    T.draw(ctx, L.frame, timeParts(date), L.pal, rng(`type:${spec.clock}:${spec.seed}`));
-    ctx.restore();
-  } else drawClassicClock(ctx, L.w, L.h, spec, date, L.pal);
+  const t = timeParts(date);
+  if (spec.h12) t.H = hour12(t.H);
+  ctx.save();
+  if (T) T.draw(ctx, editedFrame(L, spec), t, pal, rng(`type:${spec.clock}:${spec.seed}`));
+  else {
+    // classic faces: move and scale around their own centre
+    const { cx, cy } = clockFrame(L.w, L.h, spec);
+    const sz = spec.sz ?? 1;
+    ctx.translate(cx + (spec.dx ?? 0) * L.w, cy + (spec.dy ?? 0) * L.h);
+    ctx.scale(sz, sz);
+    ctx.translate(-cx, -cy);
+    drawClassicClock(ctx, L.w, L.h, spec, date, pal);
+  }
+  ctx.restore();
 }
 
-/** One finished frame: back, time, front, and the time mirrored in water. */
-export function compose(ctx, L, date = new Date(), spec = L.spec) {
+function drawCaption(ctx, L, spec) {
+  const text = (spec.cap || "").trim();
+  if (!text) return;
   const { w, h } = L;
+  const pal = timePalette(L.pal, spec);
+  const size = Math.min(w, h) * 0.06;
+  ctx.save();
+  ctx.font = `italic 400 ${size}px ${TYPEFACE.serif}`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = pal.light ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = size * 0.5;
+  ctx.fillStyle = pal.ink;
+  let s = size;
+  while (ctx.measureText(text).width > w * 0.84 && s > size * 0.5) { s *= 0.92; ctx.font = `italic 400 ${s}px ${TYPEFACE.serif}`; }
+  ctx.fillText(text, w / 2, h >= w ? h * 0.835 : h * 0.88);
+  ctx.restore();
+}
+
+function drawLayer(ctx, img, w, h, scale = 1, ox = 0, oy = 0) {
+  if (scale === 1 && !ox && !oy) return ctx.drawImage(img, 0, 0);
+  ctx.save();
+  ctx.translate(w / 2 + ox, h / 2 + oy);
+  ctx.scale(scale, scale);
+  ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  ctx.restore();
+}
+
+/**
+ * One finished frame: back, time, front, the time mirrored in water, and the caption.
+ * opts.parallax {x, y} in -1..1 shifts the layers apart (live clock tilt); opts.motion 0..1 is the phase of the
+ * looping motion wallpaper; opts.home draws the matching home-screen picture (no time).
+ */
+export function compose(ctx, L, date = new Date(), spec = L.spec, opts = {}) {
+  const { w, h } = L;
+  let bs = 1, bx = 0, by = 0, fs = 1, fx = 0, fy = 0, tx = 0, ty = 0;
+  if (opts.parallax) {
+    const { x, y } = opts.parallax;
+    bs = 1.07; bx = -x * w * 0.03; by = -y * h * 0.018;
+    fs = 1.04; fx = x * w * 0.022; fy = y * h * 0.012;
+    tx = -x * w * 0.008; ty = -y * h * 0.005;
+  }
+  if (opts.motion != null) {
+    const z = (1 - Math.cos(opts.motion * Math.PI * 2)) / 2;
+    bs = 1.02 + 0.05 * z; by = -h * 0.006 * z;
+    fs = 1.01 + 0.018 * z; fy = h * 0.004 * z;
+  }
+  ctx.fillStyle = "#000";
+  if (bs !== 1) ctx.fillRect(0, 0, w, h);
+  drawLayer(ctx, L.back, w, h, bs, bx, by);
+  if (opts.home) {
+    if (L.front) drawLayer(ctx, L.front, w, h, fs, fx, fy);
+    ctx.fillStyle = "rgba(0,0,0,0.14)";
+    ctx.fillRect(0, 0, w, h);
+    return;
+  }
   if (!L.type) L.type = makeCanvas(w, h);
   const tctx = L.type.getContext("2d");
   tctx.clearRect(0, 0, w, h);
   drawTime(tctx, L, spec, date);
-  ctx.drawImage(L.back, 0, 0);
-  ctx.drawImage(L.type, 0, 0);
-  if (L.front) ctx.drawImage(L.front, 0, 0);
-  if (L.water) {
+  const covers = !!TYPES[spec.clock]?.covers;
+  drawLayer(ctx, L.type, w, h, 1, tx, ty);
+  if (L.front && !covers) drawLayer(ctx, L.front, w, h, fs, fx, fy);
+  if (L.water && !covers) {
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, L.water, w, h - L.water);
     ctx.clip();
     ctx.globalAlpha = 0.32;
-    ctx.translate(0, L.water * 2);
+    ctx.translate(tx, L.water * 2 + ty);
     ctx.scale(1, -1);
     ctx.drawImage(L.type, 0, 0);
     ctx.restore();
   }
+  drawCaption(ctx, L, spec);
 }
 
 export function renderAll(ctx, w, h, spec, date, photo) {

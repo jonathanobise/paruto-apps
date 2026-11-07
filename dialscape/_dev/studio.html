@@ -8,7 +8,7 @@ const q = new URLSearchParams(location.search);
 const d = new Date(2026,10,7,2,30,50);
 const mode = q.get("mode") || "scenes", o = Number(q.get("o")||0);
 const list = mode === "scenes" ? R.SCENE_STYLES.map((s,i) => ({ clock: R.TYPE_STYLES[(i+o)%12].id, bg: s.id, pal: "a"+(i+o), seed: "b"+(i+o), pos: "middle" }))
-  : R.TYPE_STYLES.map((t,i) => ({ clock: t.id, bg: R.SCENE_STYLES[(i+o)%8].id, pal: "c"+(i+o), seed: "e"+(i+o), pos: "middle" }));
+  : R.TYPE_STYLES.filter(t => !q.get("only") || q.get("only").split(",").includes(t.id)).map((t,i) => ({ clock: t.id, bg: R.SCENE_STYLES[(i+o)%8].id, pal: "c"+(i+o), seed: "e"+(i+o), pos: "middle" }));
 for (const s of list) {
   const c = document.createElement("canvas"); c.width = 300; c.height = 650; c.style.width = "200px";
   const f = document.createElement("figure"); f.style.margin = 0; f.append(c, Object.assign(document.createElement("div"), { textContent: `${s.clock} / ${s.bg} / ${s.pal}` }));
