@@ -1,0 +1,13 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css"><body style="margin:0;background:#000">
+<script type=module>
+import * as E from "../engine.js";
+for (const f of ['italic 20px "Instrument Serif"','20px "Instrument Serif"','500 20px "Space Grotesk"','400 20px "DM Mono"','800 20px "Unbounded"']) await document.fonts.load(f);
+const q = new URLSearchParams(location.search);
+const spec = { clock: q.get("c"), bg: q.get("b"), pal: q.get("p") || "x1", seed: q.get("s") || "y1", pos: q.get("y") || "middle" };
+const w = +(q.get("w")||1320), h = +(q.get("h")||2868);
+const c = document.createElement("canvas"); c.width = w; c.height = h; document.body.append(c);
+const [hh, mm] = (q.get("t") || "10:42").split(":").map(Number); const d = new Date(2026,10,7,hh,mm,24);
+E.render(c.getContext("2d"), w, h, spec, d);
+window.png = () => c.toDataURL("image/jpeg", 0.9);
+document.title = "done";
+</script>

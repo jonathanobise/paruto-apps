@@ -458,6 +458,48 @@
       ]
     },
     {
+      "id": "dialscape",
+      "name": "Dialscape",
+      "tagline": "Clock wallpapers with depth for iPhone and Android: poster-size time set inside scenes, or behind the subject of your own photo.",
+      "description": "Dialscape makes lock-screen wallpapers where the time is part of the picture. Pick from sixteen poster-style clocks (giant stacked digits, neon, frosted glass, chrome, 3D, cut-out, torn paper, a signature date and more) and set them inside layered scenes such as a city skyline, misty pines or a moonlit sea, so towers, trees and houses stand in front of the digits, or use your own photo: the app cuts out the subject on your phone and puts it in front of the time. Drag, resize and recolour the time, describe a mood in a few words, preview it on an iPhone or Android lock screen, and save a single wallpaper, a lock and home pair, an eight-picture shuffle pack or a looping motion video. Free, with no sign-up.",
+      "status": "live",
+      "category": "Personalisation",
+      "platforms": ["Web", "Installable app"],
+      "accent": "#e0603f",
+      "accent2": "#5b1d4a",
+      "icon": "🕰️",
+      "iconImage": "assets/apps/dialscape/icon",
+      "added": "2026-11-07",
+      "featured": false,
+      "url": "https://apps.paruto.com/dialscape/",
+      "links": [],
+      "highlights": [
+        "Your photo's subject in front of the time, cut out on your phone",
+        "16 poster-style clocks and 8 scenes with depth",
+        "Shuffle packs and motion wallpapers that change by themselves",
+        "Free, no sign-up, works offline"
+      ],
+      "cover": "assets/apps/dialscape/app-desktop.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/dialscape/app-desktop.jpg", "caption": "Explore ready-made designs, or shuffle your own" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-neon-skyline.jpg", "caption": "Neon behind the skyline", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-fade-sea.jpg", "caption": "Fade over a moonlit sea, mirrored in the water", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-split-homestead.jpg", "caption": "Split colours behind a lit homestead", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-script-star.jpg", "caption": "Signature over a burning star", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-tower-bloom.jpg", "caption": "Tower with flowers growing in front", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-mirror-retro.jpg", "caption": "Mirror on a retro sunset", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-glass-pines.jpg", "caption": "Frosted glass digits in the pines", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-chrome-sea.jpg", "caption": "Chrome over the sea", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/edit-phone.jpg", "caption": "Drag, resize and recolour the time, and add your own words", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/mock-phone.jpg", "caption": "Preview it on an iPhone or Android lock screen", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/export-phone.jpg", "caption": "Save a pair, a shuffle pack or a motion wallpaper", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/app-phone.jpg", "caption": "A new design every tap", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/explore-phone.jpg", "caption": "Explore ready-made designs", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/clock-phone.jpg", "caption": "Twelve poster clocks, plus the classics", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/live-phone.jpg", "caption": "The live clock keeps the screen awake", "device": "phone" }
+      ]
+    },
+    {
       "id": "project-meridian",
       "name": "Project Meridian",
       "tagline": "Ninety-nine maps burned. One kept.",

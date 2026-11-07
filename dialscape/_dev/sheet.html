@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf-8>
+<link rel=stylesheet href="../fonts.css">
+<body style="margin:0;background:#111;display:flex;flex-wrap:wrap;gap:8px;padding:8px">
+<script type=module>
+import * as E from "../engine.js";
+await document.fonts.load('italic 20px "Instrument Serif"'); await document.fonts.load('20px "Instrument Serif"');
+await document.fonts.load('500 20px "Space Grotesk"'); await document.fonts.load('400 20px "DM Mono"'); await document.fonts.load('800 20px "Unbounded"');
+const q = new URLSearchParams(location.search);
+const mode = q.get("mode") || "clocks";
+const d = new Date(2026, 10, 7, 10, 42, 18);
+const list = mode === "clocks" ? E.CLOCK_STYLES.map((c,i)=>({clock:c.id,bg:E.BG_STYLES[i%E.BG_STYLES.length].id,pal:"p"+(i+Number(q.get("o")||0)),seed:"s"+i,pos:"middle"}))
+  : E.BG_STYLES.map((b,i)=>({clock:E.CLOCK_STYLES[i%E.CLOCK_STYLES.length].id,bg:b.id,pal:"q"+(i+Number(q.get("o")||0)),seed:"t"+i,pos:"middle"}));
+for (const s of list) {
+  const c = document.createElement("canvas"); c.width = 393; c.height = 852; c.style.width="196px";
+  document.body.append(c);
+  const t0=performance.now(); E.render(c.getContext("2d"), 393, 852, s, d); console.log(s.bg, s.clock, Math.round(performance.now()-t0));
+}
+document.title="done";
+</script>

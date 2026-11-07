@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dialscape: clock wallpapers, made for your phone</title>
+<meta name="description" content="Dialscape makes clock wallpapers with depth for iPhone and Android: poster-size type set inside illustrated scenes, or behind the subject of your own photo, cut out on your device. Free, no sign-up.">
+<link rel="canonical" href="https://apps.paruto.com/dialscape/">
+<meta name="theme-color" content="#0b0a0f">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paruto Apps">
+<meta property="og:title" content="Dialscape: clock wallpapers, made for your phone">
+<meta property="og:description" content="A new wallpaper with its own clock design every time you tap. Sized for iPhone and Android. Free, no sign-up.">
+<meta property="og:url" content="https://apps.paruto.com/dialscape/">
+<meta property="og:image" content="https://apps.paruto.com/dialscape/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dialscape">
+<link rel="preload" href="fonts/instrument-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="./" aria-label="Dialscape home">
+      <img src="icons/icon.svg" alt="" width="30" height="30">
+      <span>Dialscape</span>
+    </a>
+    <div class="top-actions">
+      <button class="glass pill" id="installBtn" hidden>Install</button>
+      <button class="glass pill" id="collectionBtn" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1z"/></svg>
+        <span>Saved</span> <b id="savedCount">0</b>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="preview-col" aria-label="Wallpaper preview">
+      <p class="kicker" id="kicker">Today's wallpaper</p>
+      <div class="phone" id="phone">
+        <canvas id="preview" role="img" aria-label="Wallpaper preview"></canvas>
+        <div class="mock mock-ios" aria-hidden="true">
+          <div class="m-bar"><span id="mockBar">9:41</span><i class="m-icons"></i></div>
+          <div class="m-date" id="mockDate"></div>
+          <div class="m-time" id="mockTime"></div>
+          <div class="m-bottom"><i></i><i></i></div>
+          <div class="m-home"></div>
+        </div>
+        <div class="guides" id="guides" aria-hidden="true">
+          <div class="guide g-clock"><span>System clock</span></div>
+          <div class="guide g-dock"><span>Dock</span></div>
+        </div>
+        <button class="live-hint glass" id="liveHint" aria-label="Open live clock">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        </button>
+      </div>
+      <p class="meta" id="meta"></p>
+    </section>
+
+    <section class="controls" aria-label="Design">
+      <h1 class="headline">Wallpapers with <em>depth</em></h1>
+      <p class="sub">Poster-size clocks set inside scenes, or behind the subject of your own photo. A new design every tap; lock what you like and shuffle the rest.</p>
+
+      <div class="shuffle-row">
+        <div class="locks" role="group" aria-label="Keep while shuffling">
+          <button class="lock glass" data-lock="clock" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0"/></svg>Clock</button>
+          <button class="lock glass" data-lock="bg" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0"/></svg>Art</button>
+          <button class="lock glass" data-lock="pal" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0"/></svg>Colour</button>
+        </div>
+        <button class="glass round undo" id="undoBtn" aria-label="Undo" title="Undo (Z)" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+        </button>
+        <button class="shuffle" id="shuffleBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5c2 0 3.2.9 4.3 2.6l2.4 4.8c1.1 1.7 2.3 2.6 4.3 2.6H21M3 17h3.5c1.4 0 2.4-.4 3.3-1.3M21 7h-3.5c-1.4 0-2.4.4-3.3 1.3M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
+          Shuffle
+        </button>
+      </div>
+
+      <div class="tabs glass" role="tablist" aria-label="Customise">
+        <button role="tab" aria-selected="true" data-tab="explore">Explore</button>
+        <button role="tab" aria-selected="false" data-tab="clock">Clock</button>
+        <button role="tab" aria-selected="false" data-tab="bg">Art</button>
+        <button role="tab" aria-selected="false" data-tab="pal">Colour</button>
+        <button role="tab" aria-selected="false" data-tab="edit">Edit</button>
+        <button role="tab" aria-selected="false" data-tab="fit">Fit</button>
+      </div>
+      <div class="panel" id="panel" role="tabpanel"></div>
+
+      <div class="actions">
+        <button class="primary" id="saveBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+          <span>Save wallpaper</span>
+        </button>
+        <button class="glass round" id="liveBtn" aria-label="Live clock" title="Live clock">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        </button>
+        <button class="glass round" id="favBtn" aria-label="Add to saved" aria-pressed="false" title="Add to saved">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1z"/></svg>
+        </button>
+        <button class="glass round" id="moreBtn" aria-label="More ways to save" title="More ways to save" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></svg>
+        </button>
+      </div>
+      <p class="fine">Wallpapers are pictures, so the clock shows the time you save it (or a time you pick under <b>Fit</b>). For a clock that ticks, open the <b>live clock</b>: a full-screen bedside or desk clock that keeps the screen awake. Your photos are cut out on this device and never uploaded.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Free, no sign-up, works offline. Made by <a href="https://apps.paruto.com/#/dialscape">Paruto</a>.</span>
+  </footer>
+</div>
+
+<!-- Live clock -->
+<div class="live" id="live" hidden>
+  <canvas id="liveCanvas"></canvas>
+  <button class="glass round live-close" id="liveClose" aria-label="Close live clock">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+</div>
+
+<!-- Saved designs -->
+<dialog class="sheet" id="collection" aria-labelledby="collectionTitle">
+  <div class="sheet-head">
+    <h2 id="collectionTitle">Saved designs</h2>
+    <button class="glass round" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <p class="empty" id="collectionEmpty">Tap the heart on a design you like and it lands here, ready to save again in any size.</p>
+  <div class="grid" id="collectionGrid"></div>
+</dialog>
+
+<!-- More ways to save -->
+<dialog class="sheet" id="export" aria-labelledby="exportTitle">
+  <div class="sheet-head">
+    <h2 id="exportTitle">Save as</h2>
+    <button class="glass round" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="exports">
+    <button class="export" data-export="single"><b>Wallpaper</b><span>One picture at your screen size.</span></button>
+    <button class="export" data-export="pair"><b>Lock + Home pair</b><span>The design with the time, plus a matching home-screen picture without it.</span></button>
+    <button class="export" data-export="pack"><b>Shuffle pack</b><span>Eight takes on this design, for iPhone's Photo Shuffle or Samsung's lock-screen rotation, so it changes by itself.</span></button>
+    <button class="export" data-export="motion"><b>Motion wallpaper</b><span>An 8-second looping video with the layers drifting for depth. For Android and Samsung video wallpapers.</span></button>
+    <button class="export" data-export="link"><b>Share a link</b><span>Opens this exact design in Dialscape on another device.</span></button>
+  </div>
+</dialog>
+
+<!-- After saving -->
+<dialog class="sheet" id="howto" aria-labelledby="howtoTitle">
+  <div class="sheet-head">
+    <h2 id="howtoTitle">Set it as your wallpaper</h2>
+    <button class="glass round" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="seg glass" role="tablist" aria-label="Phone">
+    <button role="tab" data-os="ios" aria-selected="true">iPhone</button>
+    <button role="tab" data-os="android" aria-selected="false">Android</button>
+  </div>
+  <ol class="steps" id="howtoSteps"></ol>
+  <p class="fine">Tip: your phone draws its own clock at the top of the lock screen. Under <b>Fit</b>, move the design's clock to the middle or lower down so the two never collide.</p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p class="noscript">Dialscape draws your wallpapers with JavaScript. Please turn it on to use the app.</p></noscript>
+</body>
+</html>

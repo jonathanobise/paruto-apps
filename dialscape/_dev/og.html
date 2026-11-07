@@ -1,0 +1,25 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css">
+<style>
+body{margin:0;width:1200px;height:630px;overflow:hidden;background:#0b0a0f;color:#f4f1ec;font-family:-apple-system,"Inter",system-ui,sans-serif;position:relative}
+body::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 400px at 75% 60%,rgba(224,96,63,.35),transparent 70%),radial-gradient(500px 400px at 15% 20%,rgba(107,47,214,.35),transparent 70%)}
+.t{position:absolute;left:64px;top:150px;width:470px}
+.t img{width:64px;height:64px;border-radius:15px}
+h1{font:600 64px/1 -apple-system,"Inter",system-ui,sans-serif;letter-spacing:-.03em;margin:26px 0 16px}
+h1 em{font:italic 400 1.12em "Instrument Serif",serif;color:#ffcf7a}
+p{font-size:23px;line-height:1.4;color:rgba(244,241,236,.7);margin:0}
+.row{position:absolute;right:-40px;top:40px;display:flex;gap:22px;transform:rotate(-6deg)}
+canvas{width:190px;height:412px;border-radius:30px;box-shadow:0 0 0 5px #0d0d10,0 0 0 6px rgba(255,255,255,.15),0 30px 60px rgba(0,0,0,.6)}
+.row canvas:nth-child(2){margin-top:70px}.row canvas:nth-child(3){margin-top:20px}
+</style>
+<div class="t"><img src="../icons/icon.svg"><h1>Clock wallpapers with <em>depth</em></h1><p>Poster-size time in scenes, or behind the subject of your own photo. For iPhone and Android.</p></div>
+<div class="row"></div>
+<script type=module>
+import * as R from "../render.js";
+await Promise.all(['italic 20px "Instrument Serif"','600 20px "Space Grotesk"','400 20px "DM Mono"','20px "Anton"','300 20px "Big Shoulders Display"','20px "Bebas Neue"'].map(f => document.fonts.load(f)));
+const d = new Date(2026,10,7,10,42,24);
+for (const s of [["neon","skyline","c16","e16"],["fade","sea","a3","b3"],["split","homestead","a1","b1"]]) {
+  const c = document.createElement("canvas"); c.width = 380; c.height = 824; document.querySelector(".row").append(c);
+  R.renderAll(c.getContext("2d"), 380, 824, { clock: s[0], bg: s[1], pal: s[2], seed: s[3], pos: "middle" }, d);
+}
+document.title = "done";
+</script>

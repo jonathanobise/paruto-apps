@@ -1,0 +1,16 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css">
+<body style="margin:0;background:#111;display:flex;flex-wrap:wrap;gap:6px;padding:6px;font:11px monospace;color:#aaa">
+<script type=module>
+import * as E from "../engine.js";
+for (const f of ['italic 20px "Instrument Serif"','20px "Instrument Serif"','500 20px "Space Grotesk"','400 20px "DM Mono"','800 20px "Unbounded"']) await document.fonts.load(f);
+const q = new URLSearchParams(location.search); const r = E.rng("pick" + (q.get("o")||0));
+const d = new Date(2026,10,7,10,42,24);
+for (let i = 0; i < 24; i++) {
+  const s = { clock: E.CLOCK_STYLES[i % 12].id, bg: r.pick(E.BG_STYLES).id, pal: "k" + Math.floor(r()*1e6).toString(36), seed: "m" + Math.floor(r()*1e6).toString(36), pos: "middle" };
+  const c = document.createElement("canvas"); c.width = 200; c.height = 433;
+  const f = document.createElement("figure"); f.style.margin = 0; f.append(c, Object.assign(document.createElement("div"), { textContent: `${i} ${s.clock} ${s.bg} ${s.pal} ${s.seed}` }));
+  f.lastChild.style.width = "200px"; document.body.append(f);
+  E.render(c.getContext("2d"), 200, 433, s, d);
+}
+document.title = "done";
+</script>
