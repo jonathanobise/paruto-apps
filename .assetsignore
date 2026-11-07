@@ -19,3 +19,6 @@ dialscape/_dev
 
 # The Worker's code is uploaded as code, not as a static file
 worker
+
+# The deploy script (it writes version.json into the published copy)
+deploy.sh
