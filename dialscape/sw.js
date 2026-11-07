@@ -1,5 +1,6 @@
 // Dialscape works offline: the app shell is cached on install and served cache-first, refreshed in the background.
 // The photo cut-out tool in vendor/ (about 16 MB) is cached the first time someone uses it.
+// ./deploy.sh replaces this with "dialscape-<commit>" in the published copy, so each deploy is a fresh cache.
 const VERSION = "dialscape-v4";
 const SHELL = [
   "./", "index.html", "style.css", "fonts.css", "app.js", "engine.js", "studio.js", "render.js", "photo.js", "describe.js", "zip.js", "gpu.js", "manifest.webmanifest",
@@ -22,7 +23,10 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== location.origin) return;
+  // the deploy stamp and the API are always asked of the network, never the cache
+  if (url.pathname === "/version.json" || url.pathname.startsWith("/api/")) return;
   e.respondWith(
     caches.open(VERSION).then(async (cache) => {
       const hit = await cache.match(req, { ignoreSearch: true });

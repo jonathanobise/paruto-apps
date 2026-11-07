@@ -8,6 +8,10 @@
 /apps.json
   Cache-Control: no-cache
 
+# The deploy stamp (./deploy.sh): which commit is live
+/version.json
+  Cache-Control: no-cache
+
 # The wall's small copies change only when their original does (scripts/wall-thumbs.mjs)
 /assets/wall/*
   Cache-Control: public, max-age=86400

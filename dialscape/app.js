@@ -1087,6 +1087,25 @@ phone.addEventListener("touchend", (e) => {
   if (Math.abs(dx) > 60 && state.tab !== "edit" && !state.tapMode) shuffle();
 });
 
+/* ───────────── version ───────────── */
+// The site's deploy stamp (version.json, written by ./deploy.sh): the commit that's live and when it was deployed
+async function showVersion() {
+  const el = $("#version");
+  try {
+    const res = await fetch("/version.json", { cache: "no-store" });
+    if (!res.ok) throw new Error(String(res.status));
+    const v = await res.json();
+    const when = new Date(v.deployed || v.committed);
+    el.textContent = `Version ${v.short} · ${when.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}`;
+    el.title = `${v.subject}\nCommit ${v.commit}\nDeployed ${when.toLocaleString()}`;
+    return v;
+  } catch {
+    el.textContent = navigator.onLine === false ? "Offline copy" : location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "Development version" : "";
+    el.title = "";
+    return null;
+  }
+}
+
 /* ───────────── start ───────────── */
 async function fontsReady() {
   const faces = [
@@ -1108,6 +1127,16 @@ async function fontsReady() {
     else { spec = { ...spec, bg: dailySpec().bg }; delete spec.photo; }
   }
   setSpec(spec || dailySpec());
-  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    // an installed copy that swaps to a newer deploy says so
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", async () => {
+      if (!hadController) return;
+      const v = await showVersion();
+      toast(v ? `Dialscape updated to version ${v.short}` : "Dialscape updated", 3600);
+    });
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+  showVersion();
   document.documentElement.dataset.ready = "1";
 })();
