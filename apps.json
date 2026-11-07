@@ -458,6 +458,42 @@
       ]
     },
     {
+      "id": "dialscape",
+      "name": "Dialscape",
+      "tagline": "Clock wallpapers for iPhone and Android, painted fresh every time you tap.",
+      "description": "Dialscape paints a new phone wallpaper with its own clock design every time you tap. Mix twelve clock faces, from Roman numerals and a word clock to orbiting planets and flip digits, with ten generative art styles and endless colours, then lock what you like and shuffle the rest. Each picture is sized for your iPhone or Android screen, and a full-screen live clock turns a spare phone or tablet into a bedside or desk clock. Free, no sign-up, and it works offline once installed.",
+      "status": "live",
+      "category": "Personalisation",
+      "platforms": ["Web", "Installable app"],
+      "accent": "#e0603f",
+      "accent2": "#5b1d4a",
+      "icon": "🕰️",
+      "iconImage": "assets/apps/dialscape/icon",
+      "added": "2026-11-07",
+      "featured": false,
+      "url": "https://apps.paruto.com/dialscape/",
+      "links": [],
+      "highlights": [
+        "12 clock faces, 10 art styles, endless colours",
+        "Sized for iPhone and Android screens",
+        "A live clock for the bedside or desk",
+        "Free, no sign-up, works offline"
+      ],
+      "cover": "assets/apps/dialscape/app-desktop.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/dialscape/app-desktop.jpg", "caption": "Shuffle a new design, or pick each part yourself" },
+        { "type": "image", "src": "assets/apps/dialscape/app-phone.jpg", "caption": "A new wallpaper every tap", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-serif-dunes.jpg", "caption": "Serif on Dunes", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-daylight-bauhaus.jpg", "caption": "Daylight: a 24-hour dial that follows the sun", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-lexicon-flow.jpg", "caption": "Lexicon: a word clock that spells the time", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-matrix-cosmos.jpg", "caption": "Dot matrix on Cosmos", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/wallpaper-bauhaus-aurora.jpg", "caption": "Bauhaus on Aurora", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/art-phone.jpg", "caption": "Ten generative art styles", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/fit-phone.jpg", "caption": "Sized for your phone, clear of its own clock and dock", "device": "phone" },
+        { "type": "image", "src": "assets/apps/dialscape/live-phone.jpg", "caption": "The live clock keeps the screen awake", "device": "phone" }
+      ]
+    },
+    {
       "id": "project-meridian",
       "name": "Project Meridian",
       "tagline": "Ninety-nine maps burned. One kept.",

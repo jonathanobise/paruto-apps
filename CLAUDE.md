@@ -66,6 +66,9 @@ Live at **https://apps.paruto.com**, served by **Cloudflare**: the Worker `parut
   `git -c http.postBuffer=157286400 -c http.version=HTTP/1.1 -c credential.helper= -c "credential.helper=!/opt/homebrew/bin/gh auth git-credential" push`
   or pushes containing images fail with HTTP 400.
 
+## Dialscape (`dialscape/`)
+A clock-wallpaper generator for iPhone and Android, served from this site at https://apps.paruto.com/dialscape/ (an installable PWA; listed in `apps.json` as `dialscape`). No build step: `engine.js` draws everything on a canvas (seeded palettes, ten background styles in `BACKGROUNDS`, twelve clock faces in `CLOCKS`; sizes are proportions of the canvas, so preview and export match), `app.js` is the UI (shuffle with locks, Clock/Art/Colour/Fit tabs, JPEG export via the share sheet, saved designs in localStorage, the full-screen live clock), `sw.js` caches the app for offline use (bump `VERSION` when shipping changes). Fonts are self-hosted in `dialscape/fonts/` (OFL). A design's link is `#c=<clock>&b=<bg>&p=<palette seed>&s=<art seed>&y=<high|middle|low>`. `dialscape/_dev/` holds contact sheets and the icon/share-image makers (open them through `python3 -m http.server`); it isn't published (`.assetsignore`). To add a clock face or art style, add an entry to `CLOCKS` or `BACKGROUNDS`; it shows up in the pickers and shuffle automatically.
+
 ## WealthOS (`wealthos/`)
 A separate product: a Next.js + Postgres fintech app (non-custodial wealth tracking, Nigeria first). It is **not** part of the showcase site and is excluded from the apps.paruto.com publish by `.assetsignore`. Work on it from `wealthos/` and follow `wealthos/CLAUDE.md`; it has its own README, docs and tests.
 

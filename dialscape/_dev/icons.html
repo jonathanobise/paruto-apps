@@ -1,0 +1,12 @@
+<!doctype html><meta charset=utf-8><body style="margin:0">
+<script type=module>
+const img = new Image(); img.src = "../icons/icon.svg"; await img.decode();
+window.out = {};
+for (const [name, size, pad] of [["icon-192",192,0],["icon-512",512,0],["apple-touch-icon",180,0],["icon-maskable-512",512,0.1]]) {
+  const c = document.createElement("canvas"); c.width = c.height = size; const x = c.getContext("2d");
+  if (pad) { x.fillStyle = "#3a1440"; x.fillRect(0,0,size,size); x.drawImage(img, size*pad, size*pad, size*(1-2*pad), size*(1-2*pad)); }
+  else x.drawImage(img, 0, 0, size, size);
+  out[name] = c.toDataURL("image/png");
+}
+document.title = "done";
+</script>
