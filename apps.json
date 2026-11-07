@@ -626,20 +626,31 @@
       "media": []
     },
     {
-      "id": "project-margin",
-      "name": "Project Margin",
-      "tagline": "Every great idea began in the margin.",
-      "description": "A student read by lamplight with a pen in hand. What she wrote in the margins outgrew the book itself. Years later she could still find any thought she had ever had, in the very hand she wrote it.",
-      "status": "in-development",
-      "category": "Unannounced",
-      "platforms": ["iOS", "Android", "Mac", "Windows", "Web"],
-      "accent": "#7aa7ff",
-      "accent2": "#1a2238",
+      "id": "my-notes",
+      "aliases": ["project-margin"],
+      "name": "My Notes by Paruto",
+      "tagline": "Handwritten notes that feel like paper, on every device.",
+      "description": "A note-taking app built around handwriting. Write with a pressure-sensitive fountain pen, a ballpoint or a highlighter on ruled, grid or dotted paper, then lasso anything to move or recolour it, with undo for every stroke. It runs in your browser today and keeps your notebooks on your device, with phone, tablet and desktop apps on the way.",
+      "status": "beta",
+      "category": "Productivity",
+      "platforms": ["Web"],
+      "accent": "#6f9bff",
+      "accent2": "#16213a",
       "icon": "🖋️",
+      "iconImage": "assets/apps/my-notes/icon",
       "added": "2026-11-07",
       "featured": false,
-      "highlights": ["Written by hand", "Found in an instant", "Wherever you open it"],
-      "media": []
+      "url": "https://notes.paruto.com",
+      "links": [],
+      "highlights": ["Ink that follows pen pressure", "Lasso to move and recolour", "Ruled, grid, dotted or blank paper", "Saves on your device"],
+      "cover": "assets/apps/my-notes/notes-page.jpg",
+      "media": [
+        { "type": "image", "src": "assets/apps/my-notes/notes-page.jpg", "caption": "Handwriting, highlighter and sketches on cream ruled paper" },
+        { "type": "image", "src": "assets/apps/my-notes/phone-notes.jpg", "caption": "The same page on a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/my-notes/library.jpg", "caption": "Every notebook, cloth-bound" },
+        { "type": "image", "src": "assets/apps/my-notes/lasso.jpg", "caption": "Lasso a sketch to move or recolour it" },
+        { "type": "image", "src": "assets/apps/my-notes/phone-library.jpg", "caption": "Your notebooks on a phone", "device": "phone" }
+      ]
     }
   ]
 }
