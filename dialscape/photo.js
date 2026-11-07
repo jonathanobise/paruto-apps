@@ -45,11 +45,11 @@ async function decode(blob) {
 }
 
 /** A picked file → a stored photo record and its live form ({ id, image, mask, pal, ... }). */
-export async function importPhoto(file) {
+export async function importPhoto(file, extra = {}) {
   const image = await decode(file);
   const id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const blob = await toBlob(image);
-  const rec = { id, blob, mask: null, point: null, depth: true, fx: 0.5, fy: 0.5, added: Date.now() };
+  const rec = { id, blob, mask: null, point: null, depth: true, fx: 0.5, fy: 0.5, added: Date.now(), ...extra };
   await putPhoto(rec);
   return live(rec, image, null);
 }
@@ -64,11 +64,11 @@ export async function loadPhoto(id) {
 }
 
 function live(rec, image, mask) {
-  return { id: rec.id, image, mask, point: rec.point, depth: rec.depth !== false, fx: rec.fx ?? 0.5, fy: rec.fy ?? 0.5, pal: paletteFromImage(image), rec };
+  return { id: rec.id, image, mask, point: rec.point, depth: rec.depth !== false, fx: rec.fx ?? 0.5, fy: rec.fy ?? 0.5, zoom: rec.zoom, ai: !!rec.ai, prompt: rec.prompt, pal: paletteFromImage(image), rec };
 }
 
 export async function savePhotoState(photo) {
-  const rec = { ...photo.rec, point: photo.point, depth: photo.depth, fx: photo.fx, fy: photo.fy };
+  const rec = { ...photo.rec, point: photo.point, depth: photo.depth, fx: photo.fx, fy: photo.fy, zoom: photo.zoom };
   if (photo.mask) rec.mask = await toBlob(photo.mask, "image/png");
   photo.rec = rec;
   await putPhoto(rec);

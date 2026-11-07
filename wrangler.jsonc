@@ -1,16 +1,28 @@
 {
   "$schema": "https://unpkg.com/wrangler@4.141.0/config-schema.json",
-  // apps.paruto.com: the Paruto Apps showcase, served by Cloudflare as static files (no build step, no Worker code).
-  // Everything in this folder is published except what .assetsignore lists. Deploy only committed code from master:
-  // a clean checkout, then `npx wrangler deploy` (see CLAUDE.md, "Deploying").
+  // apps.paruto.com: the Paruto Apps showcase, served by Cloudflare as static files (no build step).
+  // The only code is worker/index.js, and it runs only for /api/* (Dialscape's AI scenes); every other request is a
+  // static file. Everything in this folder is published except what .assetsignore lists. Deploy only committed code
+  // from master: a clean checkout, then `npx wrangler deploy` (see CLAUDE.md, "Deploying").
   "name": "paruto-apps",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-25",
   "assets": {
     "directory": "./",
+    "binding": "ASSETS",
     // Unknown addresses get the site's own 404 page; /games/x/ serves games/x/index.html, as on GitHub Pages.
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"]
   },
+  // Dialscape's AI scenes (Workers AI). MODEL: flux-schnell (default, cheap, square pictures) · phoenix · lucid-origin
+  // (sharper full-portrait pictures, several cents each) · sdxl-lightning. DAILY_LIMIT caps pictures per day site-wide.
+  "ai": { "binding": "AI" },
+  "vars": { "MODEL": "flux-schnell", "DAILY_LIMIT": "300" },
+  // at most 6 pictures a minute per visitor
+  "ratelimits": [{ "name": "PER_IP", "namespace_id": "4101", "simple": { "limit": 6, "period": 60 } }],
+  "durable_objects": { "bindings": [{ "name": "QUOTA", "class_name": "Quota" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Quota"] }],
   "routes": [{ "pattern": "apps.paruto.com", "custom_domain": true }],
   "workers_dev": true
 }

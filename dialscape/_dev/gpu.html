@@ -1,0 +1,21 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css">
+<body style="margin:0;background:#111;display:flex;flex-wrap:wrap;gap:6px;padding:6px;font:11px monospace;color:#aaa">
+<script type=module>
+import * as R from "../render.js";
+await Promise.all(['600 20px "Space Grotesk"','20px "Anton"','200 20px "Antonio"','20px "Bebas Neue"','150 20px "Big Shoulders Display"','300 20px "Big Shoulders Display"','20px "Six Caps"','20px "Yellowtail"'].map(f => document.fonts.load(f)));
+const q = new URLSearchParams(location.search);
+const W = +(q.get("w") || 270), Hh = +(q.get("h") || 585), o = +(q.get("o") || 0);
+const clocks = (q.get("c") || "tower,fade,neon,thin,glass,script").split(",");
+const scenes = (q.get("b") || R.GPU_STYLES.map(s => s.id).join(",")).split(",");
+for (const [i, bg] of scenes.entries()) {
+  const s = { clock: clocks[i % clocks.length], bg, pal: q.get("p") || "g" + (i + o), seed: "k" + (i + o), pos: "middle" };
+  if (q.get("zd")) s.zd = +q.get("zd");
+  const c = document.createElement("canvas"); c.width = W; c.height = Hh; c.style.width = (W > 400 ? 400 : W) + "px";
+  const f = document.createElement("figure"); f.style.margin = 0; f.append(c, Object.assign(document.createElement("div"), { textContent: `${s.clock}/${bg}/${s.pal}` }));
+  document.body.append(f);
+  const t0 = performance.now();
+  try { const L = R.renderAll(c.getContext("2d"), W, Hh, s, new Date(2026, 10, 7, 10, 42, 24)); console.log(bg, Math.round(performance.now() - t0) + "ms", L.gpu ? "gpu" : "FALLBACK", L.front ? "front" : "nofront"); }
+  catch (e) { console.log("ERR", bg, e.message); }
+}
+document.title = "done";
+</script>
