@@ -33,8 +33,9 @@ export function rng(seed) {
 
 export const randomSeed = () => Math.random().toString(36).slice(2, 7);
 
+const ROT = [0, 0.62, 1.31, 2.05].map((a) => [Math.cos(a), Math.sin(a)]);
 // Smooth 2D value noise with a few octaves (seeded)
-function makeNoise(r) {
+export function makeNoise(r) {
   const P = new Uint8Array(512);
   const base = [...Array(256).keys()];
   for (let i = 255; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [base[i], base[j]] = [base[j], base[i]]; }
@@ -52,7 +53,12 @@ function makeNoise(r) {
   };
   return (x, y, oct = 3) => {
     let s = 0, amp = 1, f = 1, norm = 0;
-    for (let o = 0; o < oct; o++) { s += amp * n2(x * f + o * 17.3, y * f - o * 9.1); norm += amp; amp *= 0.5; f *= 2; }
+    // each octave is turned a little, which hides the square grid value noise otherwise shows
+    for (let o = 0; o < oct; o++) {
+      const c = ROT[o % 4][0], sn = ROT[o % 4][1];
+      s += amp * n2((x * c - y * sn) * f + o * 17.3, (x * sn + y * c) * f - o * 9.1);
+      norm += amp; amp *= 0.5; f *= 2;
+    }
     return s / norm;
   };
 }
@@ -87,7 +93,7 @@ export function hexA(hex, a) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
-function luminance(hex) {
+export function luminance(hex) {
   const n = parseInt(hex.slice(1), 16);
   const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
   return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
@@ -142,7 +148,7 @@ export function makePalette(seed) {
 
 /* ───────────────────────── helpers ───────────────────────── */
 
-const TAU = Math.PI * 2;
+export const TAU = Math.PI * 2;
 const FONT = {
   serif: '"Instrument Serif", "Iowan Old Style", Georgia, serif',
   grot: '"Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif',
@@ -151,9 +157,9 @@ const FONT = {
 };
 export const FONTS = FONT;
 
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-function shade(ctx, w, h, stops, angle = 90) {
+export function shade(ctx, w, h, stops, angle = 90) {
   const a = (angle * Math.PI) / 180;
   const cx = w / 2, cy = h / 2, R = Math.hypot(w, h) / 2;
   const g = ctx.createLinearGradient(cx - Math.cos(a) * R, cy - Math.sin(a) * R, cx + Math.cos(a) * R, cy + Math.sin(a) * R);
@@ -161,7 +167,7 @@ function shade(ctx, w, h, stops, angle = 90) {
   return g;
 }
 
-function blob(ctx, x, y, r, color, alpha = 1) {
+export function blob(ctx, x, y, r, color, alpha = 1) {
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, hexA(color, alpha));
   g.addColorStop(0.45, hexA(color, alpha * 0.55));
@@ -170,7 +176,7 @@ function blob(ctx, x, y, r, color, alpha = 1) {
   ctx.fillRect(x - r, y - r, r * 2, r * 2);
 }
 
-function roundRect(ctx, x, y, w, h, r) {
+export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -180,7 +186,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function grain(ctx, w, h, seed, amount = 0.06) {
+export function grain(ctx, w, h, seed, amount = 0.06) {
   const size = 256;
   const tile = makeCanvas(size, size);
   const t = tile.getContext("2d");
@@ -203,7 +209,7 @@ function grain(ctx, w, h, seed, amount = 0.06) {
   ctx.restore();
 }
 
-function vignette(ctx, w, h, strength = 0.45) {
+export function vignette(ctx, w, h, strength = 0.45) {
   const g = ctx.createRadialGradient(w / 2, h * 0.5, Math.min(w, h) * 0.3, w / 2, h * 0.5, Math.hypot(w, h) * 0.62);
   g.addColorStop(0, "rgba(0,0,0,0)");
   g.addColorStop(1, `rgba(0,0,0,${strength})`);
@@ -221,7 +227,7 @@ export function makeCanvas(w, h) {
 /* ───────────────────────── backgrounds ───────────────────────── */
 // Each background: (ctx, w, h, pal, r, noise) → draws the full frame.
 
-const BACKGROUNDS = {
+export const BACKGROUNDS = {
   mesh: {
     name: "Mesh",
     draw(ctx, w, h, p, r) {
@@ -534,7 +540,7 @@ const BACKGROUNDS = {
   },
 };
 
-function mix(a, b, t) {
+export function mix(a, b, t) {
   const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
   const c = [16, 8, 0].map((s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t));
   return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("");
@@ -543,16 +549,16 @@ function mix(a, b, t) {
 /* ───────────────────────── clock faces ───────────────────────── */
 // Each clock: draw(ctx, cx, cy, S, t, pal, r) where S is the face size (diameter-ish) and t a time snapshot.
 
-function timeParts(d) {
+export function timeParts(d) {
   const ms = d.getMilliseconds();
   const s = d.getSeconds() + ms / 1000;
   const m = d.getMinutes() + s / 60;
   const h = (d.getHours() % 12) + m / 60;
   return { d, s, m, h, H: d.getHours(), M: d.getMinutes(), S: d.getSeconds() };
 }
-const pad = (n) => String(n).padStart(2, "0");
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+export const pad = (n) => String(n).padStart(2, "0");
+export const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function hand(ctx, cx, cy, angle, len, width, color, tail = 0.12, round = true) {
   ctx.save();
@@ -577,9 +583,9 @@ function shadowed(ctx, pal, S, fn) {
   ctx.restore();
 }
 
-function hour12(H) { return H % 12 === 0 ? 12 : H % 12; }
+export function hour12(H) { return H % 12 === 0 ? 12 : H % 12; }
 
-const CLOCKS = {
+export const CLOCKS = {
   halo: {
     name: "Halo",
     seconds: true,

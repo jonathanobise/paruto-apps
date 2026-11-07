@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css"><body style="margin:0;background:#111;display:flex;gap:8px">
+<script type=module>
+import * as P from "../photo.js"; import * as R from "../render.js";
+await Promise.all(['20px "Anton"','600 20px "Space Grotesk"','300 20px "Big Shoulders Display"','20px "Bebas Neue"'].map(f => document.fonts.load(f)));
+const q = new URLSearchParams(location.search);
+const blob = await (await fetch(q.get("img"))).blob();
+const t0 = performance.now();
+const photo = await P.importPhoto(blob);
+const { mask, coverage } = await P.cutOut(photo, { x: +q.get("x"), y: +q.get("y") });
+photo.mask = mask;
+const place = R.autoPlace(photo, { clock: "tower", seed: "y", pal: "x" }); console.log("place", JSON.stringify(place)); photo.zoom = place.zoom;
+console.log("cut", Math.round(performance.now() - t0), "ms coverage", coverage.toFixed(3), "pal", JSON.stringify(photo.pal));
+for (const clock of (q.get("c") || "tower,fade").split(",")) {
+  const c = document.createElement("canvas"); c.width = 600; c.height = 1300; c.style.width = "300px"; document.body.append(c);
+  R.renderAll(c.getContext("2d"), 600, 1300, { clock, bg: "photo", pal: "x", seed: "y", pos: place.pos }, new Date(2026,10,7,2,30,50), photo);
+}
+const m = document.createElement("canvas"); m.width = 300; m.height = 650; m.getContext("2d").drawImage(mask, 0, 0, 300, 650 * 0 + 300 * mask.height / mask.width); document.body.append(m);
+document.title = "done";
+</script>

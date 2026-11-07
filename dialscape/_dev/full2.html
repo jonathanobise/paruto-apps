@@ -1,0 +1,12 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href="../fonts.css"><body style="margin:0;background:#000">
+<script type=module>
+import * as R from "../render.js";
+await Promise.all(['italic 20px "Instrument Serif"','20px "Instrument Serif"','500 20px "Space Grotesk"','600 20px "Space Grotesk"','400 20px "DM Mono"','800 20px "Unbounded"','20px "Anton"','200 20px "Antonio"','700 20px "Antonio"','20px "Bebas Neue"','150 20px "Big Shoulders Display"','300 20px "Big Shoulders Display"','20px "Six Caps"','20px "Yellowtail"','500 20px "Caveat"'].map(f => document.fonts.load(f)));
+const q = new URLSearchParams(location.search);
+const spec = { clock: q.get("c"), bg: q.get("b"), pal: q.get("p"), seed: q.get("s"), pos: q.get("y") || "middle" };
+const w = +(q.get("w")||1320), h = +(q.get("h")||2868);
+const c = document.createElement("canvas"); c.width = w; c.height = h; document.body.append(c);
+R.renderAll(c.getContext("2d"), w, h, spec, new Date(2026,10,7,10,42,24));
+window.png = () => c.toDataURL("image/jpeg", 0.92);
+document.title = "done";
+</script>

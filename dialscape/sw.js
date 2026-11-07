@@ -1,10 +1,12 @@
 // Dialscape works offline: the app shell is cached on install and served cache-first, refreshed in the background.
-const VERSION = "dialscape-v1";
+// The photo cut-out tool in vendor/ (about 16 MB) is cached the first time someone uses it.
+const VERSION = "dialscape-v2";
 const SHELL = [
-  "./", "index.html", "style.css", "fonts.css", "app.js", "engine.js", "manifest.webmanifest",
+  "./", "index.html", "style.css", "fonts.css", "app.js", "engine.js", "studio.js", "render.js", "photo.js", "manifest.webmanifest",
   "icons/icon.svg", "icons/icon-192.png", "icons/apple-touch-icon.png",
   "fonts/instrument-serif.woff2", "fonts/instrument-serif-italic.woff2", "fonts/space-grotesk.woff2",
-  "fonts/dm-mono-300.woff2", "fonts/dm-mono-400.woff2", "fonts/unbounded.woff2",
+  "fonts/dm-mono-300.woff2", "fonts/dm-mono-400.woff2", "fonts/unbounded.woff2", "fonts/anton.woff2", "fonts/antonio.woff2",
+  "fonts/bebas-neue.woff2", "fonts/big-shoulders.woff2", "fonts/caveat.woff2", "fonts/six-caps.woff2", "fonts/yellowtail.woff2",
 ];
 
 self.addEventListener("install", (e) => {
