@@ -624,6 +624,22 @@
       "featured": false,
       "highlights": ["Every hour of the night", "Moves only on the sign"],
       "media": []
+    },
+    {
+      "id": "project-margin",
+      "name": "Project Margin",
+      "tagline": "Every great idea began in the margin.",
+      "description": "A student read by lamplight with a pen in hand. What she wrote in the margins outgrew the book itself. Years later she could still find any thought she had ever had, in the very hand she wrote it.",
+      "status": "in-development",
+      "category": "Unannounced",
+      "platforms": ["iOS", "Android", "Mac", "Windows", "Web"],
+      "accent": "#7aa7ff",
+      "accent2": "#1a2238",
+      "icon": "🖋️",
+      "added": "2026-11-07",
+      "featured": false,
+      "highlights": ["Written by hand", "Found in an instant", "Wherever you open it"],
+      "media": []
     }
   ]
 }
