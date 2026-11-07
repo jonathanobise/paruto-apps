@@ -1,9 +1,12 @@
 import {
   TYPE_STYLES, CLASSIC_CLOCKS, SCENE_STYLES, PATTERN_STYLES, ALL_CLOCKS, ALL_BACKS, isClock, isBack, clockHasSeconds,
-  randomSpec, dailySpec, buildLayers, compose, paletteOf, autoPlace, photoRect, randomSeed, DATE_FORMATS, TYPEFACES, timePalette,
+  GPU_STYLES, ILLUSTRATED_STYLES, isGpuScene,
+  randomSpec, dailySpec, buildLayers, compose, paletteOf, autoPlace, photoRect, randomSeed, DATE_FORMATS, TYPEFACES, timePalette, sceneDepthFor,
 } from "./render.js";
 import * as Photo from "./photo.js";
 import { describe } from "./describe.js";
+import { GPU_SCENES } from "./gpu.js";
+const GPU_DEFAULT_DEPTH = Object.fromEntries(Object.entries(GPU_SCENES).map(([id, g]) => [id, g.depth]));
 import { zip } from "./zip.js";
 
 /* ───────────── devices ───────────── */
@@ -77,6 +80,7 @@ function specFromHash() {
     df: DATE_FORMATS.some((d) => d.id === q.get("d")) ? q.get("d") : undefined,
     face: TYPEFACES.some((d) => d.id === q.get("f")) ? q.get("f") : undefined,
     cap: q.get("cap") ? q.get("cap").slice(0, 48) : undefined,
+    zd: num("k", 0, 1),
   });
   return tidy(spec);
 }
@@ -87,6 +91,7 @@ function tidy(spec) {
   for (const k of ["dx", "dy"]) if (s[k] == null || Math.abs(s[k]) < 0.002) delete s[k];
   for (const k of ["ink", "acc", "h12", "cap"]) if (!s[k]) delete s[k];
   for (const k of ["df", "face"]) if (!s[k] || s[k] === "auto") delete s[k];
+  if (s.zd == null || !isGpuScene(s.bg)) delete s.zd;
   if (s.bg !== "photo") delete s.photo;
   return s;
 }
@@ -102,6 +107,7 @@ function hashOf(s) {
   if (s.df) out += `&d=${s.df}`;
   if (s.face) out += `&f=${s.face}`;
   if (s.cap) out += `&cap=${encodeURIComponent(s.cap)}`;
+  if (s.zd != null) out += `&k=${r3(s.zd)}`;
   return out;
 }
 const EDIT_KEYS = ["sz", "dx", "dy", "ink", "acc", "h12", "df", "face", "cap"];
@@ -208,7 +214,7 @@ function updateMeta() {
   const s = state.spec;
   const p = themeFromPalette();
   const clockName = s.clock === "none" ? "No clock" : nameOf(ALL_CLOCKS, s.clock);
-  const bgName = s.bg === "photo" ? "Your photo" : nameOf(ALL_BACKS, s.bg);
+  const bgName = s.bg === "photo" ? (photoFor(s)?.ai ? "AI scene" : "Your photo") : nameOf(ALL_BACKS, s.bg);
   const [w, hgt] = deviceSize(state.device);
   $("#meta").textContent = `${clockName} · ${bgName} · ${p.name || "Custom"} — ${w} × ${hgt}`;
   preview.setAttribute("aria-label", `Wallpaper preview: ${clockName} clock on ${bgName}`);
@@ -278,6 +284,7 @@ function renderPanel() {
   if (state.tab === "explore") {
     const COLLECTIONS = {
       all: { name: "All" },
+      depth3d: { name: "3D", bg: GPU_STYLES.map((g) => g.id), clock: ["tower", "thin", "fade", "glass", "neon", "script", "mirror", "chrome"] },
       city: { name: "City", bg: ["skyline"], clock: ["neon", "tower", "fade", "split", "chrome", "glass", "knockout"] },
       nature: { name: "Nature", bg: ["pines", "homestead", "bloom", "sea"], clock: ["thin", "fade", "script", "mirror", "tower", "glass"] },
       space: { name: "Space", bg: ["star", "borealis"], clock: ["outline", "script", "thin", "glass", "neon", "dots"] },
@@ -293,7 +300,14 @@ function renderPanel() {
       toast(matched.length ? `Made from: ${matched.join(" · ")}` : "No words matched, so here's a surprise. Try “gold city” or “misty forest”.", 3200);
     };
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+    const paint = () => {
+      const words = input.value.trim();
+      if (!words) { input.focus(); return toast("Describe the picture first, e.g. “a fox on a misty hill at dawn”"); }
+      generateAI(words, state.aiStyle);
+    };
     panel.append(h("div", { class: "describe" }, input, h("button", { class: "chip solid", onclick: go }, "Create")));
+    panel.append(h("div", { class: "row ai-row" }, h("button", { class: "chip glass ai", onclick: paint }, "✦ Paint it with AI"),
+      h("span", { class: "fine-inline" }, "Makes a new picture from your words, then puts its subject in front of the time.")));
     panel.append(h("div", { class: "chips coll" }, Object.entries(COLLECTIONS).map(([id, c]) =>
       h("button", { class: "chip glass", "aria-pressed": String(state.collection === id), onclick: () => { state.collection = id; state.explore = []; renderPanel(); } }, c.name))));
     if (!state.explore.length) {
@@ -362,7 +376,7 @@ function renderPanel() {
       }
       return el;
     };
-    panel.append(label("Your photo, with depth"), photoStrip, label("Scenes"), strip(SCENE_STYLES), label("Patterns"), strip(PATTERN_STYLES));
+    panel.append(aiBlock(), label("Your photo, with depth"), photoStrip, label("3D scenes"), strip(GPU_STYLES), label("Illustrated"), strip(ILLUSTRATED_STYLES), label("Patterns"), strip(PATTERN_STYLES));
     if (s.bg !== "photo") panel.append(h("div", { class: "row" },
       h("button", { class: "chip glass", onclick: () => setSpec({ ...s, seed: randomSeed() }) }, "↻ New variation of this art")));
   }
@@ -441,6 +455,14 @@ function editPanel() {
   const classic = !ALL_CLOCKS.find((c) => c.id === s.clock)?.premium;
   return h("div", { class: "fit" },
     h("p", { class: "note" }, isTouch ? "Drag the time on the preview to move it." : "Drag the time on the preview to move it, or use the sliders."),
+    isGpuScene(s.bg) ? (() => {
+      const now = L?.gpu ? sceneDepthFor(L, s) : null;
+      return h("div", { class: "field" }, h("span", { class: "label" }, "Depth in the scene"),
+        slider("Depth", Math.round((s.zd ?? now?.zd ?? GPU_DEFAULT_DEPTH[s.bg] ?? 0.5) * 100), 0, 100, 1, (v) => set({ zd: v / 100 }, { record: false })),
+        h("div", { class: "row" },
+          h("button", { class: "chip glass", "aria-pressed": String(s.zd == null), onclick: () => { set({ zd: undefined }); renderPanel(); } }, "✦ Auto"),
+          h("span", { class: "fine-inline" }, s.zd == null ? "Auto keeps about a fifth of the time behind the scene." : "Slide right to push the time back into the scene.")));
+    })() : null,
     h("div", { class: "field" }, h("span", { class: "label" }, "Size and place"),
       slider("Size", Math.round((s.sz ?? 1) * 100), 50, 150, 1, (v) => set({ sz: v / 100 }, { record: false })),
       h("div", { class: "row" },
@@ -474,6 +496,63 @@ phone.addEventListener("pointermove", (e) => {
 const endDrag = () => { if (drag) { drag = null; phone.classList.remove("dragging"); } };
 phone.addEventListener("pointerup", endDrag);
 phone.addEventListener("pointercancel", endDrag);
+
+/* ───────────── AI scenes ───────────── */
+const AI_STYLES = [
+  { id: "photo", name: "Photo" }, { id: "render", name: "3D character" }, { id: "anime", name: "Anime" },
+  { id: "illustration", name: "Illustration" }, { id: "fantasy", name: "Fantasy" }, { id: "noir", name: "Noir" },
+];
+state.aiStyle = "photo";
+function aiBlock() {
+  const input = h("textarea", { class: "describe-input ai-input", rows: "2", maxlength: "300", placeholder: "Describe a picture: a red vintage car on a desert road at sunset", "aria-label": "Describe the AI picture" });
+  input.value = state.aiPrompt || "";
+  input.addEventListener("input", () => (state.aiPrompt = input.value));
+  return h("div", { class: "ai-block" },
+    h("p", { class: "section-label" }, "AI scene"),
+    input,
+    h("div", { class: "chips" }, AI_STYLES.map((st) => h("button", {
+      class: "chip glass", "aria-pressed": String(state.aiStyle === st.id),
+      onclick: () => { state.aiStyle = st.id; renderPanel(); },
+    }, st.name))),
+    h("div", { class: "row" },
+      h("button", { class: "chip solid", id: "aiGo", onclick: () => generateAI(input.value, state.aiStyle) }, "✦ Generate"),
+      h("span", { class: "fine-inline" }, "Made with Cloudflare Workers AI. Your words are sent to make the picture; nothing else is.")));
+}
+
+async function generateAI(prompt, style) {
+  prompt = (prompt || "").trim();
+  if (prompt.length < 3) return toast("Describe the picture in a few words");
+  if (state.busy) return;
+  state.busy = true;
+  phone.classList.add("working", "painting");
+  toast("Painting your scene… about 10 seconds", 12000);
+  try {
+    const res = await fetch("/api/generate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt, style }) });
+    const type = res.headers.get("content-type") || "";
+    if (!res.ok || !type.startsWith("image/")) {
+      let msg = "AI scenes work on apps.paruto.com, online.";
+      if (type.includes("json")) msg = (await res.json()).error || msg;
+      throw Object.assign(new Error(msg), { shown: true });
+    }
+    const blob = await res.blob();
+    const ph = await Photo.importPhoto(new File([blob], "ai-scene.jpg", { type }), { ai: true, prompt });
+    state.photo = ph;
+    photoCache.set(ph.id, ph);
+    cleanupPhotos(ph.id);
+    state.tab = "bg";
+    state.busy = false;
+    setSpec({ ...state.spec, bg: "photo", photo: ph.id });
+    // the prompt asked for the subject low in the frame, so look for it there
+    await runCutOut({ x: 0.5, y: 0.72 }, true);
+  } catch (e) {
+    if (!e.shown) console.error(e);
+    toast(e.shown ? e.message : "Couldn't reach the AI just now. Check your connection and try again.", 4200);
+  } finally {
+    state.busy = false;
+    phone.classList.remove("working", "painting");
+    updateMeta();
+  }
+}
 
 /* ───────────── photo tools ───────────── */
 function photoTools() {

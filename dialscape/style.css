@@ -349,3 +349,13 @@ input[type="time"] {
 .field > label.slider { display: flex; text-transform: none; letter-spacing: 0; font: 400 14px var(--sans); color: var(--ink-2); margin-bottom: 8px; }
 .field > label.slider span { min-width: 3.5em; }
 .phone[data-mock="ios"] .live-hint, .phone[data-mock="android"] .live-hint { display: none; }
+
+/* ── AI scenes ── */
+.ai-block { display: grid; gap: 10px; padding: 14px; margin-bottom: 14px; border-radius: var(--r-md); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), rgba(255,255,255,0.03)); border: 1px solid var(--line); }
+.ai-block .section-label { margin: 0; }
+.ai-input { height: auto; min-height: 64px; border-radius: 18px; padding: 12px 16px; resize: vertical; font: 500 14px/1.4 var(--sans); }
+.fine-inline { font-size: 12px; color: var(--ink-3); flex: 1; min-width: 180px; }
+.ai-row { margin: -2px 0 12px; }
+.chip.ai { color: var(--accent); }
+.note.small { font-size: 12.5px; color: var(--ink-3); margin: 0; }
+.phone.painting::after { content: "Painting…"; }

@@ -6,16 +6,21 @@ import {
   randomSeed, hexA, mix, luminance, oklch, clockFrame, hour12,
 } from "./engine.js";
 import { TYPES, SCENES, DATE, TYPEFACE } from "./studio.js";
+import { GPU_SCENES, renderGpu, depthCode, depthDistance } from "./gpu.js";
 
 export const TYPE_STYLES = Object.entries(TYPES).map(([id, t]) => ({ id, name: t.name, seconds: !!t.seconds, premium: true }));
 export const CLASSIC_CLOCKS = Object.entries(CLOCKS).map(([id, c]) => ({ id, name: c.name, seconds: !!c.seconds }));
-export const SCENE_STYLES = Object.entries(SCENES).map(([id, s]) => ({ id, name: s.name, depth: !!s.front }));
+// 3D scenes (GPU) first, then the illustrated ones
+export const GPU_STYLES = Object.entries(GPU_SCENES).map(([id, s]) => ({ id, name: s.name, depth: true, gpu: true }));
+export const ILLUSTRATED_STYLES = Object.entries(SCENES).map(([id, s]) => ({ id, name: s.name, depth: !!s.front }));
+export const SCENE_STYLES = [...GPU_STYLES, ...ILLUSTRATED_STYLES];
 export const PATTERN_STYLES = Object.entries(BACKGROUNDS).map(([id, b]) => ({ id, name: b.name }));
 export const ALL_CLOCKS = [...TYPE_STYLES, ...CLASSIC_CLOCKS];
 export const ALL_BACKS = [...SCENE_STYLES, ...PATTERN_STYLES];
 
 export const isClock = (id) => id === "none" || !!TYPES[id] || !!CLOCKS[id];
-export const isBack = (id) => id === "photo" || !!SCENES[id] || !!BACKGROUNDS[id];
+export const isBack = (id) => id === "photo" || !!GPU_SCENES[id] || !!SCENES[id] || !!BACKGROUNDS[id];
+export const isGpuScene = (id) => !!GPU_SCENES[id];
 export const clockHasSeconds = (id) => !!(TYPES[id]?.seconds || CLOCKS[id]?.seconds);
 
 const POS = { high: 0.4, middle: 0.5, low: 0.6 };
@@ -73,7 +78,9 @@ export function autoPlace(photo, spec) {
   const w = 120, h = 260;
   const clock = TYPES[spec.clock] ? spec.clock : "tower";
   let best = null;
-  for (const zoom of [1, 0.85, 0.72, 0.6]) for (const pos of ["middle", "high", "low"]) {
+  const aspect = photo.image.width / photo.image.height;
+  const zooms = aspect > 0.75 ? [0.72, 0.62, 0.55, 0.85] : [1, 0.85, 0.72, 0.6];
+  for (const zoom of zooms) for (const pos of ["middle", "high", "low"]) {
     const s = { ...spec, clock, bg: "photo", pos };
     const L = buildLayers(w, h, s, { ...photo, zoom, depth: true });
     if (!L.front) return { zoom: 1, pos: spec.pos || "middle", overlap: 0 };
@@ -85,7 +92,7 @@ export function autoPlace(photo, spec) {
     for (let i = 3; i < a.length; i += 4) { const v = a[i] / 255; ink += v; hidden += v * (b[i] / 255); }
     const overlap = ink ? hidden / ink : 0;
     // aim for about a fifth of the digits behind the subject; prefer the photo big and the time in the middle
-    const score = Math.abs(overlap - 0.2) + (1 - zoom) * 0.25 + (pos === "middle" ? 0 : 0.04) + (overlap > 0.42 ? 1 : 0);
+    const score = Math.abs(overlap - 0.2) + Math.abs(zooms[0] - zoom) * 0.25 + (pos === "middle" ? 0 : 0.04) + (overlap > 0.42 ? 1 : 0);
     if (!best || score < best.score) best = { zoom, pos, overlap, score };
   }
   return best;
@@ -131,15 +138,32 @@ export function paletteFromImage(img) {
  * Paints the expensive parts once. `photo` is { image, mask, pal } when spec.bg === "photo".
  * Returns { w, h, back, front, type, pal, frame, water }.
  */
+const hashSeed = (s) => { let x = 2166136261; for (const ch of String(s)) { x ^= ch.charCodeAt(0); x = Math.imul(x, 16777619); } return x >>> 0; };
+
 export function buildLayers(w, h, spec, photo) {
   const frame = frameFor(w, h, spec);
   const usePhoto = spec.bg === "photo" && photo?.image;
   let pal = usePhoto ? photo.pal : makePalette(spec.pal);
   // night scenes need a dark palette: step through the seed's siblings until one is
-  if (!usePhoto && SCENES[spec.bg]?.night) for (let k = 1; pal.light && k < 12; k++) pal = makePalette(spec.pal + "~" + k);
+  if (!usePhoto && (SCENES[spec.bg]?.night || GPU_SCENES[spec.bg]?.dark)) for (let k = 1; pal.light && k < 12; k++) pal = makePalette(spec.pal + "~" + k);
   const back = makeCanvas(w, h);
   const bctx = back.getContext("2d");
   let front = null, water = null;
+  let sceneId = spec.bg;
+  if (!usePhoto && GPU_SCENES[sceneId]) {
+    const g = GPU_SCENES[sceneId];
+    const out = renderGpu(sceneId, w, h, {
+      pal, seedValue: (hashSeed(spec.seed) % 10000) / 100, focus: frame.cy / h,
+      depth: spec.zd ?? g.depth, time: (hashSeed(spec.seed) % 600) / 10,
+    }, makeCanvas);
+    if (out) {
+      bctx.drawImage(out.back, 0, 0);
+      if (g.horizon != null) water = frame.cy + g.horizon * h;
+      // the front layer is cut from the depth map in compose(), at the depth chosen for the clock on top
+      return { w, h, back, front: null, type: null, pal, frame, water, spec, gpu: sceneId, depth: out };
+    }
+    sceneId = g.fallback;   // no WebGL2: the illustrated scene closest in spirit
+  }
   if (usePhoto) {
     const rect = photoRect(photo, w, h);
     if ((photo.zoom ?? 1) < 1) {
@@ -177,6 +201,21 @@ export function buildLayers(w, h, spec, photo) {
       sx.fillRect(0, rect[1] + fade, w, h);
       bctx.drawImage(soft, 0, 0);
     } else bctx.drawImage(photo.image, ...rect);
+    if ((photo.zoom ?? 1) < 1 && rect[1] > 1 && "filter" in bctx) {
+      // the sky above a zoomed-out picture continues its top edge, softly
+      const ih = photo.image.height, iw = photo.image.width;
+      const ext = makeCanvas(w, h);
+      const ex = ext.getContext("2d");
+      ex.filter = `blur(${Math.round(w / 22)}px)`;
+      ex.drawImage(photo.image, 0, 0, iw, Math.max(2, Math.round(ih * 0.03)), rect[0] - w * 0.1, -h * 0.06, rect[2] + w * 0.2, rect[1] + rect[3] * 0.05 + h * 0.06);
+      ex.filter = "none";
+      ex.globalCompositeOperation = "destination-in";
+      const g = ex.createLinearGradient(0, rect[1], 0, rect[1] + rect[3] * 0.08);
+      g.addColorStop(0, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
+      ex.fillStyle = "#000"; ex.fillRect(0, 0, w, rect[1]);
+      ex.fillStyle = g; ex.fillRect(0, rect[1], w, rect[3] * 0.08);
+      bctx.drawImage(ext, 0, 0);
+    }
     if (photo.mask && photo.depth !== false) {
       front = makeCanvas(w, h);
       const f = front.getContext("2d");
@@ -184,17 +223,17 @@ export function buildLayers(w, h, spec, photo) {
       f.globalCompositeOperation = "destination-in";
       f.drawImage(photo.mask, ...rect);
     }
-  } else if (SCENES[spec.bg]) {
-    const sc = SCENES[spec.bg];
+  } else if (SCENES[sceneId]) {
+    const sc = SCENES[sceneId];
     const noise = makeNoise(rng(`noise:${spec.seed}`));
     bctx.save();
-    sc.back(bctx, w, h, pal, rng(`back:${spec.bg}:${spec.seed}`), noise, frame);
+    sc.back(bctx, w, h, pal, rng(`back:${sceneId}:${spec.seed}`), noise, frame);
     bctx.restore();
     grain(bctx, w, h, spec.seed, pal.light ? 0.05 : 0.07);
     if (sc.front) {
       front = makeCanvas(w, h);
       const fctx = front.getContext("2d");
-      sc.front(fctx, w, h, pal, rng(`front:${spec.bg}:${spec.seed}`), noise, frame, back);
+      sc.front(fctx, w, h, pal, rng(`front:${sceneId}:${spec.seed}`), noise, frame, back);
     }
     if (sc.water) water = sc.water(w, h, frame);
   } else {
@@ -290,6 +329,66 @@ function drawCaption(ctx, L, spec) {
   ctx.restore();
 }
 
+/* ───────────── smart depth (GPU scenes) ───────────── */
+// Without a Depth setting, the time is placed so about a fifth of it is hidden by nearer parts of the scene,
+// whatever the clock's size and style. With one (spec.zd 0–1), it sits at that point between the scene's near and far.
+const AUTO_HIDDEN = 0.22;
+function depthRange(L) { const g = GPU_SCENES[L.gpu]; return [depthCode(g.near), depthCode(g.far)]; }
+export function sceneDepthFor(L, spec, date = new Date()) {
+  const g = GPU_SCENES[L.gpu];
+  if (!g) return null;
+  if (g.near === g.far) return { code: depthCode(g.near), zd: 0.5, auto: false };
+  if (spec.zd != null) return { code: depthCode(g.near * Math.pow(g.far / g.near, spec.zd)), zd: spec.zd, auto: false };
+  const key = [spec.clock, spec.sz, spec.dx, spec.dy, spec.face, spec.df, spec.h12].join("|");
+  if (L.autoKey !== key) {
+    const { depth, rw, rh } = L.depth;
+    const k = Math.max(1, Math.round(rw / 160));
+    const sw = Math.max(8, Math.round(rw / k)), sh = Math.max(8, Math.round(rh / k));
+    const t = makeCanvas(sw, sh);
+    drawTime(t.getContext("2d"), { ...L, w: sw, h: sh, frame: frameFor(sw, sh, spec), blurred: null }, spec, date);
+    const a = t.getContext("2d").getImageData(0, 0, sw, sh).data;
+    const hist = new Float64Array(256);
+    let ink = 0;
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
+      const v = a[(y * sw + x) * 4 + 3] / 255;
+      if (v < 0.15) continue;
+      const dx2 = Math.min(rw - 1, Math.round((x + 0.5) * (rw / sw))), dy2 = Math.min(rh - 1, Math.round((y + 0.5) * (rh / sh)));
+      hist[depth[dy2 * rw + dx2]] += v;
+      ink += v;
+    }
+    const [lo, hi] = depthRange(L);
+    let code = hi, acc = 0;
+    if (ink) for (let c = 0; c < 256; c++) { acc += hist[c]; if (acc / ink > AUTO_HIDDEN) { code = c; break; } }
+    code = Math.max(lo, Math.min(hi, code));
+    L.autoKey = key;
+    L.autoCode = code;
+  }
+  const zd = Math.log(depthDistance(L.autoCode) / g.near) / Math.log(g.far / g.near);
+  return { code: L.autoCode, zd: Math.max(0, Math.min(1, zd)), auto: true };
+}
+function cutFront(L, spec, date) {
+  const { code } = sceneDepthFor(L, spec, date);
+  if (L.frontCode === code) return;
+  const { depth, rw, rh, small } = L.depth;
+  const mask = makeCanvas(rw, rh);
+  const mx = mask.getContext("2d");
+  const img = mx.createImageData(rw, rh);
+  let any = false;
+  for (let i = 0; i < depth.length; i++) if (depth[i] < code) { img.data[i * 4 + 3] = 255; any = true; }
+  L.frontCode = code;
+  if (!any) { L.front = null; return; }
+  mx.putImageData(img, 0, 0);
+  const front = makeCanvas(L.w, L.h);
+  const fx = front.getContext("2d");
+  fx.imageSmoothingQuality = "high";
+  fx.drawImage(small, 0, 0, L.w, L.h);
+  fx.globalCompositeOperation = "destination-in";
+  // a hair of blur softens the cut-out edge
+  if ("filter" in fx) fx.filter = `blur(${Math.max(0.5, L.w / 1600)}px)`;
+  fx.drawImage(mask, 0, 0, L.w, L.h);
+  L.front = front;
+}
+
 function drawLayer(ctx, img, w, h, scale = 1, ox = 0, oy = 0) {
   if (scale === 1 && !ox && !oy) return ctx.drawImage(img, 0, 0);
   ctx.save();
@@ -306,6 +405,7 @@ function drawLayer(ctx, img, w, h, scale = 1, ox = 0, oy = 0) {
  */
 export function compose(ctx, L, date = new Date(), spec = L.spec, opts = {}) {
   const { w, h } = L;
+  if (L.depth) cutFront(L, spec, date);
   let bs = 1, bx = 0, by = 0, fs = 1, fx = 0, fy = 0, tx = 0, ty = 0;
   if (opts.parallax) {
     const { x, y } = opts.parallax;
@@ -357,7 +457,7 @@ export function renderAll(ctx, w, h, spec, date, photo) {
 export function paletteOf(spec, photo) {
   if (spec.bg === "photo" && photo?.pal) return photo.pal;
   let pal = makePalette(spec.pal);
-  if (SCENES[spec.bg]?.night) for (let k = 1; pal.light && k < 12; k++) pal = makePalette(spec.pal + "~" + k);
+  if (SCENES[spec.bg]?.night || GPU_SCENES[spec.bg]?.dark) for (let k = 1; pal.light && k < 12; k++) pal = makePalette(spec.pal + "~" + k);
   return pal;
 }
 export { randomSeed, hexA, oklch };
