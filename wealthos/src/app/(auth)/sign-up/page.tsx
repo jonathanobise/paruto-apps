@@ -1,12 +1,15 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignUpForm } from "./form";
 import { BRAND } from "@/lib/brand";
 import { DemoGate } from "@/components/app/demo-entry";
 import { isDemoMode } from "@/server/demo/mode";
+import { isPrivateMode } from "@/lib/private-mode";
 
 export const metadata = { title: "Create account" };
 
 export default function SignUpPage() {
+  if (isPrivateMode()) redirect("/private/enter");
   if (isDemoMode())
     return (
       <div>

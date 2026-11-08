@@ -1,6 +1,6 @@
 # Public demo
 
-**https://vio.paruto.com**: a shareable, throwaway copy of the app on the SAMPLE portfolio. The old address, https://wealth-demo.paruto.com, redirects there (same path).
+The public SAMPLE demo (build with `PROFILE=demo deploy/demo/deploy.sh`). vio.paruto.com now runs the owner's private profile instead (docs/PRIVATE.md); this profile is kept for when a public demo is wanted again. **https://vio.paruto.com** was: a shareable, throwaway copy of the app on the SAMPLE portfolio. The old address, https://wealth-demo.paruto.com, redirects there (same path).
 It is not a production deployment: no real users, no providers, no persistence.
 
 ## What visitors get

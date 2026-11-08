@@ -12,6 +12,7 @@ import { DISCLOSURES } from "@/server/compliance/features";
 import { SUPPORTED_CURRENCIES } from "@/engine";
 import { BRAND } from "@/lib/brand";
 import { isDemoMode } from "@/server/demo/mode";
+import { isPrivateMode } from "@/lib/private-mode";
 import { researchAvailability } from "@/server/research/availability";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -100,6 +101,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {isDemoMode() ? (
           <div className="mx-3 mt-3 rounded-[18px] bg-warning-soft px-4 py-2 text-[13px] text-text sm:rounded-full sm:px-5" role="note">
             <strong className="font-semibold text-warning">PUBLIC DEMO</strong> · Everyone shares this demo and it resets automatically. Please don&apos;t enter real information.
+          </div>
+        ) : null}
+        {isPrivateMode() ? (
+          <div className="mx-3 mt-3 rounded-[18px] bg-info-soft px-4 py-2 text-[13px] text-text sm:rounded-full sm:px-5" role="note">
+            <strong className="font-semibold">PRIVATE</strong> · Only you can reach this site. Research data is loaded at each deploy; anything you enter in your portfolio isn&apos;t saved (the database is rebuilt at each deploy and after 20 idle minutes).
           </div>
         ) : null}
         {app.org.isDemo ? (

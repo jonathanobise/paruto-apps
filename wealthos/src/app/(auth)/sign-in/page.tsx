@@ -7,6 +7,7 @@ import { SignInForm } from "./form";
 import { BRAND } from "@/lib/brand";
 import { DemoGate } from "@/components/app/demo-entry";
 import { isDemoMode } from "@/server/demo/mode";
+import { isPrivateMode } from "@/lib/private-mode";
 
 export const metadata = { title: "Sign in" };
 
@@ -15,6 +16,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const sp = await searchParams;
   const next = safeNext(sp.next);
   if (session?.mfaSatisfied || (session && !session.user.mfaEnabled)) redirect(next);
+  if (isPrivateMode()) redirect("/private/enter");
   if (isDemoMode())
     return (
       <div>

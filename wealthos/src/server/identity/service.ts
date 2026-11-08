@@ -1,4 +1,5 @@
 import "server-only";
+import { isPrivateMode } from "@/lib/private-mode";
 import { and, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
 import { consentRecords, userPreferences, users, verificationTokens } from "@/server/db/schema";
 import { db, withUser } from "@/server/db/client";
@@ -63,6 +64,7 @@ export interface SignUpResult {
 
 export async function signUp(input: unknown, meta: RequestMeta): Promise<SignUpResult> {
   assertNotDemo("Creating an account");
+  assertNotPrivate("Creating an account");
   const data = parseOrThrow(signUpSchema, input);
   await rateLimit(`signup:ip:${meta.ip ?? "unknown"}`, 10, 3600);
 
@@ -110,6 +112,7 @@ export async function resendVerification(userId: string, meta: RequestMeta): Pro
 export type SignInResult = { status: "ok" | "mfa_required"; session: { token: string; expiresAt: Date } };
 
 export async function signIn(input: unknown, meta: RequestMeta): Promise<SignInResult> {
+  assertNotPrivate("Password sign-in");
   const data = parseOrThrow(signInSchema, input);
   await rateLimit(`signin:ip:${meta.ip ?? "unknown"}`, 30, 900);
   await rateLimit(`signin:email:${data.email}`, 10, 900);
@@ -210,6 +213,7 @@ export async function disableMfa(userId: string, password: string, meta: Request
 }
 
 export async function requestPasswordReset(emailInput: unknown, meta: RequestMeta): Promise<void> {
+  assertNotPrivate("Password reset");
   assertNotDemo("Password reset");
   const email = parseOrThrow(z.object({ email: z.string().trim().toLowerCase().email() }), emailInput).email;
   await rateLimit(`reset:ip:${meta.ip ?? "unknown"}`, 10, 3600);
@@ -245,3 +249,9 @@ export async function verifyUserPassword(userId: string, password: string): Prom
   const [user] = await db().select({ hash: users.passwordHash }).from(users).where(eq(users.id, userId));
   return verifyPassword(password, user?.hash ?? null);
 }
+
+/** Private owner deployments have one way in: Cloudflare Access, verified by the Worker. */
+function assertNotPrivate(what: string): void {
+  if (isPrivateMode()) throw new AppError("FORBIDDEN", `${what} isn't available on this private deployment.`);
+}
+

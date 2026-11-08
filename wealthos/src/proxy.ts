@@ -1,11 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { buildCsp, HSTS } from "@/lib/csp";
+import { isPrivateMode, verifiedOwner } from "@/lib/private-mode";
 
 /**
  * Runs before every page and route: a fresh CSP nonce per request, HSTS when served over HTTPS,
  * and a request id (kept from a trusted edge if present) for log correlation.
  */
 export function proxy(request: NextRequest) {
+  // Private owner deployments: nothing is served without the Worker's proof of the owner's
+  // Cloudflare Access sign-in (src/lib/private-mode.ts).
+  if (isPrivateMode() && !verifiedOwner(request.headers)) {
+    return new NextResponse("This is a private deployment.", { status: 403, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
+  }
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const https = (process.env.APP_ORIGIN ?? "").startsWith("https://");
   const csp = buildCsp(nonce, { dev: process.env.NODE_ENV === "development", https });
