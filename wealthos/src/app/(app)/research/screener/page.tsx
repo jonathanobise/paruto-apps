@@ -7,7 +7,7 @@ import { LENSES, type Lens } from "@/server/research/performance";
 import { MARKETS, SORTS, runScreener, type ScreenerQuery, type SortKey } from "@/server/research/screener";
 import { licensedDataVisible } from "@/server/research/licence";
 import { PageHeader } from "@/components/app/page-header";
-import { ResearchTabs } from "@/components/app/research";
+import { ResearchTabs, PreRelease } from "@/components/app/research";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +38,7 @@ const LENS_LABEL: Record<Lens, string> = { local: "Own currency", NGN: "Naira", 
 export default async function ScreenerPage({ searchParams }: { searchParams: Promise<Params> }) {
   const app = await requireApp();
   const gate = await featureDecision("MARKET_RESEARCH", app.org.jurisdiction);
-  if (!gate.available) return (<><PageHeader title="Screener" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
+  if (!gate.available) return (<><PageHeader eyebrow="Research" title="Screener" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const sp = await searchParams;
   const lens: Lens = (LENSES as string[]).includes(sp.lens ?? "") ? (sp.lens as Lens) : "local";
   const query: ScreenerQuery = { lens, ...Object.fromEntries(Object.entries(sp).filter(([k, v]) => k !== "lens" && typeof v === "string" && v !== "")) };
@@ -51,9 +51,9 @@ export default async function ScreenerPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader title="Screen the market" description="Filter real listed instruments, ETFs and computed benchmarks by market, sector, long-run returns and risk. Columns are facts about the past, sorted however you choose; nothing here is ranked as a recommendation." />
+      <PageHeader eyebrow="Research" title="Screen the market" description="Filter real listed instruments, ETFs and computed benchmarks by market, sector, long-run returns and risk. Columns are facts about the past, sorted however you choose; nothing here is ranked as a recommendation." />
       <ResearchTabs current="/research/screener" jurisdiction={app.org.jurisdiction} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
 
       <Card className="mb-5">
         <CardContent className="pt-5">
@@ -109,8 +109,8 @@ export default async function ScreenerPage({ searchParams }: { searchParams: Pro
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1100px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="w-8 px-3 py-2.5"><span className="sr-only">Select to compare</span></th>
                   <th className="px-3 py-2.5 font-medium"><SortLink col="name" label="Instrument" res={res} href={href} /></th>
                   {COLUMNS.map((c) => <th key={c.key} className="whitespace-nowrap px-3 py-2.5 text-right font-medium"><SortLink col={c.key} label={c.label} res={res} href={href} /></th>)}

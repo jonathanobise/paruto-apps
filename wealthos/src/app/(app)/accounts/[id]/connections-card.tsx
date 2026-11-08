@@ -1,4 +1,5 @@
 import { featureDecision } from "@/server/compliance/gate";
+import { PreRelease } from "@/components/app/research";
 import { CONNECTABLE_TYPES, SCOPE_LABELS, listAvailableProviders, listConnections } from "@/server/connections/service";
 import type { TenantContext } from "@/server/db/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +23,7 @@ export async function ConnectionsCard({ ctx, jurisdiction, account, canWrite }: 
     <Card className="mt-6">
       <CardHeader><div><CardTitle>Bank connection</CardTitle><CardDescription>Read-only. New transactions arrive as an import preview you review; nothing reaches your records until you import it.</CardDescription></div></CardHeader>
       <CardContent className="flex flex-col gap-4 text-[13px]">
-        {gate.status === "pending_review" ? <Alert tone="warning" title="Pre-release feature">{gate.reason}</Alert> : null}
+        {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
         {live ? (
           <div className="flex flex-col gap-3">
             <p><span className="font-medium">{live.institutionName}</span> {providers.find((p) => p.key === live.provider)?.sandbox ? <Badge tone="demo">Test data</Badge> : null} {live.status === "error" ? <Badge tone="warning">Last sync failed</Badge> : null}</p>

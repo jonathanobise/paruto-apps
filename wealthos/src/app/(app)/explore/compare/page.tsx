@@ -55,8 +55,8 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-[13px]">
-            <thead className="bg-surface-2 text-left">
-              <tr>
+            <thead className="text-left text-[12px]">
+              <tr className="border-b border-border">
                 <th className="w-48 px-4 py-3 font-medium text-text-3"><span className="sr-only">Attribute</span></th>
                 {cols.map((x) => (
                   <th key={x.id} className="px-4 py-3 align-top">

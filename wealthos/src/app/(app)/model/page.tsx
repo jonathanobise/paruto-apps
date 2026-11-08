@@ -1,4 +1,5 @@
 import { ChartPie } from "lucide-react";
+import { PreRelease } from "@/components/app/research";
 import { requireApp } from "@/server/auth/context";
 import { buildDashboard } from "@/server/analytics/portfolio";
 import { listModels, driftAgainstModel, BUCKET_PRESETS } from "@/server/models/service";
@@ -33,7 +34,7 @@ export default async function ModelPage() {
   return (
     <>
       <PageHeader title="Target mix" description={`Compare your investments with an allocation you defined yourself. ${BRAND} describes the drift; it does not tell you what to buy or sell.`} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-6" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       {models.length === 0 ? (
         <EmptyState icon={<ChartPie />} title="No target mix yet">Describe the allocation you are aiming for below, and {BRAND} will show how far your holdings are from it.</EmptyState>
       ) : (

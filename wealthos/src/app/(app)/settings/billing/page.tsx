@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PreRelease } from "@/components/app/research";
 import { Check } from "lucide-react";
 import { requireApp } from "@/server/auth/context";
 import { featureDecision } from "@/server/compliance/gate";
@@ -64,7 +65,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
       {sp.canceled ? <Alert tone="success" className="mb-4">Your plan will end at the end of the current period. You can change your mind until then.</Alert> : null}
       {sp.resumed ? <Alert tone="success" className="mb-4">Your plan will renew as normal.</Alert> : null}
       {sp.withdrawn ? <Alert tone="success" className="mb-4">The unpaid request was withdrawn.</Alert> : null}
-      {!gate.available ? <Alert tone="info" className="mb-4" title="Paid plans aren't available yet">{gate.reason} Every space is on Free until they are.</Alert> : gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {!gate.available ? <Alert tone="info" className="mb-4" title="Paid plans aren't available yet">{gate.reason} Every space is on Free until they are.</Alert> : gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       {!canManage && !app.org.isDemo ? <Alert tone="info" className="mb-4">Only owners and admins of “{app.org.name}” can change its plan.</Alert> : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">

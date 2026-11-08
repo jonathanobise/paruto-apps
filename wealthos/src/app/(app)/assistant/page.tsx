@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PreRelease } from "@/components/app/research";
 import { requireApp } from "@/server/auth/context";
 import { featureDecision } from "@/server/compliance/gate";
 import { DISCLOSURES } from "@/server/compliance/features";
@@ -31,7 +32,7 @@ export default async function AssistantPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader title="Research assistant" description={`Ask about investment products, financial concepts or your own recorded finances. Answers are grounded in ${BRAND} data and calculations, with sources and dates.`} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       {!connected ? (
         <Alert tone="info" className="mb-4" title="Not connected">
           This server has no AI provider credentials, so the assistant can&apos;t answer yet. Nothing you type here is sent anywhere. (Operators: set <code>ANTHROPIC_API_KEY</code>; see docs/DEPLOYMENT.md.)

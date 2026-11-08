@@ -6,7 +6,7 @@ import { DISCLOSURES } from "@/server/compliance/features";
 import { LENSES, type Lens } from "@/server/research/performance";
 import { COMPARE_MAX, MARKETS, compareMarkets } from "@/server/research/screener";
 import { PageHeader } from "@/components/app/page-header";
-import { ResearchTabs } from "@/components/app/research";
+import { ResearchTabs, PreRelease } from "@/components/app/research";
 import { SeriesChart } from "@/components/app/series-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
@@ -26,7 +26,7 @@ const pct = (v: string | null | undefined) => (v === null || v === undefined ? <
 export default async function ComparePage({ searchParams }: { searchParams: Promise<{ ids?: string | string[]; lens?: string }> }) {
   const app = await requireApp();
   const gate = await featureDecision("MARKET_RESEARCH", app.org.jurisdiction);
-  if (!gate.available) return (<><PageHeader title="Compare" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
+  if (!gate.available) return (<><PageHeader eyebrow="Research" title="Compare" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const sp = await searchParams;
   const rawIds = (Array.isArray(sp.ids) ? sp.ids : (sp.ids ?? "").split(",")).map((s) => s.trim()).filter(Boolean);
   const lens: Exclude<Lens, "local"> = (LENSES as string[]).includes(sp.lens ?? "") && sp.lens !== "local" ? (sp.lens as Exclude<Lens, "local">) : "NGN";
@@ -39,9 +39,9 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Compare across markets" description="Put up to three instruments or benchmarks side by side in one currency, whatever they're priced in, over the period they all cover. Conversions use same-day official exchange rates; nothing is filled in from another day." />
+      <PageHeader eyebrow="Research" title="Compare across markets" description="Put up to three instruments or benchmarks side by side in one currency, whatever they're priced in, over the period they all cover. Conversions use same-day official exchange rates; nothing is filled in from another day." />
       <ResearchTabs current="/research/compare" jurisdiction={app.org.jurisdiction} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
 
       <Card className="mb-6">
         <CardContent className="pt-5">
@@ -113,7 +113,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
               <CardHeader><div><CardTitle>Trailing returns a year</CardTitle><CardDescription>To each one&apos;s latest month end; real figures remove {lens} inflation.</CardDescription></div></CardHeader>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[520px] text-[13px]">
-                  <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Period</th>{cmp.items.map((it) => <th key={it.id} className="px-4 py-2 text-right font-medium">{label(it)}</th>)}</tr></thead>
+                  <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Period</th>{cmp.items.map((it) => <th key={it.id} className="px-4 py-2 text-right font-medium">{label(it)}</th>)}</tr></thead>
                   <tbody>
                     {WINDOWS.flatMap((w) => [false, true].map((real) => (
                       <tr key={`${w}${real}`} className="border-t border-border">
@@ -137,7 +137,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
               <CardHeader><div><CardTitle>Calendar years</CardTitle><CardDescription>Total return in {lens} for each year, with the real return beneath.</CardDescription></div></CardHeader>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[520px] text-[13px]">
-                  <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Year</th>{cmp.items.map((it) => <th key={it.id} className="px-4 py-2 text-right font-medium">{label(it)}</th>)}</tr></thead>
+                  <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Year</th>{cmp.items.map((it) => <th key={it.id} className="px-4 py-2 text-right font-medium">{label(it)}</th>)}</tr></thead>
                   <tbody>
                     {cmp.calendar.map((y) => (
                       <tr key={y.year} className="border-t border-border align-top">

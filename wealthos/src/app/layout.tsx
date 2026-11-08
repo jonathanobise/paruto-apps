@@ -29,6 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         {children}
+        <div className="aura" aria-hidden />
         <div className="grain" aria-hidden />
         <ServiceWorker />
       </body>

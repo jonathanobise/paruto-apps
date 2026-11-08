@@ -5,8 +5,9 @@ import { DISCLOSURES } from "@/server/compliance/features";
 import { getFixedIncome, type AuctionView } from "@/server/research/markets";
 import { METHODOLOGY_HELP } from "@/server/research/facts";
 import { PageHeader } from "@/components/app/page-header";
-import { ResearchTabs, SourceNotes, methodologyLabel } from "@/components/app/research";
+import { ResearchTabs, SourceNotes, methodologyLabel, PreRelease } from "@/components/app/research";
 import { SeriesChart } from "@/components/app/series-chart";
+import { Stat } from "@/components/app/stat";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -32,15 +33,26 @@ function Remaining({ a }: { a: AuctionView }) {
 export default async function FixedIncomePage() {
   const app = await requireApp();
   const gate = await featureDecision("MARKET_RESEARCH", app.org.jurisdiction);
-  if (!gate.available) return (<><PageHeader title="Fixed income" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
+  if (!gate.available) return (<><PageHeader eyebrow="Research" title="Fixed income" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const f = await getFixedIncome(app.ctx);
   const infl = f.inflation;
   const sources = [f.source, infl?.source ?? null].filter((x): x is NonNullable<typeof x> => x !== null).filter((x, i, a) => a.findIndex((y) => y.name === x.name) === i);
   return (
     <>
-      <PageHeader title="Nigerian government yields" description="What the Federal Government paid at its latest primary auctions of Treasury bills and FGN bonds, money-market rates, and how they compare with inflation. Results as published by the CBN." />
+      <PageHeader eyebrow="Research" title="Nigerian government yields" description="What the Federal Government paid at its latest primary auctions of Treasury bills and FGN bonds, money-market rates, and how they compare with inflation. Results as published by the CBN." />
       <ResearchTabs current="/research/fixed-income" jurisdiction={app.org.jurisdiction} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
+
+      {f.ntb.length ? (
+        <dl className="rise mb-6 grid gap-4 sm:grid-cols-3">
+          {f.ntb.map((a) => (
+            <Card key={a.instrumentId} className="p-5">
+              <Stat label={`${a.tenorDays}-day bill`} value={formatPercent(a.effectiveAnnual, { decimals: 2 })} sub={<>effective a year · {a.realApprox ? <><Delta value={a.realApprox} percent /> after inflation</> : "no inflation data"}</>} />
+              <p className="mt-3 text-[12px] text-text-3">Auction {formatDate(a.asOf)} · stop rate {formatPercent(a.value, { decimals: 2 })} discount</p>
+            </Card>
+          ))}
+        </dl>
+      ) : null}
 
       <Card className="mb-6 overflow-hidden">
         <CardHeader>
@@ -51,8 +63,8 @@ export default async function FixedIncomePage() {
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-[13px]">
-            <thead className="bg-surface-2 text-left text-text-3">
-              <tr>
+            <thead className="text-left text-text-3 text-[12px]">
+              <tr className="border-b border-border">
                 <th className="px-4 py-2.5 font-medium">Bill</th>
                 <th className="px-4 py-2.5 text-right font-medium">Stop rate (discount)</th>
                 <th className="px-4 py-2.5 text-right font-medium">True yield</th>
@@ -97,8 +109,8 @@ export default async function FixedIncomePage() {
         <CardHeader><div><CardTitle>FGN bonds: latest auction by original term</CardTitle><CardDescription>{METHODOLOGY_HELP.yield_to_maturity}</CardDescription></div></CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-[13px]">
-            <thead className="bg-surface-2 text-left text-text-3">
-              <tr>
+            <thead className="text-left text-text-3 text-[12px]">
+              <tr className="border-b border-border">
                 <th className="px-4 py-2.5 font-medium">Bond</th>
                 <th className="px-4 py-2.5 text-right font-medium">Stop yield</th>
                 <th className="px-4 py-2.5 text-right font-medium">Time to maturity</th>

@@ -41,8 +41,8 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1080px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="px-4 py-2.5 font-medium">Instrument</th>
                   <th className="px-4 py-2.5 font-medium">Account</th>
                   <th className="px-4 py-2.5 text-right font-medium">Units</th>
@@ -95,8 +95,8 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
           <h2 className="px-5 pt-4 text-[15px] font-semibold">Closed during this period</h2>
           <div className="mt-2 overflow-x-auto">
             <table className="w-full min-w-[640px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="px-4 py-2.5 font-medium">Instrument</th>
                   <th className="px-4 py-2.5 text-right font-medium">Money in</th>
                   <th className="px-4 py-2.5 text-right font-medium">Money out</th>

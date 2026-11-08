@@ -34,7 +34,7 @@ export default async function MarketImportPreview({ params }: { params: Promise<
       {imp.status === "committed" ? <Alert tone="success" className="mb-6">Imported {s.ready} rows as verified data{imp.committedAt ? ` on ${formatDate(imp.committedAt.toISOString())}` : ""}. Analytics caches were invalidated automatically.</Alert> : null}
       <Card className="overflow-hidden">
         <table className="w-full text-[13px]">
-          <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Row</th><th className="px-4 py-2 font-medium">Data</th><th className="px-4 py-2 font-medium">Problems</th></tr></thead>
+          <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Row</th><th className="px-4 py-2 font-medium">Data</th><th className="px-4 py-2 font-medium">Problems</th></tr></thead>
           <tbody>
             {imp.rows.slice(0, 500).map((r) => (
               <tr key={r.rowNumber} className="border-t border-border align-top">

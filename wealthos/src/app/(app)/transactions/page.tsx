@@ -41,8 +41,8 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="px-4 py-2.5 font-medium">Date</th>
                   <th className="px-4 py-2.5 font-medium">Type</th>
                   <th className="px-4 py-2.5 font-medium">Account</th>

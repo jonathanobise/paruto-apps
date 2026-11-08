@@ -12,8 +12,9 @@ export function Stat({ label, value, sub, help, className, size = "md" }: { labe
           </span>
         ) : null}
       </dt>
-      <dd className={cn("num mt-1 truncate font-semibold tracking-tight text-text", size === "lg" ? "font-display text-[34px] leading-none sm:text-[40px]" : "text-[22px]")}>{value}</dd>
-      {sub ? <dd className="mt-1 text-[13px] text-text-2">{sub}</dd> : null}
+      {/* Editorial figure: the display face, tight and tabular, so the number leads the panel. */}
+      <dd className={cn("figure mt-2 truncate text-text", size === "lg" ? "text-[38px] sm:text-[46px]" : "text-[28px]")}>{value}</dd>
+      {sub ? <dd className="mt-2 text-[13px] leading-snug text-text-3">{sub}</dd> : null}
     </div>
   );
 }

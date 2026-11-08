@@ -1,4 +1,5 @@
 import { requireApp } from "@/server/auth/context";
+import { PreRelease } from "@/components/app/research";
 import { featureDecision } from "@/server/compliance/gate";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { stressTests } from "@/server/planning/stress";
@@ -19,7 +20,7 @@ export default async function StressPage() {
   return (
     <>
       <PageHeader title="Stress tests" description={`What would happen to your net worth (${formatMoney(r.results[0]?.netWorthBefore ?? "0", ccy, { decimals: 0 })} on ${formatDate(r.asOf)}) if one of these happened today? Each scenario is a written-down hypothetical, not a prediction.`} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       {!r.complete ? <Alert tone="warning" className="mb-4">Some holdings couldn&apos;t be valued (missing prices or exchange rates) and are left out.</Alert> : null}
       <div className="grid gap-4 lg:grid-cols-2">
         {r.results.map((s) => (
