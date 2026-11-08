@@ -14,9 +14,9 @@ chmod 700 "$PGDATA" >> "$LOG" 2>&1 || fail "data directory permissions"   # COPY
 gosu postgres pg_ctl -D "$PGDATA" -l /tmp/pg.log -o "-c listen_addresses=127.0.0.1" -w start >> "$LOG" 2>&1 || { cat /tmp/pg.log >> "$LOG" 2>&1; fail "postgres"; }
 export APP_ENCRYPTION_KEY="$(cat /app/.demo-key)"
 if [ "$(cat /app/.profile)" = private ]; then
-  # The owner only (docs/PRIVATE.md). Fail closed: without the owner settings from the Worker,
-  # serve nothing but the startup log (which holds no secrets).
-  [ -n "${PRIVATE_OWNER_EMAIL:-}" ] && [ "${#OWNER_PROXY_SECRET}" -ge 32 ] || fail "private profile without PRIVATE_OWNER_EMAIL / OWNER_PROXY_SECRET"
+  # The owner only, signing in through Paruto ID (docs/PRIVATE.md). Fail closed: without the owner
+  # and Paruto ID settings from the Worker, serve nothing but the startup log (which holds no secrets).
+  [ -n "${PRIVATE_OWNER_EMAIL:-}" ] && [ -n "${PARUTO_ID_URL:-}" ] && [ -n "${PARUTO_ID_CLIENT:-}" ] && [ "${#PARUTO_ID_SECRET}" -ge 32 ] || fail "private profile without PRIVATE_OWNER_EMAIL / PARUTO_ID_URL / PARUTO_ID_CLIENT / PARUTO_ID_SECRET"
   unset DEMO_MODE
   # Staging: a production build where features awaiting compliance review are visible, for the owner.
   export APP_ENV=staging

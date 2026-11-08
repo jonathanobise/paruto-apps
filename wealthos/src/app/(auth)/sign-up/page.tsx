@@ -9,7 +9,7 @@ import { isPrivateMode } from "@/lib/private-mode";
 export const metadata = { title: "Create account" };
 
 export default function SignUpPage() {
-  if (isPrivateMode()) redirect("/private/enter");
+  if (isPrivateMode()) redirect("/sign-in");
   if (isDemoMode())
     return (
       <div>
