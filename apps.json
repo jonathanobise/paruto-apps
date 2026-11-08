@@ -626,9 +626,9 @@
       "media": []
     },
     {
-      "id": "my-notes",
-      "aliases": ["project-margin"],
-      "name": "My Notes by Paruto",
+      "id": "magical-notes",
+      "aliases": ["my-notes", "project-margin"],
+      "name": "Magical Notes by Paruto",
       "tagline": "Handwritten notes that feel like paper, on every device.",
       "description": "A note-taking app built around handwriting. Write with pressure-sensitive pens on paper or an infinite board, mark up PDFs and slides, and record audio that stays in step with your ink. Claude turns your notes into flashcards, checks your maths and answers questions across every notebook, with sources. Notebooks can be locked and encrypted, synced end to end, and shared live. It runs in your browser today, with phone, tablet and desktop apps on the way.",
       "status": "beta",
@@ -637,21 +637,21 @@
       "accent": "#6f9bff",
       "accent2": "#16213a",
       "icon": "🖋️",
-      "iconImage": "assets/apps/my-notes/icon",
+      "iconImage": "assets/apps/magical-notes/icon",
       "added": "2026-11-07",
       "featured": false,
       "url": "https://notes.paruto.com",
       "links": [],
       "highlights": ["Audio synced to your handwriting", "Ask your notes, with sources", "Flashcards with spaced repetition", "End-to-end encrypted sync"],
-      "cover": "assets/apps/my-notes/notes-page.jpg",
+      "cover": "assets/apps/magical-notes/notes-page.jpg",
       "media": [
-        { "type": "image", "src": "assets/apps/my-notes/notes-page.jpg", "caption": "Handwriting, highlighter and sketches on cream ruled paper" },
-        { "type": "image", "src": "assets/apps/my-notes/phone-notes.jpg", "caption": "The same page on a phone", "device": "phone" },
-        { "type": "image", "src": "assets/apps/my-notes/library.jpg", "caption": "Every notebook, cloth-bound" },
-        { "type": "image", "src": "assets/apps/my-notes/lasso.jpg", "caption": "Lasso a sketch to move or recolour it" },
-        { "type": "image", "src": "assets/apps/my-notes/templates.jpg", "caption": "Notebooks or infinite boards, on planner, Cornell, music and more" },
-        { "type": "image", "src": "assets/apps/my-notes/study-tools.jpg", "caption": "Study, organise and share from one sheet" },
-        { "type": "image", "src": "assets/apps/my-notes/phone-library.jpg", "caption": "Your notebooks on a phone", "device": "phone" }
+        { "type": "image", "src": "assets/apps/magical-notes/notes-page.jpg", "caption": "Handwriting, highlighter and sketches on cream ruled paper" },
+        { "type": "image", "src": "assets/apps/magical-notes/phone-notes.jpg", "caption": "The same page on a phone", "device": "phone" },
+        { "type": "image", "src": "assets/apps/magical-notes/library.jpg", "caption": "Every notebook, cloth-bound" },
+        { "type": "image", "src": "assets/apps/magical-notes/lasso.jpg", "caption": "Lasso a sketch to move or recolour it" },
+        { "type": "image", "src": "assets/apps/magical-notes/templates.jpg", "caption": "Notebooks or infinite boards, on planner, Cornell, music and more" },
+        { "type": "image", "src": "assets/apps/magical-notes/study-tools.jpg", "caption": "Study, organise and share from one sheet" },
+        { "type": "image", "src": "assets/apps/magical-notes/phone-library.jpg", "caption": "Your notebooks on a phone", "device": "phone" }
       ]
     }
   ]
