@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { env } from "@/server/platform/env";
+import { parutoLogoutUrl } from "@/server/identity/paruto-id";
 import { safeNext } from "@/lib/safe-next";
 import { clearSessionCookie, getSession, requestMeta, setSessionCookie } from "@/server/auth/context";
 import { completeMfaChallenge, requestPasswordReset, resendVerification, resetPassword, signIn, signUp } from "@/server/identity/service";
@@ -82,7 +84,8 @@ export async function signOutAction(): Promise<void> {
   const session = await getSession();
   if (session) await revokeSession(session.id, session.userId);
   await clearSessionCookie();
-  redirect("/sign-in");
+  // Signed in through Paruto ID: end its single sign-on too, then come back to the sign-in page.
+  redirect(parutoLogoutUrl(env().APP_ORIGIN) ?? "/sign-in");
 }
 
 /** Public demo only: enter as the shared demo user (src/server/demo/session.ts). */

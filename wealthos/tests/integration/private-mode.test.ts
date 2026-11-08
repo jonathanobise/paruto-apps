@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { closeDb, db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
 import { requestPasswordReset, signIn, signUp } from "@/server/identity/service";
-import { completeParutoSignIn, safeNextPath, startParutoSignIn } from "@/server/identity/paruto-id";
+import { completeParutoSignIn, parutoLogoutUrl, safeNextPath, startParutoSignIn } from "@/server/identity/paruto-id";
 import { isPrivateMode, isPrivateOwner } from "@/lib/private-mode";
 import { makeUser, meta } from "./helpers";
 
@@ -51,6 +51,14 @@ describe("Paruto ID sign-in", () => {
     expect(b.cookie).not.toContain(b.state); // the state is inside a signed blob, not the raw cookie value
     process.env.PARUTO_ID_SECRET = "";
     expect(startParutoSignIn(ORIGIN, "/")).toBeNull(); // not configured → no sign-in
+  });
+
+  it("signs out of Paruto ID too, returning only to VioWealth's own sign-in page", () => {
+    const u = new URL(parutoLogoutUrl(ORIGIN)!);
+    expect(u.origin + u.pathname).toBe("https://id.example.test/logout");
+    expect(Object.fromEntries(u.searchParams)).toEqual({ client_id: "viowealth", redirect_uri: `${ORIGIN}/sign-in?signin=signed_out` });
+    process.env.PARUTO_ID_SECRET = "";
+    expect(parutoLogoutUrl(ORIGIN)).toBeNull(); // not set up → plain local sign-out
   });
 
   it("keeps people on VioWealth's own pages after sign-in", () => {
