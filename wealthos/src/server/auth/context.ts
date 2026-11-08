@@ -1,4 +1,5 @@
 import "server-only";
+import { isPrivateOwner } from "@/lib/private-mode";
 import { clientIp } from "@/lib/client-ip";
 import { env } from "@/server/platform/env";
 import { cache } from "react";
@@ -54,6 +55,9 @@ export interface AppContext {
 export const requireApp = cache(async (): Promise<AppContext> => {
   const session = await getSession();
   if (!session) redirect("/sign-in");
+  // Private deployments: only the owner's account (src/lib/private-mode.ts). Defence in depth: no other
+  // account can get a session there, but every page checks anyway.
+  if (!isPrivateOwner(session.user.email)) redirect("/sign-in?signin=not_allowed");
   if (session.user.mfaEnabled && !session.mfaSatisfied) redirect("/sign-in/mfa");
   if (!session.user.emailVerified) redirect("/verify-email");
   return buildContext(session);
@@ -63,6 +67,7 @@ export const requireApp = cache(async (): Promise<AppContext> => {
 export async function requireAppForAction(): Promise<AppContext> {
   const session = await getSession();
   if (!session || (session.user.mfaEnabled && !session.mfaSatisfied)) throw new AppError("UNAUTHENTICATED", "Your session has ended. Please sign in again.");
+  if (!isPrivateOwner(session.user.email)) throw new AppError("FORBIDDEN", "This is a private deployment.");
   if (!session.user.emailVerified) throw new AppError("FORBIDDEN", "Confirm your email address first.");
   return buildContext(session);
 }

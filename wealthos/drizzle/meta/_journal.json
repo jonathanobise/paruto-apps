@@ -239,6 +239,13 @@
       "when": 1793967579625,
       "tag": "0033_instrument_fundamentals_security",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794104342559,
+      "tag": "0034_paruto_id_link",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,8 @@ export const users = pgTable("users", {
   emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
   passwordHash: text("password_hash"),
   displayName: text("display_name").notNull(),
+  /** Paruto ID (id.paruto.com) subject this account is linked to, set at the first Paruto ID sign-in. */
+  parutoIdSub: text("paruto_id_sub"),
   platformRole: platformRole("platform_role").notNull().default("user"),
   /** AES-256-GCM encrypted TOTP secret (base64 iv|tag|ciphertext). */
   mfaTotpSecretEnc: text("mfa_totp_secret_enc"),
@@ -22,7 +24,7 @@ export const users = pgTable("users", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
-}, (t) => [uniqueIndex("users_email_key").on(t.email)]);
+}, (t) => [uniqueIndex("users_email_key").on(t.email), uniqueIndex("users_paruto_id_sub_key").on(t.parutoIdSub)]);
 
 export const sessions = pgTable("sessions", {
   id: id(),

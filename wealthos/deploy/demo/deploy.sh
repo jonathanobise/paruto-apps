@@ -7,9 +7,10 @@
 #   deploy/demo/deploy.sh --dry-run   # build and check the Worker bundle; upload nothing
 #
 # Profile (PROFILE, default private; see docs/PRIVATE.md and docs/DEMO.md):
-#   private  the owner only, behind Cloudflare Access. Needs OWNER_EMAIL, ACCESS_TEAM_DOMAIN
-#            (https://<team>.cloudflareaccess.com) and ACCESS_AUD (the Access application's
-#            audience tag). Loads official research data at build; set EODHD_API_KEY and
+#   private  the owner only, signing in through Paruto ID. Needs OWNER_EMAIL; PARUTO_ID_CLIENT
+#            defaults to viowealth and PARUTO_ID_URL to https://id.paruto.com. The Worker must
+#            already hold the PARUTO_ID_SECRET secret (docs/PRIVATE.md, "One-time setup").
+#            Loads official research data at build; set EODHD_API_KEY and
 #            EODHD_BUDGET=<calls> to add licensed EODHD data (and BLS_API_KEY for BLS limits).
 #            Keys reach the build only as Docker build secrets, never as image layers or args.
 #   demo     the public SAMPLE demo.
@@ -24,9 +25,8 @@ PROFILE=${PROFILE:-private}
 case "$PROFILE" in
   private)
     : "${OWNER_EMAIL:?set OWNER_EMAIL (the only person allowed in)}"
-    : "${ACCESS_TEAM_DOMAIN:?set ACCESS_TEAM_DOMAIN, e.g. https://<team>.cloudflareaccess.com}"
-    : "${ACCESS_AUD:?set ACCESS_AUD (the Cloudflare Access application audience tag)}"
-    case "$ACCESS_TEAM_DOMAIN" in https://*.cloudflareaccess.com) ;; *) echo "ACCESS_TEAM_DOMAIN must look like https://<team>.cloudflareaccess.com" >&2; exit 1;; esac ;;
+    PARUTO_ID_URL=${PARUTO_ID_URL:-https://id.paruto.com}
+    PARUTO_ID_CLIENT=${PARUTO_ID_CLIENT:-viowealth} ;;
   demo) ;;
   *) echo "PROFILE must be private or demo" >&2; exit 1 ;;
 esac
@@ -46,7 +46,7 @@ cd deploy/demo/worker
 ACCOUNT=$(sed -n 's/.*"account_id": "\([0-9a-f]*\)".*/\1/p' wrangler.template.jsonc)
 IMAGE="registry.cloudflare.com/$ACCOUNT/paruto-wealth-demo:$TAG"
 if [ "$PROFILE" = private ]; then
-  VARS=$(printf '"vars": { "OWNER_EMAIL": "%s", "ACCESS_TEAM_DOMAIN": "%s", "ACCESS_AUD": "%s" },' "$OWNER_EMAIL" "$ACCESS_TEAM_DOMAIN" "$ACCESS_AUD")
+  VARS=$(printf '"vars": { "OWNER_EMAIL": "%s", "PARUTO_ID_URL": "%s", "PARUTO_ID_CLIENT": "%s" },' "$OWNER_EMAIL" "$PARUTO_ID_URL" "$PARUTO_ID_CLIENT")
 else
   VARS='"vars": {},'
 fi
@@ -61,12 +61,9 @@ for attempt in 1 2 3 4; do
   [ "$attempt" = 4 ] && { echo "Image push failed." >&2; exit 1; }
   sleep $((attempt * 5))
 done
-if [ "$PROFILE" = private ] && ! npx wrangler secret list --config wrangler.generated.jsonc 2>/dev/null | grep -q '"OWNER_PROXY_SECRET"'; then
-  # Created once, before the first private deploy, and kept: the Worker hands it to the container,
-  # which refuses to start in the private profile without it. (Putting a secret on the existing
-  # Worker keeps its current code; the new code only arrives with the deploy below.)
-  node -e "process.stdout.write(require('crypto').randomBytes(32).toString('base64url'))" | npx wrangler secret put OWNER_PROXY_SECRET --config wrangler.generated.jsonc >/dev/null
-  echo "Created the Worker's OWNER_PROXY_SECRET."
+if [ "$PROFILE" = private ] && ! npx wrangler secret list --config wrangler.generated.jsonc 2>/dev/null | grep -q '"PARUTO_ID_SECRET"'; then
+  # The app can't sign anyone in without it, and the container refuses to start without it.
+  echo "The Worker has no PARUTO_ID_SECRET yet: make one with Paruto ID's client-secret script and put it (docs/PRIVATE.md)." >&2; exit 1
 fi
 npx wrangler deploy --config wrangler.generated.jsonc --tag "$TAG" --message "$PROFILE $TAG"
 echo "Deployed $PROFILE $TAG: https://vio.paruto.com"

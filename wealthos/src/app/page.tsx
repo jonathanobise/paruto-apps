@@ -16,7 +16,7 @@ const pillars = [
 ];
 
 export default function Landing() {
-  if (isPrivateMode()) redirect("/private/enter");
+  if (isPrivateMode()) redirect("/sign-in");
   const demo = isDemoMode();
   return (
     <div className="relative min-h-dvh overflow-hidden">
