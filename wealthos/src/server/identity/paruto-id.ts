@@ -46,6 +46,19 @@ function config() {
 }
 export const parutoReady = () => config() !== null;
 
+/**
+ * Where to send the browser after VioWealth's own session has ended, so Paruto ID's single sign-on
+ * ends too and "Continue with Paruto ID" asks again. Paruto ID's /logout returns only to an address on
+ * this app's registered origin. Null when Paruto ID isn't set up here.
+ */
+export function parutoLogoutUrl(origin: string): string | null {
+  const c = config();
+  if (!c) return null;
+  const url = new URL("/logout", c.url);
+  url.search = new URLSearchParams({ client_id: c.client, redirect_uri: `${origin}/sign-in?signin=signed_out` }).toString();
+  return url.toString();
+}
+
 const b64url = (b: Buffer) => b.toString("base64url");
 const sameString = (a: string, b: string) => {
   const x = Buffer.from(a);

@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 
 const OUTCOMES: Record<string, { tone: "warning" | "danger" | "info"; text: string }> = {
+  signed_out: { tone: "info", text: "You're signed out of VioWealth and Paruto ID." },
   cancelled: { tone: "info", text: "Sign-in was cancelled. You can try again whenever you're ready." },
   expired: { tone: "warning", text: "That sign-in took too long or was opened in another browser. Please start again." },
   failed: { tone: "danger", text: "Paruto ID couldn't confirm your sign-in. Please try again." },
