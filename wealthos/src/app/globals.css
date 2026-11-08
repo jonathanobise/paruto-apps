@@ -14,8 +14,11 @@
  *   chips, secondary buttons, menus. Never on content.
  * - Apple system colours for status (stepped for text contrast ≥ 4.5:1 on every surface).
  * - Capsule buttons with spring motion; concentric radii (inner = outer − padding).
- * - Chart series validated with the dataviz palette validator in both modes (ADR-027):
- *   dark #21a346 / #0a84ff / #d9760a, light #248a3d / #0071e3 / #b25000.
+ * - Vio brand (ADR-030): violet is the brand and interface accent (links, active states, focus,
+ *   primary actions, chart series 1). Gains and losses keep their semantic green and red; DEMO
+ *   labels are cyan so they never read as brand. Accent text ≥ 5.8:1 on every surface.
+ * - Chart series validated with the dataviz palette validator in both modes (all pairs):
+ *   dark #9b6bff / #21a89a / #d9760a, light #6a35d9 / #00917f / #b25000.
  */
 :root {
   color-scheme: dark;
@@ -31,19 +34,25 @@
   --text-3: #8e8e96;
   --brand: #f5f5f7;
   --brand-ink: #060608;
-  --accent: #30d158;
-  --accent-soft: rgb(48 209 88 / 0.13);
-  --focus: #409cff;
+  --accent: #b294ff;
+  --accent-soft: rgb(155 107 255 / 0.16);
+  --focus: #a987ff;
+  /* Vio brand: the app-icon gradient, the primary capsule and the canvas light. */
+  --vio-1: #9b6bff;
+  --vio-2: #6a2fe0;
+  --vio-3: #2e0f7a;
+  --vio-cta: linear-gradient(135deg, #7c4dff, #5b2bc4);
+  --aura: radial-gradient(60% 45% at 18% -8%, rgb(124 77 255 / 0.2), transparent 70%), radial-gradient(45% 35% at 92% 0%, rgb(33 168 154 / 0.08), transparent 70%);
   --positive: #30d158;
   --negative: #ff6961;
   --warning: #ffb340;
   --warning-soft: rgb(255 159 10 / 0.13);
   --info-soft: rgb(10 132 255 / 0.13);
   --danger-soft: rgb(255 69 58 / 0.14);
-  --demo: #d08cff;
-  --demo-soft: rgb(191 90 242 / 0.15);
-  --series-1: #21a346;
-  --series-2: #0a84ff;
+  --demo: #5ac8e0;
+  --demo-soft: rgb(90 200 224 / 0.14);
+  --series-1: #9b6bff;
+  --series-2: #21a89a;
   --series-3: #d9760a;
   --grid: rgb(255 255 255 / 0.06);
   --shadow: 0 1px 0 0 var(--hi) inset, 0 30px 60px -40px rgb(0 0 0 / 0.8);
@@ -72,19 +81,21 @@
   --text-3: #636368;
   --brand: #1d1d1f;
   --brand-ink: #ffffff;
-  --accent: #1f7a36;
-  --accent-soft: rgb(52 199 89 / 0.13);
-  --focus: #0066cc;
+  --accent: #6a35d9;
+  --accent-soft: rgb(106 53 217 / 0.1);
+  --focus: #6a35d9;
+  --vio-cta: linear-gradient(135deg, #7c4dff, #5b2bc4);
+  --aura: radial-gradient(60% 45% at 18% -8%, rgb(124 77 255 / 0.12), transparent 70%), radial-gradient(45% 35% at 92% 0%, rgb(0 145 127 / 0.06), transparent 70%);
   --positive: #1f7a36;
   --negative: #c4001a;
   --warning: #9a4a00;
   --warning-soft: rgb(255 159 10 / 0.16);
   --info-soft: rgb(0 122 255 / 0.09);
   --danger-soft: rgb(255 59 48 / 0.1);
-  --demo: #7a3c9e;
-  --demo-soft: rgb(175 82 222 / 0.12);
-  --series-1: #248a3d;
-  --series-2: #0071e3;
+  --demo: #00718f;
+  --demo-soft: rgb(0 113 143 / 0.1);
+  --series-1: #6a35d9;
+  --series-2: #00917f;
   --series-3: #b25000;
   --grid: rgb(0 0 0 / 0.06);
   --shadow: 0 1px 0 0 var(--hi) inset, 0 24px 48px -36px rgb(20 20 50 / 0.3);
@@ -108,7 +119,7 @@
     --text: #1d1d1f;
     --text-2: #3a3a3d;
     --text-3: #55555a;
-    --accent: #1f7a36;
+    --accent: #6a35d9;
     --positive: #1f7a36;
     --negative: #c4001a;
     --warning: #9a4a00;
@@ -156,7 +167,8 @@ body {
   overflow-x: clip;
 }
 body {
-  background: var(--bg);
+  /* Transparent so the fixed .aura (z-index −1) shows between the canvas (html) and content. */
+  background: transparent;
   color: var(--text);
   font-family: var(--font-sans);
   letter-spacing: -0.011em;
@@ -186,7 +198,7 @@ body {
   border-radius: 10px;
 }
 ::selection {
-  background: var(--focus);
+  background: #6a35d9;
   color: #fff;
 }
 
@@ -228,6 +240,58 @@ body {
 }
 .spring:active:not(:disabled) {
   scale: 0.97;
+}
+
+/* Tables: the header row carries the rule, so the first body row doesn't draw a second one. */
+thead + tbody > tr:first-child {
+  border-top-width: 0;
+}
+
+/* Vio light behind the app canvas (decorative; content panels sit above it). */
+.aura {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--aura);
+}
+@media print {
+  .aura {
+    display: none;
+  }
+}
+
+/* Editorial figure: the one number a panel is about. */
+.figure {
+  font-family: var(--font-display);
+  font-weight: 640;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Small-caps label above a figure or section. */
+.kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* Gentle entrance for page content (respects reduced motion below). */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.6s var(--ease) both;
 }
 
 /* Film grain on the canvas (editorial texture; decorative). */

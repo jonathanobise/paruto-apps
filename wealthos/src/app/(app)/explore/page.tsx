@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/form";
 import { EmptyState } from "@/components/ui/empty-state";
-import { RateLine, StatusBadge, VerificationBadge } from "@/components/app/research";
+import { RateLine, StatusBadge, VerificationBadge, PreRelease } from "@/components/app/research";
 import { formatDate, formatMoney } from "@/lib/format";
 import { ASSET_CLASSES, ASSET_CLASS_LABELS } from "@/engine";
 
@@ -26,7 +26,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
   return (
     <>
       <PageHeader title="Explorer" description="Factual information on investment products: prices, published rates with their methodology, fees and risks — each with its source and as-of date. Information, not recommendations." />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       <form className="mb-5 flex flex-wrap items-end gap-3" role="search">
         <label className="min-w-64 flex-1">
           <span className="sr-only">Search</span>
@@ -54,8 +54,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[860px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="px-4 py-2.5 font-medium">Instrument</th>
                   <th className="px-4 py-2.5 font-medium">Type</th>
                   <th className="px-4 py-2.5 text-right font-medium">Latest price / NAV</th>

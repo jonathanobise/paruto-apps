@@ -3,7 +3,7 @@ import { featureDecision } from "@/server/compliance/gate";
 import { DISCLOSURES } from "@/server/compliance/features";
 import { getMacroOverview, type SeriesLatest } from "@/server/research/markets";
 import { PageHeader } from "@/components/app/page-header";
-import { ResearchTabs, SourceNotes } from "@/components/app/research";
+import { ResearchTabs, SourceNotes, PreRelease } from "@/components/app/research";
 import { SeriesChart } from "@/components/app/series-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
@@ -43,13 +43,13 @@ function LatestTable({ rows, valueHeader }: { rows: SeriesLatest[]; valueHeader:
 export default async function MacroPage() {
   const app = await requireApp();
   const gate = await featureDecision("MARKET_RESEARCH", app.org.jurisdiction);
-  if (!gate.available) return (<><PageHeader title="Macro" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
+  if (!gate.available) return (<><PageHeader eyebrow="Research" title="Macro" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const m = await getMacroOverview(app.ctx);
   return (
     <>
-      <PageHeader title="The economic backdrop" description="Inflation, policy rates and the naira's official exchange rates, for Nigeria alongside the United States and the United Kingdom. Monthly, from the official publishers." />
+      <PageHeader eyebrow="Research" title="The economic backdrop" description="Inflation, policy rates and the naira's official exchange rates, for Nigeria alongside the United States and the United Kingdom. Monthly, from the official publishers." />
       <ResearchTabs current="/research/macro" jurisdiction={app.org.jurisdiction} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card>

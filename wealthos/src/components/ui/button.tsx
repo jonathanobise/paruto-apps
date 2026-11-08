@@ -9,7 +9,8 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-brand text-brand-ink shadow-[0_10px_30px_-12px_color-mix(in_srgb,var(--brand)_45%,transparent)] hover:opacity-95",
+        // The Vio capsule: the brand gradient, white label (6.7:1), a violet glow.
+        primary: "bg-[image:var(--vio-cta)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_12px_32px_-12px_rgb(124_77_255/0.65)] hover:brightness-110",
         accent: "bg-accent text-brand-ink shadow-[0_10px_30px_-12px_color-mix(in_srgb,var(--accent)_55%,transparent)] hover:opacity-95",
         secondary: "glass text-text",
         ghost: "text-text-2 hover:bg-surface-2 hover:text-text",

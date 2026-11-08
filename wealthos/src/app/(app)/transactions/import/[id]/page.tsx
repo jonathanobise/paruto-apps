@@ -123,8 +123,8 @@ export default async function ImportPreviewPage({ params, searchParams }: { para
           </div>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[820px] text-[13px]">
-              <thead className="bg-surface-2 text-left text-text-3">
-                <tr>
+              <thead className="text-left text-text-3 text-[12px]">
+                <tr className="border-b border-border">
                   <th className="px-4 py-2 font-medium">Row</th>
                   <th className="px-4 py-2 font-medium">Status</th>
                   <th className="px-4 py-2 font-medium">Date</th>

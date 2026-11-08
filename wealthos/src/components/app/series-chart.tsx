@@ -1,5 +1,6 @@
 "use client";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipContentProps } from "recharts";
+import { useId } from "react";
+import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipContentProps } from "recharts";
 import { formatNumber, formatPercent } from "@/lib/format";
 
 export interface SeriesDef {
@@ -27,6 +28,7 @@ function compact(v: number): string {
  * text labels names each line; the data is also available as a table.
  */
 export function SeriesChart({ rows, series, unit, label, step = false }: { rows: Row[]; series: SeriesDef[]; unit: "percent" | "number"; label: string; step?: boolean }) {
+  const fillId = `fill-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const defs = series.slice(0, 3);
   const used = rows.filter((r) => defs.some((s) => typeof r[s.key] === "number"));
   if (used.length < 2) return <p className="text-sm text-text-3">Not enough history to chart yet.</p>;
@@ -44,7 +46,13 @@ export function SeriesChart({ rows, series, unit, label, step = false }: { rows:
       </ul>
       <div className="h-64 w-full" role="img" aria-label={`${label}: ${defs.map((s) => s.label).join(", ")}, ${monthLabel(used[0]!.month)} to ${monthLabel(used[used.length - 1]!.month)}`}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={used} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <ComposedChart data={used} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="var(--series-1)" stopOpacity="0.24" />
+                <stop offset="1" stopColor="var(--series-1)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
             <CartesianGrid vertical={false} stroke="var(--grid)" />
             <XAxis dataKey="month" tickFormatter={(m: string) => m.slice(0, 4)} tick={{ fill: "var(--text-3)", fontSize: 12 }} axisLine={false} tickLine={false} minTickGap={40} />
             <YAxis domain={["auto", "auto"]} tickFormatter={axis} tick={{ fill: "var(--text-3)", fontSize: 12 }} axisLine={false} tickLine={false} width={56} />
@@ -68,17 +76,22 @@ export function SeriesChart({ rows, series, unit, label, step = false }: { rows:
               }}
             />
             {defs.map((s, i) => (
-              <Line key={s.key} type={step ? "stepAfter" : "monotone"} dataKey={s.key} name={s.label} stroke={COLORS[i]} strokeWidth={2} dot={false} connectNulls={false} activeDot={{ r: 4, stroke: "var(--surface)", strokeWidth: 2 }} isAnimationActive={false} />
+              // One series: a soft violet area under the line. Several: lines only, so fills never overlap.
+              defs.length === 1 ? (
+                <Area key={s.key} type={step ? "stepAfter" : "monotone"} dataKey={s.key} name={s.label} stroke={COLORS[i]} strokeWidth={2} fill={`url(#${fillId})`} dot={false} connectNulls={false} activeDot={{ r: 4, stroke: "var(--surface)", strokeWidth: 2 }} isAnimationActive={false} />
+              ) : (
+                <Line key={s.key} type={step ? "stepAfter" : "monotone"} dataKey={s.key} name={s.label} stroke={COLORS[i]} strokeWidth={2} dot={false} connectNulls={false} activeDot={{ r: 4, stroke: "var(--surface)", strokeWidth: 2 }} isAnimationActive={false} />
+              )
             ))}
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
       <details className="mt-2 text-[13px]">
         <summary className="cursor-pointer text-text-3 hover:text-text">Show as table (monthly)</summary>
         <div className="mt-2 max-h-64 overflow-auto rounded-[var(--radius-inner)] border border-border">
           <table className="w-full">
-            <thead className="bg-surface-2 text-left text-text-3">
-              <tr>
+            <thead className="text-left text-text-3 text-[12px]">
+              <tr className="border-b border-border">
                 <th className="px-3 py-1.5 font-medium">Month</th>
                 {defs.map((s) => <th key={s.key} className="px-3 py-1.5 text-right font-medium">{s.label}</th>)}
               </tr>

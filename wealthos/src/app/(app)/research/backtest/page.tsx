@@ -6,7 +6,7 @@ import { DISCLOSURES } from "@/server/compliance/features";
 import { BACKTEST_MAX_HOLDINGS, backtest, backtestOptions, type BacktestSummary } from "@/server/research/backtest";
 import { MARKETS } from "@/server/research/screener";
 import { PageHeader } from "@/components/app/page-header";
-import { ResearchTabs } from "@/components/app/research";
+import { ResearchTabs, PreRelease } from "@/components/app/research";
 import { SeriesChart } from "@/components/app/series-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
@@ -27,7 +27,7 @@ const pct = (v: string | null | undefined) => (v === null || v === undefined ? <
 export default async function BacktestPage({ searchParams }: { searchParams: Promise<Params> }) {
   const app = await requireApp();
   const gate = await featureDecision("PORTFOLIO_BACKTEST", app.org.jurisdiction);
-  if (!gate.available) return (<><PageHeader title="Backtest" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
+  if (!gate.available) return (<><PageHeader eyebrow="Research" title="Backtest" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const sp = await searchParams;
   const lens = (LENSES as readonly string[]).includes(sp.lens ?? "") ? (sp.lens as (typeof LENSES)[number]) : "NGN";
   const slots = Array.from({ length: BACKTEST_MAX_HOLDINGS }, (_, i) => ({ id: sp[`h${i}`] ?? "", weight: sp[`w${i}`] ?? "" }));
@@ -58,9 +58,9 @@ export default async function BacktestPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader title="Backtest a portfolio" description="See how a mix you choose would have behaved in the past, in one currency, with optional monthly contributions and rebalancing. A hypothetical illustration of history, not a forecast or a recommendation." />
+      <PageHeader eyebrow="Research" title="Backtest a portfolio" description="See how a mix you choose would have behaved in the past, in one currency, with optional monthly contributions and rebalancing. A hypothetical illustration of history, not a forecast or a recommendation." />
       <ResearchTabs current="/research/backtest" jurisdiction={app.org.jurisdiction} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       <Alert tone="info" className="mb-6">{DISCLOSURES.hypothetical} {DISCLOSURES.past_performance}</Alert>
 
       <Card className="mb-6">
@@ -126,7 +126,7 @@ export default async function BacktestPage({ searchParams }: { searchParams: Pro
             <Card className="overflow-hidden">
               <CardHeader><div><CardTitle>Risk and results</CardTitle><CardDescription>Time-weighted figures, so contributions don&apos;t distort them.</CardDescription></div></CardHeader>
               <table className="w-full text-[13px]">
-                <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Measure</th><th className="px-4 py-2 text-right font-medium">Your mix</th>{run.benchmark ? <th className="px-4 py-2 text-right font-medium">Benchmark</th> : null}</tr></thead>
+                <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Measure</th><th className="px-4 py-2 text-right font-medium">Your mix</th>{run.benchmark ? <th className="px-4 py-2 text-right font-medium">Benchmark</th> : null}</tr></thead>
                 <tbody>
                   <Row label="Return a year" a={pct(run.portfolio.twrAnnualized)} b={run.benchmark ? pct(run.benchmark.twrAnnualized) : undefined} />
                   <Row label="After inflation, a year" a={pct(run.portfolio.real?.annualized)} b={run.benchmark ? pct(run.benchmark.real?.annualized) : undefined} />
@@ -142,7 +142,7 @@ export default async function BacktestPage({ searchParams }: { searchParams: Pro
             <Card className="overflow-hidden">
               <CardHeader><div><CardTitle>Holdings</CardTitle><CardDescription>Target weights and where they ended{run.rebalanceLabel.startsWith("Never") ? " after drifting" : " (drift since the last rebalance)"}.</CardDescription></div></CardHeader>
               <table className="w-full text-[13px]">
-                <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Instrument</th><th className="px-4 py-2 text-right font-medium">Target</th><th className="px-4 py-2 text-right font-medium">At the end</th></tr></thead>
+                <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Instrument</th><th className="px-4 py-2 text-right font-medium">Target</th><th className="px-4 py-2 text-right font-medium">At the end</th></tr></thead>
                 <tbody>
                   {run.holdings.map((h) => (
                     <tr key={h.id} className="border-t border-border">
@@ -160,7 +160,7 @@ export default async function BacktestPage({ searchParams }: { searchParams: Pro
             <CardHeader><div><CardTitle>Year by year</CardTitle><CardDescription>Time-weighted return in {run.lens}. Part-years are marked.</CardDescription></div></CardHeader>
             <div className="overflow-x-auto">
               <table className="w-full text-[13px]">
-                <thead className="bg-surface-2 text-left text-text-3"><tr><th className="px-4 py-2 font-medium">Year</th><th className="px-4 py-2 text-right font-medium">Your mix</th>{run.benchmark ? <th className="px-4 py-2 text-right font-medium">Benchmark</th> : null}</tr></thead>
+                <thead className="text-left text-text-3 text-[12px]"><tr className="border-b border-border"><th className="px-4 py-2 font-medium">Year</th><th className="px-4 py-2 text-right font-medium">Your mix</th>{run.benchmark ? <th className="px-4 py-2 text-right font-medium">Benchmark</th> : null}</tr></thead>
                 <tbody>
                   {[...run.portfolio.calendar].reverse().map((c) => (
                     <tr key={c.year} className="border-t border-border">

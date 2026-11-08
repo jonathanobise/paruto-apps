@@ -2,8 +2,8 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 export function Card({ className, ...props }: ComponentProps<"section">) {
-  // Content panel: hairline border, top-edge highlight, no glass (glass is for floating controls).
-  return <section className={cn("rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow)]", className)} {...props} />;
+  // Content panel: hairline border, a faint top sheen and top-edge highlight; no glass (glass is for floating controls).
+  return <section className={cn("rounded-[var(--radius-card)] border border-border bg-surface bg-[linear-gradient(180deg,rgb(255_255_255/0.028),transparent_42%)] shadow-[var(--shadow)]", className)} {...props} />;
 }
 export function CardHeader({ className, ...props }: ComponentProps<"div">) {
   return <div className={cn("flex items-start justify-between gap-4 px-5 pt-5", className)} {...props} />;

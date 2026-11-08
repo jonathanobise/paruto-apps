@@ -76,3 +76,14 @@ export function SourceNotes({ sources }: { sources: Array<{ name: string; url: s
     </section>
   );
 }
+
+/** Features awaiting compliance review: a quiet pill instead of a warning panel (the reason stays readable in full). */
+export function PreRelease({ reason }: { reason: string }) {
+  return (
+    <p className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full bg-warning-soft px-3 py-1 text-[12px] text-text-2" role="note">
+      <span className="inline-block size-1.5 shrink-0 rounded-full bg-warning" aria-hidden />
+      <span className="font-semibold text-warning">Pre-release</span>
+      <span className="truncate">{reason.replace(/^Pre-release:\s*/i, "")}</span>
+    </p>
+  );
+}

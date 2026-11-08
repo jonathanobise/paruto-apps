@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PreRelease } from "@/components/app/research";
 import { Plus, Target } from "lucide-react";
 import { requireApp } from "@/server/auth/context";
 import { featureDecision } from "@/server/compliance/gate";
@@ -20,7 +21,7 @@ export default async function GoalsPage() {
   return (
     <>
       <PageHeader title="Goals" description="Set targets and see how different assumptions play out. Every projection shows several scenarios and its assumptions." actions={app.canWrite ? <Button asChild><Link href="/goals/new"><Plus aria-hidden /> New goal</Link></Button> : null} />
-      {gate.status === "pending_review" ? <Alert tone="warning" className="mb-4" title="Pre-release feature">{gate.reason}</Alert> : null}
+      {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
       {goals.length === 0 ? (
         <EmptyState icon={<Target />} title="No goals yet" action={app.canWrite ? <Button asChild><Link href="/goals/new">Create a goal</Link></Button> : null}>A home deposit, school fees, an emergency reserve, retirement — pick a target, a date and the accounts that count towards it.</EmptyState>
       ) : (
