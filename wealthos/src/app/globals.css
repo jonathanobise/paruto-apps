@@ -202,32 +202,36 @@ body {
   color: #fff;
 }
 
-/* Liquid Glass — floating controls only. */
-.glass {
-  position: relative;
-  isolation: isolate;
-  background: var(--glass-tint), var(--glass-fill);
-  backdrop-filter: blur(22px) saturate(1.9) brightness(1.06);
-  -webkit-backdrop-filter: blur(22px) saturate(1.9) brightness(1.06);
-  box-shadow: inset 0 0 0 1px var(--glass-rim), inset 0 1px 1px -0.5px var(--glass-spec), var(--glass-shadow);
-}
-.glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: linear-gradient(135deg, var(--glass-spec), transparent 32%, transparent 68%, color-mix(in srgb, var(--glass-spec) 40%, transparent));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  opacity: 0.5;
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+/* Liquid Glass — floating controls only. In the components layer so utilities on the same element
+   (sticky, fixed, absolute…) win: `position: relative` here is only a default for the rim highlight.
+   Un-layered, it overrode `sticky` and the sidebar and top bar scrolled away with the page. */
+@layer components {
   .glass {
-    background: var(--surface-2);
+    position: relative;
+    isolation: isolate;
+    background: var(--glass-tint), var(--glass-fill);
+    backdrop-filter: blur(22px) saturate(1.9) brightness(1.06);
+    -webkit-backdrop-filter: blur(22px) saturate(1.9) brightness(1.06);
+    box-shadow: inset 0 0 0 1px var(--glass-rim), inset 0 1px 1px -0.5px var(--glass-spec), var(--glass-shadow);
+  }
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--glass-spec), transparent 32%, transparent 68%, color-mix(in srgb, var(--glass-spec) 40%, transparent));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    opacity: 0.5;
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass {
+      background: var(--surface-2);
+    }
   }
 }
 
