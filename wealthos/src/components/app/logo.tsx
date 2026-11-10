@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { BRAND_LAST, BRAND_LEAD } from "@/lib/brand";
 
-/** Layered app-icon mark (violet gradient tile, inner gloss, faceted V) + editorial wordmark (ADR-030). Keep public/icons/*.svg in step. */
+/** Layered app-icon mark (violet gradient tile, inner gloss, faceted V) + editorial wordmark (ADR-030). The app icon PNGs in public/icons come from the owner's artwork; keep this vector close to it. */
 export function LogoMark({ className = "size-7" }: { className?: string }) {
   // Unique gradient ids per instance: a gradient defined inside a hidden copy (e.g. the desktop
   // sidebar on a phone) wouldn't paint for the visible one.

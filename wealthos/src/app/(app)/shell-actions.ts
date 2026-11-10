@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { CURRENCY_COOKIE, THEME_COOKIE, getSession } from "@/server/auth/context";
+import { CURRENCY_COOKIE, getSession } from "@/server/auth/context";
 import { setActiveOrg } from "@/server/identity/sessions";
 import { listOrganizations } from "@/server/identity/tenancy";
 import { isDisplayCurrency } from "@/engine";
@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { userPreferences } from "@/server/db/schema";
 import { isDemoMode } from "@/server/demo/mode";
+import { isTheme } from "@/lib/appearance";
 
 export async function switchOrgAction(form: FormData): Promise<void> {
   const session = await getSession();
@@ -27,11 +28,9 @@ export async function setCurrencyAction(form: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-/** Header sun/moon toggle: dark is the default; light is opt-in (cookie + saved preference). */
-export async function setThemeAction(form: FormData): Promise<void> {
-  const theme = String(form.get("theme")) === "light" ? "light" : "dark";
-  (await cookies()).set(THEME_COOKIE, theme, { path: "/", sameSite: "lax", maxAge: 31536000 });
+/** The sidebar's Light / Dark / System control: the cookie is set in the page (so nothing re-renders); this saves the preference too. */
+export async function saveAppearanceAction(theme: string): Promise<void> {
+  if (!isTheme(theme)) return;
   const session = await getSession();
   if (session && !isDemoMode()) await db().update(userPreferences).set({ theme, updatedAt: new Date() }).where(eq(userPreferences.userId, session.userId));
-  revalidatePath("/", "layout");
 }

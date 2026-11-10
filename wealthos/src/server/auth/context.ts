@@ -16,7 +16,7 @@ import { isDisplayCurrency } from "@/engine";
 import { isDemoMode } from "@/server/demo/mode";
 
 export const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-wos_session" : "wos_session";
-export const THEME_COOKIE = "wos_theme";
+export { THEME_COOKIE } from "@/lib/appearance";
 export const CURRENCY_COOKIE = "wos_ccy";
 
 export async function setSessionCookie(token: string, expiresAt: Date): Promise<void> {

@@ -24,7 +24,8 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "test:perf": "vitest run --project perf",
     "worker": "tsx --conditions=react-server scripts/worker.ts",
-    "ai:eval": "tsx --conditions=react-server scripts/ai-eval.ts"
+    "ai:eval": "tsx --conditions=react-server scripts/ai-eval.ts",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.3.0",

@@ -1,7 +1,7 @@
 # VioWealth on vio.paruto.com: the app and its own Postgres in one container, with its data baked
 # in at build time. Every container start begins from this clean state (it resets whenever it
 # sleeps; see worker/src/index.ts). Not a production topology. Two profiles (--build-arg PROFILE):
-#   private (default): the owner only, behind Cloudflare Access; official research data loaded at
+#   private (default): the owner only, signing in through Paruto ID; official research data loaded at
 #                      build (plus EODHD when an eodhd_key build secret is given). docs/PRIVATE.md
 #   demo:              the public SAMPLE demo (docs/DEMO.md).
 #
@@ -20,13 +20,19 @@ ENV NEXT_TELEMETRY_DISABLED=1 PGDATA=/var/lib/demo-pg
 FROM base AS build
 ARG PROFILE=private
 ARG EODHD_BUDGET=0
+# The release this image is (from its git tag; deploy.sh), shown in the app and at /__version.
+ARG VIO_RELEASE=""
+ARG VIO_RELEASE_AT=""
+ARG VIO_BUILD=dev
+ARG VIO_RELEASES="[]"
 COPY package.json package-lock.json ./
 # Optional: a TLS-intercepting proxy's CA for the install (passed as a build secret, never stored).
 RUN --mount=type=secret,id=ca_bundle,required=false \
     if [ -f /run/secrets/ca_bundle ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/ca_bundle; fi; \
     npm ci --no-audit --no-fund
 COPY . .
-RUN npm run build
+RUN NEXT_PUBLIC_VIO_RELEASE="$VIO_RELEASE" NEXT_PUBLIC_VIO_RELEASE_AT="$VIO_RELEASE_AT" \
+    NEXT_PUBLIC_VIO_BUILD="$VIO_BUILD" NEXT_PUBLIC_VIO_RELEASES="$VIO_RELEASES" npm run build
 # A throwaway key for this image's own database (the demo holds no real data).
 RUN node -e "process.stdout.write(require('crypto').randomBytes(32).toString('base64'))" > /app/.demo-key
 # Bake the database: roles and schema, then the profile's data: official research data (private)

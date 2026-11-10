@@ -18,11 +18,16 @@ const config: NextConfig = {
   typedRoutes: false,
   // CSV imports accept files up to 2 MiB (validated again server-side); allow multipart overhead.
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
+  // What's live, for the update pill and the connection light (a "__" folder would be private in the app router).
+  async rewrites() {
+    return [{ source: "/__version", destination: "/api/version" }];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
       // The service worker must always be re-checked so fixes reach installed apps promptly.
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+      { source: "/__version", headers: [{ key: "Cache-Control", value: "no-store, max-age=0" }] },
     ];
   },
 };

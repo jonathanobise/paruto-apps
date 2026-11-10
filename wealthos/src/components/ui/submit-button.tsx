@@ -11,7 +11,7 @@ export function SubmitButton({ children, pendingText, ...props }: ComponentProps
   const contextPending = useContext(PendingContext);
   const pending = status.pending || contextPending;
   return (
-    <Button type="submit" disabled={pending || props.disabled} aria-busy={pending} {...props}>
+    <Button type="submit" data-own-busy="" disabled={pending || props.disabled} aria-busy={pending} {...props}>
       {pending ? <Loader2 className="animate-spin" aria-hidden /> : null}
       {pending ? (pendingText ?? "Working…") : children}
     </Button>
