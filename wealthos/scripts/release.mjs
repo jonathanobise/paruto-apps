@@ -57,7 +57,7 @@ const latest =
 const since = latest ? `${PREFIX}${latest.join(".")}` : null;
 
 let notes = readFileSync(NOTES, "utf8");
-const waiting = notes.match(/version: "next"/g)?.length ?? 0;
+const waiting = notes.match(/^\s*version: "next",/gm)?.length ?? 0;
 if (waiting > 1) fail(`more than one What's New note says version: "next" in ${NOTES}.`);
 
 const rel = (p) => p.replace(/^wealthos\//, "");
