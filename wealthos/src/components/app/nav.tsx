@@ -66,7 +66,7 @@ export function Nav({ onNavigate, isAdmin = false, researchHref = null }: { onNa
               const active = pathname === href || pathname.startsWith(`${href}/`) || (label === "Markets" && pathname.startsWith("/research"));
               return (
                 <li key={href}>
-                  <Link href={href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={item(active)}>
+                  <Link href={href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={item(active)} title={label}>
                     <Icon className={cn("size-4", active ? "text-accent" : "text-text-3")} aria-hidden />
                     {label}
                   </Link>
@@ -91,18 +91,18 @@ export function Nav({ onNavigate, isAdmin = false, researchHref = null }: { onNa
       <ul className="flex flex-col gap-0.5">
         {isAdmin ? (
           <li>
-            <Link href="/admin" onClick={onNavigate} className={item(pathname.startsWith("/admin"))}>
+            <Link href="/admin" onClick={onNavigate} className={item(pathname.startsWith("/admin"))} title="Admin">
               <Shield className="size-4 text-text-3" aria-hidden /> Admin
             </Link>
           </li>
         ) : null}
         <li>
-          <Link href="/settings" onClick={onNavigate} className={item(pathname.startsWith("/settings"))}>
+          <Link href="/settings" onClick={onNavigate} className={item(pathname.startsWith("/settings"))} title="Settings">
             <Settings className="size-4 text-text-3" aria-hidden /> Settings
           </Link>
         </li>
         <li>
-          <Link href="/support" onClick={onNavigate} className={item(pathname.startsWith("/support"))}>
+          <Link href="/support" onClick={onNavigate} className={item(pathname.startsWith("/support"))} title="Help">
             <LifeBuoy className="size-4 text-text-3" aria-hidden /> Help
           </Link>
         </li>
@@ -121,7 +121,7 @@ export function MobileNav({ isAdmin = false, researchHref = null, footer }: { is
           near-opaque so the menu stays readable over content. */}
       <div className="absolute inset-x-0 top-[calc(100%+8px)] z-40 max-h-[calc(100dvh-96px)] overflow-y-auto rounded-[28px] border border-[var(--glass-rim)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] p-3 shadow-[var(--glass-shadow)] backdrop-blur-xl">
         <Nav isAdmin={isAdmin} researchHref={researchHref} />
-        {footer ? <div className="mt-4 border-t border-border pt-3 sm:hidden">{footer}</div> : null}
+        {footer ? <div>{footer}</div> : null}
       </div>
     </details>
   );

@@ -48,7 +48,7 @@ test("phone layouts, PWA manifest, service worker and offline page", async ({ br
     for (const k of await caches.keys()) for (const r of await (await caches.open(k)).keys()) out.push(new URL(r.url).pathname);
     return out;
   });
-  expect(cached).toEqual(["/offline.html"]);
+  expect(cached.sort()).toEqual(["/icons/icon-192.png", "/offline.html"]); // the offline page and its icon: never data
   await ctx.setOffline(false);
   await ctx.close();
 });

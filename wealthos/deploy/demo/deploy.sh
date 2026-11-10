@@ -6,6 +6,9 @@
 #   deploy/demo/deploy.sh             # build, push, deploy
 #   deploy/demo/deploy.sh --dry-run   # build and check the Worker bundle; upload nothing
 #
+# Releases go through `npm run release` (scripts/release.mjs), which numbers and tags the commit
+# (viowealth-vX.Y.Z) and then runs this; the tag gives the build its number (shown in the app).
+#
 # Profile (PROFILE, default private; see docs/PRIVATE.md and docs/DEMO.md):
 #   private  the owner only, signing in through Paruto ID. Needs OWNER_EMAIL; PARUTO_ID_CLIENT
 #            defaults to viowealth and PARUTO_ID_URL to https://id.paruto.com. The Worker must
@@ -32,7 +35,16 @@ case "$PROFILE" in
 esac
 TAG=$(git rev-parse --short=12 HEAD)
 set -- "$@"
+# The release this commit is (its viowealth-vX.Y.Z tag, made by `npm run release`), and every earlier
+# one, so the app shows its number and its timeline. An untagged commit builds without a number.
+RELEASE=$(git tag --points-at HEAD -l 'viowealth-v*' | sed -n 's/^viowealth-v\([0-9]*\.[0-9]*\.[0-9]*\)$/\1/p' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+RELEASE_AT=""
+[ -n "$RELEASE" ] && RELEASE_AT=$(git for-each-ref --format='%(creatordate:iso-strict)' "refs/tags/viowealth-v$RELEASE")
+RELEASES=$(git for-each-ref --format='%(refname:short) %(creatordate:iso-strict)' 'refs/tags/viowealth-v*' | sed -n 's/^viowealth-v\([0-9]*\.[0-9]*\.[0-9]*\) \(.*\)$/["\1","\2"]/p' | paste -sd, -)
+RELEASES="[${RELEASES}]"
+echo "Building ${RELEASE:+VioWealth v$RELEASE }($PROFILE, $TAG)"
 BUILD="docker build -f deploy/demo/Dockerfile -t paruto-wealth-demo:$TAG --build-arg PROFILE=$PROFILE --build-arg EODHD_BUDGET=${EODHD_BUDGET:-0}"
+BUILD="$BUILD --build-arg VIO_BUILD=$TAG --build-arg VIO_RELEASE=$RELEASE --build-arg VIO_RELEASE_AT=$RELEASE_AT --build-arg VIO_RELEASES=$RELEASES"
 [ -n "${DEMO_BUILD_NETWORK:-}" ] && BUILD="$BUILD --network $DEMO_BUILD_NETWORK"
 [ -n "${DEMO_BUILD_CA:-}" ] && BUILD="$BUILD --secret id=ca_bundle,src=$DEMO_BUILD_CA"
 if [ "$PROFILE" = private ]; then
@@ -65,5 +77,6 @@ if [ "$PROFILE" = private ] && ! npx wrangler secret list --config wrangler.gene
   # The app can't sign anyone in without it, and the container refuses to start without it.
   echo "The Worker has no PARUTO_ID_SECRET yet: make one with Paruto ID's client-secret script and put it (docs/PRIVATE.md)." >&2; exit 1
 fi
-npx wrangler deploy --config wrangler.generated.jsonc --tag "$TAG" --message "$PROFILE $TAG"
-echo "Deployed $PROFILE $TAG: https://vio.paruto.com"
+LABEL=${RELEASE:+v$RELEASE}
+npx wrangler deploy --config wrangler.generated.jsonc --tag "${LABEL:-$TAG}" --message "${RELEASE:+VioWealth v$RELEASE · }$PROFILE $TAG"
+echo "Deployed ${RELEASE:+VioWealth v$RELEASE, }$PROFILE $TAG: https://vio.paruto.com (live: curl -s https://vio.paruto.com/__version)"

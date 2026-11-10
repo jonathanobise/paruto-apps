@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import QRCode from "qrcode";
+import { isTheme } from "@/lib/appearance";
 import { CURRENCY_COOKIE, THEME_COOKIE, clearSessionCookie, requestMeta, requireAppForAction } from "@/server/auth/context";
 import { updatePreferences, setMarketingConsent } from "@/server/identity/preferences";
 import { beginMfaEnrollment, changePassword, confirmMfaEnrollment, disableMfa } from "@/server/identity/service";
@@ -18,7 +19,10 @@ export type MfaState = (ActionResult<{ secret: string; uri: string; qrSvg: strin
 export async function preferencesAction(_: FormState, form: FormData): Promise<FormState> {
   try {
     const app = await requireAppForAction();
-    const theme = String(form.get("theme"));
+    // Appearance is chosen live (sidebar, Settings › Appearance) and kept in its cookie.
+    const jar = await cookies();
+    const chosen = jar.get(THEME_COOKIE)?.value;
+    const theme = isTheme(chosen) ? chosen : "dark";
     await updatePreferences(app.session.userId, {
       displayName: form.get("displayName"),
       baseCurrency: form.get("baseCurrency"),
@@ -28,9 +32,7 @@ export async function preferencesAction(_: FormState, form: FormData): Promise<F
       notifyInApp: form.get("notifyInApp") === "on",
       notifyEmail: form.get("notifyEmail") === "on",
     });
-    const jar = await cookies();
     jar.delete(CURRENCY_COOKIE);
-    jar.set(THEME_COOKIE, theme === "light" ? "light" : "dark", { path: "/", sameSite: "lax", maxAge: 31536000 });
   } catch (err) {
     return toActionError(err);
   }
