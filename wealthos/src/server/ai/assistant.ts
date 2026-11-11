@@ -11,6 +11,7 @@ import { currentConsents } from "@/server/identity/preferences";
 import { ADVICE_BOUNDARY_NOTE, SAFE_ANSWER, checkOutput, classifyRequest, redact } from "./policy";
 import { SYSTEM_PROMPT, contextNote } from "./prompt";
 import { TOOLS, toolsFor, type ToolSource } from "./tools";
+import { researchAvailability } from "@/server/research/availability";
 import type { AIProvider, ChatMessage } from "./provider";
 
 /** Consent to let the assistant read the user's own records and send them to the AI vendor. */
@@ -75,11 +76,11 @@ export async function askAssistant(ctx: TenantContext, input: { conversationId?:
   await rateLimit(`ai:user:${ctx.userId}`, AI_LIMITS.messagesPerDay, 86_400);
 
   const personalDataAllowed = await hasAiConsent(ctx.userId);
-  const { history, conversationId: existingId, isDemo } = await withTenant(ctx, async (tx) => {
+  const { history, conversationId: existingId, isDemo, jurisdiction } = await withTenant(ctx, async (tx) => {
     const usage = await tx.execute<{ n: string }>(sql`select app_ai_tokens_this_month(${ctx.orgId}) as n`);
     if (Number(usage.rows[0]?.n ?? 0) >= AI_LIMITS.orgTokensPerMonth) throw new AppError("RATE_LIMITED", "This workspace has used its assistant allowance for the month. It resets on the 1st.");
     await enforceLimit(tx, ctx, "aiQuestionsPerMonth");
-    const [org] = await tx.select({ isDemo: organizations.isDemo }).from(organizations).where(eq(organizations.id, ctx.orgId));
+    const [org] = await tx.select({ isDemo: organizations.isDemo, jurisdiction: organizations.jurisdiction }).from(organizations).where(eq(organizations.id, ctx.orgId));
     const convId = input.conversationId ?? null;
     let past: Array<{ role: string; content: string }> = [];
     if (convId) {
@@ -87,13 +88,14 @@ export async function askAssistant(ctx: TenantContext, input: { conversationId?:
       if (!c) throw new AppError("NOT_FOUND", "Conversation not found.");
       past = (await tx.select({ role: aiMessages.role, content: aiMessages.content }).from(aiMessages).where(eq(aiMessages.conversationId, convId)).orderBy(desc(aiMessages.createdAt)).limit(AI_LIMITS.historyMessages)).reverse();
     }
-    return { history: past, conversationId: convId, isDemo: org?.isDemo ?? false };
+    return { history: past, conversationId: convId, isDemo: org?.isDemo ?? false, jurisdiction: org?.jurisdiction ?? "NG" };
   });
 
   const request = classifyRequest(message);
   const flags: string[] = request.personalAdvice ? ["personal_advice_request"] : [];
   const safeMessage = redact(message);
-  const tools = toolsFor(personalDataAllowed);
+  // Research tools follow the same compliance gates as the research pages.
+  const tools = toolsFor(personalDataAllowed, await researchAvailability(jurisdiction));
   const allowed = new Set(tools.map((t) => t.definition.name));
 
   // History holds only final user/assistant texts (already redacted); tool results are not replayed.

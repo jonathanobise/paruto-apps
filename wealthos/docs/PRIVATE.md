@@ -39,6 +39,10 @@ Sign-in is **Paruto ID** (id.paruto.com), the shared passwordless sign-in for ev
    and run Paruto ID locally (`npm run dev` there, with `DEV_MODE=1` in its `.dev.vars`).
 3. Deploy: `OWNER_EMAIL=… deploy/demo/deploy.sh` (PROFILE=private is the default; `PARUTO_ID_CLIENT`
    defaults to `viowealth`). The script refuses if the Worker has no `PARUTO_ID_SECRET`.
+4. Optional, the research assistant (a paid service: Claude API usage): `npx wrangler secret put
+   ANTHROPIC_API_KEY --name paruto-wealth-demo` and paste the key at the prompt (never on the command
+   line or in a file in the repo). The Worker passes it to the container on its next start; without
+   it the assistant page says the assistant isn't connected. Remove it with `wrangler secret delete`.
 
 ## Checks
 - Signed out, every page redirects to `/sign-in`, which offers only "Continue with Paruto ID".
