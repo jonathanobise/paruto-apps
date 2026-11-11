@@ -52,6 +52,8 @@ if [ "$PROFILE" = private ]; then
   [ -n "${BLS_API_KEY:-}" ] && BUILD="$BUILD --secret id=bls_key,env=BLS_API_KEY"
 fi
 $BUILD .
+# A data source that failed at build is left out rather than blocking the deploy; say which.
+GAPS=$(docker run --rm --entrypoint cat "paruto-wealth-demo:$TAG" /app/.data-gaps 2>/dev/null | paste -sd, - | sed 's/,/, /g')
 
 cd deploy/demo/worker
 [ -d node_modules ] || npm ci --no-audit --no-fund
@@ -65,7 +67,7 @@ fi
 sed -e "s#IMAGE_URI#$IMAGE#" -e "s#\"VARS_PLACEHOLDER\": null,#$VARS#" wrangler.template.jsonc > wrangler.generated.jsonc
 if [ "${1:-}" = "--dry-run" ]; then
   npx wrangler deploy --config wrangler.generated.jsonc --dry-run --outdir .wrangler/dry-run
-  echo "Dry run ($PROFILE): image paruto-wealth-demo:$TAG built; nothing uploaded."; exit 0
+  echo "Dry run ($PROFILE): image paruto-wealth-demo:$TAG built; nothing uploaded.${GAPS:+ Not loaded: $GAPS.}"; exit 0
 fi
 # Registry uploads occasionally fail mid-push ("blob unknown"); pushed layers are skipped on retry.
 for attempt in 1 2 3 4; do
@@ -80,3 +82,5 @@ fi
 LABEL=${RELEASE:+v$RELEASE}
 npx wrangler deploy --config wrangler.generated.jsonc --tag "${LABEL:-$TAG}" --message "${RELEASE:+VioWealth v$RELEASE · }$PROFILE $TAG"
 echo "Deployed ${RELEASE:+VioWealth v$RELEASE, }$PROFILE $TAG: https://vio.paruto.com (live: curl -s https://vio.paruto.com/__version)"
+[ -n "$GAPS" ] && echo "! Not loaded at this build (left out; redeploy to retry): $GAPS"
+exit 0

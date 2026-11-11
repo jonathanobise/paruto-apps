@@ -1,7 +1,7 @@
 /**
  * Ingest real data from official sources into the research catalogue (owner role; operator script).
  *
- *   npm run ingest -- all
+ *   npm run ingest -- all                 (add --keep-going to leave out a failed source; deploy builds do)
  *   npm run ingest -- cbn-fx cbn-inflation cbn-money-market cbn-auctions fed-funds boe-bank-rate ons-cpi
  *
  * Every row keeps its provenance (source, methodology, retrieval time). Re-running is safe: rows are
@@ -9,6 +9,7 @@
  * Derived series (the rolled T-bill index) are recomputed from the stored auction results.
  * Sources and their terms: docs/DATA_SOURCES.md.
  */
+import { writeFileSync } from "node:fs";
 import { config } from "dotenv";
 import pg from "pg";
 
@@ -324,6 +325,12 @@ TASKS.eodhd = eodhdTask;
 
 const ALL = ["cbn-fx", "cbn-inflation", "cbn-money-market", "cbn-auctions", "fed-funds", "boe-bank-rate", "ons-cpi", "bls-cpi"];
 const requested = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+// --keep-going: a source that fails is reported and left out, and the run still succeeds as long as
+// some data loaded (deploy builds: one unreachable source shouldn't block a release). With
+// --gaps-file=PATH the failed sources are written there, one per line, for the deploy to report.
+const keepGoing = process.argv.includes("--keep-going");
+const gapsFile = process.argv.find((a) => a.startsWith("--gaps-file="))?.slice("--gaps-file=".length);
+const gaps: string[] = [];
 const tasks = requested.includes("all") || requested.length === 0 ? ALL : requested;
 let failed = 0;
 try {
@@ -332,6 +339,7 @@ try {
     if (!fn) {
       console.error(`unknown task ${t}; known: ${Object.keys(TASKS).join(", ")}`);
       failed++;
+      gaps.push(`${t} (unknown task)`);
       continue;
     }
     const started = Date.now();
@@ -339,10 +347,15 @@ try {
       console.log(`${t}: ${await fn()} [${((Date.now() - started) / 1000).toFixed(1)}s]`);
     } catch (err) {
       failed++;
+      gaps.push(t);
       console.error(`${t}: FAILED — ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 } finally {
   await pool.end();
 }
-process.exitCode = failed ? 1 : 0;
+if (gapsFile) writeFileSync(gapsFile, gaps.map((g) => `${g}\n`).join(""));
+if (failed) console.error(`Not loaded: ${gaps.join(", ")}${keepGoing && failed < tasks.length ? " (left out; the rest loaded)" : ""}`);
+// Unknown task names are a mistake in the command, never a gap to carry on past.
+const unknown = gaps.some((g) => g.endsWith("(unknown task)"));
+process.exitCode = failed && (!keepGoing || unknown || failed === tasks.length) ? 1 : 0;

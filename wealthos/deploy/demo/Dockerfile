@@ -60,12 +60,12 @@ RUN --mount=type=secret,id=ca_bundle,required=false \
       npm run -s db:seed-demo -- --with-user | grep -v "^Created"; \
     else \
       if [ -f /run/secrets/bls_key ]; then export BLS_API_KEY="$(cat /run/secrets/bls_key)"; fi; \
-      npm run -s ingest -- all; \
+      npm run -s ingest -- all --keep-going --gaps-file=/app/.data-gaps; \
       if [ -f /run/secrets/eodhd_key ] && [ "$EODHD_BUDGET" -gt 0 ]; then \
         EODHD_API_KEY="$(cat /run/secrets/eodhd_key)" npm run -s ingest -- eodhd --budget="$EODHD_BUDGET" --fundamentals; \
       fi; \
     fi; \
-    echo "$PROFILE" > /app/.profile; \
+    echo "$PROFILE" > /app/.profile; touch /app/.data-gaps; \
     gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop >/dev/null
 # The running demo needs only production dependencies and the compiled app.
 RUN npm prune --omit=dev --no-audit --no-fund >/dev/null && rm -rf .next/cache
@@ -76,7 +76,7 @@ ENV NODE_ENV=production APP_ENV=production DEMO_MODE=1 PORT=8080 \
     APP_ORIGIN=https://vio.paruto.com \
     TRUSTED_IP_HEADER=cf-connecting-ip EMAIL_TRANSPORT=outbox
 COPY --from=build --chown=postgres:postgres /var/lib/demo-pg /var/lib/demo-pg
-COPY --from=build --chown=app:app /app/package.json /app/next.config.ts /app/tsconfig.json /app/.demo-key /app/.profile ./
+COPY --from=build --chown=app:app /app/package.json /app/next.config.ts /app/tsconfig.json /app/.demo-key /app/.profile /app/.data-gaps ./
 COPY --from=build --chown=app:app /app/node_modules ./node_modules
 COPY --from=build --chown=app:app /app/.next ./.next
 COPY --from=build --chown=app:app /app/public ./public
