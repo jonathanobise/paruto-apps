@@ -133,9 +133,13 @@ export interface InstrumentDetail extends CatalogueRow {
   identifiers: Array<{ scheme: string; value: string; verification: string }>;
   priceSource: { name: string; kind: string; licenseNote: string; url: string | null } | null;
   chart: Array<{ date: string; price: number }>;
+  /** Daily closes for the last ten years (the interactive chart); `chart` stays weekly for tables and the assistant. */
+  daily: Array<{ date: string; price: number }>;
   trailing: Array<{ key: string; start: string; cumulative: string | null; annualized: string | null }>;
   rateHistory: RateView[];
 }
+
+const tenYearsBefore = (iso: string) => `${Number(iso.slice(0, 4)) - 10}${iso.slice(4)}`;
 
 export async function getInstrument(ctx: TenantContext, id: string): Promise<InstrumentDetail> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new AppError("NOT_FOUND", "Instrument not found.");
@@ -189,6 +193,7 @@ export async function getInstrument(ctx: TenantContext, id: string): Promise<Ins
       identifiers: ids.map((x) => ({ scheme: x.scheme, value: x.value, verification: x.verificationState })),
       priceSource: last ? { name: last.sourceName, kind: last.sourceKind, licenseNote: last.license, url: last.url } : null,
       chart: weeklySeries(points).map((p) => ({ date: p.date, price: p.price.toNumber() })),
+      daily: points.filter((p) => p.date >= tenYearsBefore(today)).map((p) => ({ date: p.date, price: p.price.toNumber() })),
       trailing: trailing.map((t) => ({ key: t.key, start: t.start, cumulative: t.cumulative?.toFixed(8) ?? null, annualized: t.annualized?.toFixed(8) ?? null })),
       rateHistory,
     };

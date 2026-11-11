@@ -14,7 +14,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Delta } from "@/components/ui/money";
-import { PriceChart } from "@/components/app/price-chart";
+import { ProPriceChart } from "@/components/charts/pro-price-chart";
 import { StatusBadge, VerificationBadge, methodologyLabel } from "@/components/app/research";
 import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { watchAction } from "../actions";
@@ -73,7 +73,7 @@ export default async function InstrumentPage({ params, searchParams }: { params:
             <StatusBadge status={x.priceStatus} observedOn={x.latestPrice?.observedOn ?? null} />
           </CardHeader>
           <CardContent>
-            <PriceChart data={x.chart} currency={x.currency} label={`${x.name} ${x.pricingModel === "nav" ? "NAV" : "price"}`} />
+            <ProPriceChart daily={x.daily} weekly={x.chart} currency={x.currency} label={`${x.name} ${x.pricingModel === "nav" ? "NAV" : "price"}`} />
             <h3 className="mt-6 text-[13px] font-semibold">Trailing price returns (in {x.currency})</h3>
             <dl className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-6">
               {x.trailing.map((t) => (
