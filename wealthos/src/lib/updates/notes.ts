@@ -17,7 +17,7 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
-    id: "next-bond-yields",
+    id: "2026-11-11-bond-yields",
     date: "2026-11-11",
     at: "2026-11-11T00:00+01:00",
     version: "next",
