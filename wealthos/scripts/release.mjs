@@ -104,18 +104,33 @@ if (!run("npm run check")) {
 // 4. Record it, then deploy what was recorded.
 if (waiting) execSync(`git commit -q -m "VioWealth v${release}" -m "Stamps the What's New note for v${release}." -- ${NOTES}`);
 execSync(`git tag -a ${tag} -m "VioWealth v${release}"`);
+/** What the live site says it is (null when it can't be reached). */
+const liveNow = () =>
+  fetch(`${SITE}/__version`, { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null);
 if (!run("deploy/demo/deploy.sh")) {
-  execSync(`git tag -d ${tag}`);
-  if (waiting) execSync("git reset -q --keep HEAD~1");
-  fail("the deploy didn't go through; the release commit and tag were taken back, and nothing changed in production.");
+  // A late step can fail after the new version is already live (Cloudflare once throttled its
+  // custom-domain check after the Worker and container had both been updated). Before taking the
+  // release back, ask the site which build it is serving.
+  const build = sh("git rev-parse --short=12 HEAD");
+  let live = null;
+  for (let i = 0; i < 24 && live?.build !== build; i++) {
+    live = await liveNow();
+    if (live?.build !== build) await new Promise((r) => setTimeout(r, 5_000));
+  }
+  if (live?.build !== build) {
+    execSync(`git tag -d ${tag}`);
+    if (waiting) execSync("git reset -q --keep HEAD~1");
+    fail("the deploy didn't go through; the release commit and tag were taken back, and nothing changed in production.");
+  }
+  console.log(`\n! The deploy reported an error, but ${SITE} is serving this build (${build}), so the release stands.`);
 }
 
 // 5. Share it, and see it live.
 if (!run(`git push -q origin master ${tag}`)) console.error(`\n! Live, but the push failed: push master and ${tag} by hand.`);
 for (let i = 0; i < 36; i++) {
-  const live = await fetch(`${SITE}/__version`, { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null))
-    .catch(() => null);
+  const live = await liveNow();
   if (live?.release === release) {
     console.log(`\n✔ VioWealth v${release} is live at ${SITE} (${lagos().at}).`);
     process.exit(0);

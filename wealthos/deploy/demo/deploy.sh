@@ -75,6 +75,8 @@ for attempt in 1 2 3 4; do
   [ "$attempt" = 4 ] && { echo "Image push failed." >&2; exit 1; }
   sleep $((attempt * 5))
 done
+# Keep the machine's disk for the next build: only this image stays.
+docker images --format '{{.Repository}}:{{.Tag}}' | grep -E '^(registry.cloudflare.com/.*/)?paruto-wealth-demo:' | grep -v ":$TAG\$" | xargs -r docker rmi -f >/dev/null 2>&1 || true
 if [ "$PROFILE" = private ] && ! npx wrangler secret list --config wrangler.generated.jsonc 2>/dev/null | grep -q '"PARUTO_ID_SECRET"'; then
   # The app can't sign anyone in without it, and the container refuses to start without it.
   echo "The Worker has no PARUTO_ID_SECRET yet: make one with Paruto ID's client-secret script and put it (docs/PRIVATE.md)." >&2; exit 1

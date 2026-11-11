@@ -17,7 +17,7 @@ Add it at the top of `src/lib/updates/notes.ts` with `version: "next"` (id, date
 1. Checks it's on `master` with a clean tree; numbers the release.
 2. Stamps the note; runs `npm run check`; stops on any failure.
 3. Commits the note ("VioWealth vX.Y.Z"), tags the commit, and runs `deploy/demo/deploy.sh` (same environment as a deploy: `OWNER_EMAIL`, `PROFILE`, keys). The deploy reads the tag, so the build knows its number, its time and every earlier release.
-4. If the deploy fails, the commit and tag are taken back. A research source that can't be reached at build time (for example BLS's keyless daily allowance running out) doesn't fail it: that source is left out of this build (its figures show as unavailable) and the deploy ends with "! Not loaded at this build: …". Redeploy later to fill it in.
+4. If the deploy fails, the command first asks the live site which build it serves: a late step can fail after the new version is already live (Cloudflare once throttled a custom-domain check after the update had gone through), and then the release stands. Otherwise the commit and tag are taken back. A research source that can't be reached at build time (for example BLS's keyless daily allowance running out) doesn't fail it: that source is left out of this build (its figures show as unavailable) and the deploy ends with "! Not loaded at this build: …". Redeploy later to fill it in.
 5. Pushes `master` and the tag, then waits for `https://vio.paruto.com/__version` to show the release.
 
 `npm run release -- --dry-run` shows the number and the plan and changes nothing.
