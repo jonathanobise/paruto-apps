@@ -5,7 +5,8 @@
  * Two profiles (deploy.sh):
  * - private (OWNER_EMAIL set): the owner only. People sign in through Paruto ID (id.paruto.com) and
  *   the app admits only the owner's verified email (docs/PRIVATE.md). The container gets outbound
- *   internet access for one reason: the app exchanges Paruto ID's one-time code server-side.
+ *   internet access to exchange Paruto ID's one-time code server-side and, when the ANTHROPIC_API_KEY
+ *   secret is set, for the research assistant to reach the Claude API.
  * - demo (no OWNER_EMAIL): the public SAMPLE demo, open to everyone, with no internet access.
  */
 import { Container } from "@cloudflare/containers";
@@ -21,6 +22,8 @@ interface Env {
   PARUTO_ID_CLIENT?: string;
   /** Private profile (secret): this copy's Paruto ID client secret. */
   PARUTO_ID_SECRET?: string;
+  /** Private profile (secret, optional): connects the research assistant. Without it the assistant says it isn't connected. */
+  ANTHROPIC_API_KEY?: string;
 }
 
 export class DemoApp extends Container<Env> {
@@ -37,6 +40,7 @@ export class DemoApp extends Container<Env> {
         PARUTO_ID_URL: env.PARUTO_ID_URL ?? "",
         PARUTO_ID_CLIENT: env.PARUTO_ID_CLIENT ?? "",
         PARUTO_ID_SECRET: env.PARUTO_ID_SECRET ?? "",
+        ...(env.ANTHROPIC_API_KEY ? { ANTHROPIC_API_KEY: env.ANTHROPIC_API_KEY } : {}),
       };
     }
   }

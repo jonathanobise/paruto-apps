@@ -12,6 +12,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Alert } from "@/components/ui/alert";
 import { NetWorthChart } from "@/components/app/net-worth-chart";
 import { KindIcon } from "@/components/app/kind-icon";
+import { MarketBand } from "@/components/app/market-band";
+import { getMarketSnapshot } from "@/server/research/snapshot";
+import { researchAvailability } from "@/server/research/availability";
 import { AllocationBars } from "@/components/app/allocation-bars";
 import { DataIssues } from "@/components/app/data-issues";
 import { PeriodTabs } from "@/components/app/period-tabs";
@@ -25,7 +28,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const app = await requireApp();
   const sp = await searchParams;
   const period: PeriodKey = sp.period && sp.period in PERIODS ? (sp.period as PeriodKey) : "1Y";
-  const data = await buildDashboard(app.ctx, { baseCurrency: app.baseCurrency, period });
+  // Market figures are official data shown only where market research is available; they never block the page.
+  const [data, research] = await Promise.all([buildDashboard(app.ctx, { baseCurrency: app.baseCurrency, period }), researchAvailability(app.org.jurisdiction)]);
+  const snapshot = research.research ? await getMarketSnapshot(app.ctx) : null;
   const ccy = data.baseCurrency;
   const hasDemo = app.orgs.some((o) => o.isDemo);
 
@@ -34,6 +39,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <>
         <PageHeader title={`Welcome, ${app.session.user.displayName.split(" ")[0]}`} description="Start by adding the accounts you hold. Everything else builds from there." />
         {sp.welcome ? <Alert tone="success" className="mb-6">Your email is confirmed. You&apos;re all set.</Alert> : null}
+        {snapshot ? <MarketBand snapshot={snapshot} /> : null}
         <div className="grid gap-4 lg:grid-cols-2">
           <EmptyState
             icon={<Landmark />}
@@ -110,6 +116,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </dl>
         </CardContent>
       </Card>
+
+      {snapshot ? <MarketBand snapshot={snapshot} /> : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
         <Card>

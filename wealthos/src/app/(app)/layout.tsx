@@ -18,6 +18,8 @@ import { BRAND } from "@/lib/brand";
 import { isDemoMode } from "@/server/demo/mode";
 import { isPrivateMode } from "@/lib/private-mode";
 import { researchAvailability } from "@/server/research/availability";
+import { getMarketSnapshot } from "@/server/research/snapshot";
+import { MarketTicker } from "@/components/app/market-band";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const app = await requireApp();
@@ -28,6 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const appearance = { theme: isTheme(themeRaw) ? themeRaw : "dark", depth: isDepth(depthRaw) ? depthRaw : "night" } as const;
   const isStaff = app.session.user.platformRole !== "user";
   const research = await researchAvailability(app.org.jurisdiction);
+  const snapshot = research.research ? await getMarketSnapshot(app.ctx) : null;
   const user = { name: app.session.user.displayName, email: app.session.user.email };
   const timezone = app.preferences.timezone || "Africa/Lagos";
   return (
@@ -45,6 +48,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <p className="hidden pl-2 text-[13px] text-text-3 lg:block">
             {new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: timezone }).format(new Date())}
           </p>
+          {snapshot ? <MarketTicker snapshot={snapshot} /> : null}
           <div className="ml-auto flex min-w-0 items-center gap-1 sm:gap-1.5">
             <form action={switchOrgAction}>
               <label htmlFor="org-switch" className="sr-only">

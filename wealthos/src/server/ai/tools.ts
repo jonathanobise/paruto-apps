@@ -8,6 +8,7 @@ import { getInstrument, searchCatalogue } from "@/server/research/catalogue";
 import { loadFxTable } from "@/server/market-data/service";
 import { MissingFxRateError, d, projectScenarios } from "@/engine";
 import { BRAND } from "@/lib/brand";
+import { RESEARCH_TOOLS } from "./research-tools";
 
 /**
  * Tools the assistant may call. All are READ-ONLY and run with the requesting user's tenant
@@ -33,9 +34,11 @@ export interface ToolOutput {
   notes?: string[];
 }
 
-interface ToolDef {
+export interface ToolDef {
   definition: Anthropic.Beta.BetaTool;
   personal: boolean;
+  /** A research feature the tool needs available in the organisation's jurisdiction. */
+  feature?: "research" | "backtest";
   run: (ctx: TenantContext, input: Record<string, unknown>, env: { baseCurrency: string }) => Promise<ToolOutput>;
 }
 
@@ -178,6 +181,9 @@ export const TOOLS: Record<string, ToolDef> = {
   },
 };
 
-export function toolsFor(personalDataAllowed: boolean): ToolDef[] {
-  return Object.values(TOOLS).filter((t) => personalDataAllowed || !t.personal);
+Object.assign(TOOLS, RESEARCH_TOOLS);
+
+/** The tools offered for one request: personal tools need consent; research tools need their feature. */
+export function toolsFor(personalDataAllowed: boolean, features: { research: boolean; backtest: boolean } = { research: false, backtest: false }): ToolDef[] {
+  return Object.values(TOOLS).filter((t) => (personalDataAllowed || !t.personal) && (!t.feature || features[t.feature]));
 }

@@ -17,6 +17,19 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
+    id: "2026-11-11-markets-today",
+    date: "2026-11-11",
+    at: "2026-11-11T00:00+01:00",
+    version: "next",
+    title: "The markets, at a glance, every day",
+    summary: "Your dashboard now opens with the official figures that move a Nigerian portfolio, and the research assistant can look them up for you.",
+    points: [
+      "Markets today: the CBN's official dollar, pound and euro rates, Nigeria's inflation, the policy rate, the real policy rate, the US fed funds rate and the one-year Treasury bill yield, each with its date, source and two-year trend.",
+      "The dollar rate, inflation and the policy rate sit in the top bar on wide screens, one tap from the full economic backdrop.",
+      "The research assistant can now read the economy and the markets: exchange-rate and inflation history, Treasury bill and bond yields, long-run returns, and screens, comparisons and backtests of mixes you choose.",
+    ],
+  },
+  {
     id: "2026-11-11-charts-and-pages",
     date: "2026-11-11",
     at: "2026-11-11T04:10+01:00",
