@@ -133,8 +133,11 @@ export interface InstrumentDetail extends CatalogueRow {
   identifiers: Array<{ scheme: string; value: string; verification: string }>;
   priceSource: { name: string; kind: string; licenseNote: string; url: string | null } | null;
   chart: Array<{ date: string; price: number }>;
-  /** Daily closes for the last ten years (the interactive chart); `chart` stays weekly for tables and the assistant. */
-  daily: Array<{ date: string; price: number }>;
+  /**
+   * Daily closes for the last ten years (the interactive chart), with the day's open, high, low and
+   * volume where the source publishes them; `chart` stays weekly for tables and the assistant.
+   */
+  daily: Array<{ date: string; price: number; open: number | null; high: number | null; low: number | null; volume: number | null }>;
   trailing: Array<{ key: string; start: string; cumulative: string | null; annualized: string | null }>;
   rateHistory: RateView[];
 }
@@ -148,7 +151,7 @@ export async function getInstrument(ctx: TenantContext, id: string): Promise<Ins
     const [r] = await tx.select().from(instruments).where(eq(instruments.id, id)).limit(1);
     if (!r || (r.isDemo && !(await isDemoOrg(tx, ctx.orgId)))) throw new AppError("NOT_FOUND", "Instrument not found.");
     const series = await tx
-      .select({ date: marketPrices.observedOn, price: marketPrices.price, sourceName: marketDataSources.name, sourceKind: marketDataSources.kind, license: marketDataSources.licenseNote, url: marketDataSources.url, verification: marketPrices.verificationState, methodology: marketPrices.methodology })
+      .select({ date: marketPrices.observedOn, price: marketPrices.price, open: marketPrices.open, high: marketPrices.high, low: marketPrices.low, volume: marketPrices.volume, sourceName: marketDataSources.name, sourceKind: marketDataSources.kind, license: marketDataSources.licenseNote, url: marketDataSources.url, verification: marketPrices.verificationState, methodology: marketPrices.methodology })
       .from(marketPrices)
       .innerJoin(marketDataSources, eq(marketDataSources.id, marketPrices.sourceId))
       .where(and(eq(marketPrices.instrumentId, id), ...hiddenSourceKinds().map((k) => sql`${marketDataSources.kind} <> ${k}`)))
@@ -193,7 +196,9 @@ export async function getInstrument(ctx: TenantContext, id: string): Promise<Ins
       identifiers: ids.map((x) => ({ scheme: x.scheme, value: x.value, verification: x.verificationState })),
       priceSource: last ? { name: last.sourceName, kind: last.sourceKind, licenseNote: last.license, url: last.url } : null,
       chart: weeklySeries(points).map((p) => ({ date: p.date, price: p.price.toNumber() })),
-      daily: points.filter((p) => p.date >= tenYearsBefore(today)).map((p) => ({ date: p.date, price: p.price.toNumber() })),
+      daily: series
+        .filter((p) => p.date >= tenYearsBefore(today))
+        .map((p) => ({ date: p.date, price: Number(p.price), open: p.open === null ? null : Number(p.open), high: p.high === null ? null : Number(p.high), low: p.low === null ? null : Number(p.low), volume: p.volume === null ? null : Number(p.volume) })),
       trailing: trailing.map((t) => ({ key: t.key, start: t.start, cumulative: t.cumulative?.toFixed(8) ?? null, annualized: t.annualized?.toFixed(8) ?? null })),
       rateHistory,
     };

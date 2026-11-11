@@ -246,6 +246,13 @@
       "when": 1794104342559,
       "tag": "0034_paruto_id_link",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794383855329,
+      "tag": "0035_market_price_ohlc",
+      "breakpoints": true
     }
   ]
 }
