@@ -45,6 +45,9 @@ export function SeriesChart({ rows, series, unit, label, step = false }: { rows:
   // Under three years, years would repeat along the axis: label months instead ("Jan 25").
   const months = (Number(used[used.length - 1]!.month.slice(0, 4)) - Number(used[0]!.month.slice(0, 4))) * 12 + Number(used[used.length - 1]!.month.slice(5, 7)) - Number(used[0]!.month.slice(5, 7));
   const tick = (m: string) => (months < 36 ? `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slice(2, 4)}` : m.slice(0, 4));
+  // Three years or more: one tick per January (thinned to about eight), so each year shows once.
+  const januaries = months < 36 ? [] : used.filter((r) => r.month.endsWith("-01")).map((r) => r.month);
+  const yearTicks = januaries.length ? januaries.filter((_, i) => i % Math.ceil(januaries.length / 8) === 0) : undefined;
   return (
     <div>
       <Legend items={defs.map((s, i) => ({ label: s.label, color: SERIES[i]!, value: fmt(latest(s.key)) }))} />
@@ -55,7 +58,7 @@ export function SeriesChart({ rows, series, unit, label, step = false }: { rows:
               <Wash id={`w-${id}`} strength={0.28} />
             </defs>
             <CartesianGrid {...GRID} />
-            <XAxis dataKey="month" {...timeAxis} tickFormatter={tick} />
+            <XAxis dataKey="month" {...timeAxis} tickFormatter={tick} ticks={yearTicks} />
             <YAxis {...valueAxis} domain={["auto", "auto"]} tickFormatter={axis} width={52} />
             <Tooltip
               cursor={CURSOR}

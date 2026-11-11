@@ -7,8 +7,9 @@ import { getFixedIncome, getMacroOverview, type ChartRow, type SourceRef } from 
  * (naira exchange rates, inflation, policy rates, Treasury bill yields), each with its as-of date,
  * source and a two-year trend. Shown on the dashboard and given to the assistant.
  *
- * Official data only (CBN, Federal Reserve, Bank of England, ONS, BLS): it is the same for every
- * person, so it is computed once and kept for ten minutes. Any part that fails to load is left
+ * Official data (CBN, Federal Reserve, Bank of England, ONS, BLS), plus the FGN 10-year market
+ * yield where licensed data may be shown (EODHD; never on the demo). It is the same for every
+ * person in a deployment, so it is computed once and kept for ten minutes. Any part that fails to load is left
  * out (and the snapshot says what is missing) rather than failing the page.
  */
 export interface SnapshotTile {
@@ -92,8 +93,14 @@ async function build(ctx: TenantContext): Promise<MarketSnapshot> {
     tiles.push({ key: "NG.NTB", label: bill?.tenorDays ? `${bill.tenorDays}-day T-bill yield` : "T-bill yield", value: bill?.effectiveAnnual ?? bill?.trueYield ?? null, unit: "percent", asOf: bill?.asOf ?? null, asOfKind: "day", yearAgo: null, change1y: null, trend: trendOf(fixed.ntbChart, trendKey), source: fixed.source?.name ?? null, href: "/research/fixed-income", note: "Effective annual yield from the latest CBN primary auction stop rate." });
   }
 
+  // The FGN 10-year market yield: only where it is loaded and may be shown (never counted missing).
+  const ng10 = fixed?.marketYields?.latest.find((y) => y.country === "NG");
+  if (fixed?.marketYields && ng10?.value) {
+    tiles.push({ key: "NG.GB10Y", label: "FGN 10-year yield", value: ng10.value, unit: "percent", asOf: ng10.asOf, asOfKind: "day", yearAgo: ng10.yearAgo, change1y: null, trend: trendOf(fixed.marketYields.chart, "ng"), source: ng10.source?.name ?? null, href: "/research/fixed-income", note: "What the 10-year FGN bond yields in the market, end of day." });
+  }
+
   const sources = [...(macro?.sources ?? [])];
-  if (fixed?.source && !sources.some((s) => s.name === fixed.source!.name)) sources.push(fixed.source);
+  for (const src of [fixed?.source, ng10 ? fixed?.marketYields?.source : null]) if (src && !sources.some((s) => s.name === src.name)) sources.push(src);
   return { tiles, sources, missing, builtAt: new Date().toISOString() };
 }
 

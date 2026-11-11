@@ -17,6 +17,19 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
+    id: "next-bond-yields",
+    date: "2026-11-11",
+    at: "2026-11-11T00:00+01:00",
+    version: "next",
+    title: "Today's FGN bond yield",
+    summary: "Fixed income now shows what the 10-year FGN bond yields in the market every trading day, not just at the last auction on record.",
+    points: [
+      "The 10-year FGN bond's market yield, end of day, with where it stood a year earlier and roughly what it pays after inflation.",
+      "The US 10-year Treasury and UK 10-year gilt alongside it, with ten years of history on one chart.",
+      "The FGN 10-year yield joins Markets today on the dashboard and the ticker, and the assistant can quote it.",
+    ],
+  },
+  {
     id: "2026-11-11-candlesticks",
     date: "2026-11-11",
     at: "2026-11-11T09:05+01:00",

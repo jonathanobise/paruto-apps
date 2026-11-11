@@ -30,7 +30,7 @@ export function MarketBand({ snapshot }: { snapshot: MarketSnapshot }) {
           <h2 id="markets-today" className="kicker">
             Markets today
           </h2>
-          <p className="mt-1 text-[12.5px] text-text-3">Official figures, each with its date. {snapshot.missing.length ? `Not loaded: ${snapshot.missing.join(", ")}.` : null}</p>
+          <p className="mt-1 text-[12.5px] text-text-3">{snapshot.tiles.some((t) => t.key === "NG.GB10Y") ? "Official figures and the bond market" : "Official figures"}, each with its date. {snapshot.missing.length ? `Not loaded: ${snapshot.missing.join(", ")}.` : null}</p>
         </div>
         <Link href="/research/macro" className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline">
           Economic backdrop <ArrowRight className="size-3.5" aria-hidden />

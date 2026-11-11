@@ -36,10 +36,12 @@ export default async function FixedIncomePage() {
   if (!gate.available) return (<><PageHeader eyebrow="Research" title="Fixed income" /><Alert tone="info" title="Not available yet">{gate.reason}</Alert></>);
   const f = await getFixedIncome(app.ctx);
   const infl = f.inflation;
-  const sources = [f.source, infl?.source ?? null].filter((x): x is NonNullable<typeof x> => x !== null).filter((x, i, a) => a.findIndex((y) => y.name === x.name) === i);
+  const my = f.marketYields;
+  const ng10 = my?.latest.find((y) => y.country === "NG") ?? null;
+  const sources = [f.source, my?.source ?? null, infl?.source ?? null].filter((x): x is NonNullable<typeof x> => x !== null).filter((x, i, a) => a.findIndex((y) => y.name === x.name) === i);
   return (
     <>
-      <PageHeader eyebrow="Research" title="Nigerian government yields" description="What the Federal Government paid at its latest primary auctions of Treasury bills and FGN bonds, money-market rates, and how they compare with inflation. Results as published by the CBN." />
+      <PageHeader eyebrow="Research" title="Nigerian government yields" description="What the Federal Government paid at its latest primary auctions of Treasury bills and FGN bonds, what its 10-year bond yields in the market today, money-market rates, and how they compare with inflation." />
       <ResearchTabs current="/research/fixed-income" jurisdiction={app.org.jurisdiction} />
       {gate.status === "pending_review" ? <PreRelease reason={gate.reason} /> : null}
 
@@ -94,6 +96,40 @@ export default async function FixedIncomePage() {
         </CardContent>
       </Card>
 
+      {my ? (
+        <Card className="mb-6">
+          <CardHeader>
+            <div>
+              <CardTitle>10-year government bond yields in the market</CardTitle>
+              <CardDescription>What the 10-year benchmark bond yields as it trades between investors, end of day. Auctions are monthly; this moves every trading day, so it shows where FGN bond yields are now.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <dl className="mb-6 grid gap-5 sm:grid-cols-3">
+              {my.latest.map((y) => (
+                <Stat
+                  key={y.key}
+                  label={y.name}
+                  value={formatPercent(y.value, { decimals: 2 })}
+                  sub={
+                    <>
+                      {y.asOf ? formatDate(y.asOf) : "—"}
+                      {y.yearAgo ? <> · {formatPercent(y.yearAgo, { decimals: 2 })} a year earlier</> : null}
+                      {y.realApprox ? <> · <Delta value={y.realApprox} percent /> after inflation*</> : null}
+                    </>
+                  }
+                />
+              ))}
+            </dl>
+            <SeriesChart rows={my.chart} series={[{ key: "ng", label: "Nigeria" }, { key: "us", label: "United States" }, { key: "uk", label: "United Kingdom" }].filter((x) => my.latest.some((y) => y.country === ({ ng: "NG", us: "US", uk: "GB" } as const)[x.key as "ng" | "us" | "uk"]))} unit="percent" label="10-year government bond yields, month end" />
+            <p className="mt-3 text-[12px] text-text-3">
+              Yields are in each bond&apos;s own currency, so they reflect each country&apos;s inflation and currency risk and aren&apos;t a like-for-like return comparison.
+              {ng10?.realApprox ? <> * (1 + yield) ÷ (1 + latest headline inflation{infl?.value ? `, ${formatPercent(infl.value, { decimals: 2 })} in ${monthName(infl.asOf!)}` : ""}) − 1, an approximation.</> : null}
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <div className="grid gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader><div><CardTitle>Bill yields over time</CardTitle><CardDescription>True yield at the last auction of each month, by tenor.</CardDescription></div></CardHeader>
@@ -132,7 +168,7 @@ export default async function FixedIncomePage() {
           </table>
         </div>
         <CardContent className="flex flex-col gap-1 pt-3 text-[12px] text-text-3">
-          {f.lastBondAuction ? <p>The CBN&apos;s published FGN bond results run to {formatDate(f.lastBondAuction)}. FGN bond auctions are run by the Debt Management Office, whose later results aren&apos;t a source here yet, so these yields are dated: check the auction date before using any of them.</p> : null}
+          {f.lastBondAuction ? <p>The CBN&apos;s published FGN bond results run to {formatDate(f.lastBondAuction)}. Later auctions are run by the Debt Management Office, whose results aren&apos;t a source here, so these auction yields are dated: check the auction date before using any of them.{my ? " For today's level, see the 10-year market yield above." : ""}</p> : null}
           {f.excludedBondResults ? <p>{f.excludedBondResults} bond result{f.excludedBondResults === 1 ? "" : "s"} with under six months to maturity were left out as suspected keying errors in the source.</p> : null}
           <p>* As for bills; bond yields are semi-annual-coupon yields, treated here as annual for a rough comparison.</p>
         </CardContent>

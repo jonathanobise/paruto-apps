@@ -29,10 +29,16 @@ Derived series are computed by us and say so (source kind `derived`):
 | **EODHD** (recommended for prices) | End-of-day prices, dividends and splits: US, LSE, global ETFs **and NGX (XNSA, 159 tickers)**; 30+ years; FX | Personal plans $19.99–99.99/mo forbid "displaying" (to others); Commercial Internal $399/mo forbids display outside the company; display rights by quote (Enterprise $2,499/mo; Custom "from $399/mo") | Owner approval for a personal plan for the private phase; confirm in writing that a single-user private app is personal use; get a display quote before going public, including XNSA provenance |
 | NGX (direct) | NGX equity EOD prices, dividends, index values | EOD Prices API ₦125k/yr; Website/Mobile EOD licence ₦120k/yr; Historical Data Redistribution ₦1.25m/yr (+VAT). Policy §8.2.6: redistribution needs "prior written permission from NGX" | Needed before showing NGX data publicly, even if prices come from a vendor |
 | SEC Nigeria | Weekly NAV and unit price of every collective investment scheme, 2011 → (XLSX) | Terms of Use page has no body text: reuse unstated | Ask SEC for written permission; ingest privately in the meantime only with owner approval |
-| DMO | Eurobond daily prices/yields; FGN bond auction summaries; Savings bonds | "All Rights Reserved"; no reuse licence | Ask DMO for permission |
+| DMO | Eurobond daily prices/yields; FGN bond auction summaries; Savings bonds | "All Rights Reserved"; no reuse licence. The site also refuses automated downloads of its files (HTTP 403, checked 11 Nov 2026) | Ask DMO for permission and a data file. Meanwhile the FGN 10-year market yield comes from EODHD (below) |
+| IMF (Monetary and Financial Statistics, interest rates) | Checked 11 Nov 2026: for Nigeria only T-bill yield, deposit, lending and policy rates (monthly, to Apr 2026); no government bond yield | Free with attribution | Not needed: the CBN publishes the same rates daily/monthly |
 | NBS | CPI index levels, inflation reports | Reported: no redistribution "without the written agreement" of NBS (page did not load for verification) | We use the CBN's republication of the inflation rates; confirm with NBS before public launch |
 | FMDQ | Secondary-market T-bill and FGN bond quotes | Redistribution licence ₦13.4m/yr; "may not be… displayed… without the prior written consent of FMDQ Group" | Deferred; primary-auction rates from the CBN instead |
 | Index providers (S&P DJI, FTSE Russell, NGX ASI) | Index levels | Licensed for display | Show tracking ETFs instead until licensed |
+
+**EODHD government bond yields** (in use on the private deployment, under the same personal plan and
+terms as the prices): daily 10-year yields for Nigeria (`NG10Y.GBOND`, the only Nigerian tenor EODHD
+carries), the US and the UK, ingested with the EODHD task as licensed macro series and never shown on
+the public demo. Before any public display, the display licence must cover these series too.
 
 ## Rules
 - Store provenance for every value (source, methodology, retrieval time); never fill gaps.
