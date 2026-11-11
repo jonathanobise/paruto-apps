@@ -17,7 +17,8 @@ export const EODHD_BASE = "https://eodhd.com/api";
 /** API calls each endpoint costs against the daily allowance (EODHD's published weighting). */
 export const EODHD_CALL_COST = { eod: 1, div: 1, splits: 1, fundamentals: 10, symbols: 1 } as const;
 
-export interface EodPrice { date: ISODate; close: string }
+/** A day's raw prices. open/high/low/volume are null when missing or inconsistent (the close is kept). */
+export interface EodPrice { date: ISODate; close: string; open: string | null; high: string | null; low: string | null; volume: string | null }
 export interface EodDividend { exDate: ISODate; payDate: ISODate | null; amount: string; currency: string }
 export interface EodSplit { exDate: ISODate; ratio: string }
 
@@ -35,6 +36,24 @@ export function normaliseCurrency(value: string, currency: string): { value: str
   return { value, currency: c };
 }
 
+/**
+ * The day's open, high and low (normalised like the close) and volume, only when they make a
+ * coherent bar: all positive, high the highest and low the lowest of the four. A bar that doesn't
+ * (sources occasionally publish one) is left out rather than corrected; the close still counts.
+ */
+function bar(r: Record<string, unknown>, close: string, currency: string): Pick<EodPrice, "open" | "high" | "low" | "volume"> {
+  const o = num(r.open);
+  const h = num(r.high);
+  const l = num(r.low);
+  const v = num(r.volume);
+  const volume = v !== null && d(v).gte(0) ? d(v).toString() : null;
+  if (o === null || h === null || l === null) return { open: null, high: null, low: null, volume };
+  const [O, H, L, C] = [d(o), d(h), d(l), d(close)];
+  const coherent = O.gt(0) && L.gt(0) && H.gte(O) && H.gte(C) && H.gte(L) && L.lte(O) && L.lte(C);
+  if (!coherent) return { open: null, high: null, low: null, volume };
+  return { open: normaliseCurrency(o, currency).value, high: normaliseCurrency(h, currency).value, low: normaliseCurrency(l, currency).value, volume };
+}
+
 export function parseEod(json: unknown, currency: string): { rows: EodPrice[]; currency: string; skipped: number } {
   const rows: EodPrice[] = [];
   let skipped = 0;
@@ -47,7 +66,7 @@ export function parseEod(json: unknown, currency: string): { rows: EodPrice[]; c
     }
     const n = normaliseCurrency(close, currency);
     outCcy = n.currency;
-    rows.push({ date: r.date, close: n.value });
+    rows.push({ date: r.date, close: n.value, ...bar(r, close, currency) });
   }
   return { rows, currency: outCcy, skipped };
 }

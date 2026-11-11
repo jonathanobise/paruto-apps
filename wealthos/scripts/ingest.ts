@@ -282,14 +282,18 @@ async function eodhdTask(): Promise<string> {
         if (sectorKey) await pool.query("update instruments set sector_key = $2 where id = $1 and sector_key is distinct from $2", [instrumentId, sectorKey]);
         report.fundamentals++;
       }
-      const from = last?.last ? new Date(Date.parse(last.last) - 10 * 86400_000).toISOString().slice(0, 10) : "1990-01-01";
+      // From just before the last stored day; or from the start when stored days lack open/high/low
+      // (stored before those were kept), so the full bars are filled in once. One call either way.
+      const needsBars = instrumentId ? (await pool.query("select exists (select 1 from market_prices where instrument_id = $1 and source_id = $2 and high is null and volume is null) as missing", [instrumentId, sourceId])).rows[0]?.missing === true : false;
+      const from = last?.last && !needsBars ? new Date(Date.parse(last.last) - 10 * 86400_000).toISOString().slice(0, 10) : "1990-01-01";
       const eod = parseEod(await client.get("eod", `eod/${entry.code}`, { from }), currency);
       await chunked(eod.rows, 1000, async (chunk) => {
-        const values = chunk.map((_, j) => `('${instrumentId}','${sourceId}',$${j * 2 + 1}::date,$${j * 2 + 2}::numeric,'${eod.currency}','close','verified')`).join(",");
+        const values = chunk.map((_, j) => `('${instrumentId}','${sourceId}',$${j * 6 + 1}::date,$${j * 6 + 2}::numeric,$${j * 6 + 3}::numeric,$${j * 6 + 4}::numeric,$${j * 6 + 5}::numeric,$${j * 6 + 6}::numeric,'${eod.currency}','close','verified')`).join(",");
         await pool.query(
-          `insert into market_prices (instrument_id, source_id, observed_on, price, currency, methodology, verification_state) values ${values}
-           on conflict (instrument_id, source_id, observed_on) do update set price = excluded.price, retrieved_at = now() where market_prices.price <> excluded.price`,
-          chunk.flatMap((p) => [p.date, p.close]),
+          `insert into market_prices (instrument_id, source_id, observed_on, price, open, high, low, volume, currency, methodology, verification_state) values ${values}
+           on conflict (instrument_id, source_id, observed_on) do update set price = excluded.price, open = excluded.open, high = excluded.high, low = excluded.low, volume = excluded.volume, retrieved_at = now()
+           where (market_prices.price, market_prices.open, market_prices.high, market_prices.low, market_prices.volume) is distinct from (excluded.price, excluded.open, excluded.high, excluded.low, excluded.volume)`,
+          chunk.flatMap((p) => [p.date, p.close, p.open, p.high, p.low, p.volume]),
         );
       });
       if (!eod.rows.length) await pool.query("update market_prices set retrieved_at = now() where instrument_id = $1 and source_id = $2 and observed_on = $3", [instrumentId, sourceId, last?.last ?? "1900-01-01"]);

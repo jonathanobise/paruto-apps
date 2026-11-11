@@ -104,6 +104,11 @@ export const marketPrices = pgTable("market_prices", {
   sourceId: uuid("source_id").notNull().references(() => marketDataSources.id),
   observedOn: date("observed_on", { mode: "string" }).notNull(),
   price: quantity("price").notNull(),
+  /** The day's open, high and low (same currency and basis as `price`, the close) and shares traded, where the source publishes them. */
+  open: quantity("open"),
+  high: quantity("high"),
+  low: quantity("low"),
+  volume: quantity("volume"),
   currency: text("currency").notNull(),
   /** close | nav | mid | bid | user_estimate */
   methodology: text("methodology").notNull(),

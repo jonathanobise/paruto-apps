@@ -17,6 +17,19 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
+    id: "2026-11-11-candlesticks",
+    date: "2026-11-11",
+    at: "2026-11-11T00:00+01:00",
+    version: "next",
+    title: "Candlesticks and volume",
+    summary: "Price charts for shares and funds traded on an exchange now show each day's full range and how much changed hands.",
+    points: [
+      "Candlesticks show each day's open, high, low and close: green when the day closed above where it opened, red below.",
+      "Volume bars underneath show how many shares traded each day.",
+      "Point at any day to read its open, high, low, close and volume; switch back to a line whenever you like.",
+    ],
+  },
+  {
     id: "2026-11-11-pro-price-charts",
     date: "2026-11-11",
     at: "2026-11-11T08:15+01:00",
