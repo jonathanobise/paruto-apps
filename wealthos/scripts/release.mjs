@@ -128,7 +128,9 @@ if (!run("deploy/demo/deploy.sh")) {
 }
 
 // 5. Share it, and see it live.
-if (!run(`git push -q origin master ${tag}`)) console.error(`\n! Live, but the push failed: push master and ${tag} by hand.`);
+// Separately, so a refused tag push (some machines may push branches but not tags) never holds back master.
+if (!run("git push -q origin master")) console.error("\n! Live, but pushing master failed: push it by hand.");
+if (!run(`git push -q origin ${tag}`)) console.error(`\n! Live, but pushing the tag failed: push ${tag} by hand (git push origin ${tag}).`);
 for (let i = 0; i < 36; i++) {
   const live = await liveNow();
   if (live?.release === release) {
