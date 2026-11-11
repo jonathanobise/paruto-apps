@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Alert } from "@/components/ui/alert";
 import { NetWorthChart } from "@/components/app/net-worth-chart";
+import { KindIcon } from "@/components/app/kind-icon";
 import { AllocationBars } from "@/components/app/allocation-bars";
 import { DataIssues } from "@/components/app/data-issues";
 import { PeriodTabs } from "@/components/app/period-tabs";
@@ -105,7 +106,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <Stat size="lg" label="Net worth" value={formatMoney(data.totals.netWorth, ccy, { decimals: 0 })} sub={<>Assets {formatMoney(data.totals.assets, ccy, { compact: true })} · Liabilities {formatMoney(data.totals.liabilities, ccy, { compact: true })}</>} />
             <Stat label="Invested" value={formatMoney(data.totals.invested, ccy, { decimals: 0 })} sub="Market value in investment accounts" />
             <Stat label="Cash" value={formatMoney(data.totals.cash, ccy, { decimals: 0 })} sub="Across all ledger accounts" />
-            <Stat label="Unrealised gain" value={<Delta value={data.totals.unrealized} currency={ccy} />} sub={<>Realised to date <Delta value={data.totals.realized} currency={ccy} /></>} help="Market value minus cost basis, in the display currency at acquisition-date FX (includes currency effects)." />
+            <Stat label="Unrealised gain" value={<Delta value={data.totals.unrealized} currency={ccy} decimals={0} />} sub={<>Realised to date <Delta value={data.totals.realized} currency={ccy} decimals={0} /></>} help="Market value minus cost basis, in the display currency at acquisition-date FX (includes currency effects)." />
           </dl>
         </CardContent>
       </Card>
@@ -115,7 +116,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <CardHeader>
             <div>
               <CardTitle>Net worth over time</CardTitle>
-              <CardDescription>Month-end values. The gap between the lines is growth and income, not new money.</CardDescription>
+              <CardDescription>Month-end values. The gap between the lines is growth and income, not new money. Point at the chart to read any month.</CardDescription>
             </div>
           </CardHeader>
           <CardContent>{nwChange.length ? <NetWorthChart data={data.history} currency={ccy} /> : <p className="text-sm text-text-3">History appears after your first month of records.</p>}</CardContent>
@@ -226,8 +227,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <CardContent>
             <ul className="divide-y divide-border">
               {data.recent.map((t) => (
-                <li key={t.id} className="flex items-center justify-between gap-3 py-2.5 text-[13px]">
-                  <div className="min-w-0">
+                <li key={t.id} className="flex items-center gap-3.5 py-3 text-[13px]">
+                  <KindIcon event={t.type} />
+                  <div className="min-w-0 flex-1">
                     <p className={t.reversed ? "text-text-3 line-through" : "font-medium"}>
                       {t.label}
                       {t.description ? <span className="font-normal text-text-2"> · {t.description}</span> : null}

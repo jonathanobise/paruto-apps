@@ -7,7 +7,8 @@ import { PeriodTabs } from "@/components/app/period-tabs";
 import { PageHeader } from "@/components/app/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Delta } from "@/components/ui/money";
+import { Delta, DeltaPill } from "@/components/ui/money";
+import { Monogram } from "@/components/app/kind-icon";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatMoney, formatNumber, formatPercent } from "@/lib/format";
@@ -38,20 +39,34 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
       {d.holdings.length === 0 ? (
         <EmptyState icon={<Layers />} title="No holdings yet" action={<Button asChild><Link href="/transactions/new">Record a purchase</Link></Button>}>Record a purchase or an existing (opening) position.</EmptyState>
       ) : (
+        <>
+        <dl className="mb-5 grid grid-cols-2 gap-x-8 gap-y-4 sm:flex sm:flex-wrap">
+          <div>
+            <dt className="kicker">Positions</dt>
+            <dd className="figure mt-1.5 text-[24px]">{d.holdings.length}</dd>
+          </div>
+          <div>
+            <dt className="kicker">Market value</dt>
+            <dd className="figure mt-1.5 text-[24px]">{formatMoney(d.totals.invested, ccy, { decimals: 0 })}</dd>
+          </div>
+          <div>
+            <dt className="kicker">Unrealised</dt>
+            <dd className="mt-1.5"><DeltaPill amount={d.totals.unrealized} currency={ccy} /></dd>
+          </div>
+        </dl>
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1080px] text-[13px]">
+            <table className="w-full min-w-[980px] text-[13px]">
               <thead className="text-left text-text-3 text-[12px]">
                 <tr className="border-b border-border">
-                  <th className="px-4 py-2.5 font-medium">Instrument</th>
-                  <th className="px-4 py-2.5 font-medium">Account</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Units</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Price</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Cost basis ({ccy})</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Value ({ccy})</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Unrealised</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Return · {period}</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Weight</th>
+                  <th className="py-2.5 pl-4 pr-3 font-medium">Instrument</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Units</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Price</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Cost basis</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Value</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Unrealised</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Return · {period}</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Weight</th>
                 </tr>
               </thead>
               <tbody>
@@ -60,28 +75,38 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
                   const pct = h.unrealizedBase && h.costBase && Number(h.costBase) !== 0 ? String(Number(h.unrealizedBase) / Number(h.costBase)) : null;
                   return (
                     <tr key={`${h.accountId}-${h.instrumentId}`} className="border-t border-border align-top">
-                      <td className="px-4 py-3">
-                        <p className="font-medium">{h.symbol ?? h.name}</p>
-                        <p className="text-text-3">{h.symbol ? h.name : h.assetClass}{h.maturityDate ? ` · matures ${formatDate(h.maturityDate)}` : ""}</p>
-                      </td>
-                      <td className="px-4 py-3 text-text-2">{h.accountName}</td>
-                      <td className="num px-4 py-3 text-right">{formatNumber(h.quantity)}</td>
-                      <td className="num px-4 py-3 text-right">
-                        {h.price ? formatMoney(h.price, h.currency, { decimals: h.method === "accrual" ? 4 : 2 }) : "—"}
-                        <div className="mt-1 flex justify-end gap-1">
-                          <Badge tone={m.tone}>{m.label}</Badge>
-                          {h.synthetic ? <Badge tone="demo">Sample</Badge> : null}
+                      <td className="py-3.5 pl-4 pr-3">
+                        <div className="flex gap-3">
+                          <Monogram text={h.symbol ?? h.name} assetClass={h.assetClass} />
+                          <div className="min-w-0">
+                            <p className="font-semibold tracking-[-0.01em]">{h.symbol ?? h.name}</p>
+                            <p className="max-w-[230px] truncate text-text-3" title={`${h.symbol ? h.name : h.assetClass}${h.maturityDate ? ` · matures ${formatDate(h.maturityDate)}` : ""}`}>{h.symbol ? h.name : h.assetClass}</p>
+                            <p className="mt-0.5 text-[11.5px] text-text-3">{h.accountName}{h.maturityDate ? ` · matures ${formatDate(h.maturityDate)}` : ""}</p>
+                          </div>
                         </div>
-                        {h.priceDate ? <p className="mt-0.5 text-[11px] text-text-3">as of {formatDate(h.priceDate)}</p> : null}
                       </td>
-                      <td className="num px-4 py-3 text-right">{formatMoney(h.costBase, ccy, { decimals: 0 })}</td>
-                      <td className="num px-4 py-3 text-right font-medium">{formatMoney(h.marketValueBase, ccy, { decimals: 0 })}</td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="num px-3 py-3.5 text-right">{formatNumber(h.quantity)}</td>
+                      <td className="num px-3 py-3.5 text-right">
+                        {h.price ? formatMoney(h.price, h.currency, { decimals: h.method === "accrual" ? 4 : 2 }) : "—"}
+                        <p className="mt-1 flex items-center justify-end gap-1.5 whitespace-nowrap text-[11px] text-text-3">
+                          {m.tone === "neutral" ? <span>{m.label}</span> : <Badge tone={m.tone}>{m.label}</Badge>}
+                          {h.priceDate ? <span>· {formatDate(h.priceDate, "short")}</span> : null}
+                        </p>
+                        {h.synthetic ? <p className="mt-1 flex justify-end"><Badge tone="demo">Sample</Badge></p> : null}
+                      </td>
+                      <td className="num px-3 py-3.5 text-right">{formatMoney(h.costBase, ccy, { decimals: 0 })}</td>
+                      <td className="num px-3 py-3.5 text-right font-semibold">{formatMoney(h.marketValueBase, ccy, { decimals: 0 })}</td>
+                      <td className="px-3 py-3.5 text-right">
                         <Delta value={h.unrealizedBase} currency={ccy} />
                         {pct ? <p><Delta value={pct} percent className="text-[12px]" /></p> : null}
                       </td>
-                      <td className="px-4 py-3 text-right"><ReturnCell p={perfOf(h.accountId, h.instrumentId)} baseCurrency={ccy} /></td>
-                      <td className="num px-4 py-3 text-right">{formatPercent(h.weight)}</td>
+                      <td className="px-3 py-3.5 text-right"><ReturnCell p={perfOf(h.accountId, h.instrumentId)} baseCurrency={ccy} /></td>
+                      <td className="px-3 py-3.5 text-right">
+                        <span className="num">{formatPercent(h.weight)}</span>
+                        <span className="ml-auto mt-1.5 block h-1 w-16 overflow-hidden rounded-full bg-text/[0.07]" aria-hidden>
+                          <span className="block h-full rounded-full bg-[var(--series-1)]" style={{ width: `${Math.min(100, Number(h.weight) * 100 / Math.max(...d.holdings.map((x) => Number(x.weight)), 0.0001))}%` }} />
+                        </span>
+                      </td>
                     </tr>
                   );
                 })}
@@ -89,6 +114,7 @@ export default async function HoldingsPage({ searchParams }: { searchParams: Pro
             </table>
           </div>
         </Card>
+        </>
       )}
       {closed.length ? (
         <Card className="mt-6 overflow-hidden">

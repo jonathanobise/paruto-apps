@@ -294,12 +294,13 @@ thead + tbody > tr:first-child {
   }
 }
 
-/* Editorial figure: the one number a panel is about. */
+/* Editorial figure: the one number a panel is about. Proportional figures at display sizes
+   (tabular digits look loose this big); columns of numbers keep .num. */
 .figure {
   font-family: var(--font-display);
   font-weight: 640;
   letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: proportional-nums lining-nums;
   line-height: 1;
 }
 
@@ -869,4 +870,95 @@ html[data-launched] #vio-launch {
   .vio-conn-on {
     animation: none;
   }
+}
+
+/* ——— Charts (components/charts/kit.tsx) ——— */
+/* The brand series glows softly; other series stay flat so the eye knows where to look. */
+.vio-glow .recharts-curve,
+.vio-glow.recharts-curve {
+  filter: drop-shadow(0 6px 14px rgb(124 77 255 / 0.4));
+}
+:root[data-theme="light"] .vio-glow .recharts-curve,
+:root[data-theme="light"] .vio-glow.recharts-curve {
+  filter: drop-shadow(0 6px 12px rgb(106 53 217 / 0.22));
+}
+.vio-end-halo {
+  opacity: 0.22;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vio-breathe 2.4s ease-in-out infinite;
+}
+@keyframes vio-breathe {
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.32;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.08;
+  }
+}
+.recharts-cartesian-axis-tick-value {
+  font-variant-numeric: tabular-nums;
+}
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+.vio-tip {
+  box-shadow: inset 0 0 0 1px var(--glass-rim), 0 18px 40px -16px rgb(0 0 0 / 0.65);
+}
+.vio-table-toggle > summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.25s var(--ease);
+}
+.vio-table-toggle[open] > summary::before {
+  transform: rotate(45deg);
+}
+.vio-table-toggle > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ——— Tables: one quiet, precise style for every data table ——— */
+@layer base {
+  main table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  main table tbody tr {
+    transition: background-color 0.2s;
+  }
+  main table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--text) 2.5%, transparent);
+  }
+}
+
+/* ——— Pages arrive in a calm cascade (none under Reduce Motion) ——— */
+main#main > * {
+  animation: rise 0.7s var(--ease) both;
+}
+main#main > :nth-child(2) {
+  animation-delay: 0.05s;
+}
+main#main > :nth-child(3) {
+  animation-delay: 0.1s;
+}
+main#main > :nth-child(4) {
+  animation-delay: 0.15s;
+}
+main#main > :nth-child(5) {
+  animation-delay: 0.2s;
+}
+main#main > :nth-child(n + 6) {
+  animation-delay: 0.25s;
 }
