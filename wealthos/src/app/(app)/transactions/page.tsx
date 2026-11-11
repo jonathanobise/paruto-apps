@@ -10,6 +10,8 @@ import { Alert } from "@/components/ui/alert";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import { ReverseForm } from "./reverse-form";
+import { Fragment } from "react";
+import { KindIcon } from "@/components/app/kind-icon";
 
 export const metadata = { title: "Transactions" };
 
@@ -53,22 +55,36 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
                 </tr>
               </thead>
               <tbody>
-                {rows.map((t) => (
-                  <tr key={t.id} className="border-t border-border align-top">
-                    <td className="num whitespace-nowrap px-4 py-2.5 text-text-2">{formatDate(t.date)}</td>
-                    <td className="px-4 py-2.5">
-                      <span className={t.reversedBy ? "text-text-3 line-through" : "font-medium"}>{t.label}</span>
-                      {t.reversedBy ? <Badge className="ml-2">Reversed</Badge> : null}
-                      {t.source === "demo" ? <Badge tone="demo" className="ml-2">Demo</Badge> : null}
-                      {t.source === "import" ? <Badge className="ml-2">Imported</Badge> : null}
-                      {t.description ? <p className="text-text-3">{t.description}</p> : null}
+                {rows.map((t, i) => (
+                  <Fragment key={t.id}>
+                  {i === 0 || rows[i - 1]!.date.slice(0, 7) !== t.date.slice(0, 7) ? (
+                    <tr className="bg-text/[0.02] hover:!bg-text/[0.02]">
+                      <th colSpan={7} scope="colgroup" className="border-t border-border px-4 pb-1.5 pt-4 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-text-3">
+                        {new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${t.date.slice(0, 7)}-01T00:00:00Z`))}
+                      </th>
+                    </tr>
+                  ) : null}
+                  <tr className="border-t border-border">
+                    <td className="num whitespace-nowrap px-4 py-3 text-text-2">{formatDate(t.date)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-start gap-3">
+                        <KindIcon event={t.type} className="size-8 rounded-[10px]" />
+                        <div className="min-w-0">
+                          <span className={t.reversedBy ? "text-text-3 line-through" : "font-medium"}>{t.label}</span>
+                          {t.reversedBy ? <Badge className="ml-2">Reversed</Badge> : null}
+                          {t.source === "demo" ? <Badge tone="demo" className="ml-2">Demo</Badge> : null}
+                          {t.source === "import" ? <Badge className="ml-2">Imported</Badge> : null}
+                          {t.description ? <p className="text-text-3">{t.description}</p> : null}
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-4 py-2.5 text-text-2">{t.account}</td>
-                    <td className="px-4 py-2.5 text-text-2">{t.instrument ?? "—"}</td>
-                    <td className="num px-4 py-2.5 text-right">{t.quantity ? formatNumber(t.quantity) : ""}</td>
-                    <td className="num whitespace-nowrap px-4 py-2.5 text-right">{t.amount && t.currency ? formatMoney(t.amount, t.currency) : ""}</td>
-                    <td className="px-4 py-2.5">{app.canWrite && !t.reversedBy && t.type !== "reversal" ? <ReverseForm eventId={t.id} /> : null}</td>
+                    <td className="px-4 py-3 text-text-2">{t.account}</td>
+                    <td className="px-4 py-3 text-text-2">{t.instrument ?? "—"}</td>
+                    <td className="num px-4 py-3 text-right">{t.quantity ? formatNumber(t.quantity) : ""}</td>
+                    <td className="num whitespace-nowrap px-4 py-3 text-right font-semibold">{t.amount && t.currency ? formatMoney(t.amount, t.currency) : ""}</td>
+                    <td className="w-12 px-2 py-2">{app.canWrite && !t.reversedBy && t.type !== "reversal" ? <ReverseForm eventId={t.id} /> : null}</td>
                   </tr>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

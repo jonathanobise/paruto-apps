@@ -111,7 +111,7 @@ test("a new user records investments and sees a correct dashboard", async ({ pag
   // Reverse the dividend; history keeps it, marked reversed
   await page.goto("/transactions");
   const row = page.getByRole("row", { name: /Dividend/ });
-  await row.getByText("Reverse…").click();
+  await row.getByTitle("Reverse this entry").click();
   await row.getByPlaceholder(/Why\?/).fill("Entered in error");
   await row.getByRole("button", { name: "Reverse entry" }).click();
   await page.waitForURL("**/transactions?reversed=1");

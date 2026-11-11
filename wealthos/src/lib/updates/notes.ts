@@ -17,6 +17,21 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
+    id: "2026-11-11-charts-and-pages",
+    date: "2026-11-11",
+    at: "2026-11-11T00:00+01:00",
+    version: "next",
+    title: "Charts you can read with a fingertip",
+    summary: "Every chart and page has been refined: your net worth reads month by month as you point, and lists scan at a glance.",
+    points: [
+      "Point at your net worth chart and the figure above it follows you, with the change since the start. Switch between 6 months, a year, three years or everything.",
+      "Charts share one calm look: the value scale on the right, each line's latest value in its legend, and a marker on the most recent point.",
+      "Projections show the range between the lowest and highest scenario as a soft fan, so no single line looks like the answer.",
+      "Accounts, transactions and holdings scan by shape: a small icon for each kind of account and transaction, monograms for investments, and transactions grouped by month.",
+      "Holdings opens with your positions, market value and unrealised gain, and each holding's weight has its own small bar.",
+    ],
+  },
+  {
     id: "2026-11-11-first-numbered-release",
     date: "2026-11-11",
     at: "2026-11-11T03:39+01:00",

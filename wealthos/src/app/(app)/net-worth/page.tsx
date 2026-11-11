@@ -21,7 +21,7 @@ export default async function NetWorthPage() {
       <PageHeader title="Net worth" description={`What you own minus what you owe, in ${ccy}, as of ${formatDate(d.asOf)}. Jointly owned items count at your share.`} />
       <Card className="mb-6">
         <CardContent className="pt-5">
-          <dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <Stat size="lg" label="Net worth" value={formatMoney(d.totals.netWorth, ccy, { decimals: 0 })} />
             <Stat label="Financial assets" value={formatMoney(String(ledgerTotal), ccy, { decimals: 0 })} sub="Cash and investments (ledger)" />
             <Stat label="Other assets" value={formatMoney(d.totals.manualAssets, ccy, { decimals: 0 })} sub="Your estimates" />

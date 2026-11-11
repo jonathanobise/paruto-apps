@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Monogram } from "@/components/app/kind-icon";
 import { Search } from "lucide-react";
 import { requireApp } from "@/server/auth/context";
 import { featureDecision } from "@/server/compliance/gate";
@@ -67,8 +68,13 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
                 {rows.map((r) => (
                   <tr key={r.id} className="border-t border-border align-top">
                     <td className="px-4 py-3">
-                      <Link href={`/explore/${r.id}`} className="font-medium hover:text-accent">{r.name}</Link>
-                      <p className="text-text-3">{[r.symbol, r.issuer, r.currency].filter(Boolean).join(" · ")}</p>
+                      <div className="flex gap-3">
+                        <Monogram text={r.symbol ?? r.name} assetClass={r.assetClassLabel} />
+                        <div className="min-w-0">
+                          <Link href={`/explore/${r.id}`} className="font-medium hover:text-accent">{r.name}</Link>
+                          <p className="text-text-3">{[r.symbol, r.issuer, r.currency].filter(Boolean).join(" · ")}</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-text-2">{r.assetClassLabel}{r.isPrivate ? <Badge className="ml-1">Private</Badge> : null}</td>
                     <td className="num px-4 py-3 text-right">

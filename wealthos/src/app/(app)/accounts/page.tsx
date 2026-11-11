@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Landmark, Plus } from "lucide-react";
+import { ChevronRight, Landmark, Plus } from "lucide-react";
+import { KindIcon } from "@/components/app/kind-icon";
 import { requireApp } from "@/server/auth/context";
 import { listAccounts, ACCOUNT_TYPES } from "@/server/accounts/service";
 import { buildDashboard } from "@/server/analytics/portfolio";
@@ -44,16 +45,20 @@ export default async function AccountsPage() {
             if (!rows.length) return null;
             return (
               <Card key={g.key}>
-                <div className="flex items-baseline justify-between px-5 pt-4">
-                  <h2 className="text-[15px] font-semibold">{g.title}</h2>
-                  <span className="text-[12px] text-text-3">{g.hint}</span>
+                <div className="flex items-end justify-between gap-4 px-5 pt-5">
+                  <div>
+                    <h2 className="text-[15px] font-semibold">{g.title}</h2>
+                    <p className="mt-0.5 text-[12.5px] text-text-3">{g.hint} · {rows.length} {rows.length === 1 ? "account" : "accounts"}</p>
+                  </div>
+                  <p className="figure text-[22px] text-text">{formatMoney(String(rows.reduce((s, a) => s + valueOf(a.id), 0)), dash.baseCurrency, { decimals: 0 })}</p>
                 </div>
-                <ul className="mt-2 divide-y divide-border">
+                <ul className="mt-3 divide-y divide-border border-t border-border">
                   {rows.map((a) => {
                     const manual = dash.manual.find((m) => m.accountId === a.id);
                     return (
                       <li key={a.id}>
-                        <Link href={`/accounts/${a.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface-2">
+                        <Link href={`/accounts/${a.id}`} className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-text/[0.03]">
+                          <KindIcon account={a.type} />
                           <div className="min-w-0 flex-1">
                             <p className="flex items-center gap-2 font-medium">
                               {a.name}
@@ -68,7 +73,8 @@ export default async function AccountsPage() {
                               {manual ? ` · ${manual.valuationType} as of ${formatDate(manual.valuedOn)}` : ""}
                             </p>
                           </div>
-                          <span className="num text-right font-medium">{formatMoney(String(valueOf(a.id)), dash.baseCurrency, { decimals: 0 })}</span>
+                          <span className="num text-right text-[15px] font-semibold tracking-[-0.01em]">{formatMoney(String(valueOf(a.id)), dash.baseCurrency, { decimals: 0 })}</span>
+                          <ChevronRight className="size-4 shrink-0 text-text-3 transition-transform group-hover:translate-x-0.5" aria-hidden />
                         </Link>
                       </li>
                     );
