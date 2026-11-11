@@ -19,8 +19,8 @@ export const NOTES: UpdateNote[] = [
   {
     id: "2026-11-11-pro-price-charts",
     date: "2026-11-11",
-    at: "2026-11-11T00:00+01:00",
-    version: "next",
+    at: "2026-11-11T08:15+01:00",
+    version: "1.3.0",
     title: "Price charts you can explore",
     summary: "Every instrument page now has a full, interactive price chart.",
     points: [
