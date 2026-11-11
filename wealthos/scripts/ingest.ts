@@ -18,7 +18,7 @@ config({ path: process.env.ENV_FILE ?? ".env.local", quiet: true });
 const { parseBlsSeries, parseBoeCsv, parseCbnAuctions, parseCbnExchangeRates, parseCbnInflation, parseCbnMoneyMarket, parseFedH15Csv, parseOnsMonthlyCsv } = await import("../src/server/ingest/official");
 const { OFFICIAL_SOURCES, MACRO_SERIES, AUCTION_INSTRUMENTS, DERIVED } = await import("../src/server/ingest/catalogue");
 const { rolledBillIndex, d } = await import("../src/engine");
-const { BudgetExhausted, EodhdClient, mapSector, normaliseCurrency, parseDividends, parseEod, parseFundamentals, parseSplits } = await import("../src/server/ingest/eodhd");
+const { BudgetExhausted, EodhdClient, GBOND_SERIES, mapSector, normaliseCurrency, parseBondYields, parseDividends, parseEod, parseFundamentals, parseSplits } = await import("../src/server/ingest/eodhd");
 const { CURATED, marketOfCode } = await import("../src/server/ingest/universe");
 
 const FLAGS = Object.fromEntries(process.argv.slice(2).filter((a) => a.startsWith("--")).map((a) => { const [k, v] = a.slice(2).split("="); return [k!, v ?? "1"]; }));
@@ -233,6 +233,30 @@ async function eodhdTask(): Promise<string> {
     }
   }
 
+  // Government bond yields first (three calls): the FGN 10-year is the only Nigerian bond yield
+  // available after the CBN's auction results end in 2023. --bonds=0 leaves them out.
+  const bonds = { series: 0, rows: 0, skippedFresh: 0 };
+  if (FLAGS.bonds !== "0") {
+    for (const g of GBOND_SERIES) {
+      try {
+        const last = (await pool.query("select max(o.observed_on)::text as last, max(o.retrieved_at) as fetched from macro_observations o join macro_series s on s.id = o.series_id where s.key = $1 and o.source_id = $2", [g.key, sourceId])).rows[0];
+        if (last?.fetched && Date.now() - new Date(last.fetched).getTime() < 18 * 3600_000 && !FLAGS.force) {
+          bonds.skippedFresh++;
+          continue;
+        }
+        const from = last?.last ? new Date(Date.parse(last.last) - 10 * 86400_000).toISOString().slice(0, 10) : "1990-01-01";
+        const parsed = parseBondYields(await client.get("eod", `eod/${g.code}`, { from }), g.key);
+        if (parsed.rows.length) bonds.rows += await upsertMacro(parsed.rows, "eodhd");
+        // Unchanged rows keep their retrieval time: stamp the latest day so a quiet day counts as fresh.
+        await pool.query("update macro_observations set retrieved_at = now() where source_id = $1 and series_id = (select id from macro_series where key = $2) and observed_on = (select max(observed_on) from macro_observations where source_id = $1 and series_id = (select id from macro_series where key = $2))", [sourceId, g.key]);
+        bonds.series++;
+      } catch (err) {
+        if (err instanceof BudgetExhausted) return "budget exhausted while loading government bond yields";
+        console.warn(`  ${g.code}: ${err instanceof Error ? err.message : err}`);
+      }
+    }
+  }
+
   const report = { created: 0, updated: 0, prices: 0, dividends: 0, splits: 0, fundamentals: 0, unknown: [] as string[], skippedFresh: 0 };
   for (const entry of universe) {
     try {
@@ -323,7 +347,7 @@ async function eodhdTask(): Promise<string> {
     }
   }
   const done = report.created + report.updated + report.skippedFresh;
-  return `${done}/${universe.length} symbols (${report.created} new, ${report.updated} refreshed, ${report.skippedFresh} already fresh); ${report.prices} prices, ${report.dividends} dividends, ${report.splits} splits, ${report.fundamentals} fundamentals; ${client.calls}/${budget} API calls${report.unknown.length ? `; not found: ${report.unknown.join(", ")}` : ""}${done < universe.length ? " — budget reached; run again tomorrow to continue" : ""}`;
+  return `bond yields: ${bonds.series} series refreshed (${bonds.rows} days), ${bonds.skippedFresh} already fresh; ${done}/${universe.length} symbols (${report.created} new, ${report.updated} refreshed, ${report.skippedFresh} already fresh); ${report.prices} prices, ${report.dividends} dividends, ${report.splits} splits, ${report.fundamentals} fundamentals; ${client.calls}/${budget} API calls${report.unknown.length ? `; not found: ${report.unknown.join(", ")}` : ""}${done < universe.length ? " — budget reached; run again tomorrow to continue" : ""}`;
 }
 TASKS.eodhd = eodhdTask;
 

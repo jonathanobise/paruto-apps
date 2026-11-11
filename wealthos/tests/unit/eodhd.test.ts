@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseEod } from "@/server/ingest/eodhd";
+import { GBOND_SERIES, parseBondYields, parseEod } from "@/server/ingest/eodhd";
 
 describe("EODHD end-of-day parsing", () => {
   it("keeps each day's open, high, low and volume with the close", () => {
@@ -27,5 +27,29 @@ describe("EODHD end-of-day parsing", () => {
       ["11", null, null, null, null],
       ["11", null, null, null, null],
     ]);
+  });
+});
+
+describe("EODHD government bond yields", () => {
+  it("stores the yield in percent as a decimal fraction and skips bad prints", () => {
+    const r = parseBondYields(
+      [
+        { date: "2026-11-06", close: 16.42 },
+        { date: "2026-11-07", close: "4.1" },
+        { date: "2026-11-08", close: 160 }, // a bad print, not a yield
+        { date: "2026-11-09", close: null },
+        { date: "11/10/2026", close: 16 },
+      ],
+      "NG.GB10Y",
+    );
+    expect(r.rows).toEqual([
+      { seriesKey: "NG.GB10Y", date: "2026-11-06", value: "0.1642" },
+      { seriesKey: "NG.GB10Y", date: "2026-11-07", value: "0.041" },
+    ]);
+    expect(r.skipped).toBe(3);
+  });
+
+  it("covers the Nigerian 10-year with US and UK context", () => {
+    expect(GBOND_SERIES.map((g) => g.code)).toEqual(["NG10Y.GBOND", "US10Y.GBOND", "UK10Y.GBOND"]);
   });
 });

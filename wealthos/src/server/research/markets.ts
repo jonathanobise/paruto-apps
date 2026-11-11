@@ -44,10 +44,13 @@ interface LoadedSeries {
 
 async function loadSeries(tx: Tx, keys: string[]): Promise<Map<string, LoadedSeries>> {
   const meta = await tx
-    .select({ id: macroSeries.id, key: macroSeries.key, name: macroSeries.name, unit: macroSeries.unit, frequency: macroSeries.frequency, isDemo: macroSeries.isDemo, sourceName: marketDataSources.name, sourceUrl: marketDataSources.url, license: marketDataSources.licenseNote })
+    .select({ id: macroSeries.id, key: macroSeries.key, name: macroSeries.name, unit: macroSeries.unit, frequency: macroSeries.frequency, isDemo: macroSeries.isDemo, kind: marketDataSources.kind, sourceName: marketDataSources.name, sourceUrl: marketDataSources.url, license: marketDataSources.licenseNote })
     .from(macroSeries)
     .innerJoin(marketDataSources, eq(marketDataSources.id, macroSeries.sourceId))
     .where(and(inArray(macroSeries.key, keys), eq(macroSeries.isDemo, false)));
+  // Licensed series (EODHD bond yields) are left out where this deployment may not show them.
+  const hidden = hiddenSourceKinds() as string[];
+  meta.splice(0, meta.length, ...meta.filter((m) => !hidden.includes(m.kind)));
   const out = new Map<string, LoadedSeries>();
   if (!meta.length) return out;
   const rows = await tx
@@ -253,13 +256,39 @@ export interface FixedIncomeOverview {
   /** Date of the latest FGN bond result in the source. */
   lastBondAuction: string | null;
   source: SourceRef | null;
+  /**
+   * 10-year government bond yields traded in the market (Nigeria, US, UK; daily, licensed from
+   * EODHD): null when none are loaded or this deployment may not show licensed data.
+   */
+  marketYields: MarketYields | null;
+  /** True when licensed data (the market yields) exists as a kind but is not shown here (demo). */
+  licensedHidden: boolean;
 }
+
+export interface MarketYield extends SeriesLatest {
+  country: "NG" | "US" | "GB";
+  /** Nigeria only: (1 + yield) ÷ (1 + latest headline inflation) − 1, an approximation. */
+  realApprox: string | null;
+}
+
+export interface MarketYields {
+  latest: MarketYield[];
+  /** Month-end yields, last ten years; keys ng, us, uk. */
+  chart: ChartRow[];
+  source: SourceRef;
+}
+
+const GB_KEYS = [
+  { key: "NG.GB10Y", country: "NG", chart: "ng", label: "Nigeria 10-year FGN bond" },
+  { key: "US.GB10Y", country: "US", chart: "us", label: "US 10-year Treasury" },
+  { key: "UK.GB10Y", country: "GB", chart: "uk", label: "UK 10-year gilt" },
+] as const;
 
 const MM_KEYS = ["NG.MPR", "NG.INTERBANK_CALL", "NG.TBILL_RATE", "NG.SAVINGS_DEPOSIT", "NG.DEPOSIT_12M", "NG.PRIME_LENDING", "NG.MAX_LENDING"];
 
 export async function getFixedIncome(ctx: TenantContext): Promise<FixedIncomeOverview> {
   return withTenant(ctx, async (tx) => {
-    const series = await loadSeries(tx, [...MM_KEYS, "NG.CPI_YOY"]);
+    const series = await loadSeries(tx, [...MM_KEYS, "NG.CPI_YOY", ...GB_KEYS.map((g) => g.key)]);
     const cpi = series.get("NG.CPI_YOY");
     const inflation = cpi ? latestOf("NG.CPI_YOY", "Nigeria headline inflation", monthlyLast(cpi.points), cpi.source) : null;
     const infl = inflation?.value ? d(inflation.value) : null;
@@ -330,7 +359,29 @@ export async function getFixedIncome(ctx: TenantContext): Promise<FixedIncomeOve
       return [latestOf(k, s.name.replace(/^Nigeria /, ""), s.frequency === "event" ? stepMonthly(s.points, today) : monthlyLast(s.points), s.source)];
     });
     const src = rates.at(-1);
+
+    const gb = GB_KEYS.flatMap((g) => {
+      const s = series.get(g.key);
+      return s?.points.length ? [{ ...g, s }] : [];
+    });
+    const marketYields: MarketYields | null = gb.length
+      ? {
+          latest: gb.map(({ key, country, label, s }) => {
+            const monthly = monthlyLast(s.points);
+            const l = latestOf(key, label, monthly, s.source, s.points.at(-1)!.date);
+            // A year earlier: the last observation on or before the same day a year back.
+            const target = `${Number(l.asOf!.slice(0, 4)) - 1}${l.asOf!.slice(4)}`;
+            const ago = [...s.points].reverse().find((p) => p.date <= target);
+            const real = country === "NG" && infl && l.value ? d(l.value).plus(1).div(infl.plus(1)).minus(1).toString() : null;
+            return { ...l, yearAgo: ago ? ago.value.toString() : null, country, realApprox: real };
+          }),
+          chart: toChart(Object.fromEntries(gb.map(({ chart, s }) => [chart, monthlyLast(s.points)])), start),
+          source: gb[0]!.s.source,
+        }
+      : null;
     return {
+      marketYields,
+      licensedHidden: !licensedDataVisible(),
       ntb: ntbInsts.map(view).filter((x): x is AuctionView => x !== null),
       bonds: bondInsts.map(view).filter((x): x is AuctionView => x !== null),
       ntbChart,

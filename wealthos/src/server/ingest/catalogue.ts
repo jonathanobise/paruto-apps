@@ -86,6 +86,9 @@ export const MACRO_SERIES: Record<string, MacroDef> = {
   "NG.MAX_LENDING": { name: "Nigeria maximum lending rate", country: "NG", unit: "percent", frequency: "monthly", description: "Average maximum lending rate (CBN money-market indicators)." },
   "US.FEDFUNDS": { name: "US effective federal funds rate", country: "US", unit: "percent", frequency: "daily", description: "Effective federal funds rate, daily (Federal Reserve H.15)." },
   "UK.BANKRATE": { name: "UK Bank Rate", country: "GB", unit: "percent", frequency: "event", description: "Bank of England official Bank Rate; one value per change." },
+  "NG.GB10Y": { name: "Nigeria 10-year government bond yield", country: "NG", unit: "percent", frequency: "daily", description: "Secondary-market yield on the 10-year FGN benchmark bond, end of day (EODHD, series NG10Y.GBOND). Licensed for the owner's own use." },
+  "US.GB10Y": { name: "US 10-year Treasury yield", country: "US", unit: "percent", frequency: "daily", description: "Yield on the 10-year US Treasury note, end of day (EODHD, series US10Y.GBOND). Licensed for the owner's own use." },
+  "UK.GB10Y": { name: "UK 10-year gilt yield", country: "GB", unit: "percent", frequency: "daily", description: "Yield on the 10-year UK gilt, end of day (EODHD, series UK10Y.GBOND). Licensed for the owner's own use." },
   "US.CPI": { name: "US consumer price index (CPI-U, 1982–84 = 100)", country: "US", unit: "index", frequency: "monthly", description: "All items, U.S. city average, not seasonally adjusted (BLS series CUUR0000SA0)." },
   "UK.CPI": { name: "UK consumer price index (2015 = 100)", country: "GB", unit: "index", frequency: "monthly", description: "ONS CPI index, all items (series D7BT)." },
 };

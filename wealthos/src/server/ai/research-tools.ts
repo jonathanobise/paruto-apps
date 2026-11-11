@@ -110,7 +110,7 @@ export const RESEARCH_TOOLS: Record<string, ToolDef> = {
     feature: "research",
     definition: {
       name: "get_fixed_income",
-      description: "Nigerian fixed income from the CBN: the latest Treasury bill auction stop rates (bank-discount basis) with the true and effective annual yields worked out from them, FGN bond auction results, money-market and bank rates, and the latest inflation for context.",
+      description: "Nigerian fixed income: from the CBN, the latest Treasury bill auction stop rates (bank-discount basis) with the true and effective annual yields worked out from them, FGN bond auction results (to mid-2023), money-market and bank rates and the latest inflation; and, where available, the daily market yield of the 10-year FGN bond with the US and UK 10-year yields for context.",
       input_schema: schema({}),
       strict: true,
     },
@@ -124,12 +124,17 @@ export const RESEARCH_TOOLS: Record<string, ToolDef> = {
           lastBondAuctionInSource: f.lastBondAuction,
           moneyMarket: f.moneyMarket.map((x) => ({ rate: x.name, value: pct(x.value), asOf: x.asOf, aYearEarlier: pct(x.yearAgo) })),
           inflation: f.inflation ? { value: pct(f.inflation.value), asOf: f.inflation.asOf } : null,
+          tenYearMarketYields: f.marketYields ? f.marketYields.latest.map((y) => ({ bond: y.name, yield: pct(y.value), asOf: y.asOf, aYearEarlier: pct(y.yearAgo), realApprox: pct(y.realApprox) })) : null,
         },
-        sources: f.source ? [{ kind: "market-data", label: f.source.name, asOf: f.ntb.at(-1)?.asOf ?? null, url: f.source.url }] : [],
+        sources: [
+          ...(f.source ? [{ kind: "market-data" as const, label: f.source.name, asOf: f.ntb.at(-1)?.asOf ?? null, url: f.source.url }] : []),
+          ...(f.marketYields ? [{ kind: "market-data" as const, label: f.marketYields.source.name, asOf: f.marketYields.latest[0]?.asOf ?? null, url: f.marketYields.source.url }] : []),
+        ],
         notes: [
           "A T-bill stop rate is a bank-discount rate; the true yield and the effective annual yield are different measures. Keep them distinct.",
           "Real yields are approximate: inflation is backward-looking.",
-          ...(f.lastBondAuction ? [`The CBN's FGN bond results end on ${f.lastBondAuction}; later auctions are run by the DMO and are not in this source yet.`] : []),
+          ...(f.lastBondAuction ? [`The CBN's FGN bond auction results end on ${f.lastBondAuction}; later auctions are run by the DMO and are not a source here.${f.marketYields ? " For the current level use the 10-year market yield, which is a secondary-market yield, not an auction result." : ""}`] : []),
+          ...(f.marketYields ? ["Bond yields are in each bond's own currency; don't compare them as if they were returns in one currency."] : []),
         ],
       };
     },

@@ -71,6 +71,34 @@ export function parseEod(json: unknown, currency: string): { rows: EodPrice[]; c
   return { rows, currency: outCcy, skipped };
 }
 
+/**
+ * Government bond yields EODHD publishes as end-of-day series (exchange GBOND), with the macro
+ * series each is stored as. Nigeria has only the 10-year; the US and UK 10-year give context.
+ */
+export const GBOND_SERIES = [
+  { code: "NG10Y.GBOND", key: "NG.GB10Y" },
+  { code: "US10Y.GBOND", key: "US.GB10Y" },
+  { code: "UK10Y.GBOND", key: "UK.GB10Y" },
+] as const;
+
+/**
+ * EOD rows of a GBOND yield series (the close is the yield in percent, e.g. 16.42) → decimal
+ * fractions ("0.1642"). A yield outside −5%…60% is a bad print and is skipped, never corrected.
+ */
+export function parseBondYields(json: unknown, seriesKey: string): { rows: Array<{ seriesKey: string; date: ISODate; value: string }>; skipped: number } {
+  const rows: Array<{ seriesKey: string; date: ISODate; value: string }> = [];
+  let skipped = 0;
+  for (const r of Array.isArray(json) ? (json as Array<Record<string, unknown>>) : []) {
+    const close = num(r.close);
+    if (!isDate(r.date) || close === null || d(close).lte(-5) || d(close).gte(60)) {
+      skipped++;
+      continue;
+    }
+    rows.push({ seriesKey, date: r.date, value: d(close).div(100).toString() });
+  }
+  return { rows, skipped };
+}
+
 export function parseDividends(json: unknown, fallbackCurrency: string): { rows: EodDividend[]; skipped: number } {
   const rows: EodDividend[] = [];
   let skipped = 0;
