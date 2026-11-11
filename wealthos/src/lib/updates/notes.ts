@@ -19,8 +19,8 @@ export const NOTES: UpdateNote[] = [
   {
     id: "2026-11-11-candlesticks",
     date: "2026-11-11",
-    at: "2026-11-11T00:00+01:00",
-    version: "next",
+    at: "2026-11-11T09:05+01:00",
+    version: "1.4.0",
     title: "Candlesticks and volume",
     summary: "Price charts for shares and funds traded on an exchange now show each day's full range and how much changed hands.",
     points: [
