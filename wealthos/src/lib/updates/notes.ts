@@ -17,10 +17,10 @@ export type UpdateNote = {
 
 export const NOTES: UpdateNote[] = [
   {
-    id: "2026-11-09-first-numbered-release",
-    date: "2026-11-09",
-    at: "2026-11-09T00:00+00:00",
-    version: "next",
+    id: "2026-11-11-first-numbered-release",
+    date: "2026-11-11",
+    at: "2026-11-11T03:39+01:00",
+    version: "1.0.0",
     title: "Research, your way in, and a calmer app",
     summary: "The first numbered release of VioWealth: real market research beside your portfolio, one secure way in, and an app that tells you what it's doing.",
     points: [
