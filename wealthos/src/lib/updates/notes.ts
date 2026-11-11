@@ -19,8 +19,8 @@ export const NOTES: UpdateNote[] = [
   {
     id: "2026-11-11-charts-and-pages",
     date: "2026-11-11",
-    at: "2026-11-11T00:00+01:00",
-    version: "next",
+    at: "2026-11-11T04:10+01:00",
+    version: "1.1.0",
     title: "Charts you can read with a fingertip",
     summary: "Every chart and page has been refined: your net worth reads month by month as you point, and lists scan at a glance.",
     points: [
